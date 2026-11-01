@@ -5,7 +5,7 @@ rubric, updates the plan based on what worked, rebuilds the report, and tells
 the person what to do next.
 
 Every script takes `--workspace PATH`. Without it, scripts use
-`$CAREER_EVAL_HOME`, or the only folder inside `~/career-eval-workspaces/`.
+`$CLIMB_HOME`, or the only folder inside `~/climb-workspaces/`.
 The commands below omit it. Run them from the engine folder.
 
 ## Run modes

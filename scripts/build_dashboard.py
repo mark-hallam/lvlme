@@ -130,7 +130,7 @@ class Data:
         files = sorted(f for f in glob.glob(C.wpath(ws, "eval", "runs", "*.json"))
                        if re.match(r"\d{4}-\d{2}-\d{2}\.json$", os.path.basename(f)))
         if not files:
-            raise SystemExit("career-eval: no runs in eval/runs/. Run scripts/score.py first.")
+            raise SystemExit("climb: no runs in eval/runs/. Run scripts/score.py first.")
         self.run_files = [os.path.basename(f) for f in files]
         self.runs = [C.load_json(f) for f in files]
         self.cur = self.runs[-1]
@@ -654,7 +654,7 @@ def agent_payload(data, page):
         counts[e.get("level")] = counts.get(e.get("level"), 0) + 1
     payload = {
         "about": "Private career campaign data. Read only. See SUMMARY.md in this folder for the rules.",
-        "generated_by": "career-eval scripts/build_dashboard.py",
+        "generated_by": "climb scripts/build_dashboard.py",
         "sensitive_mode": sensitive,
         "run_date": cur["run_date"], "rubric_version": cur["rubric_version"],
         "goal": {"title": goal.get("title", ""), "description": goal.get("description", ""),
@@ -752,7 +752,7 @@ def summary_md(data, p):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Build the dashboard and the agent briefing.")
-    ap.add_argument("--workspace", help="workspace folder (default: $CAREER_EVAL_HOME)")
+    ap.add_argument("--workspace", help="workspace folder (default: $CLIMB_HOME)")
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)
     data = Data(ws, config)

@@ -1,9 +1,9 @@
 ---
-name: career-eval
-description: Honest, evidence-based estimate of how likely a person is to land a specific kind of role at specific organisations, with every point traced to a source, a separate sceptical review, deterministic scoring, and a prioritised campaign of actions that raise the odds. Use when someone asks how likely they are to get a kind of job at particular organisations (for example "could I get hired at an AI lab?"), wants an evidence-based job-search plan, wants their CV, LinkedIn or website claims checked against evidence, or wants to run or update their career campaign ("run my career eval", "update my job campaign"). Works in a private workspace on the person's own machine and produces drafts only, so it never applies, sends, posts or changes accounts.
+name: climb
+description: Honest, evidence-based estimate of how likely a person is to land a specific kind of role at specific organisations, with every point traced to a source, a separate sceptical review, deterministic scoring, and a prioritised campaign of actions that raise the odds. Use when someone asks how likely they are to get a kind of job at particular organisations (for example "could I get hired at an AI lab?"), wants an evidence-based job-search plan, wants their CV, LinkedIn or website claims checked against evidence, or wants to run or update their career campaign ("run Climb", "run my career eval", "update my job campaign"). Works in a private workspace on the person's own machine and produces drafts only, so it never applies, sends, posts or changes accounts.
 ---
 
-# career-eval: the procedure
+# climb: the procedure
 
 You are running an honest career evaluation and campaign for one person. The
 method lives in `method/`. The maths lives in `scripts/score.py`. Your job is
@@ -38,8 +38,8 @@ paths are relative to the person's workspace.
 
 ## Find or create the workspace
 
-- If `$CAREER_EVAL_HOME` is set, that is the workspace.
-- Otherwise look in `~/career-eval-workspaces/`. One folder there: use it.
+- If `$CLIMB_HOME` is set, that is the workspace.
+- Otherwise look in `~/climb-workspaces/`. One folder there: use it.
   Several: ask which goal.
 - None: ask the person for their goal in one sentence, then run
   `python3 scripts/init.py --goal "<goal>"`. Edit `config.json` with them:

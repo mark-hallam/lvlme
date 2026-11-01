@@ -1,6 +1,6 @@
-# Design: career eval and campaign engine
+# Design: Climb, the career eval and campaign engine
 
-Status: draft v0.1 (2026-11-01). Working name `career-eval`; final name TBD.
+Status: draft v0.1 (2026-11-01). Name: Climb (chosen 2026-11-02). Folder, skill and command name: `climb`.
 
 ## 1. What it is
 
@@ -41,7 +41,7 @@ targets, role families and weights are configuration.
 ## 3. Architecture
 
 ```
-career-eval/                  public engine (this repo, MIT)
+climb/                        public engine (this repo, MIT)
   SKILL.md  AGENTS.md  README.md  LICENSE
   method/   RUBRIC.md INTAKE.md SWOT.md CAMPAIGN.md REVIEW.md PRIVACY.md RUNBOOK.md
   schemas/  JSON schemas for every workspace file
@@ -68,7 +68,7 @@ career-eval/                  public engine (this repo, MIT)
   report/index.html  report/for-agents/SUMMARY.md  report/for-agents/dashboard.json
 ```
 
-Workspace location: `$CAREER_EVAL_HOME`, else `~/career-eval-workspaces/<goal-slug>`.
+Workspace location: `$CLIMB_HOME`, else `~/climb-workspaces/<goal-slug>`.
 `validate.py` refuses to run if the workspace is inside the engine repo or any
 git repo with a public remote.
 
@@ -207,7 +207,7 @@ the scorer's reasoning, and must justify every change).
 ## 11. Packaging
 
 - `SKILL.md` (Agent Skills format): Claude Code users drop the repo into
-  `~/.claude/skills/career-eval/` or install it as a plugin.
+  `~/.claude/skills/climb/` or install it as a plugin.
 - `AGENTS.md`: instructions for Codex, Cursor / Grok Bot and other agents.
 - Scripts: Python 3.9+, standard library only, no network calls except public
   job-board APIs and connectors the user approves. No telemetry.

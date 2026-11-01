@@ -1,6 +1,6 @@
 # For AI agents (Codex, Cursor and others)
 
-This repository is **career-eval**: a method and small scripts that estimate,
+This repository is **Climb**: a method and small scripts that estimate,
 honestly, how likely a person is to land a specific kind of role at specific
 organisations, and turn the gaps into a prioritised campaign.
 
@@ -17,7 +17,7 @@ in [`method/`](method/). This file is the short version.
 - **Never** ask about, infer or score protected attributes (age, gender,
   ethnicity, disability, religion, family status).
 - The person's data lives in a **private workspace** outside this repository
-  (`$CAREER_EVAL_HOME`, or a folder in `~/career-eval-workspaces/`). Never
+  (`$CLIMB_HOME`, or a folder in `~/climb-workspaces/`). Never
   write personal data into this repository and never copy the workspace
   anywhere public.
 - Read-only access to any source (email, calendar, LinkedIn), and only when

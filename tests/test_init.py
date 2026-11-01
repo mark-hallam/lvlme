@@ -13,7 +13,7 @@ import validate as V
 
 class InitTests(unittest.TestCase):
     def tmp(self):
-        d = tempfile.mkdtemp(prefix="career-eval-init-")
+        d = tempfile.mkdtemp(prefix="climb-init-")
         self.addCleanup(shutil.rmtree, d, True)
         return d
 
@@ -35,7 +35,7 @@ class InitTests(unittest.TestCase):
     def test_env_default_and_refusals(self):
         parent = self.tmp()
         target = os.path.join(parent, "from-env")
-        with mock.patch.dict(os.environ, {"CAREER_EVAL_HOME": target}), mock.patch("sys.stdout"):
+        with mock.patch.dict(os.environ, {"CLIMB_HOME": target}), mock.patch("sys.stdout"):
             self.assertEqual(I.main(["--goal", "AI labs"]), 0)
         self.assertTrue(os.path.exists(os.path.join(target, "config.json")))
         with mock.patch("sys.stderr"):

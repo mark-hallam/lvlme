@@ -44,7 +44,7 @@ def template_config():
 
 def new_workspace(test, config=None):
     """A fresh workspace from templates/ in a temp folder; removed after the test."""
-    parent = tempfile.mkdtemp(prefix="career-eval-test-")
+    parent = tempfile.mkdtemp(prefix="climb-test-")
     test.addCleanup(shutil.rmtree, parent, True)
     ws = os.path.join(parent, "ws")
     shutil.copytree(os.path.join(ENGINE, "templates"), ws)
@@ -54,7 +54,7 @@ def new_workspace(test, config=None):
 
 
 def copy_demo(test):
-    parent = tempfile.mkdtemp(prefix="career-eval-demo-test-")
+    parent = tempfile.mkdtemp(prefix="climb-demo-test-")
     test.addCleanup(shutil.rmtree, parent, True)
     ws = os.path.join(parent, "demo")
     shutil.copytree(DEMO, ws)

@@ -1223,12 +1223,12 @@ function refreshDetail(){ if (state.stack.length && (detail.classList.contains("
 function refreshNumbers(){ renderTopline(); renderTiles4(); showView(false); refreshDetail(); }
 function refresh(){ recompute(); renderTopline(); drawChart(); renderTiles4(); renderDoNext(); renderSwitches(); renderHistory(); showView(false); refreshDetail(); }
 let theme = "light";
-try { const t = localStorage.getItem("career-eval-theme"); if (t === "dark" || t === "light") theme = t; } catch (e) {}
+try { const t = localStorage.getItem("climb-theme"); if (t === "dark" || t === "light") theme = t; } catch (e) {}
 function applyTheme(){
   if (theme === "dark") document.documentElement.dataset.theme = "dark"; else delete document.documentElement.dataset.theme;
   $("#themeSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.t === theme)));
 }
-$("#themeSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { theme = b.dataset.t; try { localStorage.setItem("career-eval-theme", theme); } catch (e) {} applyTheme(); chartBuilt = false; lastVals = null; refresh(); }));
+$("#themeSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { theme = b.dataset.t; try { localStorage.setItem("climb-theme", theme); } catch (e) {} applyTheme(); chartBuilt = false; lastVals = null; refresh(); }));
 $("#allOn").addEventListener("click", () => { D.actions.forEach(a => { if (live(a)) enabled.add(a.id); }); refresh(); });
 $("#allOff").addEventListener("click", () => { enabled.clear(); refresh(); });
 $("#sampleTog").addEventListener("click", () => { state.sample = !state.sample; $("#sampleTog").setAttribute("aria-checked", String(state.sample)); renderTopline(); drawChart(); renderHistory(); });
@@ -1280,7 +1280,7 @@ HEADER = r"""<!doctype html>
   badge. Left rail: the what-if switches with their own lift. Centre below the hero:
   scoreboard tiles, then the views. Right pane: drill-down with breadcrumbs. On a
   phone the rail opens from a bottom toolbar that reserves its own space. Motion is
-  quiet and never leaves content hidden. Built by career-eval scripts/build_dashboard.py.
+  quiet and never leaves content hidden. Built by Climb scripts/build_dashboard.py.
 -->
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

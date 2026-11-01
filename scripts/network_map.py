@@ -86,7 +86,7 @@ def read_connections(path):
         lines = fh.read().splitlines()
     start = next((i for i, line in enumerate(lines) if "First Name" in line and "Company" in line), None)
     if start is None:
-        raise SystemExit("career-eval: %s does not look like a LinkedIn Connections.csv "
+        raise SystemExit("climb: %s does not look like a LinkedIn Connections.csv "
                          "(no header row with First Name and Company)" % path)
     return list(csv.DictReader(io.StringIO("\n".join(lines[start:]))))
 
@@ -136,7 +136,7 @@ def build_network(rows, config, today, previous=None, source=""):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Map LinkedIn connections onto the target organisations.")
-    ap.add_argument("--workspace", help="workspace folder (default: $CAREER_EVAL_HOME)")
+    ap.add_argument("--workspace", help="workspace folder (default: $CLIMB_HOME)")
     ap.add_argument("--csv", required=True, help="path to Connections.csv from the LinkedIn data export")
     ap.add_argument("--today", help="date to measure 'months connected' from (default: today)")
     args = ap.parse_args(argv)

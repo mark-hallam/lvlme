@@ -347,21 +347,21 @@ def validate_workspace(ws):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Validate a career-eval workspace.")
-    ap.add_argument("--workspace", help="workspace folder (default: $CAREER_EVAL_HOME)")
+    ap = argparse.ArgumentParser(description="Validate a Climb workspace.")
+    ap.add_argument("--workspace", help="workspace folder (default: $CLIMB_HOME)")
     ap.add_argument("--json", action="store_true", help="print the result as JSON")
     args = ap.parse_args(argv)
     try:
         ws = C.resolve_workspace(args.workspace)
     except C.WorkspaceError as exc:
-        print("career-eval: %s" % exc, file=sys.stderr)
+        print("climb: %s" % exc, file=sys.stderr)
         return 1
     problem = C.location_problem(ws)
     if problem:
         if args.json:
             print(json.dumps({"workspace": ws, "ok": False, "refused": problem}, indent=2))
         else:
-            print("career-eval: refused. " + problem, file=sys.stderr)
+            print("climb: refused. " + problem, file=sys.stderr)
         return 2
     errors, warnings, checked = validate_workspace(ws)
     if args.json:

@@ -2,7 +2,7 @@
 """Create a private workspace for one goal from the templates/ skeleton.
 
 The workspace holds all personal data and lives outside the engine repo:
-  --workspace PATH, else $CAREER_EVAL_HOME, else ~/career-eval-workspaces/<goal-slug>
+  --workspace PATH, else $CLIMB_HOME, else ~/climb-workspaces/<goal-slug>
 
 Refuses a folder that already has files in it, a folder inside the engine
 repo, or a folder inside a git repository that has a remote. The new folder
@@ -52,20 +52,20 @@ def copy_skeleton(dest):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Create a private career-eval workspace.")
+    ap = argparse.ArgumentParser(description="Create a private Climb workspace.")
     ap.add_argument("--goal", required=True, help='your goal in a few words, for example "Frontier AI labs"')
-    ap.add_argument("--workspace", help="where to create it (default: $CAREER_EVAL_HOME or "
-                                        "~/career-eval-workspaces/<goal-slug>)")
+    ap.add_argument("--workspace", help="where to create it (default: $CLIMB_HOME or "
+                                        "~/climb-workspaces/<goal-slug>)")
     args = ap.parse_args(argv)
     slug = slugify(args.goal)
-    dest = args.workspace or os.environ.get("CAREER_EVAL_HOME") or os.path.join(C.DEFAULT_PARENT, slug)
+    dest = args.workspace or os.environ.get("CLIMB_HOME") or os.path.join(C.DEFAULT_PARENT, slug)
     dest = os.path.abspath(os.path.expanduser(dest))
     if os.path.exists(dest) and (not os.path.isdir(dest) or os.listdir(dest)):
-        print("career-eval: %s already exists and is not empty. Choose another --workspace." % dest, file=sys.stderr)
+        print("climb: %s already exists and is not empty. Choose another --workspace." % dest, file=sys.stderr)
         return 1
     problem = C.location_problem(dest, {})
     if problem:
-        print("career-eval: refused. " + problem, file=sys.stderr)
+        print("climb: refused. " + problem, file=sys.stderr)
         return 2
     copy_skeleton(dest)
     for root, dirs, _ in os.walk(dest):
@@ -84,7 +84,7 @@ def main(argv=None):
     print("  2. Ask your agent to run the intake (method/INTAKE.md), or fill intake/answers.md yourself.")
     print("  3. Put exports such as LinkedIn's Connections.csv in intake/sources/.")
     print("  4. Run: python3 scripts/fetch_roles.py --workspace %s" % dest)
-    print("Tip: set CAREER_EVAL_HOME=%s so you can leave out --workspace." % dest)
+    print("Tip: set CLIMB_HOME=%s so you can leave out --workspace." % dest)
     return 0
 
 

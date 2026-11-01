@@ -1,4 +1,4 @@
-"""Shared helpers for the career-eval scripts. Standard library only.
+"""Shared helpers for the Climb scripts. Standard library only.
 
 Covers: finding the workspace, the workspace location guard, JSON input and
 output, keyword matching, dates, and constants shared by several scripts.
@@ -12,7 +12,7 @@ import sys
 ENGINE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCHEMA_DIR = os.path.join(ENGINE_ROOT, "schemas")
 TEMPLATE_DIR = os.path.join(ENGINE_ROOT, "templates")
-DEFAULT_PARENT = os.path.join(os.path.expanduser("~"), "career-eval-workspaces")
+DEFAULT_PARENT = os.path.join(os.path.expanduser("~"), "climb-workspaces")
 
 DIMENSIONS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]
 DIMENSION_NAMES = {
@@ -75,10 +75,10 @@ def wpath(workspace, *parts):
 
 
 def resolve_workspace(arg):
-    """--workspace, else $CAREER_EVAL_HOME, else the only folder in ~/career-eval-workspaces."""
+    """--workspace, else $CLIMB_HOME, else the only folder in ~/climb-workspaces."""
     if arg:
         return os.path.abspath(os.path.expanduser(arg))
-    env = os.environ.get("CAREER_EVAL_HOME")
+    env = os.environ.get("CLIMB_HOME")
     if env:
         return os.path.abspath(os.path.expanduser(env))
     if os.path.isdir(DEFAULT_PARENT):
@@ -87,10 +87,10 @@ def resolve_workspace(arg):
         if len(subs) == 1:
             return os.path.join(DEFAULT_PARENT, subs[0])
         if len(subs) > 1:
-            raise WorkspaceError("Several workspaces in %s (%s). Pass --workspace or set CAREER_EVAL_HOME."
+            raise WorkspaceError("Several workspaces in %s (%s). Pass --workspace or set CLIMB_HOME."
                                  % (DEFAULT_PARENT, ", ".join(subs)))
     raise WorkspaceError("No workspace found. Run scripts/init.py first, or pass --workspace PATH, "
-                         "or set CAREER_EVAL_HOME.")
+                         "or set CLIMB_HOME.")
 
 
 def _is_within(path, parent):
@@ -155,8 +155,8 @@ def location_problem(workspace, config=None):
     if demo:
         return None
     if _is_within(workspace, ENGINE_ROOT):
-        return ("The workspace %s is inside the career-eval engine folder. Personal data must live outside "
-                "it. Use the default ~/career-eval-workspaces/<goal> or set CAREER_EVAL_HOME." % workspace)
+        return ("The workspace %s is inside the Climb engine folder. Personal data must live outside "
+                "it. Use the default ~/climb-workspaces/<goal> or set CLIMB_HOME." % workspace)
     root = find_git_root(workspace)
     if root:
         remotes = git_remotes(root)
@@ -171,14 +171,14 @@ def open_workspace(arg, need_config=True):
     try:
         ws = resolve_workspace(arg)
     except WorkspaceError as exc:
-        sys.exit("career-eval: %s" % exc)
+        sys.exit("climb: %s" % exc)
     cfg_path = wpath(ws, "config.json")
     if need_config and not os.path.exists(cfg_path):
-        sys.exit("career-eval: no config.json in %s. Run scripts/init.py first." % ws)
+        sys.exit("climb: no config.json in %s. Run scripts/init.py first." % ws)
     config = load_json(cfg_path, {}) or {}
     problem = location_problem(ws, config)
     if problem:
-        print("career-eval: refused. " + problem, file=sys.stderr)
+        print("climb: refused. " + problem, file=sys.stderr)
         sys.exit(2)
     return ws, config
 
@@ -200,7 +200,7 @@ def check_date(value):
     try:
         dt.date.fromisoformat(value)
     except (TypeError, ValueError):
-        raise SystemExit("career-eval: bad date %r, use YYYY-MM-DD" % (value,))
+        raise SystemExit("climb: bad date %r, use YYYY-MM-DD" % (value,))
     return value
 
 

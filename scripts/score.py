@@ -288,7 +288,7 @@ def digest(*parts):
 def build_run(ws, config, run_date):
     roles_doc = C.load_json(C.wpath(ws, "market", "roles", "latest.json"))
     if roles_doc is None:
-        raise SystemExit("career-eval: no market/roles/latest.json. Run scripts/fetch_roles.py first.")
+        raise SystemExit("climb: no market/roles/latest.json. Run scripts/fetch_roles.py first.")
     judgements_doc = C.load_json(C.wpath(ws, "eval", "judgements.json"), {"roles": {}}) or {"roles": {}}
     profile = C.load_json(C.wpath(ws, "eval", "profile-dimensions.json"), {}) or {}
     templates = (C.load_json(C.wpath(ws, "eval", "gap-templates.json"), {}) or {}).get("gaps", [])
@@ -352,7 +352,7 @@ def build_run(ws, config, run_date):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Score every open role from the judgement files.")
-    ap.add_argument("--workspace", help="workspace folder (default: $CAREER_EVAL_HOME)")
+    ap.add_argument("--workspace", help="workspace folder (default: $CLIMB_HOME)")
     ap.add_argument("--date", help="run date YYYY-MM-DD (default: today in the candidate's time zone)")
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)

@@ -41,7 +41,7 @@ from html.parser import HTMLParser
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 
-UA = "career-eval/0.1 (personal job-search research script; read only)"
+UA = "climb/0.1 (personal job-search research script; read only)"
 MAX_REQ_LEN = 160
 DASHES = "\u2013\u2014"
 
@@ -626,7 +626,7 @@ def collect(config, workspace, fixtures=None, save_raw=None):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Fetch and classify open roles at the target organisations.")
-    ap.add_argument("--workspace", help="workspace folder (default: $CAREER_EVAL_HOME)")
+    ap.add_argument("--workspace", help="workspace folder (default: $CLIMB_HOME)")
     ap.add_argument("--fixtures", help="offline mode: read <DIR>/<target id>.json instead of the network")
     ap.add_argument("--save-raw", help="also save each raw API response to <DIR>/<target id>.json")
     ap.add_argument("--date", help="snapshot date YYYY-MM-DD (default: today in the candidate's time zone)")
@@ -641,7 +641,7 @@ def main(argv=None):
     remote_targets = [t["id"] for t in config["targets"] if t["ats"] != "manual"]
     if remote_targets and all(t in errors for t in remote_targets) and not roles:
         print(json.dumps({"endpoint_errors": errors}, indent=2), file=sys.stderr)
-        print("career-eval: every job board failed; latest.json left unchanged.", file=sys.stderr)
+        print("climb: every job board failed; latest.json left unchanged.", file=sys.stderr)
         return 1
     for tid in errors:  # keep the last known roles for a board that failed today
         roles.extend(r for r in prev_roles.values() if r.get("org") == tid)

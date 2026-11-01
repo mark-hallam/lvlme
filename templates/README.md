@@ -1,6 +1,6 @@
 # This folder is private
 
-This is your career-eval workspace. It holds your evidence, your contacts,
+This is your Climb workspace. It holds your evidence, your contacts,
 your scores and your plan.
 
 - Keep it on your own computer. Do not put it in a shared folder, a public

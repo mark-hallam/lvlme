@@ -1,6 +1,6 @@
 # Privacy
 
-career-eval handles some of the most personal data there is: your work
+Climb handles some of the most personal data there is: your work
 history, your contacts, your pay, your plans. It is built to keep that data on
 your machine and out of anyone else's hands.
 
@@ -10,8 +10,8 @@ your machine and out of anyone else's hands.
   the scripts, empty templates and a fictional demo. Nothing you enter goes
   into it.
 - **Your workspace is a separate, private folder** on your own computer. By
-  default it is `~/career-eval-workspaces/<goal>`, or wherever
-  `$CAREER_EVAL_HOME` points. `init.py` makes it readable by your user account
+  default it is `~/climb-workspaces/<goal>`, or wherever
+  `$CLIMB_HOME` points. `init.py` makes it readable by your user account
   only.
 - **The scripts refuse an unsafe workspace.** Every script checks the
   workspace location and refuses one inside the engine repository (except

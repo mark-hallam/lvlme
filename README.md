@@ -1,9 +1,11 @@
-# career-eval
+# Climb
+
+From a very low starting score to your dream job, one verified step at a time.
 
 An honest, evidence-based way to answer one question: **how likely am I to land
 this kind of role at these organisations, and what would raise my odds?**
 
-career-eval is a method plus a few small scripts. You, or a personal
+Climb is a method plus a few small scripts. You, or a personal
 artificial intelligence (AI) agent working for you, run it on your own computer. It:
 
 1. **Estimates your chances** for every open role that fits your goal, from
@@ -56,7 +58,7 @@ in your workspace: `campaign/inbox.md`.
 
 - **Your data never lives in this repository.** `init.py` creates a private
   workspace folder on your own machine, by default in
-  `~/career-eval-workspaces/<goal>`. Only you can open it.
+  `~/climb-workspaces/<goal>`. Only you can open it.
 - The scripts refuse to work on a workspace inside this repository, or inside
   any git repository (a version-controlled folder) that has a remote, meaning
   a copy on a server such as GitHub.
@@ -101,7 +103,7 @@ standard library.
 1. Put this repository where Claude Code looks for skills:
 
    ```bash
-   git clone <this repository's address> ~/.claude/skills/career-eval
+   git clone <this repository's address> ~/.claude/skills/climb
    ```
 
 2. Open Claude Code anywhere and say: **"run my career eval"**.
@@ -119,7 +121,7 @@ same procedure in a shorter form and points to the method files.
 
 ```bash
 python3 scripts/init.py --goal "Frontier AI labs"     # creates your private workspace
-export CAREER_EVAL_HOME=~/career-eval-workspaces/frontier-ai-labs
+export CLIMB_HOME=~/climb-workspaces/frontier-ai-labs
 python3 scripts/fetch_roles.py                        # open roles from public job boards
 python3 scripts/network_map.py --csv ~/Downloads/Connections.csv
 python3 scripts/claims_audit.py https://your-site.example/about
@@ -134,7 +136,7 @@ rubric. The method files explain each step, and
 [`method/RUNBOOK.md`](method/RUNBOOK.md) gives the full run order.
 
 Every script takes `--workspace PATH`. Without it, scripts use
-`$CAREER_EVAL_HOME`, or the only folder inside `~/career-eval-workspaces/`.
+`$CLIMB_HOME`, or the only folder inside `~/climb-workspaces/`.
 
 ## What you get
 
