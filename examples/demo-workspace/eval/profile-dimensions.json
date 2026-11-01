@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "rubric_version": "1.0",
+  "judged_on": "2026-10-04",
+  "reviewed_on": "2026-10-26",
+  "D3": {
+    "acme": {
+      "score": 1,
+      "evidence": [
+        "E10"
+      ],
+      "note": "One first-degree contact in an unrelated team.",
+      "judged_on": "2026-10-11"
+    },
+    "globex": {
+      "score": 2,
+      "evidence": [
+        "E09"
+      ],
+      "note": "Jordan agreed to introduce Alex to the AI Success lead.",
+      "judged_on": "2026-10-25"
+    },
+    "initech": {
+      "score": 0,
+      "evidence": [
+        "E19"
+      ],
+      "note": "Nobody known yet.",
+      "judged_on": "2026-10-11"
+    }
+  },
+  "D5": {
+    "default": {
+      "score": 2,
+      "evidence": [
+        "E07",
+        "E14"
+      ],
+      "note": "Site, essays and one recorded talk; a hiring manager would find something.",
+      "judged_on": "2026-10-18"
+    }
+  },
+  "D7": {
+    "default": {
+      "score": 1,
+      "evidence": [
+        "E17"
+      ],
+      "note": "Generic resume only."
+    },
+    "initech": {
+      "score": 3,
+      "evidence": [
+        "E18"
+      ],
+      "note": "Tailored resume and cover note ready for the fleet role.",
+      "judged_on": "2026-11-01",
+      "reviewed_on": "2026-11-01"
+    }
+  },
+  "D6_rules": {
+    "classes": {
+      "australia_nz": {
+        "score": 5,
+        "evidence": [
+          "E11"
+        ],
+        "note": "Lives in Australia with full work rights; New Zealand is open to Australian citizens."
+      },
+      "apac_other": {
+        "score": 2,
+        "evidence": [
+          "E12"
+        ],
+        "note": "Willing to move; needs a work pass."
+      },
+      "us": {
+        "score": 2,
+        "evidence": [
+          "E12"
+        ],
+        "note": "Willing to move; needs employer visa sponsorship."
+      },
+      "canada": {
+        "score": 2,
+        "evidence": [
+          "E12"
+        ],
+        "note": "Willing to move; needs a work permit."
+      },
+      "uk_eu": {
+        "score": 2,
+        "evidence": [
+          "E12"
+        ],
+        "note": "Willing to move; needs a visa."
+      },
+      "remote": {
+        "score": 3,
+        "evidence": [
+          "E11"
+        ],
+        "note": "Remote is possible but time zones can be hard from Brisbane."
+      },
+      "other": {
+        "score": 0,
+        "evidence": [],
+        "note": "Unknown location."
+      }
+    },
+    "blocked": {
+      "note": "Alex is not a US person and holds no security clearance.",
+      "evidence": [
+        "E11"
+      ]
+    }
+  }
+}

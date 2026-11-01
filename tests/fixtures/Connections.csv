@@ -1,0 +1,10 @@
+﻿Notes:
+"Test export in the LinkedIn Connections.csv format, with a notes preamble."
+
+First Name,Last Name,URL,Email Address,Company,Position,Connected On
+Jordan,Sample,https://example.com/in/jordan,jordan@example.com,"Globex Labs, Inc.",Program Manager,12 Mar 2022
+Casey,Demo,https://example.com/in/casey,,Globex Labs Research,AI Success Manager,03/01/2024
+Riley,Placeholder,,riley@example.com,ACME AI,Recruiting Coordinator,2023-06-20
+Sky,Sampleton,,,Initech Consulting Group,Consultant,19 Sep 2024
+Morgan,Test,,,Contoso Freight,Operations Lead,15 Aug 2019
+Pat,Nodate,,,Acme Artificial Intelligence,Analyst,

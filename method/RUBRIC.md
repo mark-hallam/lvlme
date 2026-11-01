@@ -1,0 +1,247 @@
+# Scoring rubric (version 1.0)
+
+Purpose: estimate, honestly, a person's chance of being hired into a specific
+open role at a specific organisation, and show what would raise it. Every run
+uses the same rubric, so a change in score reflects a change in evidence, not
+a change in the scorer's mood.
+
+The rules marked **(enforced)** are applied by `scripts/score.py`, so they hold
+even if a judgement file says otherwise. Everything else is the judge's
+responsibility, checked by the reviewer (see `REVIEW.md`).
+
+## Ground rules
+
+1. **Evidence or it scores zero (enforced).** Every point needs a cited
+   evidence id from `profile/evidence.json`. A score with no evidence cited
+   counts as 0. Claims with no source are listed as "verify to unlock"
+   questions instead.
+2. **No flattery.** Score against what the posting actually asks for and what
+   a strong competing applicant would bring. Competitive employers reject the
+   large majority of applicants. The default answer is "unlikely".
+3. **Separate scorer and reviewer (enforced for scores above 2).** One pass
+   scores. A second, sceptical pass challenges every score above 2 and must
+   agree before the score stands.
+4. **Same scale every run.** Changing this rubric bumps its version, and the
+   report notes that runs before and after are not directly comparable.
+5. **Never score protected attributes.** Age, gender, ethnicity, disability,
+   religion and family status are never asked about, inferred or scored. Work
+   rights are recorded only as the person states them, and only to match what
+   a posting legally requires.
+
+## The seven dimensions
+
+Each role is scored 0 to 5 on each dimension. The weights below are the
+defaults; change them per goal in `config.json` under `scoring.weights`.
+
+| # | Dimension | Default weight | Judged | What it measures |
+|---|---|---|---|---|
+| D1 | Requirements match | 25 | per role | Hard requirements in the posting: years in a comparable role, domain, named skills, degree. |
+| D2 | Proof of work | 20 | per role | Shipped, checkable work relevant to this role and this organisation's products. |
+| D3 | Warm path | 20 | per organisation | People inside who know the person's work and would refer or vouch for them. |
+| D4 | Organisation-specific edge | 10 | per role | Something this organisation values that most applicants lack. |
+| D5 | Public signal | 10 | per organisation | What a hiring manager finds: writing, site, code, talks, posts, followers. |
+| D6 | Eligibility and logistics | 10 | per location class | Work rights, visa route, location and relocation fit with where the role sits. |
+| D7 | Application readiness | 5 | per organisation | A tailored résumé, portfolio and crisp story ready for this role. |
+
+**Fit score** = the sum over all seven of (score / 5 x weight), giving 0 to
+100, rounded to one decimal. If the weights do not add up to 100, the result
+is rescaled to 100 (enforced).
+
+Where they live:
+
+- D1, D2 and D4: `eval/judgements.json`, one entry per role id.
+- D3, D5 and D7: `eval/profile-dimensions.json`, one entry per target
+  organisation id, with an optional `default` entry used for any organisation
+  without its own.
+- D6: `eval/profile-dimensions.json` under `D6_rules.classes`, one entry per
+  location class (from `config.json`), plus a note for blocked roles under
+  `D6_rules.blocked`.
+
+### Anchors (all dimensions)
+
+| Score | Meaning |
+|---|---|
+| 0 | Absent, or claimed with no evidence. |
+| 1 | Weak or tangential. |
+| 2 | Partial: meets some of it; a reviewer would see a clear gap. |
+| 3 | Meets it: comparable to a typical shortlisted applicant. |
+| 4 | Strong: better than most shortlisted applicants. |
+| 5 | Exceptional: a reason to hire on its own. |
+
+### Dimension notes
+
+**D1 Requirements match.** Score against the posting's stated requirements,
+not the title. If the posting states a hard requirement the person plainly
+lacks (for example "computer science degree required" or "5 or more years as a
+software engineer"), set `hard_requirement_lacking` to true with a short
+`hard_requirement_note`. D1 is then capped at 1 (enforced).
+
+**D2 Proof of work.** Count shipped things a stranger can check: a public
+repository, a release history, a live product with users, a published case
+study, a paper. Software built with AI agents counts when it is verifiable.
+Volume without outcomes counts less than one shipped thing with users. Private
+work counts only if a second source (a referee, a press article, an email from
+the client) backs it up.
+
+**D3 Warm path.** Use these anchors exactly:
+
+| Score | Meaning |
+|---|---|
+| 0 | Nobody known at the organisation. |
+| 1 | A first-degree contact in an unrelated team who has not seen the person's work. |
+| 2 | A second-degree path that someone has agreed to open. |
+| 3 | A named insider who knows the person's work. |
+| 4 | That person has agreed to refer. |
+| 5 | Referral submitted. |
+
+`scripts/network_map.py` gives the first-degree contacts at each target. A
+LinkedIn connection proves the connection exists, not that the person knows
+your work: that needs their own words (an email, a message, a referee note).
+
+**D4 Organisation-specific edge.** Something this organisation values that
+most applicants lack. Examples for an AI lab goal: deep daily use of that lab's
+own products with published results, domain experience in a sector the lab is
+selling into, or a contribution to a project the lab maintains. Generic
+strengths that every applicant claims ("passionate about AI") score 0.
+
+**D5 Public signal.** What a hiring manager would find in five minutes of
+searching: writing, a personal site, public code, talks, podcasts, posts, and
+how many people follow them. Score what exists and is findable, not what is
+planned.
+
+**D6 Eligibility and logistics.** Scored against where the role sits and the
+person's stated work rights and willingness to move. Set one entry per
+location class in `D6_rules.classes`, for example: a role in the person's own
+country with full work rights scores high; a role that needs a visa the
+person has a confirmed route to scores in the middle; a role that needs
+sponsorship with no known route scores low. `scripts/score.py` picks the best
+class among the role's locations (enforced). A judgement can set
+`location_class` to override the automatic choice. A location class with no
+rule scores 0.
+
+**D7 Application readiness.** A tailored résumé, a portfolio and a crisp,
+true story for this role. A generic résumé scores 1. A résumé tailored to this
+family of roles, with a portfolio link, scores 3.
+
+## The verification ladder (enforced)
+
+Every evidence item has a level. A dimension score can be no higher than the
+best evidence it cites supports.
+
+| Level | Meaning | Highest score it supports |
+|---|---|---|
+| `verified` | Primary source checked (a repository, a certificate address, a live product, an email from the issuer). | 5 |
+| `corroborated` | Two independent sources agree (for example LinkedIn plus a referee or a press article). | 4 |
+| `self_reported` | The person's own résumé, LinkedIn or answers. | Depends on the kind, see below. |
+| `unverified` | A claim with no source. | 0 |
+| `contradicted` | Evidence says otherwise. Also flagged in the claims audit. | 0 |
+
+For `self_reported` evidence, the cap depends on the evidence kind, set in
+`config.json` under `scoring.self_reported_caps`:
+
+| Kind | Default cap | Why |
+|---|---|---|
+| `job_history` | 3 | Screening accepts a résumé's titles, employers and dates and verifies them later. |
+| `education` | 3 | Same as job history. |
+| `eligibility` | 5 | Work rights and where the person lives are taken on the applicant's word at screening too. |
+| `preference` | 5 | Willingness to move or travel is only knowable from the person. |
+| everything else | 1 | Specific achievements, credentials, artefacts and network claims need a second source. |
+
+Unknown evidence ids are reported as warnings and ignored.
+
+## Employment history and achievement claims
+
+- **Employment history works the way real screening does.** Job titles,
+  employers and dates on the person's résumé or LinkedIn count as stated
+  experience for D1 (up to 3), because recruiters accept them at screening and
+  check them later.
+- **Specific achievement claims** inside those roles (budgets, team sizes,
+  outcomes, savings) count at most 1 point until a second source, a referee or
+  a public artefact backs them up.
+
+## Eligibility beats everything (enforced)
+
+`scripts/fetch_roles.py` looks for four kinds of eligibility blocker in each
+posting:
+
+| Blocker type | What it catches |
+|---|---|
+| `us_person_export_control` | ITAR (the United States International Traffic in Arms Regulations), "US person", export control, US citizenship or permanent residency (green card). |
+| `security_clearance` | An active or obtainable government security clearance. |
+| `citizenship` | "Must be a citizen of" a named country. |
+| `licence` | "Must hold" a named licence. |
+
+A role is **blocked** if it has a blocker whose type is not listed in
+`config.json` under `candidate.eligibility_cleared`. The judgement field
+`eligibility_blocked` (true or false) overrides the automatic call, for example
+when the detector misread the posting.
+
+A blocked role scores D6 = 0 and counts as a lacking hard requirement, so D1
+is capped at 1 and both bands move down one step.
+
+## Review cap (enforced)
+
+A dimension score above `scoring.review_required_above` (default 2) counts as
+2 until the reviewer has agreed. Agreement is recorded as `reviewed_on`, dated
+on or after `judged_on`:
+
+- for D1, D2 and D4, on the role judgement (or on the single dimension entry);
+- for D3, D5, D7 and D6 rules, on that entry (or on the file's top level).
+
+Changing a judgement after review (a later `judged_on`) needs a fresh review.
+The run lists these roles as awaiting review.
+
+## Unjudged roles (enforced)
+
+A role with no entry in `eval/judgements.json` scores 0 on D1, D2 and D4 and
+is flagged "Not yet judged". If its posting expects production coding and
+`candidate.writes_production_code` is false, it also counts as a lacking hard
+requirement. Judge the best-looking roles first.
+
+## From fit score to chances
+
+Two estimates per role, shown as bands, not false-precision percentages:
+
+| Fit score | Chance of an interview | Chance of an offer (if applied now) |
+|---|---|---|
+| 0 to 39 | Very low | Very low |
+| 40 to 54 | Low | Very low |
+| 55 to 69 | Moderate | Low |
+| 70 to 84 | Good | Moderate |
+| 85 to 100 | Strong | Good |
+
+Adjustments, applied after the table, in this order (enforced):
+
+1. **Warm referral** (D3 at least 4): the interview band moves up one step.
+2. **Hard requirement lacking** (or blocked): both bands move down one step.
+3. **Cold application only** (D3 at most 1): the offer band is capped at Low.
+
+These are judgement estimates, not statistics. The point is the direction and
+the size of each gap, so effort goes where it moves the number most.
+
+## Headline numbers in each report
+
+1. **Best-fit roles**: the top roles by fit score, with bands.
+2. **Per organisation**: the best role and its bands at each target (highest
+   fit, ties broken by interview band, then role id).
+3. **Gap leaderboard**: from `eval/gap-templates.json`. For each gap, over the
+   top roles by fit (`scoring.top_n_for_gaps`, default 25) that match the
+   gap's organisations, families, location classes and blocked filter: the
+   sum of the fit points gained if that dimension rose to the gap's target
+   score. A D1 target is capped at 1 on roles with a lacking hard requirement,
+   and a D6 gap skips roles with an eligibility blocker (raising D6 there
+   means clearing the blocker, which is its own gap).
+4. **Outlook**: a plain-English estimate of the chance of reaching the goal
+   within `goal.horizon_months` if the campaign is followed, with the main
+   reasons. The agent writes it in `eval/outlook.json`. Without it the report
+   says "Not yet judged".
+5. **Verify to unlock**: open questions from `profile/evidence.json`, plus one
+   question for each unverified evidence item.
+6. **Trend**: the change since the last run, for each headline number.
+
+## Repeatability
+
+`scripts/score.py` is deterministic: the same input files give the same run
+file, byte for byte. Each run file carries an `inputs_digest` (a fingerprint
+of every input) and the weights used, so any two runs can be compared and any
+change traced to the files that caused it.

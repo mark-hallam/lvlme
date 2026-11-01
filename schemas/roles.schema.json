@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open roles (market/roles/latest.json)",
+  "description": "Open roles at the target organisations that match a role family, written by fetch_roles.py. Daily snapshots of role ids go to market/roles/snapshots/<date>.json.",
+  "type": "object",
+  "required": ["schema_version", "fetched_on", "summary", "roles"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "fetched_on": {"$ref": "#/definitions/date"},
+    "fetched_at_utc": {"type": "string"},
+    "summary": {
+      "type": "object",
+      "required": ["matched_total"],
+      "additionalProperties": false,
+      "properties": {
+        "endpoints": {"type": "object", "additionalProperties": {"type": "string"}},
+        "total_postings_fetched": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "matched_counts": {"type": "object", "additionalProperties": {"type": "object", "additionalProperties": {"type": "integer"}}},
+        "matched_total": {"type": "integer", "minimum": 0},
+        "remote_true": {"type": "integer", "minimum": 0},
+        "blocked_by_eligibility": {"type": "integer", "minimum": 0},
+        "excluded_count": {"type": "integer", "minimum": 0},
+        "endpoint_errors": {"type": "object", "additionalProperties": {"type": "string"}},
+        "previous_snapshot": {"type": ["string", "null"]},
+        "new_role_ids": {"type": "array", "items": {"type": "string"}},
+        "closed_role_ids": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "roles": {"type": "array", "items": {"$ref": "#/definitions/role"}},
+    "excluded": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["org", "title", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "org": {"type": "string"},
+          "title": {"type": "string"},
+          "url": {"type": ["string", "null"]},
+          "reason": {"type": "string"}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "role": {
+      "type": "object",
+      "required": ["id", "org", "title", "family", "locations", "location_classes", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9_]+:.+$"},
+        "org": {"type": "string"},
+        "title": {"type": "string"},
+        "family": {"type": "string"},
+        "team_or_department": {"type": ["string", "null"]},
+        "locations": {"type": "array", "items": {"type": "string"}},
+        "location_classes": {"type": "array", "items": {"type": "string"}},
+        "remote": {"enum": [true, false, "unknown"]},
+        "url": {"type": ["string", "null"]},
+        "updated_at": {"type": ["string", "null"]},
+        "published_at": {"type": ["string", "null"]},
+        "first_seen": {"$ref": "#/definitions/date"},
+        "compensation": {"type": ["string", "null"]},
+        "years_experience": {"type": ["integer", "null"]},
+        "years_experience_basis": {"enum": ["required", "preferred", null]},
+        "degree_requirement": {"type": ["string", "null"]},
+        "hard_requirements": {"type": "array", "items": {"type": "string"}},
+        "nice_to_haves": {"type": "array", "items": {"type": "string"}},
+        "responsibilities": {"type": "array", "items": {"type": "string"}},
+        "requires_heavy_coding": {"type": "boolean"},
+        "coding_signals": {"type": "array", "items": {"type": "string"}},
+        "eligibility_blockers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "text"],
+            "additionalProperties": false,
+            "properties": {
+              "type": {"enum": ["us_person_export_control", "security_clearance", "citizenship", "licence"]},
+              "text": {"type": "string"}
+            }
+          }
+        },
+        "visa_or_relocation_note": {"type": ["string", "null"]},
+        "classification_note": {"type": "string"},
+        "parse_note": {"type": "string"},
+        "description_text": {"type": "string"}
+      }
+    }
+  }
+}

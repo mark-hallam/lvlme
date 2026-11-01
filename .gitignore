@@ -1,0 +1,4 @@
+# Never commit a real workspace. The engine repo holds no personal data.
+__pycache__/
+*.pyc
+.DS_Store

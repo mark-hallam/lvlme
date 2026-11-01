@@ -1,0 +1,62 @@
+[
+  {
+    "date": "2026-10-04",
+    "top5_avg": 36.4,
+    "metrics": {
+      "warm_intros": 0,
+      "applications": 0,
+      "interviews": 0,
+      "offers": 0,
+      "proof_pieces": 1,
+      "credentials": 1
+    }
+  },
+  {
+    "date": "2026-10-11",
+    "top5_avg": 39.6,
+    "metrics": {
+      "warm_intros": 0,
+      "applications": 0,
+      "interviews": 0,
+      "offers": 0,
+      "proof_pieces": 1,
+      "credentials": 1
+    }
+  },
+  {
+    "date": "2026-10-18",
+    "top5_avg": 41.6,
+    "metrics": {
+      "warm_intros": 0,
+      "applications": 0,
+      "interviews": 0,
+      "offers": 0,
+      "proof_pieces": 2,
+      "credentials": 1
+    }
+  },
+  {
+    "date": "2026-10-25",
+    "top5_avg": 45.6,
+    "metrics": {
+      "warm_intros": 1,
+      "applications": 0,
+      "interviews": 0,
+      "offers": 0,
+      "proof_pieces": 3,
+      "credentials": 1
+    }
+  },
+  {
+    "date": "2026-11-01",
+    "top5_avg": 46.4,
+    "metrics": {
+      "warm_intros": 1,
+      "applications": 0,
+      "interviews": 0,
+      "offers": 0,
+      "proof_pieces": 3,
+      "credentials": 1
+    }
+  }
+]

@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SWOT and TOWS (eval/swot.json)",
+  "description": "Strengths and weaknesses (internal, evidence-cited, tied to a dimension), opportunities and threats (external, from market data), overall and per target organisation, then TOWS strategies that name the plan actions they create.",
+  "type": "object",
+  "required": ["schema_version", "overall", "strategies"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "updated_on": {"$ref": "#/definitions/date"},
+    "overall": {"$ref": "#/definitions/grid"},
+    "per_org": {"type": "object", "additionalProperties": {"$ref": "#/definitions/grid"}},
+    "strategies": {"type": "array", "items": {"$ref": "#/definitions/strategy"}}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "dimension": {"enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]},
+    "scope_list": {
+      "anyOf": [
+        {"const": "all"},
+        {"type": "array", "items": {"type": "string"}}
+      ]
+    },
+    "internal": {
+      "type": "object",
+      "required": ["id", "text", "dimension", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[SW][0-9]+$"},
+        "text": {"type": "string", "minLength": 1},
+        "dimension": {"$ref": "#/definitions/dimension"},
+        "evidence": {"type": "array", "items": {"type": "string", "pattern": "^E[0-9]{2,}$"}},
+        "orgs": {"$ref": "#/definitions/scope_list"},
+        "families": {"$ref": "#/definitions/scope_list"}
+      }
+    },
+    "external": {
+      "type": "object",
+      "required": ["id", "text", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[OT][0-9]+$"},
+        "text": {"type": "string", "minLength": 1},
+        "source": {"type": "string", "minLength": 1, "description": "Where this came from: a workspace file, a URL, or a posting id."},
+        "dimension": {"$ref": "#/definitions/dimension"},
+        "orgs": {"$ref": "#/definitions/scope_list"},
+        "seen_on": {"$ref": "#/definitions/date"}
+      }
+    },
+    "grid": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "strengths": {"type": "array", "items": {"$ref": "#/definitions/internal"}},
+        "weaknesses": {"type": "array", "items": {"$ref": "#/definitions/internal"}},
+        "opportunities": {"type": "array", "items": {"$ref": "#/definitions/external"}},
+        "threats": {"type": "array", "items": {"$ref": "#/definitions/external"}}
+      }
+    },
+    "strategy": {
+      "type": "object",
+      "required": ["id", "type", "text", "uses", "actions"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^(SO|ST|WO|WT)[0-9]+$"},
+        "type": {"enum": ["SO", "ST", "WO", "WT"]},
+        "text": {"type": "string", "minLength": 1},
+        "uses": {"type": "array", "minItems": 2, "items": {"type": "string", "pattern": "^[SWOT][0-9]+$"}},
+        "actions": {"type": "array", "items": {"type": "string", "pattern": "^A[0-9]{2,}$"}},
+        "scope": {"type": "string", "description": "'overall' or a target org id."}
+      }
+    }
+  }
+}

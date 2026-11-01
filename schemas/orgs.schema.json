@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Organisation intelligence (market/orgs.json)",
+  "description": "Org-level facts the agent researches: offices in the person's region, teams growing, events, partner programmes, eligibility notes. Every fact has a source.",
+  "type": "object",
+  "required": ["schema_version", "orgs"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "updated_on": {"$ref": "#/definitions/date"},
+    "orgs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "offices": {"type": "array", "items": {"type": "string"}},
+          "facts": {"type": "array", "items": {"$ref": "#/definitions/fact"}}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "fact": {
+      "type": "object",
+      "required": ["kind", "text", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"enum": ["office", "team_growth", "event", "partner_programme", "eligibility", "hiring_signal", "other"]},
+        "text": {"type": "string", "minLength": 1},
+        "source": {"type": "string", "minLength": 1},
+        "seen_on": {"$ref": "#/definitions/date"}
+      }
+    }
+  }
+}

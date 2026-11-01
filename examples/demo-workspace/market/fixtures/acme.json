@@ -1,0 +1,183 @@
+{
+  "jobs": [
+    {
+      "id": 4100001,
+      "internal_job_id": 4105001,
+      "title": "Technical Program Manager, Model Launches",
+      "updated_at": "2026-10-20T10:00:00-04:00",
+      "requisition_id": "REQ-4100001",
+      "location": {
+        "name": "San Francisco, CA | Sydney, Australia"
+      },
+      "absolute_url": "https://example.com/jobs/acme/4100001",
+      "metadata": null,
+      "data_compliance": [],
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Acme AI builds reliable AI systems for businesses. This is a fictional company used in the career-eval demo.&lt;/p&gt;&lt;/div&gt;&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;Coordinate model launches across research, product and safety teams.&lt;/p&gt;&lt;h2&gt;Responsibilities&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Own launch plans and timelines for new model releases&lt;/li&gt;&lt;li&gt;Run launch reviews and keep risks visible to leadership&lt;/li&gt;&lt;li&gt;Work with safety teams on evaluation sign-off&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;You may be a good fit if you have&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;5+ years of program or project management in a technical environment&lt;/li&gt;&lt;li&gt;Experience running cross-functional launches with many teams&lt;/li&gt;&lt;li&gt;Clear written communication&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;Strong candidates may also have&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Experience with machine learning products or evaluation&lt;/li&gt;&lt;li&gt;A degree in a technical field&lt;/li&gt;&lt;/ul&gt;&lt;div class=&quot;content-pay-transparency&quot;&gt;&lt;div class=&quot;pay-input&quot;&gt;&lt;div class=&quot;title&quot;&gt;Annual Salary:&lt;/div&gt;&lt;div class=&quot;pay-range&quot;&gt;&lt;span&gt;$190,000&lt;/span&gt;&lt;span class=&quot;divider&quot;&gt;&amp;mdash;&lt;/span&gt;&lt;span&gt;$240,000 USD&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;",
+      "departments": [
+        {
+          "id": 10,
+          "name": "Technical Program Management"
+        }
+      ],
+      "offices": [
+        {
+          "id": 20,
+          "name": "San Francisco, CA, United States",
+          "location": "San Francisco, CA, United States"
+        },
+        {
+          "id": 21,
+          "name": "Sydney, NSW, Australia",
+          "location": "Sydney, NSW, Australia"
+        }
+      ],
+      "first_published": "2026-09-29T09:00:00-04:00",
+      "company_name": "Acme AI"
+    },
+    {
+      "id": 4100002,
+      "internal_job_id": 4105002,
+      "title": "Applied AI Deployment Lead, Asia Pacific",
+      "updated_at": "2026-10-20T10:00:00-04:00",
+      "requisition_id": "REQ-4100002",
+      "location": {
+        "name": "Sydney, Australia"
+      },
+      "absolute_url": "https://example.com/jobs/acme/4100002",
+      "metadata": null,
+      "data_compliance": [],
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Acme AI builds reliable AI systems for businesses. This is a fictional company used in the career-eval demo.&lt;/p&gt;&lt;/div&gt;&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;Help customers in Asia Pacific put Acme AI models into daily operations. You will not write production code; you will configure, test and roll out solutions with customer teams.&lt;/p&gt;&lt;h2&gt;Responsibilities&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Lead deployments with enterprise customers from pilot to rollout&lt;/li&gt;&lt;li&gt;Turn customer feedback into product requests&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;You may be a good fit if you have&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;4+ years of customer-facing technical delivery or operations work&lt;/li&gt;&lt;li&gt;Comfort explaining technical trade-offs to non-technical leaders&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;Strong candidates may also have&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Experience in logistics, retail or operations-heavy industries&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;This role is based in Sydney. Relocation support is available within Australia.&lt;/p&gt;",
+      "departments": [
+        {
+          "id": 10,
+          "name": "Applied AI"
+        }
+      ],
+      "offices": [
+        {
+          "id": 20,
+          "name": "Sydney, NSW, Australia",
+          "location": "Sydney, NSW, Australia"
+        }
+      ],
+      "first_published": "2026-09-29T09:00:00-04:00",
+      "company_name": "Acme AI"
+    },
+    {
+      "id": 4100003,
+      "internal_job_id": 4105003,
+      "title": "Forward Deployed Engineer",
+      "updated_at": "2026-10-20T10:00:00-04:00",
+      "requisition_id": "REQ-4100003",
+      "location": {
+        "name": "New York, NY"
+      },
+      "absolute_url": "https://example.com/jobs/acme/4100003",
+      "metadata": null,
+      "data_compliance": [],
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Acme AI builds reliable AI systems for businesses. This is a fictional company used in the career-eval demo.&lt;/p&gt;&lt;/div&gt;&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;Build custom integrations for customers.&lt;/p&gt;&lt;h2&gt;Responsibilities&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Write production code that connects our models to customer systems&lt;/li&gt;&lt;li&gt;Ship and maintain integrations&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;You may be a good fit if you have&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;3+ years of software engineering experience&lt;/li&gt;&lt;li&gt;Strong proficiency in Python or TypeScript&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;Strong candidates may also have&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Experience with distributed systems&lt;/li&gt;&lt;/ul&gt;",
+      "departments": [
+        {
+          "id": 10,
+          "name": "Applied AI"
+        }
+      ],
+      "offices": [
+        {
+          "id": 20,
+          "name": "New York, NY, United States",
+          "location": "New York, NY, United States"
+        }
+      ],
+      "first_published": "2026-09-29T09:00:00-04:00",
+      "company_name": "Acme AI"
+    },
+    {
+      "id": 4100004,
+      "internal_job_id": 4105004,
+      "title": "Policy Manager, Safeguards Operations",
+      "updated_at": "2026-10-20T10:00:00-04:00",
+      "requisition_id": "REQ-4100004",
+      "location": {
+        "name": "London, United Kingdom"
+      },
+      "absolute_url": "https://example.com/jobs/acme/4100004",
+      "metadata": null,
+      "data_compliance": [],
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Acme AI builds reliable AI systems for businesses. This is a fictional company used in the career-eval demo.&lt;/p&gt;&lt;/div&gt;&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;Write and run the policies that keep Acme AI products safe to use.&lt;/p&gt;&lt;h2&gt;Responsibilities&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Draft usage policies and enforcement guidelines&lt;/li&gt;&lt;li&gt;Run policy reviews with product teams&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;You may be a good fit if you have&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;3+ years in trust and safety, content policy or policy operations&lt;/li&gt;&lt;li&gt;Bachelor&#x27;s degree or equivalent experience&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;Strong candidates may also have&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Experience with AI governance frameworks&lt;/li&gt;&lt;/ul&gt;",
+      "departments": [
+        {
+          "id": 10,
+          "name": "Safeguards"
+        }
+      ],
+      "offices": [
+        {
+          "id": 20,
+          "name": "London, United Kingdom",
+          "location": "London, United Kingdom"
+        }
+      ],
+      "first_published": "2026-09-29T09:00:00-04:00",
+      "company_name": "Acme AI"
+    },
+    {
+      "id": 4100005,
+      "internal_job_id": 4105005,
+      "title": "Recruiter, Technical",
+      "updated_at": "2026-10-20T10:00:00-04:00",
+      "requisition_id": "REQ-4100005",
+      "location": {
+        "name": "San Francisco, CA"
+      },
+      "absolute_url": "https://example.com/jobs/acme/4100005",
+      "metadata": null,
+      "data_compliance": [],
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Acme AI builds reliable AI systems for businesses. This is a fictional company used in the career-eval demo.&lt;/p&gt;&lt;/div&gt;&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;Hire great people.&lt;/p&gt;&lt;h2&gt;Responsibilities&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Run hiring loops&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;You may be a good fit if you have&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;3+ years of technical recruiting&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;Strong candidates may also have&lt;/h2&gt;&lt;ul&gt;&lt;/ul&gt;",
+      "departments": [
+        {
+          "id": 10,
+          "name": "Recruiting"
+        }
+      ],
+      "offices": [
+        {
+          "id": 20,
+          "name": "San Francisco, CA, United States",
+          "location": "San Francisco, CA, United States"
+        }
+      ],
+      "first_published": "2026-09-29T09:00:00-04:00",
+      "company_name": "Acme AI"
+    },
+    {
+      "id": 4100006,
+      "internal_job_id": 4105006,
+      "title": "Program Manager, Government Partnerships",
+      "updated_at": "2026-10-20T10:00:00-04:00",
+      "requisition_id": "REQ-4100006",
+      "location": {
+        "name": "Washington, DC"
+      },
+      "absolute_url": "https://example.com/jobs/acme/4100006",
+      "metadata": null,
+      "data_compliance": [],
+      "content": "&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;Acme AI builds reliable AI systems for businesses. This is a fictional company used in the career-eval demo.&lt;/p&gt;&lt;/div&gt;&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;Run programs with government customers.&lt;/p&gt;&lt;h2&gt;Responsibilities&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Coordinate delivery of public-sector projects&lt;/li&gt;&lt;li&gt;Manage partner relationships&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;You may be a good fit if you have&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;5+ years of program management with government customers&lt;/li&gt;&lt;li&gt;Must be a U.S. citizen and able to obtain and maintain a security clearance&lt;/li&gt;&lt;/ul&gt;&lt;h2&gt;Strong candidates may also have&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Existing Secret clearance&lt;/li&gt;&lt;/ul&gt;",
+      "departments": [
+        {
+          "id": 10,
+          "name": "Public Sector"
+        }
+      ],
+      "offices": [
+        {
+          "id": 20,
+          "name": "Washington, DC, United States",
+          "location": "Washington, DC, United States"
+        }
+      ],
+      "first_published": "2026-09-29T09:00:00-04:00",
+      "company_name": "Acme AI"
+    }
+  ]
+}

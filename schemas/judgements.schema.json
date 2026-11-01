@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Per-role judgements (eval/judgements.json)",
+  "description": "The scorer's per-role judgements for D1 (requirements match), D2 (proof of work) and D4 (org-specific edge), plus hard-requirement and eligibility calls. Keyed by role id from market/roles/latest.json.",
+  "type": "object",
+  "required": ["schema_version", "roles"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "rubric_version": {"type": "string"},
+    "roles": {"type": "object", "additionalProperties": {"$ref": "#/definitions/judgement"}}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "entry": {
+      "type": "object",
+      "required": ["score"],
+      "additionalProperties": false,
+      "properties": {
+        "score": {"type": "integer", "minimum": 0, "maximum": 5},
+        "evidence": {"type": "array", "items": {"type": "string", "pattern": "^E[0-9]{2,}$"}},
+        "note": {"type": "string"},
+        "judged_on": {"$ref": "#/definitions/date"},
+        "reviewed_on": {"$ref": "#/definitions/date"},
+        "reviewer_note": {"type": "string"}
+      }
+    },
+    "judgement": {
+      "type": "object",
+      "required": ["D1", "D2", "D4"],
+      "additionalProperties": false,
+      "properties": {
+        "D1": {"$ref": "#/definitions/entry"},
+        "D2": {"$ref": "#/definitions/entry"},
+        "D4": {"$ref": "#/definitions/entry"},
+        "hard_requirement_lacking": {"type": "boolean"},
+        "hard_requirement_note": {"type": "string"},
+        "eligibility_blocked": {"type": ["boolean", "null"], "description": "Overrides the automatic blocker detection when set."},
+        "location_class": {"type": "string", "description": "Overrides the automatic location class when set."},
+        "judged_on": {"$ref": "#/definitions/date"},
+        "reviewed_on": {"$ref": "#/definitions/date"},
+        "reviewer_note": {"type": "string"}
+      }
+    }
+  }
+}

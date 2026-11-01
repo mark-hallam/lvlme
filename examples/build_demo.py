@@ -1,0 +1,215 @@
+#!/usr/bin/env python3
+"""Rebuild every generated file in the demo workspace from its inputs.
+
+The demo is a fictional person (Alex Example) applying to fictional
+organisations (Acme AI, Globex Labs, Initech Robotics). To give the Trends view
+some history, this replays five weekly runs, 2026-10-04 to 2026-11-01. Each
+week uses the job postings that were open then and the evidence, judgements
+and metrics as they stood then, and runs the real scripts on them.
+
+Hand-written inputs: config.json, intake/, profile/evidence.json,
+profile/claims-audit.json, profile/network.json (second_degree only),
+eval/judgements.json, eval/profile-dimensions.json, eval/gap-templates.json,
+eval/outlook.json, eval/swot.json, campaign/, market/orgs.json, market/fixtures/.
+Generated: market/roles/, profile/network.json (orgs), eval/runs/,
+campaign/metrics-history.json, report/.
+
+Usage: python3 examples/build_demo.py
+"""
+import copy
+import glob
+import json
+import os
+import shutil
+import sys
+import tempfile
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+DEMO = os.path.join(HERE, "demo-workspace")
+sys.path.insert(0, os.path.join(os.path.dirname(HERE), "scripts"))
+import build_dashboard  # noqa: E402
+import fetch_roles  # noqa: E402
+import network_map  # noqa: E402
+import score  # noqa: E402
+
+WEEKS = ["2026-10-04", "2026-10-11", "2026-10-18", "2026-10-25", "2026-11-01"]
+# Postings that were not open for the whole period: role id -> (first week, last week), as indexes into WEEKS.
+OPEN = {"acme:4100007": (0, 2), "initech:i-0001": (2, 4), "globex:g-0004": (3, 4), "initech:i-0004": (4, 4)}
+FIXTURE_ORGS = {"acme": "greenhouse", "globex": "ashby", "initech": "lever"}
+METRICS = {"warm_intros": [0, 0, 0, 1, 1], "proof_pieces": [1, 1, 2, 3, 3]}
+OUTPUTS = ["eval/runs", "market/roles", "report", "campaign/metrics-history.json"]
+
+
+def load(rel, root=DEMO):
+    with open(os.path.join(root, rel), encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def save(rel, data, root):
+    path = os.path.join(root, rel)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
+
+
+def entry(score_, evidence, note, judged="2026-10-04"):
+    return {"score": score_, "evidence": evidence, "note": note, "judged_on": judged}
+
+
+def earlier_judgements():
+    """Judgements as they stood before the 2026-10-25 re-judging."""
+    base = {"hard_requirement_lacking": False, "judged_on": "2026-10-04", "reviewed_on": "2026-10-05"}
+    return {
+        "globex:g-0002": dict(base, D1=entry(2, ["E01", "E02"], "Programs were operations, not infrastructure."),
+                              D2=entry(2, ["E05"], "Rollout claim is self-reported only."),
+                              D4=entry(1, ["E01"], "Hardware delivery tracking is adjacent.")),
+        "globex:g-0003": dict(base, D1=entry(3, ["E01", "E02"], "Operations roles close to implementation work."),
+                              D2=entry(3, ["E04"], "Verified tool."), D4=entry(2, ["E01"], "Logistics customers are a plus.")),
+        "initech:i-0002": dict(base, D1=entry(2, ["E01"], "Operations close to product, but no product title."),
+                               D2=entry(2, ["E04", "E05"], "No case study yet."),
+                               D4=entry(3, ["E01"], "Deep warehouse workflow knowledge.")),
+        "acme:4100007": dict(base, hard_requirement_lacking=True, hard_requirement_note="4+ years of product management",
+                             D1=entry(1, ["E02"], "No product management title."),
+                             D2=entry(2, ["E04"], "route-eval is close to safety tooling."),
+                             D4=entry(1, ["E04"], "Some overlap with evaluation tools.")),
+    }
+
+
+def week_state(i, cur):
+    """Return the input documents as they stood in week i."""
+    week = WEEKS[i]
+    ev, jd, prof, plan, outlook = (copy.deepcopy(cur[k]) for k in ("evidence", "judgements", "profile", "plan", "outlook"))
+    ev["items"] = [e for e in ev["items"] if e.get("added_on", "") <= week]
+    known = {e["id"] for e in ev["items"]}
+    for q in ev["open_questions"]:
+        if any(a not in known for a in q.get("answer_evidence", [])):
+            q["status"], q["answer_evidence"] = "open", []
+    older = earlier_judgements()
+    roles = {}
+    for rid, j in jd["roles"].items():
+        if j.get("judged_on", "") <= week:
+            roles[rid] = j
+        elif rid in older:
+            roles[rid] = older[rid]
+    if i <= 2:
+        roles["acme:4100007"] = older["acme:4100007"]
+    jd["roles"] = roles
+    d3 = prof["D3"]
+    if i == 0:
+        for org in ("acme", "globex", "initech"):
+            d3[org] = entry(0, [], "Network not mapped yet.")
+    elif i < 3:
+        d3["globex"] = entry(1, ["E09"], "Two first-degree contacts; neither has seen Alex's work yet.", "2026-10-11")
+    if i < 2:
+        prof["D5"]["default"] = entry(1, ["E07"], "Personal site and essays only.")
+    if i < 4:
+        prof["D7"].pop("initech", None)
+    prof["reviewed_on"] = week
+    for m in plan["north_star"]:
+        if m["id"] in METRICS:
+            m["current"] = METRICS[m["id"]][i]
+    if i < 2:
+        outlook.update(band="Very low", text="Early days: no warm paths and little public proof yet.", reasons=[])
+    elif i < 4:
+        outlook.update(band="Low", text="The Initech fleet role is a strong domain fit, but there is no warm path yet.",
+                       reasons=[])
+    outlook["judged_on"] = week
+    for doc in (jd, prof):  # a review recorded later than this run had not happened yet: it happened in this run
+        for e in _entries(doc):
+            if e.get("reviewed_on", "") > week:
+                e["reviewed_on"] = week
+    return {"profile/evidence.json": ev, "eval/judgements.json": jd, "eval/profile-dimensions.json": prof,
+            "campaign/plan.json": plan, "eval/outlook.json": outlook}
+
+
+def _entries(doc):
+    if "roles" in doc:
+        for j in doc["roles"].values():
+            yield j
+            for d in ("D1", "D2", "D4"):
+                yield j[d]
+    else:
+        for sec in ("D3", "D5", "D7"):
+            yield from doc.get(sec, {}).values()
+        yield from doc.get("D6_rules", {}).get("classes", {}).values()
+
+
+def role_id(org, job):
+    return "%s:%s" % (org, job["id"])
+
+
+def week_fixtures(i, dest):
+    os.makedirs(dest, exist_ok=True)
+    extra = {}
+    for path in glob.glob(os.path.join(DEMO, "market", "fixtures", "history-only", "*.json")):
+        org = os.path.basename(path).split("-", 1)[0]
+        extra.setdefault(org, []).append(load(os.path.relpath(path, DEMO)))
+
+    def open_now(org, job):
+        first, last = OPEN.get(role_id(org, job), (0, len(WEEKS) - 1))
+        return first <= i <= last
+
+    for org in FIXTURE_ORGS:
+        data = load("market/fixtures/%s.json" % org)
+        jobs = data if isinstance(data, list) else data["jobs"]
+        jobs = [j for j in jobs + extra.get(org, []) if open_now(org, j)]
+        if isinstance(data, list):
+            data = jobs
+        else:
+            data["jobs"] = jobs
+        save("%s.json" % org, data, dest)
+
+
+def clean_outputs(root):
+    for rel in OUTPUTS:
+        path = os.path.join(root, rel)
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+        elif os.path.exists(path):
+            os.remove(path)
+
+
+def run(fn, argv):
+    code = fn(argv)
+    if code:
+        raise SystemExit("career-eval demo: %s %s failed with code %s" % (fn.__module__, argv, code))
+
+
+def main():
+    cur = {"evidence": load("profile/evidence.json"), "judgements": load("eval/judgements.json"),
+           "profile": load("eval/profile-dimensions.json"), "plan": load("campaign/plan.json"),
+           "outlook": load("eval/outlook.json")}
+    tmp = tempfile.mkdtemp(prefix="career-eval-demo-")
+    try:
+        work = os.path.join(tmp, "demo")
+        shutil.copytree(DEMO, work)
+        clean_outputs(work)
+        for i, week in enumerate(WEEKS[:-1]):
+            for rel, doc in week_state(i, cur).items():
+                save(rel, doc, work)
+            fx = os.path.join(tmp, "fixtures-%s" % week)
+            week_fixtures(i, fx)
+            run(fetch_roles.main, ["--workspace", work, "--fixtures", fx, "--date", week])
+            run(score.main, ["--workspace", work, "--date", week])
+            run(build_dashboard.main, ["--workspace", work])
+        clean_outputs(DEMO)
+        for rel in ("eval/runs", "market/roles"):
+            shutil.copytree(os.path.join(work, rel), os.path.join(DEMO, rel))
+        shutil.copy2(os.path.join(work, "campaign", "metrics-history.json"),
+                     os.path.join(DEMO, "campaign", "metrics-history.json"))
+        fx = os.path.join(tmp, "fixtures-final")
+        week_fixtures(len(WEEKS) - 1, fx)
+        today = WEEKS[-1]
+        run(fetch_roles.main, ["--workspace", DEMO, "--fixtures", fx, "--date", today])
+        run(network_map.main, ["--workspace", DEMO, "--csv", os.path.join(DEMO, "intake", "sources", "Connections.csv"),
+                               "--today", today])
+        run(score.main, ["--workspace", DEMO, "--date", today])
+        run(build_dashboard.main, ["--workspace", DEMO])
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    print("Demo rebuilt: examples/demo-workspace/report/index.html")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

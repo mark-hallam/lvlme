@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-25",
+  "roles": {
+    "acme:4100002": {
+      "org": "acme",
+      "title": "Applied AI Deployment Lead, Asia Pacific",
+      "family": "applied_ai"
+    },
+    "acme:4100004": {
+      "org": "acme",
+      "title": "Policy Manager, Safeguards Operations",
+      "family": "policy_safety"
+    },
+    "acme:4100006": {
+      "org": "acme",
+      "title": "Program Manager, Government Partnerships",
+      "family": "tpm"
+    },
+    "acme:4100001": {
+      "org": "acme",
+      "title": "Technical Program Manager, Model Launches",
+      "family": "tpm"
+    },
+    "globex:g-0003": {
+      "org": "globex",
+      "title": "AI Success Manager, Asia",
+      "family": "applied_ai"
+    },
+    "globex:g-0004": {
+      "org": "globex",
+      "title": "Trust and Safety Operations Lead",
+      "family": "policy_safety"
+    },
+    "globex:g-0001": {
+      "org": "globex",
+      "title": "Product Manager, Developer Platform",
+      "family": "product"
+    },
+    "globex:g-0002": {
+      "org": "globex",
+      "title": "Technical Program Manager, Infrastructure",
+      "family": "tpm"
+    },
+    "initech:i-0003": {
+      "org": "initech",
+      "title": "Policy Lead, Robotics Safety Standards",
+      "family": "policy_safety"
+    },
+    "initech:i-0002": {
+      "org": "initech",
+      "title": "Product Manager, Warehouse Autonomy",
+      "family": "product"
+    },
+    "initech:i-0001": {
+      "org": "initech",
+      "title": "Program Manager, Robot Fleet Deployments",
+      "family": "tpm"
+    }
+  }
+}

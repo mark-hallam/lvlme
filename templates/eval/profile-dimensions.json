@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "rubric_version": "1.0",
+  "judged_on": "2026-01-01",
+  "D3": {
+    "default": {
+      "score": 0,
+      "evidence": [],
+      "note": "Not yet judged: map your network first (scripts/network_map.py)."
+    }
+  },
+  "D5": {
+    "default": {
+      "score": 0,
+      "evidence": [],
+      "note": "Not yet judged."
+    }
+  },
+  "D7": {
+    "default": {
+      "score": 0,
+      "evidence": [],
+      "note": "Not yet judged."
+    }
+  },
+  "D6_rules": {
+    "classes": {
+      "australia_nz": {
+        "score": 0,
+        "evidence": [],
+        "note": "Not yet judged: set from your work rights and willingness to move (method/RUBRIC.md, D6)."
+      },
+      "apac_other": {
+        "score": 0,
+        "evidence": [],
+        "note": "Not yet judged: set from your work rights and willingness to move (method/RUBRIC.md, D6)."
+      },
+      "us": {
+        "score": 0,
+        "evidence": [],
+        "note": "Not yet judged: set from your work rights and willingness to move (method/RUBRIC.md, D6)."
+      },
+      "canada": {
+        "score": 0,
+        "evidence": [],
+        "note": "Not yet judged: set from your work rights and willingness to move (method/RUBRIC.md, D6)."
+      },
+      "uk_eu": {
+        "score": 0,
+        "evidence": [],
+        "note": "Not yet judged: set from your work rights and willingness to move (method/RUBRIC.md, D6)."
+      },
+      "remote": {
+        "score": 0,
+        "evidence": [],
+        "note": "Not yet judged: set from your work rights and willingness to move (method/RUBRIC.md, D6)."
+      },
+      "other": {
+        "score": 0,
+        "evidence": [],
+        "note": "Not yet judged: set from your work rights and willingness to move (method/RUBRIC.md, D6)."
+      }
+    },
+    "blocked": {
+      "note": "The posting has an eligibility blocker you have not cleared (for example US person or security clearance).",
+      "evidence": []
+    }
+  }
+}

@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-11-01",
+  "overall": {
+    "strengths": [
+      {
+        "id": "S1",
+        "text": "Ten years running warehouse and transport operations and programs.",
+        "dimension": "D1",
+        "evidence": [
+          "E01",
+          "E02"
+        ],
+        "orgs": "all",
+        "families": [
+          "tpm",
+          "applied_ai"
+        ]
+      },
+      {
+        "id": "S2",
+        "text": "A verified open-source evaluation tool with 14 releases and outside contributors.",
+        "dimension": "D2",
+        "evidence": [
+          "E04"
+        ],
+        "orgs": "all",
+        "families": "all"
+      },
+      {
+        "id": "S3",
+        "text": "Full work rights in Australia and New Zealand, where Initech and Acme hire.",
+        "dimension": "D6",
+        "evidence": [
+          "E11"
+        ],
+        "orgs": "all",
+        "families": "all"
+      }
+    ],
+    "weaknesses": [
+      {
+        "id": "W1",
+        "text": "No warm path into Initech Robotics yet.",
+        "dimension": "D3",
+        "evidence": [
+          "E19"
+        ],
+        "orgs": [
+          "initech"
+        ],
+        "families": "all"
+      },
+      {
+        "id": "W2",
+        "text": "No product management title, so product roles see a hard-requirement gap.",
+        "dimension": "D1",
+        "evidence": [
+          "E01",
+          "E02"
+        ],
+        "orgs": "all",
+        "families": [
+          "product"
+        ]
+      },
+      {
+        "id": "W3",
+        "text": "The LinkedIn headline overstates team size (40, when the evidence says 8).",
+        "dimension": "D5",
+        "evidence": [
+          "E16"
+        ],
+        "orgs": "all",
+        "families": "all"
+      },
+      {
+        "id": "W4",
+        "text": "Nothing built specifically for Acme AI yet.",
+        "dimension": "D4",
+        "evidence": [
+          "E04"
+        ],
+        "orgs": [
+          "acme"
+        ],
+        "families": "all"
+      }
+    ],
+    "opportunities": [
+      {
+        "id": "O1",
+        "text": "Initech Robotics has program and product roles open in Melbourne and Brisbane.",
+        "source": "market/roles/latest.json (initech:i-0001, initech:i-0002)",
+        "dimension": "D6",
+        "orgs": [
+          "initech"
+        ],
+        "seen_on": "2026-10-25"
+      },
+      {
+        "id": "O2",
+        "text": "Globex Labs lists an AI Success role in Singapore that names logistics customers as a plus.",
+        "source": "market/roles/latest.json (globex:g-0003)",
+        "dimension": "D4",
+        "orgs": [
+          "globex"
+        ],
+        "seen_on": "2026-10-25"
+      },
+      {
+        "id": "O3",
+        "text": "Acme AI runs a public evaluation challenge every quarter.",
+        "source": "market/orgs.json",
+        "dimension": "D4",
+        "orgs": [
+          "acme"
+        ],
+        "seen_on": "2026-10-11"
+      }
+    ],
+    "threats": [
+      {
+        "id": "T1",
+        "text": "Government-facing roles at Acme AI need US citizenship and a clearance.",
+        "source": "market/roles/latest.json (acme:4100006)",
+        "dimension": "D6",
+        "orgs": [
+          "acme"
+        ]
+      },
+      {
+        "id": "T2",
+        "text": "Recruiters compare public profiles with resumes at screening; a mismatch reads as dishonest.",
+        "source": "campaign/inbox.md (note from a recruiter friend, 2026-10-20)",
+        "dimension": "D5",
+        "orgs": "all"
+      },
+      {
+        "id": "T3",
+        "text": "Product roles ask for 5 or more years with a product title.",
+        "source": "market/roles/latest.json (globex:g-0001)",
+        "dimension": "D1",
+        "orgs": "all"
+      }
+    ]
+  },
+  "per_org": {
+    "initech": {
+      "strengths": [
+        {
+          "id": "S10",
+          "text": "Warehouse operations is the exact domain Initech sells into.",
+          "dimension": "D4",
+          "evidence": [
+            "E01",
+            "E15"
+          ],
+          "orgs": [
+            "initech"
+          ],
+          "families": "all"
+        }
+      ],
+      "weaknesses": [
+        {
+          "id": "W10",
+          "text": "Nobody known at Initech, so an application today is cold.",
+          "dimension": "D3",
+          "evidence": [
+            "E19"
+          ],
+          "orgs": [
+            "initech"
+          ],
+          "families": "all"
+        }
+      ],
+      "opportunities": [
+        {
+          "id": "O10",
+          "text": "A partner programme for warehouse operators runs meetups in Melbourne.",
+          "source": "market/orgs.json",
+          "orgs": [
+            "initech"
+          ],
+          "seen_on": "2026-10-25"
+        }
+      ],
+      "threats": [
+        {
+          "id": "T10",
+          "text": "The fleet role has been open four weeks and may close soon.",
+          "source": "market/roles/latest.json (initech:i-0001 first_seen)",
+          "orgs": [
+            "initech"
+          ]
+        }
+      ]
+    },
+    "globex": {
+      "strengths": [
+        {
+          "id": "S20",
+          "text": "A named contact has agreed to introduce Alex to the AI Success lead.",
+          "dimension": "D3",
+          "evidence": [
+            "E09"
+          ],
+          "orgs": [
+            "globex"
+          ],
+          "families": "all"
+        }
+      ],
+      "weaknesses": [
+        {
+          "id": "W20",
+          "text": "Every Globex role is overseas and needs a visa.",
+          "dimension": "D6",
+          "evidence": [
+            "E12"
+          ],
+          "orgs": [
+            "globex"
+          ],
+          "families": "all"
+        }
+      ],
+      "opportunities": [],
+      "threats": []
+    }
+  },
+  "strategies": [
+    {
+      "id": "SO1",
+      "type": "SO",
+      "text": "Use ten years of warehouse programs to go after Initech's fleet deployments role in Melbourne.",
+      "uses": [
+        "S1",
+        "O1"
+      ],
+      "actions": [
+        "A05",
+        "A06"
+      ],
+      "scope": "initech"
+    },
+    {
+      "id": "SO2",
+      "type": "SO",
+      "text": "Use route-eval and the logistics background to stand out for Globex's AI Success role.",
+      "uses": [
+        "S2",
+        "O2"
+      ],
+      "actions": [
+        "A02"
+      ],
+      "scope": "globex"
+    },
+    {
+      "id": "ST1",
+      "type": "ST",
+      "text": "Lean on Australian work rights and focus on Australian roles, not US government ones.",
+      "uses": [
+        "S3",
+        "T1"
+      ],
+      "actions": [
+        "A06"
+      ],
+      "scope": "overall"
+    },
+    {
+      "id": "WO1",
+      "type": "WO",
+      "text": "Fix the missing warm path into Initech to unlock its open roles in Australia.",
+      "uses": [
+        "W1",
+        "O1"
+      ],
+      "actions": [
+        "A07",
+        "A11"
+      ],
+      "scope": "initech"
+    },
+    {
+      "id": "WO2",
+      "type": "WO",
+      "text": "Turn route-eval into an Acme-specific demo for the quarterly evaluation challenge.",
+      "uses": [
+        "W4",
+        "O3"
+      ],
+      "actions": [
+        "A10"
+      ],
+      "scope": "acme"
+    },
+    {
+      "id": "WT1",
+      "type": "WT",
+      "text": "Correct the overstated team size before any recruiter compares it with the resume.",
+      "uses": [
+        "W3",
+        "T2"
+      ],
+      "actions": [
+        "A04"
+      ],
+      "scope": "overall"
+    },
+    {
+      "id": "WT2",
+      "type": "WT",
+      "text": "Do not spend effort on product roles that ask for years of product titles; keep them in the backlog.",
+      "uses": [
+        "W2",
+        "T3"
+      ],
+      "actions": [],
+      "scope": "overall"
+    }
+  ]
+}

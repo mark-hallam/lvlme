@@ -1,0 +1,403 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-11-01",
+  "items": [
+    {
+      "id": "E01",
+      "claim": "Program Manager at Contoso Freight, 2021 to now, running warehouse and transport programs",
+      "kind": "job_history",
+      "level": "corroborated",
+      "dimensions": [
+        "D1",
+        "D4"
+      ],
+      "sources": [
+        {
+          "type": "linkedin_export",
+          "ref": "intake/sources/Positions.csv",
+          "checked_on": "2026-10-04"
+        },
+        {
+          "type": "reference",
+          "ref": "intake/answers.md#references",
+          "checked_on": "2026-10-04",
+          "note": "Former manager confirmed title and dates"
+        }
+      ],
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "E02",
+      "claim": "Operations Analyst at Contoso Freight, 2016 to 2021",
+      "kind": "job_history",
+      "level": "self_reported",
+      "dimensions": [
+        "D1"
+      ],
+      "sources": [
+        {
+          "type": "linkedin_export",
+          "ref": "intake/sources/Positions.csv",
+          "checked_on": "2026-10-04"
+        }
+      ],
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "E03",
+      "claim": "Bachelor of Business (Logistics), 2015",
+      "kind": "education",
+      "level": "self_reported",
+      "dimensions": [
+        "D1",
+        "D6"
+      ],
+      "sources": [
+        {
+          "type": "resume",
+          "ref": "intake/sources/resume.pdf",
+          "checked_on": "2026-10-04"
+        }
+      ],
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "E04",
+      "claim": "route-eval: an open-source tool that scores AI answers to logistics questions, 14 releases, 2 outside contributors",
+      "kind": "artefact",
+      "level": "verified",
+      "dimensions": [
+        "D2",
+        "D4",
+        "D5"
+      ],
+      "sources": [
+        {
+          "type": "github",
+          "ref": "https://example.com/alex/route-eval",
+          "checked_on": "2026-10-04"
+        }
+      ],
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "E05",
+      "claim": "Led the rollout of a warehouse scheduling system across 6 sites",
+      "kind": "achievement",
+      "level": "self_reported",
+      "dimensions": [
+        "D2",
+        "D4"
+      ],
+      "sources": [
+        {
+          "type": "resume",
+          "ref": "intake/sources/resume.pdf",
+          "checked_on": "2026-10-04"
+        }
+      ],
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "E06",
+      "claim": "Cut late deliveries by 18 percent in 2023",
+      "kind": "achievement",
+      "level": "unverified",
+      "dimensions": [
+        "D2"
+      ],
+      "sources": [
+        {
+          "type": "website",
+          "ref": "https://example.com/alex/about",
+          "checked_on": "2026-10-04",
+          "note": "Claimed on the personal site; no source yet"
+        }
+      ],
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "E07",
+      "claim": "Personal site with 6 essays on AI in operations",
+      "kind": "public_signal",
+      "level": "verified",
+      "dimensions": [
+        "D5"
+      ],
+      "sources": [
+        {
+          "type": "website",
+          "ref": "https://example.com/alex",
+          "checked_on": "2026-10-04"
+        }
+      ],
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "E08",
+      "claim": "AI practitioner certificate from Example Academy, 2026",
+      "kind": "credential",
+      "level": "verified",
+      "dimensions": [
+        "D2"
+      ],
+      "sources": [
+        {
+          "type": "certification",
+          "ref": "https://example.com/academy/certificates/alex-example",
+          "checked_on": "2026-10-04"
+        }
+      ],
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "E09",
+      "claim": "Two first-degree contacts at Globex Labs; Jordan Sample agreed to introduce Alex to the AI Success team lead",
+      "kind": "network",
+      "level": "verified",
+      "dimensions": [
+        "D3"
+      ],
+      "sources": [
+        {
+          "type": "linkedin_export",
+          "ref": "profile/network.json",
+          "checked_on": "2026-10-11"
+        },
+        {
+          "type": "email",
+          "ref": "Email from Jordan Sample, 2026-10-24",
+          "checked_on": "2026-10-24"
+        }
+      ],
+      "added_on": "2026-10-11",
+      "orgs": [
+        "globex"
+      ]
+    },
+    {
+      "id": "E10",
+      "claim": "One first-degree contact at Acme AI, in an unrelated team, who has not seen Alex's work",
+      "kind": "network",
+      "level": "verified",
+      "dimensions": [
+        "D3"
+      ],
+      "sources": [
+        {
+          "type": "linkedin_export",
+          "ref": "profile/network.json",
+          "checked_on": "2026-10-11"
+        }
+      ],
+      "added_on": "2026-10-11",
+      "orgs": [
+        "acme"
+      ]
+    },
+    {
+      "id": "E11",
+      "claim": "Australian citizen living in Brisbane; can work anywhere in Australia without a visa",
+      "kind": "eligibility",
+      "level": "self_reported",
+      "dimensions": [
+        "D6"
+      ],
+      "sources": [
+        {
+          "type": "interview",
+          "ref": "intake/answers.md#work-rights",
+          "checked_on": "2026-10-04"
+        }
+      ],
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "E12",
+      "claim": "Willing to move to the US, Canada, the UK or Singapore for the right role; would need visa sponsorship there",
+      "kind": "preference",
+      "level": "self_reported",
+      "dimensions": [
+        "D6"
+      ],
+      "sources": [
+        {
+          "type": "interview",
+          "ref": "intake/answers.md#constraints",
+          "checked_on": "2026-10-04"
+        }
+      ],
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "E13",
+      "claim": "Holds a full driver's licence",
+      "kind": "eligibility",
+      "level": "self_reported",
+      "dimensions": [
+        "D6"
+      ],
+      "sources": [
+        {
+          "type": "interview",
+          "ref": "intake/answers.md#work-rights",
+          "checked_on": "2026-10-04"
+        }
+      ],
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "E14",
+      "claim": "Recorded talk at a regional logistics meetup on testing AI answers, 2025",
+      "kind": "public_signal",
+      "level": "verified",
+      "dimensions": [
+        "D5"
+      ],
+      "sources": [
+        {
+          "type": "talk",
+          "ref": "https://example.com/meetups/logistics-ai-2025",
+          "checked_on": "2026-10-18"
+        }
+      ],
+      "added_on": "2026-10-18"
+    },
+    {
+      "id": "E15",
+      "claim": "Case study of the scheduling rollout, with the numbers checked by Alex's former manager",
+      "kind": "artefact",
+      "level": "corroborated",
+      "dimensions": [
+        "D2",
+        "D4"
+      ],
+      "sources": [
+        {
+          "type": "website",
+          "ref": "https://example.com/alex/case-study-scheduling",
+          "checked_on": "2026-10-25"
+        },
+        {
+          "type": "reference",
+          "ref": "intake/answers.md#references",
+          "checked_on": "2026-10-25"
+        }
+      ],
+      "added_on": "2026-10-25"
+    },
+    {
+      "id": "E16",
+      "claim": "LinkedIn headline says Alex 'led a team of 40'; the resume and the referee say 8",
+      "kind": "achievement",
+      "level": "contradicted",
+      "dimensions": [
+        "D5"
+      ],
+      "sources": [
+        {
+          "type": "linkedin_profile",
+          "ref": "https://example.com/in/alex-example",
+          "checked_on": "2026-10-04"
+        },
+        {
+          "type": "resume",
+          "ref": "intake/sources/resume.pdf",
+          "checked_on": "2026-10-04"
+        }
+      ],
+      "added_on": "2026-10-04",
+      "notes": "Fix before applying; see claim C001."
+    },
+    {
+      "id": "E17",
+      "claim": "Generic resume, updated 2026",
+      "kind": "artefact",
+      "level": "verified",
+      "dimensions": [
+        "D7"
+      ],
+      "sources": [
+        {
+          "type": "document",
+          "ref": "intake/sources/resume.pdf",
+          "checked_on": "2026-10-04"
+        }
+      ],
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "E18",
+      "claim": "Tailored resume and cover note for the Initech Robotics fleet deployments role",
+      "kind": "artefact",
+      "level": "verified",
+      "dimensions": [
+        "D7"
+      ],
+      "sources": [
+        {
+          "type": "document",
+          "ref": "campaign/drafts/initech-fleet-application.md",
+          "checked_on": "2026-11-01"
+        }
+      ],
+      "added_on": "2026-11-01",
+      "orgs": [
+        "initech"
+      ]
+    },
+    {
+      "id": "E19",
+      "claim": "LinkedIn export shows no first-degree contacts at Initech Robotics",
+      "kind": "network",
+      "level": "verified",
+      "dimensions": [
+        "D3"
+      ],
+      "sources": [
+        {
+          "type": "linkedin_export",
+          "ref": "profile/network.json",
+          "checked_on": "2026-10-11"
+        }
+      ],
+      "added_on": "2026-10-11",
+      "orgs": [
+        "initech"
+      ]
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "Q01",
+      "question": "What is your notice period at your current employer, and do you have any non-compete terms?",
+      "why": "Sets the earliest start date and whether some roles are off limits (D6, D7).",
+      "dimensions": [
+        "D6",
+        "D7"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "Q02",
+      "question": "Do you know anyone who knows someone at Initech Robotics?",
+      "why": "A second-degree path someone agrees to open lifts D3 from 0 to 2 for four roles.",
+      "dimensions": [
+        "D3"
+      ],
+      "status": "open"
+    },
+    {
+      "id": "Q03",
+      "question": "Would your former manager act as a referee for the scheduling rollout?",
+      "why": "A second source lifts the rollout claim from 1 to 4.",
+      "dimensions": [
+        "D2"
+      ],
+      "status": "answered",
+      "answer_evidence": [
+        "E15"
+      ]
+    }
+  ]
+}

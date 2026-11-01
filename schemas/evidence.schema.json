@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Evidence (profile/evidence.json)",
+  "description": "Every fact the scores may rely on, each with a verification level and its sources, plus open questions only the person can answer.",
+  "type": "object",
+  "required": ["schema_version", "items"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "updated_on": {"$ref": "#/definitions/date"},
+    "items": {"type": "array", "items": {"$ref": "#/definitions/item"}},
+    "open_questions": {"type": "array", "items": {"$ref": "#/definitions/question"}}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "dimension": {"enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]},
+    "item": {
+      "type": "object",
+      "required": ["id", "claim", "kind", "level", "sources"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^E[0-9]{2,}$"},
+        "claim": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["job_history", "education", "credential", "artefact", "achievement", "network", "public_signal", "eligibility", "preference", "other"]},
+        "level": {"enum": ["verified", "corroborated", "self_reported", "unverified", "contradicted"]},
+        "dimensions": {"type": "array", "items": {"$ref": "#/definitions/dimension"}},
+        "orgs": {"type": "array", "items": {"type": "string"}},
+        "sources": {"type": "array", "items": {"$ref": "#/definitions/source"}},
+        "added_on": {"$ref": "#/definitions/date"},
+        "notes": {"type": "string"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["type", "ref"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {"enum": ["interview", "resume", "linkedin_export", "linkedin_profile", "github", "website", "app_store", "publication", "certification", "talk", "web_search", "email", "calendar", "reference", "document", "other"]},
+        "ref": {"type": "string", "minLength": 1, "description": "A URL, a workspace file path, or a short pointer such as 'intake/answers.md#work-rights'."},
+        "checked_on": {"$ref": "#/definitions/date"},
+        "note": {"type": "string"}
+      }
+    },
+    "question": {
+      "type": "object",
+      "required": ["id", "question", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^Q[0-9]{2,}$"},
+        "question": {"type": "string", "minLength": 1},
+        "why": {"type": "string"},
+        "dimensions": {"type": "array", "items": {"$ref": "#/definitions/dimension"}},
+        "status": {"enum": ["open", "answered", "dropped"]},
+        "answer_evidence": {"type": "array", "items": {"type": "string", "pattern": "^E[0-9]{2,}$"}}
+      }
+    }
+  }
+}

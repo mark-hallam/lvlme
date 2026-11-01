@@ -1,0 +1,312 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-11-01",
+  "principle": "Attack the binding constraint first: eligibility, then a warm path, then visible proof of work, then a tailored application.",
+  "max_active": 8,
+  "north_star": [
+    {
+      "id": "warm_intros",
+      "name": "Warm introductions",
+      "current": 1,
+      "target": 3,
+      "evidence": [
+        "E09"
+      ]
+    },
+    {
+      "id": "applications",
+      "name": "Applications to best-fit roles",
+      "current": 0,
+      "target": 3
+    },
+    {
+      "id": "interviews",
+      "name": "Interviews",
+      "current": 0,
+      "target": 2
+    },
+    {
+      "id": "offers",
+      "name": "Offers",
+      "current": 0,
+      "target": 1
+    },
+    {
+      "id": "proof_pieces",
+      "name": "Public proof-of-work pieces",
+      "current": 3,
+      "target": 4,
+      "evidence": [
+        "E04",
+        "E14",
+        "E15"
+      ]
+    },
+    {
+      "id": "credentials",
+      "name": "Credentials",
+      "current": 1,
+      "target": 1,
+      "evidence": [
+        "E08"
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "A01",
+      "title": "Map your LinkedIn network onto the three target organisations",
+      "why": "D3 starts from knowing who you already know.",
+      "status": "done",
+      "owner": "both",
+      "dimension": "D3",
+      "effort_hours": 1,
+      "expected_points": 4,
+      "roles_affected": 12,
+      "chance": 0.9,
+      "done_when": "profile/network.json lists contacts per organisation",
+      "gap_id": "warm-intro",
+      "metric": "warm_intros",
+      "added_on": "2026-10-04",
+      "started_on": "2026-10-04",
+      "finished_on": "2026-10-11",
+      "done_evidence": "profile/network.json (generated 2026-10-11)"
+    },
+    {
+      "id": "A02",
+      "title": "Ask Jordan Sample for the introduction to the Globex AI Success lead, and send route-eval first",
+      "why": "Turns an agreed path (D3 2) into a named insider who knows your work (D3 3).",
+      "status": "doing",
+      "owner": "you",
+      "dimension": "D3",
+      "effort_hours": 2,
+      "expected_points": 4,
+      "roles_affected": 4,
+      "chance": 0.5,
+      "done_when": "The AI Success lead has replied and seen route-eval (email)",
+      "strategy_ids": [
+        "SO2"
+      ],
+      "gap_id": "warm-intro",
+      "metric": "warm_intros",
+      "orgs": [
+        "globex"
+      ],
+      "added_on": "2026-10-18",
+      "started_on": "2026-10-25",
+      "draft": "campaign/drafts/intro-request-jordan.md"
+    },
+    {
+      "id": "A03",
+      "title": "Publish the scheduling rollout case study with numbers your former manager has checked",
+      "why": "One corroborated, public proof-of-work piece lifts D2 for most best-fit roles.",
+      "status": "done",
+      "owner": "you",
+      "dimension": "D2",
+      "effort_hours": 6,
+      "expected_points": 4,
+      "roles_affected": 6,
+      "chance": 0.7,
+      "done_when": "Case study is live and the referee has confirmed the numbers",
+      "gap_id": "proof-piece",
+      "metric": "proof_pieces",
+      "added_on": "2026-10-04",
+      "started_on": "2026-10-11",
+      "finished_on": "2026-10-25",
+      "done_evidence": "https://example.com/alex/case-study-scheduling"
+    },
+    {
+      "id": "A04",
+      "title": "Fix the LinkedIn headline: 'led a team of 40' should say 'led a team of 8'",
+      "why": "Overclaims hurt credibility more than gaps. Fix before any application goes out.",
+      "status": "todo",
+      "owner": "you",
+      "dimension": "D5",
+      "effort_hours": 0.5,
+      "expected_points": 2,
+      "roles_affected": 12,
+      "chance": 0.9,
+      "done_when": "Headline changed (screenshot or link), claim C001 re-checked as supported",
+      "strategy_ids": [
+        "WT1"
+      ],
+      "added_on": "2026-10-25"
+    },
+    {
+      "id": "A05",
+      "title": "Tailor your resume and cover note for the Initech fleet deployments role",
+      "why": "A tailored application lifts D7 for the best-fit role.",
+      "status": "done",
+      "owner": "you",
+      "dimension": "D7",
+      "effort_hours": 3,
+      "expected_points": 2,
+      "roles_affected": 1,
+      "chance": 0.9,
+      "done_when": "Tailored resume and cover note saved in campaign/drafts/",
+      "strategy_ids": [
+        "SO1"
+      ],
+      "gap_id": "tailored-application",
+      "metric": "applications",
+      "orgs": [
+        "initech"
+      ],
+      "added_on": "2026-10-25",
+      "started_on": "2026-10-26",
+      "finished_on": "2026-11-01",
+      "done_evidence": "campaign/drafts/initech-fleet-application.md"
+    },
+    {
+      "id": "A06",
+      "title": "Apply to the Initech Robotics fleet deployments role once A04 is done",
+      "why": "Best fit of all open roles. Apply after the headline fix so the profiles match.",
+      "status": "todo",
+      "owner": "you",
+      "dimension": "D7",
+      "effort_hours": 1,
+      "expected_points": 1,
+      "roles_affected": 1,
+      "chance": 0.8,
+      "done_when": "Application submitted (confirmation email)",
+      "strategy_ids": [
+        "SO1",
+        "ST1"
+      ],
+      "metric": "applications",
+      "orgs": [
+        "initech"
+      ],
+      "added_on": "2026-11-01",
+      "draft": "campaign/drafts/initech-fleet-application.md"
+    },
+    {
+      "id": "A07",
+      "title": "Ask your three closest logistics contacts whether they know anyone at Initech Robotics",
+      "why": "Initech has four matching roles and no warm path (D3 0). An agreed second-degree path is D3 2.",
+      "status": "todo",
+      "owner": "you",
+      "dimension": "D3",
+      "effort_hours": 2,
+      "expected_points": 8,
+      "roles_affected": 4,
+      "chance": 0.4,
+      "done_when": "Someone has agreed to introduce you to a person at Initech (email or message)",
+      "strategy_ids": [
+        "WO1"
+      ],
+      "gap_id": "initech-path",
+      "metric": "warm_intros",
+      "orgs": [
+        "initech"
+      ],
+      "added_on": "2026-10-25"
+    },
+    {
+      "id": "A08",
+      "title": "Answer the notice period and non-compete question (Q01)",
+      "why": "Confirms the earliest start date and that no role is off limits.",
+      "status": "todo",
+      "owner": "you",
+      "dimension": "D6",
+      "effort_hours": 0.5,
+      "expected_points": 1,
+      "roles_affected": 12,
+      "chance": 0.9,
+      "done_when": "Answer recorded in intake/answers.md and evidence.json",
+      "added_on": "2026-10-25"
+    },
+    {
+      "id": "A09",
+      "title": "Start a weekly newsletter on AI in operations",
+      "why": "A bet on public signal (D5).",
+      "status": "dropped",
+      "owner": "you",
+      "dimension": "D5",
+      "effort_hours": 3,
+      "expected_points": 2,
+      "roles_affected": 12,
+      "chance": 0.3,
+      "done_when": "Three issues sent and at least 50 subscribers",
+      "metric": "proof_pieces",
+      "added_on": "2026-10-04",
+      "started_on": "2026-10-04",
+      "finished_on": "2026-10-25",
+      "notes": "Dropped: no movement after 3 runs."
+    },
+    {
+      "id": "A10",
+      "title": "Build a small route-eval demo for Acme AI's quarterly evaluation challenge",
+      "why": "An Acme-specific piece of work is the D4 edge most applicants lack.",
+      "status": "doing",
+      "owner": "you",
+      "dimension": "D4",
+      "effort_hours": 6,
+      "expected_points": 2,
+      "roles_affected": 3,
+      "chance": 0.5,
+      "done_when": "Demo submitted to the challenge (link)",
+      "strategy_ids": [
+        "WO2"
+      ],
+      "gap_id": "org-edge",
+      "orgs": [
+        "acme"
+      ],
+      "added_on": "2026-10-11",
+      "started_on": "2026-10-11"
+    },
+    {
+      "id": "A11",
+      "title": "Go to the Initech warehouse operators meetup in Melbourne",
+      "why": "Meets Initech staff in person; a possible warm path.",
+      "status": "todo",
+      "owner": "you",
+      "dimension": "D3",
+      "effort_hours": 4,
+      "expected_points": 8,
+      "roles_affected": 4,
+      "chance": 0.2,
+      "done_when": "Met at least one Initech employee who has seen your work (follow-up email)",
+      "strategy_ids": [
+        "WO1"
+      ],
+      "gap_id": "initech-path",
+      "metric": "warm_intros",
+      "orgs": [
+        "initech"
+      ],
+      "added_on": "2026-11-01"
+    }
+  ],
+  "backlog": [
+    "Product roles at Globex and Initech: revisit after six months of product-adjacent work (WT2).",
+    "A second public talk, once the case study has had a month to circulate."
+  ],
+  "experiments_log": [
+    {
+      "date": "2026-10-11",
+      "action_id": "A01",
+      "action": "Map the LinkedIn network",
+      "result": "1 contact at Acme AI, 2 at Globex Labs, 0 at Initech Robotics.",
+      "decision": "done",
+      "why": "D3 rose from 0 to 1 at Acme and Globex."
+    },
+    {
+      "date": "2026-10-25",
+      "action_id": "A09",
+      "action": "Weekly newsletter",
+      "result": "3 issues, 9 subscribers, no change in D5 or any metric over 3 runs.",
+      "decision": "drop",
+      "why": "The case study moved D2 more for less time."
+    },
+    {
+      "date": "2026-10-25",
+      "action_id": "A03",
+      "action": "Scheduling case study",
+      "result": "D2 rose from 2 to 3 on the two Initech roles.",
+      "decision": "done",
+      "why": "Keep: corroborated proof works. Plan a second piece later."
+    }
+  ]
+}

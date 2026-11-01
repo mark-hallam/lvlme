@@ -1,0 +1,346 @@
+{
+  "schema_version": 1,
+  "goal": {
+    "slug": "ai-product-companies",
+    "title": "A program, applied AI or policy role at an AI product company",
+    "description": "Fictional demo goal for Alex Example: one of three made-up AI companies, ideally in Australia.",
+    "horizon_months": 12,
+    "started_on": "2026-10-04"
+  },
+  "candidate": {
+    "display_name": "Alex Example",
+    "home_region": "Brisbane, Australia",
+    "timezone": "Australia/Brisbane",
+    "writes_production_code": false,
+    "eligibility_cleared": [
+      "licence"
+    ]
+  },
+  "targets": [
+    {
+      "id": "acme",
+      "name": "Acme AI",
+      "ats": "greenhouse",
+      "slug": "acme",
+      "aliases": [
+        "Acme Artificial Intelligence"
+      ],
+      "notes": "Fictional."
+    },
+    {
+      "id": "globex",
+      "name": "Globex Labs",
+      "ats": "ashby",
+      "slug": "globex",
+      "aliases": [
+        "Globex Labs AI"
+      ],
+      "notes": "Fictional."
+    },
+    {
+      "id": "initech",
+      "name": "Initech Robotics",
+      "ats": "lever",
+      "slug": "initech",
+      "aliases": [
+        "Initech Robotics Pty Ltd"
+      ],
+      "notes": "Fictional."
+    }
+  ],
+  "families": [
+    {
+      "id": "tpm",
+      "name": "Technical program manager",
+      "title_keywords": [
+        "technical program manag",
+        "tpm",
+        "program manag",
+        "programme manag",
+        "project manag",
+        "chief of staff"
+      ],
+      "department_keywords": [
+        "Technical Program Management"
+      ],
+      "exclude_title_keywords": [
+        "finance",
+        "legal",
+        "sox"
+      ]
+    },
+    {
+      "id": "product",
+      "name": "Product manager",
+      "title_keywords": [
+        "product manag",
+        "head of product",
+        "product lead",
+        "group product",
+        "product owner"
+      ],
+      "department_keywords": [
+        "Product Management"
+      ],
+      "exclude_title_keywords": [
+        "product marketing"
+      ]
+    },
+    {
+      "id": "applied_ai",
+      "name": "Applied and forward-deployed AI",
+      "title_keywords": [
+        "applied ai",
+        "forward deployed",
+        "forward-deployed",
+        "fde",
+        "deployment lead",
+        "deployment manager",
+        "deployment strategist",
+        "solutions architect",
+        "solution architect",
+        "ai success",
+        "technical success",
+        "customer success",
+        "partner enablement",
+        "enablement lead"
+      ],
+      "department_keywords": [
+        "Applied AI",
+        "Forward Deployed Engineering",
+        "Technical Success"
+      ],
+      "exclude_title_keywords": [
+        "ads"
+      ],
+      "drop_if_heavy_coding": true
+    },
+    {
+      "id": "policy_safety",
+      "name": "Policy and safety operations",
+      "title_keywords": [
+        "policy",
+        "policies",
+        "trust and safety",
+        "trust & safety",
+        "safety operations",
+        "safety ops",
+        "safeguards",
+        "governance",
+        "enforcement",
+        "integrity",
+        "public affairs",
+        "government affairs",
+        "global affairs",
+        "regulatory",
+        "threat intel",
+        "child safety",
+        "abuse"
+      ],
+      "department_keywords": [
+        "Safeguards",
+        "Public Policy",
+        "Global Affairs",
+        "Trust & Safety",
+        "Safety Systems"
+      ],
+      "exclude_title_keywords": [
+        "engineer",
+        "developer",
+        "scientist",
+        "researcher"
+      ]
+    }
+  ],
+  "exclude_title_keywords": [
+    "intern",
+    "internship",
+    "co-op",
+    "fellowship",
+    "recruiter",
+    "recruiting",
+    "sourcer",
+    "talent",
+    "counsel",
+    "attorney",
+    "paralegal",
+    "accountant",
+    "accounting",
+    "payroll",
+    "tax",
+    "treasury",
+    "account executive",
+    "business development",
+    "sales",
+    "marketing",
+    "designer",
+    "data scientist",
+    "research scientist",
+    "research engineer",
+    "software engineer",
+    "technician",
+    "facilities",
+    "chef",
+    "barista"
+  ],
+  "locations": {
+    "classes": [
+      {
+        "id": "australia_nz",
+        "name": "Australia and New Zealand",
+        "keywords": [
+          "australia",
+          "sydney",
+          "melbourne",
+          "brisbane",
+          "perth",
+          "adelaide",
+          "canberra",
+          "hobart",
+          "new zealand",
+          "auckland",
+          "wellington"
+        ]
+      },
+      {
+        "id": "apac_other",
+        "name": "Rest of Asia Pacific",
+        "keywords": [
+          "singapore",
+          "tokyo",
+          "japan",
+          "seoul",
+          "korea",
+          "india",
+          "bengaluru",
+          "bangalore",
+          "mumbai",
+          "delhi",
+          "hyderabad",
+          "hong kong",
+          "taipei",
+          "taiwan",
+          "jakarta",
+          "manila",
+          "apac",
+          "asia pacific",
+          "asia-pacific"
+        ]
+      },
+      {
+        "id": "us",
+        "name": "United States",
+        "keywords": [
+          "united states",
+          "usa",
+          "u.s.",
+          "us",
+          "san francisco",
+          "new york",
+          "seattle",
+          "washington",
+          "boston",
+          "austin",
+          "palo alto",
+          "mountain view",
+          "los angeles",
+          "chicago",
+          "denver",
+          "bay area",
+          "re:,\\s*(al|ak|az|ar|ca|co|ct|dc|de|fl|ga|hi|ia|id|il|in|ks|ky|la|ma|md|me|mi|mn|mo|ms|mt|nc|nd|ne|nh|nj|nm|nv|ny|oh|ok|or|pa|ri|sc|sd|tn|tx|ut|va|vt|wa|wi|wv|wy)\\b"
+        ]
+      },
+      {
+        "id": "canada",
+        "name": "Canada",
+        "keywords": [
+          "canada",
+          "toronto",
+          "vancouver",
+          "montreal",
+          "ontario"
+        ]
+      },
+      {
+        "id": "uk_eu",
+        "name": "United Kingdom and Europe",
+        "keywords": [
+          "united kingdom",
+          "uk",
+          "england",
+          "london",
+          "dublin",
+          "ireland",
+          "paris",
+          "france",
+          "germany",
+          "berlin",
+          "munich",
+          "zurich",
+          "switzerland",
+          "amsterdam",
+          "netherlands",
+          "madrid",
+          "spain",
+          "milan",
+          "italy",
+          "stockholm",
+          "warsaw",
+          "europe",
+          "emea"
+        ]
+      },
+      {
+        "id": "remote",
+        "name": "Remote, any country",
+        "keywords": [
+          "remote",
+          "anywhere"
+        ]
+      }
+    ],
+    "default_class": "other"
+  },
+  "heavy_coding": {
+    "detect": true
+  },
+  "scoring": {
+    "weights": {
+      "D1": 25,
+      "D2": 20,
+      "D3": 20,
+      "D4": 10,
+      "D5": 10,
+      "D6": 10,
+      "D7": 5
+    },
+    "review_required_above": 2,
+    "top_n_for_gaps": 25,
+    "self_reported_caps": {
+      "job_history": 3,
+      "education": 3,
+      "eligibility": 5,
+      "preference": 5,
+      "default": 1
+    }
+  },
+  "cadence": {
+    "mode": "weekly",
+    "build_up_weeks": 0,
+    "run_time": "07:00"
+  },
+  "privacy": {
+    "sensitive_mode": true,
+    "share_contact_names_with_agents": false,
+    "show_contact_names_in_dashboard": false,
+    "redact_terms": [
+      "Contoso Freight",
+      "Contoso"
+    ]
+  },
+  "report": {
+    "title": "Alex Example: career campaign",
+    "subtitle": "Fictional demo. Honest odds, and what moves them."
+  },
+  "fictional": true
+}

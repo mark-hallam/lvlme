@@ -1,0 +1,257 @@
+"""Shared helpers for the career-eval scripts. Standard library only.
+
+Covers: finding the workspace, the workspace location guard, JSON input and
+output, keyword matching, dates, and constants shared by several scripts.
+"""
+import datetime as dt
+import json
+import os
+import re
+import sys
+
+ENGINE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SCHEMA_DIR = os.path.join(ENGINE_ROOT, "schemas")
+TEMPLATE_DIR = os.path.join(ENGINE_ROOT, "templates")
+DEFAULT_PARENT = os.path.join(os.path.expanduser("~"), "career-eval-workspaces")
+
+DIMENSIONS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]
+DIMENSION_NAMES = {
+    "D1": "Requirements match",
+    "D2": "Proof of work",
+    "D3": "Warm path",
+    "D4": "Org-specific edge",
+    "D5": "Public signal",
+    "D6": "Eligibility and logistics",
+    "D7": "Application readiness",
+}
+DEFAULT_WEIGHTS = {"D1": 25, "D2": 20, "D3": 20, "D4": 10, "D5": 10, "D6": 10, "D7": 5}
+BANDS = ["Very low", "Low", "Moderate", "Good", "Strong"]
+BLOCKER_TYPES = ["us_person_export_control", "security_clearance", "citizenship", "licence"]
+BLOCKER_NAMES = {
+    "us_person_export_control": "US person or export control (ITAR)",
+    "security_clearance": "Security clearance",
+    "citizenship": "Citizenship",
+    "licence": "Licence",
+}
+
+
+class WorkspaceError(Exception):
+    """Raised when a workspace cannot be found or is in an unsafe place."""
+
+
+# ------------------------------------------------------------------ files
+
+
+def load_json(path, default=None):
+    """Read a JSON file; return default if it does not exist."""
+    if not os.path.exists(path):
+        return default
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def dump_json(data):
+    """Canonical JSON text used for every file the engine writes."""
+    return json.dumps(data, indent=2, ensure_ascii=False) + "\n"
+
+
+def write_json(path, data):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(dump_json(data))
+
+
+def write_text(path, text):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(text)
+
+
+def wpath(workspace, *parts):
+    return os.path.join(workspace, *parts)
+
+
+# -------------------------------------------------------------- workspace
+
+
+def resolve_workspace(arg):
+    """--workspace, else $CAREER_EVAL_HOME, else the only folder in ~/career-eval-workspaces."""
+    if arg:
+        return os.path.abspath(os.path.expanduser(arg))
+    env = os.environ.get("CAREER_EVAL_HOME")
+    if env:
+        return os.path.abspath(os.path.expanduser(env))
+    if os.path.isdir(DEFAULT_PARENT):
+        subs = [d for d in sorted(os.listdir(DEFAULT_PARENT))
+                if os.path.isfile(os.path.join(DEFAULT_PARENT, d, "config.json"))]
+        if len(subs) == 1:
+            return os.path.join(DEFAULT_PARENT, subs[0])
+        if len(subs) > 1:
+            raise WorkspaceError("Several workspaces in %s (%s). Pass --workspace or set CAREER_EVAL_HOME."
+                                 % (DEFAULT_PARENT, ", ".join(subs)))
+    raise WorkspaceError("No workspace found. Run scripts/init.py first, or pass --workspace PATH, "
+                         "or set CAREER_EVAL_HOME.")
+
+
+def _is_within(path, parent):
+    path, parent = os.path.realpath(path), os.path.realpath(parent)
+    return path == parent or path.startswith(parent.rstrip(os.sep) + os.sep)
+
+
+def find_git_root(path):
+    """Nearest folder at or above path that holds a .git entry, or None."""
+    cur = os.path.realpath(path)
+    while not os.path.exists(cur):
+        cur = os.path.dirname(cur)
+    while True:
+        if os.path.exists(os.path.join(cur, ".git")):
+            return cur
+        parent = os.path.dirname(cur)
+        if parent == cur:
+            return None
+        cur = parent
+
+
+def git_config_path(repo_root):
+    """Path of the git config for a repo, following worktree and submodule .git files."""
+    dotgit = os.path.join(repo_root, ".git")
+    if os.path.isdir(dotgit):
+        return os.path.join(dotgit, "config")
+    try:
+        with open(dotgit, encoding="utf-8") as fh:
+            line = fh.read().strip()
+    except OSError:
+        return None
+    if not line.startswith("gitdir:"):
+        return None
+    gitdir = line.split(":", 1)[1].strip()
+    if not os.path.isabs(gitdir):
+        gitdir = os.path.join(repo_root, gitdir)
+    common = os.path.join(gitdir, "commondir")
+    if os.path.exists(common):
+        with open(common, encoding="utf-8") as fh:
+            gitdir = os.path.normpath(os.path.join(gitdir, fh.read().strip()))
+    return os.path.join(gitdir, "config")
+
+
+def git_remotes(repo_root):
+    """Remote names configured for the repo at repo_root (reads the config file, no git needed)."""
+    cfg = git_config_path(repo_root)
+    if not cfg or not os.path.exists(cfg):
+        return []
+    with open(cfg, encoding="utf-8", errors="replace") as fh:
+        return re.findall(r'^\s*\[remote\s+"([^"]+)"\]', fh.read(), re.M)
+
+
+def location_problem(workspace, config=None):
+    """Return a reason string if the workspace is in an unsafe place, else None.
+
+    Unsafe: inside the engine repo (except the fictional demo under examples/),
+    or inside any git repository that has a remote configured.
+    """
+    if config is None:
+        config = load_json(wpath(workspace, "config.json"), {}) or {}
+    demo = bool(config.get("fictional")) and _is_within(workspace, os.path.join(ENGINE_ROOT, "examples"))
+    if demo:
+        return None
+    if _is_within(workspace, ENGINE_ROOT):
+        return ("The workspace %s is inside the career-eval engine folder. Personal data must live outside "
+                "it. Use the default ~/career-eval-workspaces/<goal> or set CAREER_EVAL_HOME." % workspace)
+    root = find_git_root(workspace)
+    if root:
+        remotes = git_remotes(root)
+        if remotes:
+            return ("The workspace %s is inside the git repository %s, which has a remote (%s). A push could "
+                    "publish personal data. Move the workspace outside it." % (workspace, root, ", ".join(remotes)))
+    return None
+
+
+def open_workspace(arg, need_config=True):
+    """Resolve and guard a workspace. Returns (path, config). Exits with code 2 if unsafe."""
+    try:
+        ws = resolve_workspace(arg)
+    except WorkspaceError as exc:
+        sys.exit("career-eval: %s" % exc)
+    cfg_path = wpath(ws, "config.json")
+    if need_config and not os.path.exists(cfg_path):
+        sys.exit("career-eval: no config.json in %s. Run scripts/init.py first." % ws)
+    config = load_json(cfg_path, {}) or {}
+    problem = location_problem(ws, config)
+    if problem:
+        print("career-eval: refused. " + problem, file=sys.stderr)
+        sys.exit(2)
+    return ws, config
+
+
+# ------------------------------------------------------------------ dates
+
+
+def today_in(config):
+    """Today's date (ISO) in the candidate's time zone, falling back to UTC."""
+    tz_name = ((config or {}).get("candidate") or {}).get("timezone") or "UTC"
+    try:
+        from zoneinfo import ZoneInfo
+        return dt.datetime.now(ZoneInfo(tz_name)).date().isoformat()
+    except Exception:
+        return dt.datetime.now(dt.timezone.utc).date().isoformat()
+
+
+def check_date(value):
+    try:
+        dt.date.fromisoformat(value)
+    except (TypeError, ValueError):
+        raise SystemExit("career-eval: bad date %r, use YYYY-MM-DD" % (value,))
+    return value
+
+
+# --------------------------------------------------------------- keywords
+
+
+def keyword_regex(keyword):
+    """Compile one config keyword.
+
+    Plain phrases match case-insensitively at the start of a word, so
+    'program manag' matches 'Program Manager'. Keywords of three letters or
+    fewer must match a whole word. 're:' starts a regular expression.
+    """
+    if keyword.startswith("re:"):
+        return re.compile(keyword[3:], re.I)
+    phrase = keyword.strip().lower()
+    end = r"(?![a-z0-9])" if len(phrase) <= 3 else ""
+    return re.compile(r"(?<![a-z0-9])" + re.escape(phrase) + end, re.I)
+
+
+_KW_CACHE = {}
+
+
+def matches_any(keywords, text):
+    """True if any keyword matches text."""
+    if not text:
+        return False
+    for kw in keywords or []:
+        rx = _KW_CACHE.get(kw)
+        if rx is None:
+            rx = _KW_CACHE[kw] = keyword_regex(kw)
+        if rx.search(text):
+            return True
+    return False
+
+
+# ------------------------------------------------------------------ misc
+
+
+def weights_of(config):
+    w = ((config or {}).get("scoring") or {}).get("weights") or {}
+    return {d: int(w.get(d, DEFAULT_WEIGHTS[d])) for d in DIMENSIONS}
+
+
+def target_ids(config):
+    return [t["id"] for t in (config or {}).get("targets", [])]
+
+
+def target_names(config):
+    return {t["id"]: t.get("name", t["id"]) for t in (config or {}).get("targets", [])}
+
+
+def family_names(config):
+    return {f["id"]: f.get("name", f["id"]) for f in (config or {}).get("families", [])}

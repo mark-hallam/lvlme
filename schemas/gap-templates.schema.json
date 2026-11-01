@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Gap templates (eval/gap-templates.json)",
+  "description": "Gaps the person could close in one to three months. score.py works out how many fit points each would add across the best roles.",
+  "type": "object",
+  "required": ["schema_version", "gaps"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "dimension", "target_score"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9_-]+$"},
+          "title": {"type": "string", "minLength": 1},
+          "why": {"type": "string"},
+          "dimension": {"enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]},
+          "target_score": {"type": "integer", "minimum": 0, "maximum": 5},
+          "orgs": {"anyOf": [{"const": "all"}, {"type": "array", "items": {"type": "string"}}]},
+          "families": {"anyOf": [{"const": "all"}, {"type": "array", "items": {"type": "string"}}]},
+          "location_classes": {"type": "array", "items": {"type": "string"}},
+          "exclude_blocked": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

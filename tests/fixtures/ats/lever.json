@@ -1,0 +1,116 @@
+[
+  {
+    "id": "i-0001",
+    "text": "Program Manager, Robot Fleet Deployments",
+    "categories": {
+      "commitment": "Full-time",
+      "department": "Operations",
+      "location": "Melbourne, Australia",
+      "team": "Fleet",
+      "allLocations": [
+        "Melbourne, Australia"
+      ]
+    },
+    "country": "AU",
+    "workplaceType": "onsite",
+    "hostedUrl": "https://example.com/jobs/initech/i-0001",
+    "applyUrl": "https://example.com/jobs/initech/i-0001/apply",
+    "createdAt": 1760832000000,
+    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the career-eval demo.</div><div>Plan and run robot fleet rollouts at customer warehouses.</div>",
+    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the career-eval demo.</div><div>Plan and run robot fleet rollouts at customer warehouses.</div>",
+    "lists": [
+      {
+        "text": "What you will do",
+        "content": "<li>Run deployment programs across customer sites</li><li>Coordinate hardware, software and site teams</li>"
+      },
+      {
+        "text": "Requirements",
+        "content": "<li>4+ years of program or project management</li><li>Experience with hardware, logistics or warehouse operations</li><li>Comfort working on customer sites</li>"
+      },
+      {
+        "text": "Nice to have",
+        "content": "<li>Experience with robotics or automation projects</li>"
+      }
+    ],
+    "additional": "",
+    "additionalPlain": "",
+    "salaryRange": {
+      "currency": "AUD",
+      "interval": "per-year-salary",
+      "min": 150000,
+      "max": 180000
+    }
+  },
+  {
+    "id": "i-0002",
+    "text": "Product Manager, Warehouse Autonomy",
+    "categories": {
+      "commitment": "Full-time",
+      "department": "Product",
+      "location": "Brisbane, Australia",
+      "team": "Autonomy",
+      "allLocations": [
+        "Brisbane, Australia"
+      ]
+    },
+    "country": "AU",
+    "workplaceType": "hybrid",
+    "hostedUrl": "https://example.com/jobs/initech/i-0002",
+    "applyUrl": "https://example.com/jobs/initech/i-0002/apply",
+    "createdAt": 1759622400000,
+    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the career-eval demo.</div><div>Shape how autonomous robots move goods through warehouses.</div>",
+    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the career-eval demo.</div><div>Shape how autonomous robots move goods through warehouses.</div>",
+    "lists": [
+      {
+        "text": "What you will do",
+        "content": "<li>Define the roadmap for autonomy features</li><li>Visit customer warehouses to learn their workflows</li>"
+      },
+      {
+        "text": "Requirements",
+        "content": "<li>3+ years in product management or operations roles close to product</li><li>Must hold a valid driver's licence for site visits</li>"
+      },
+      {
+        "text": "Nice to have",
+        "content": "<li>Background in logistics</li>"
+      }
+    ],
+    "additional": "",
+    "additionalPlain": ""
+  },
+  {
+    "id": "i-0004",
+    "text": "Customer Success Manager, Fleet Operations",
+    "categories": {
+      "commitment": "Full-time",
+      "department": "Customer",
+      "location": "Auckland, New Zealand",
+      "team": "Success",
+      "allLocations": [
+        "Auckland, New Zealand"
+      ]
+    },
+    "country": "AU",
+    "workplaceType": "unspecified",
+    "hostedUrl": "https://example.com/jobs/initech/i-0004",
+    "applyUrl": "https://example.com/jobs/initech/i-0004/apply",
+    "createdAt": 1761955200000,
+    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the career-eval demo.</div><div>Keep fleet customers in New Zealand successful.</div>",
+    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the career-eval demo.</div><div>Keep fleet customers in New Zealand successful.</div>",
+    "lists": [
+      {
+        "text": "What you will do",
+        "content": "<li>Run quarterly reviews with customers</li><li>Spot problems before they become outages</li>"
+      },
+      {
+        "text": "Requirements",
+        "content": "<li>3+ years in customer success or operations</li>"
+      },
+      {
+        "text": "Nice to have",
+        "content": "<li>Experience with warehouse management systems</li>"
+      }
+    ],
+    "additional": "",
+    "additionalPlain": ""
+  }
+]

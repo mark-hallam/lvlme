@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Workspace config (config.json)",
+  "description": "The goal, the target organisations, the role families and their keywords, location classes, scoring weights, cadence and privacy settings for one workspace.",
+  "type": "object",
+  "required": ["schema_version", "goal", "targets", "families", "locations"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "fictional": {"type": "boolean", "description": "True only for the bundled demo workspace. Lets the demo live inside the engine repo."},
+    "goal": {
+      "type": "object",
+      "required": ["slug", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "slug": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+        "title": {"type": "string", "minLength": 1},
+        "description": {"type": "string"},
+        "horizon_months": {"type": "integer", "minimum": 1, "maximum": 60},
+        "started_on": {"$ref": "#/definitions/date"}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "display_name": {"type": "string"},
+        "home_region": {"type": "string"},
+        "timezone": {"type": "string", "description": "IANA time zone name, for example Australia/Sydney. Sets what 'today' means."},
+        "writes_production_code": {"type": "boolean", "description": "False means postings that expect production coding count as a lacking hard requirement until judged."},
+        "eligibility_cleared": {
+          "type": "array",
+          "description": "Eligibility blocker types this person meets, so postings with them are not blocked.",
+          "items": {"$ref": "#/definitions/blocker_type"}
+        }
+      }
+    },
+    "targets": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/target"}},
+    "families": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/family"}},
+    "exclude_title_keywords": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "locations": {
+      "type": "object",
+      "required": ["classes"],
+      "additionalProperties": false,
+      "properties": {
+        "classes": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/location_class"}},
+        "default_class": {"type": "string"}
+      }
+    },
+    "heavy_coding": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"detect": {"type": "boolean"}}
+    },
+    "scoring": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "weights": {
+          "type": "object",
+          "required": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"],
+          "additionalProperties": false,
+          "properties": {
+            "D1": {"type": "integer", "minimum": 0, "maximum": 100},
+            "D2": {"type": "integer", "minimum": 0, "maximum": 100},
+            "D3": {"type": "integer", "minimum": 0, "maximum": 100},
+            "D4": {"type": "integer", "minimum": 0, "maximum": 100},
+            "D5": {"type": "integer", "minimum": 0, "maximum": 100},
+            "D6": {"type": "integer", "minimum": 0, "maximum": 100},
+            "D7": {"type": "integer", "minimum": 0, "maximum": 100}
+          }
+        },
+        "review_required_above": {"type": "integer", "minimum": 0, "maximum": 5},
+        "top_n_for_gaps": {"type": "integer", "minimum": 1, "maximum": 500},
+        "self_reported_caps": {
+          "type": "object",
+          "additionalProperties": {"type": "integer", "minimum": 0, "maximum": 5}
+        }
+      }
+    },
+    "cadence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {"enum": ["daily", "weekly"]},
+        "build_up_weeks": {"type": "integer", "minimum": 0, "maximum": 52},
+        "run_time": {"type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$"}
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sensitive_mode": {"type": "boolean", "description": "Agent files (SUMMARY.md, dashboard.json) omit employer names, third-party names and salary."},
+        "share_contact_names_with_agents": {"type": "boolean", "description": "Opt in to contact names in agent files. Ignored while sensitive_mode is true."},
+        "show_contact_names_in_dashboard": {"type": "boolean"},
+        "redact_terms": {"type": "array", "items": {"type": "string", "minLength": 2}, "description": "Employer names and other words to hide in sensitive mode."}
+      }
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": {"type": "string"},
+        "subtitle": {"type": "string"}
+      }
+    }
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "blocker_type": {"enum": ["us_person_export_control", "security_clearance", "citizenship", "licence"]},
+    "target": {
+      "type": "object",
+      "required": ["id", "name", "ats"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "ats": {"enum": ["greenhouse", "ashby", "lever", "manual"]},
+        "slug": {"type": "string"},
+        "region": {"enum": ["global", "eu"], "description": "Lever only: eu uses the EU endpoint."},
+        "aliases": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "careers_url": {"type": "string"},
+        "notes": {"type": "string"}
+      }
+    },
+    "family": {
+      "type": "object",
+      "required": ["id", "name", "title_keywords"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "title_keywords": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "department_keywords": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "exclude_title_keywords": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "drop_if_heavy_coding": {"type": "boolean"}
+      }
+    },
+    "location_class": {
+      "type": "object",
+      "required": ["id", "name", "keywords"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "keywords": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+Notes:
+"Fictional demo export in the LinkedIn Connections.csv format. Some email addresses are blank, as in real exports."
+
+First Name,Last Name,URL,Email Address,Company,Position,Connected On
+Jordan,Sample,https://example.com/in/jordan-sample,jordan.sample@example.com,Globex Labs,Program Manager,12 Mar 2022
+Casey,Demo,https://example.com/in/casey-demo,,"Globex Labs, Inc.",AI Success Manager,03 Jan 2024
+Riley,Placeholder,https://example.com/in/riley-placeholder,,ACME AI Inc,Recruiting Coordinator,20 Jun 2023
+Morgan,Test,https://example.com/in/morgan-test,morgan@example.com,Contoso Freight,Operations Lead,15 Aug 2019
+Taylor,Fixture,https://example.com/in/taylor-fixture,,Fabrikam,Warehouse Manager,02 Feb 2021
+Avery,Mock,https://example.com/in/avery-mock,,Northwind Traders,Logistics Analyst,30 Nov 2020
+Quinn,Stub,https://example.com/in/quinn-stub,,Contoso Freight,Transport Planner,11 May 2018
+Drew,Example,https://example.com/in/drew-example,,Tailspin Toys,Supply Chain Lead,07 Jul 2022
+Sky,Sampleton,https://example.com/in/sky-sampleton,,Initech Consulting Group,Consultant,19 Sep 2024
+Rowan,Dummy,https://example.com/in/rowan-dummy,,Wide World Importers,Operations Manager,25 Oct 2017

@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Scored run (eval/runs/<date>.json)",
+  "description": "One deterministic scored run written by score.py: every role with its seven dimension scores, fit, bands and adjustments, plus best role per organisation, the gap leaderboard, the outlook and the verify-to-unlock questions.",
+  "type": "object",
+  "required": ["schema_version", "run_date", "rubric_version", "weights", "counts", "roles", "per_org", "gaps", "outlook", "verify_to_unlock", "warnings"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "run_date": {"$ref": "#/definitions/date"},
+    "rubric_version": {"type": "string"},
+    "goal": {"type": "string"},
+    "weights": {"type": "object", "additionalProperties": {"type": "integer"}},
+    "inputs_digest": {"type": "string"},
+    "counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+    "roles": {"type": "array", "items": {"$ref": "#/definitions/role"}},
+    "per_org": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {"type": "null"},
+          {
+            "type": "object",
+            "required": ["role_id", "title", "fit", "interview_band", "offer_band"],
+            "additionalProperties": false,
+            "properties": {
+              "role_id": {"type": "string"},
+              "title": {"type": "string"},
+              "fit": {"type": "number"},
+              "interview_band": {"$ref": "#/definitions/band"},
+              "offer_band": {"$ref": "#/definitions/band"}
+            }
+          }
+        ]
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "dimension", "points_gain", "roles_affected"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string"},
+          "title": {"type": "string"},
+          "why": {"type": "string"},
+          "dimension": {"$ref": "#/definitions/dimension"},
+          "target_score": {"type": "integer", "minimum": 0, "maximum": 5},
+          "points_gain": {"type": "number", "minimum": 0},
+          "roles_affected": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "outlook": {
+      "type": "object",
+      "required": ["band", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "band": {"enum": ["Very low", "Low", "Moderate", "Good", "Strong", "Not yet judged"]},
+        "text": {"type": "string"},
+        "reasons": {"type": "array", "items": {"type": "string"}},
+        "judged_on": {"$ref": "#/definitions/date"}
+      }
+    },
+    "verify_to_unlock": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["question", "why", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string"},
+          "question": {"type": "string"},
+          "why": {"type": "string"},
+          "dimensions": {"type": "array", "items": {"$ref": "#/definitions/dimension"}},
+          "source": {"enum": ["open_question", "unverified_evidence"]}
+        }
+      }
+    },
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "dimension": {"enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]},
+    "band": {"enum": ["Very low", "Low", "Moderate", "Good", "Strong"]},
+    "score": {
+      "type": "object",
+      "required": ["score", "raw", "evidence", "note"],
+      "additionalProperties": false,
+      "properties": {
+        "score": {"type": "integer", "minimum": 0, "maximum": 5},
+        "raw": {"type": "integer", "minimum": 0, "maximum": 5},
+        "evidence": {"type": "array", "items": {"type": "string"}},
+        "note": {"type": "string"},
+        "capped": {"type": "string"}
+      }
+    },
+    "role": {
+      "type": "object",
+      "required": ["role_id", "org", "title", "family", "scores", "fit", "interview_band", "offer_band", "adjustments"],
+      "additionalProperties": false,
+      "properties": {
+        "role_id": {"type": "string"},
+        "org": {"type": "string"},
+        "title": {"type": "string"},
+        "family": {"type": "string"},
+        "locations": {"type": "array", "items": {"type": "string"}},
+        "location_class": {"type": "string"},
+        "url": {"type": ["string", "null"]},
+        "scores": {
+          "type": "object",
+          "required": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"],
+          "additionalProperties": false,
+          "properties": {
+            "D1": {"$ref": "#/definitions/score"},
+            "D2": {"$ref": "#/definitions/score"},
+            "D3": {"$ref": "#/definitions/score"},
+            "D4": {"$ref": "#/definitions/score"},
+            "D5": {"$ref": "#/definitions/score"},
+            "D6": {"$ref": "#/definitions/score"},
+            "D7": {"$ref": "#/definitions/score"}
+          }
+        },
+        "fit": {"type": "number", "minimum": 0, "maximum": 100},
+        "interview_band": {"$ref": "#/definitions/band"},
+        "offer_band": {"$ref": "#/definitions/band"},
+        "adjustments": {"type": "array", "items": {"type": "string"}},
+        "judged": {"type": "boolean"},
+        "awaiting_review": {"type": "array", "items": {"$ref": "#/definitions/dimension"}},
+        "eligibility_blocked": {"type": "boolean"},
+        "hard_requirement_lacking": {"type": "boolean"},
+        "requires_heavy_coding": {"type": "boolean"},
+        "reviewer_note": {"type": "string"}
+      }
+    }
+  }
+}

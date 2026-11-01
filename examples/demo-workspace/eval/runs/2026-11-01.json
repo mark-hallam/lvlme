@@ -1,0 +1,1154 @@
+{
+  "schema_version": 1,
+  "run_date": "2026-11-01",
+  "rubric_version": "1.0",
+  "goal": "A program, applied AI or policy role at an AI product company",
+  "weights": {
+    "D1": 25,
+    "D2": 20,
+    "D3": 20,
+    "D4": 10,
+    "D5": 10,
+    "D6": 10,
+    "D7": 5
+  },
+  "inputs_digest": "sha256:ec2813a810112a760f4199e12d062220dc8d8a03852d2227034a84e0754ad616",
+  "counts": {
+    "roles": 12,
+    "judged": 11,
+    "not_judged": 1,
+    "awaiting_review": 1,
+    "eligibility_blocked": 1,
+    "hard_requirement_lacking": 5,
+    "stale_judgements": 0
+  },
+  "roles": [
+    {
+      "role_id": "initech:i-0001",
+      "org": "initech",
+      "title": "Program Manager, Robot Fleet Deployments",
+      "family": "tpm",
+      "locations": [
+        "Melbourne, Australia"
+      ],
+      "location_class": "australia_nz",
+      "url": "https://example.com/jobs/initech/i-0001",
+      "scores": {
+        "D1": {
+          "score": 4,
+          "raw": 4,
+          "evidence": [
+            "E01",
+            "E02"
+          ],
+          "note": "Warehouse and transport programs map closely to fleet rollouts at customer sites."
+        },
+        "D2": {
+          "score": 3,
+          "raw": 3,
+          "evidence": [
+            "E04",
+            "E15"
+          ],
+          "note": "Corroborated multi-site rollout case study."
+        },
+        "D3": {
+          "score": 0,
+          "raw": 0,
+          "evidence": [
+            "E19"
+          ],
+          "note": "Nobody known yet."
+        },
+        "D4": {
+          "score": 4,
+          "raw": 4,
+          "evidence": [
+            "E01",
+            "E15"
+          ],
+          "note": "Warehouse operations is exactly the domain Initech sells into."
+        },
+        "D5": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E07",
+            "E14"
+          ],
+          "note": "Site, essays and one recorded talk; a hiring manager would find something."
+        },
+        "D6": {
+          "score": 5,
+          "raw": 5,
+          "evidence": [
+            "E11"
+          ],
+          "note": "Lives in Australia with full work rights; New Zealand is open to Australian citizens."
+        },
+        "D7": {
+          "score": 3,
+          "raw": 3,
+          "evidence": [
+            "E18"
+          ],
+          "note": "Tailored resume and cover note ready for the fleet role."
+        }
+      },
+      "fit": 57.0,
+      "interview_band": "Moderate",
+      "offer_band": "Low",
+      "adjustments": [],
+      "judged": true,
+      "awaiting_review": [],
+      "eligibility_blocked": false,
+      "hard_requirement_lacking": false,
+      "requires_heavy_coding": false,
+      "reviewer_note": "Agreed D1 4 and D4 4: same domain and scale; D2 held at 3, one case study is not a track record."
+    },
+    {
+      "role_id": "acme:4100001",
+      "org": "acme",
+      "title": "Technical Program Manager, Model Launches",
+      "family": "tpm",
+      "locations": [
+        "San Francisco, CA",
+        "Sydney, Australia"
+      ],
+      "location_class": "australia_nz",
+      "url": "https://example.com/jobs/acme/4100001",
+      "scores": {
+        "D1": {
+          "score": 3,
+          "raw": 3,
+          "evidence": [
+            "E01",
+            "E02"
+          ],
+          "note": "Ten years of operations and programs; launches were physical, not model launches."
+        },
+        "D2": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E04",
+            "E05"
+          ],
+          "note": "route-eval is relevant to evaluation sign-off; no launch case study yet."
+        },
+        "D3": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E10"
+          ],
+          "note": "One first-degree contact in an unrelated team."
+        },
+        "D4": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E04"
+          ],
+          "note": "Acme AI cares about evaluation, and route-eval is an evaluation tool."
+        },
+        "D5": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E07",
+            "E14"
+          ],
+          "note": "Site, essays and one recorded talk; a hiring manager would find something."
+        },
+        "D6": {
+          "score": 5,
+          "raw": 5,
+          "evidence": [
+            "E11"
+          ],
+          "note": "Lives in Australia with full work rights; New Zealand is open to Australian citizens."
+        },
+        "D7": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E17"
+          ],
+          "note": "Generic resume only."
+        }
+      },
+      "fit": 46.0,
+      "interview_band": "Low",
+      "offer_band": "Very low",
+      "adjustments": [],
+      "judged": true,
+      "awaiting_review": [],
+      "eligibility_blocked": false,
+      "hard_requirement_lacking": false,
+      "requires_heavy_coding": false,
+      "reviewer_note": "Agreed D1 3: program years meet the ask, the domain gap keeps it at 3."
+    },
+    {
+      "role_id": "acme:4100002",
+      "org": "acme",
+      "title": "Applied AI Deployment Lead, Asia Pacific",
+      "family": "applied_ai",
+      "locations": [
+        "Sydney, Australia"
+      ],
+      "location_class": "australia_nz",
+      "url": "https://example.com/jobs/acme/4100002",
+      "scores": {
+        "D1": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E01"
+          ],
+          "note": "Customer-facing delivery is partial: internal operations, not customer deployments."
+        },
+        "D2": {
+          "score": 3,
+          "raw": 3,
+          "evidence": [
+            "E04"
+          ],
+          "note": "Verified tool used by outside contributors; close to what deployment leads show."
+        },
+        "D3": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E10"
+          ],
+          "note": "One first-degree contact in an unrelated team."
+        },
+        "D4": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E01",
+            "E04"
+          ],
+          "note": "Logistics customers are named as a plus in the posting."
+        },
+        "D5": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E07",
+            "E14"
+          ],
+          "note": "Site, essays and one recorded talk; a hiring manager would find something."
+        },
+        "D6": {
+          "score": 5,
+          "raw": 5,
+          "evidence": [
+            "E11"
+          ],
+          "note": "Lives in Australia with full work rights; New Zealand is open to Australian citizens."
+        },
+        "D7": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E17"
+          ],
+          "note": "Generic resume only."
+        }
+      },
+      "fit": 45.0,
+      "interview_band": "Low",
+      "offer_band": "Very low",
+      "adjustments": [],
+      "judged": true,
+      "awaiting_review": [],
+      "eligibility_blocked": false,
+      "hard_requirement_lacking": false,
+      "requires_heavy_coding": false,
+      "reviewer_note": "Agreed D2 3 on the verified repository; D1 stays 2."
+    },
+    {
+      "role_id": "initech:i-0002",
+      "org": "initech",
+      "title": "Product Manager, Warehouse Autonomy",
+      "family": "product",
+      "locations": [
+        "Brisbane, Australia"
+      ],
+      "location_class": "australia_nz",
+      "url": "https://example.com/jobs/initech/i-0002",
+      "scores": {
+        "D1": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E01"
+          ],
+          "note": "Operations close to product, but no product title."
+        },
+        "D2": {
+          "score": 3,
+          "raw": 3,
+          "evidence": [
+            "E15"
+          ],
+          "note": "The rollout case study shows product-like work with users."
+        },
+        "D3": {
+          "score": 0,
+          "raw": 0,
+          "evidence": [
+            "E19"
+          ],
+          "note": "Nobody known yet."
+        },
+        "D4": {
+          "score": 3,
+          "raw": 3,
+          "evidence": [
+            "E01",
+            "E15"
+          ],
+          "note": "Deep warehouse workflow knowledge."
+        },
+        "D5": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E07",
+            "E14"
+          ],
+          "note": "Site, essays and one recorded talk; a hiring manager would find something."
+        },
+        "D6": {
+          "score": 5,
+          "raw": 5,
+          "evidence": [
+            "E11"
+          ],
+          "note": "Lives in Australia with full work rights; New Zealand is open to Australian citizens."
+        },
+        "D7": {
+          "score": 3,
+          "raw": 3,
+          "evidence": [
+            "E18"
+          ],
+          "note": "Tailored resume and cover note ready for the fleet role."
+        }
+      },
+      "fit": 45.0,
+      "interview_band": "Low",
+      "offer_band": "Very low",
+      "adjustments": [],
+      "judged": true,
+      "awaiting_review": [],
+      "eligibility_blocked": false,
+      "hard_requirement_lacking": false,
+      "requires_heavy_coding": false,
+      "reviewer_note": "Agreed: the licence blocker is cleared (E13)."
+    },
+    {
+      "role_id": "globex:g-0003",
+      "org": "globex",
+      "title": "AI Success Manager, Asia",
+      "family": "applied_ai",
+      "locations": [
+        "Singapore"
+      ],
+      "location_class": "apac_other",
+      "url": "https://example.com/jobs/globex/g-0003",
+      "scores": {
+        "D1": {
+          "score": 2,
+          "raw": 3,
+          "evidence": [
+            "E01",
+            "E02"
+          ],
+          "note": "Operations roles close to implementation work; customer success is a step across.",
+          "capped": "awaiting review"
+        },
+        "D2": {
+          "score": 2,
+          "raw": 3,
+          "evidence": [
+            "E04",
+            "E15"
+          ],
+          "note": "Verified tool plus a corroborated case study.",
+          "capped": "awaiting review"
+        },
+        "D3": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E09"
+          ],
+          "note": "Jordan agreed to introduce Alex to the AI Success lead."
+        },
+        "D4": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E01"
+          ],
+          "note": "Logistics customers are named as a plus."
+        },
+        "D5": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E07",
+            "E14"
+          ],
+          "note": "Site, essays and one recorded talk; a hiring manager would find something."
+        },
+        "D6": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E12"
+          ],
+          "note": "Willing to move; needs a work pass."
+        },
+        "D7": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E17"
+          ],
+          "note": "Generic resume only."
+        }
+      },
+      "fit": 39.0,
+      "interview_band": "Very low",
+      "offer_band": "Very low",
+      "adjustments": [
+        "D1 3 counted as 2 until the reviewer agrees",
+        "D2 3 counted as 2 until the reviewer agrees"
+      ],
+      "judged": true,
+      "awaiting_review": [
+        "D1",
+        "D2"
+      ],
+      "eligibility_blocked": false,
+      "hard_requirement_lacking": false,
+      "requires_heavy_coding": false,
+      "reviewer_note": ""
+    },
+    {
+      "role_id": "globex:g-0002",
+      "org": "globex",
+      "title": "Technical Program Manager, Infrastructure",
+      "family": "tpm",
+      "locations": [
+        "Seattle, WA",
+        "Toronto, Canada"
+      ],
+      "location_class": "us",
+      "url": "https://example.com/jobs/globex/g-0002",
+      "scores": {
+        "D1": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E01",
+            "E02"
+          ],
+          "note": "Programs were operations, not data-centre infrastructure."
+        },
+        "D2": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E05",
+            "E15"
+          ],
+          "note": "The scheduling rollout shows multi-site program delivery."
+        },
+        "D3": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E09"
+          ],
+          "note": "Jordan agreed to introduce Alex to the AI Success lead."
+        },
+        "D4": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E01"
+          ],
+          "note": "Hardware delivery tracking is adjacent."
+        },
+        "D5": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E07",
+            "E14"
+          ],
+          "note": "Site, essays and one recorded talk; a hiring manager would find something."
+        },
+        "D6": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E12"
+          ],
+          "note": "Willing to move; needs employer visa sponsorship."
+        },
+        "D7": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E17"
+          ],
+          "note": "Generic resume only."
+        }
+      },
+      "fit": 37.0,
+      "interview_band": "Very low",
+      "offer_band": "Very low",
+      "adjustments": [],
+      "judged": true,
+      "awaiting_review": [],
+      "eligibility_blocked": false,
+      "hard_requirement_lacking": false,
+      "requires_heavy_coding": false,
+      "reviewer_note": ""
+    },
+    {
+      "role_id": "globex:g-0001",
+      "org": "globex",
+      "title": "Product Manager, Developer Platform",
+      "family": "product",
+      "locations": [
+        "Remote"
+      ],
+      "location_class": "remote",
+      "url": "https://example.com/jobs/globex/g-0001",
+      "scores": {
+        "D1": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E02"
+          ],
+          "note": "No product management title; the posting asks for 5+ years of it."
+        },
+        "D2": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E04"
+          ],
+          "note": "route-eval is a developer tool, which helps a little."
+        },
+        "D3": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E09"
+          ],
+          "note": "Jordan agreed to introduce Alex to the AI Success lead."
+        },
+        "D4": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E04"
+          ],
+          "note": "Small overlap with the developer platform."
+        },
+        "D5": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E07",
+            "E14"
+          ],
+          "note": "Site, essays and one recorded talk; a hiring manager would find something."
+        },
+        "D6": {
+          "score": 3,
+          "raw": 3,
+          "evidence": [
+            "E11"
+          ],
+          "note": "Remote is possible but time zones can be hard from Brisbane."
+        },
+        "D7": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E17"
+          ],
+          "note": "Generic resume only."
+        }
+      },
+      "fit": 34.0,
+      "interview_band": "Very low",
+      "offer_band": "Very low",
+      "adjustments": [
+        "Hard requirement lacking (5+ years of product management): D1 capped at 1 and both bands down one step"
+      ],
+      "judged": true,
+      "awaiting_review": [],
+      "eligibility_blocked": false,
+      "hard_requirement_lacking": true,
+      "requires_heavy_coding": false,
+      "reviewer_note": ""
+    },
+    {
+      "role_id": "globex:g-0004",
+      "org": "globex",
+      "title": "Trust and Safety Operations Lead",
+      "family": "policy_safety",
+      "locations": [
+        "Dublin, Ireland"
+      ],
+      "location_class": "uk_eu",
+      "url": "https://example.com/jobs/globex/g-0004",
+      "scores": {
+        "D1": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E02"
+          ],
+          "note": "No trust and safety leadership."
+        },
+        "D2": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E07"
+          ],
+          "note": "None relevant."
+        },
+        "D3": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E09"
+          ],
+          "note": "Jordan agreed to introduce Alex to the AI Success lead."
+        },
+        "D4": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E07"
+          ],
+          "note": "None."
+        },
+        "D5": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E07",
+            "E14"
+          ],
+          "note": "Site, essays and one recorded talk; a hiring manager would find something."
+        },
+        "D6": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E12"
+          ],
+          "note": "Willing to move; needs a visa."
+        },
+        "D7": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E17"
+          ],
+          "note": "Generic resume only."
+        }
+      },
+      "fit": 28.0,
+      "interview_band": "Very low",
+      "offer_band": "Very low",
+      "adjustments": [
+        "Hard requirement lacking (3+ years leading trust and safety operations): D1 capped at 1 and both bands down one step"
+      ],
+      "judged": true,
+      "awaiting_review": [],
+      "eligibility_blocked": false,
+      "hard_requirement_lacking": true,
+      "requires_heavy_coding": false,
+      "reviewer_note": ""
+    },
+    {
+      "role_id": "acme:4100004",
+      "org": "acme",
+      "title": "Policy Manager, Safeguards Operations",
+      "family": "policy_safety",
+      "locations": [
+        "London, United Kingdom"
+      ],
+      "location_class": "uk_eu",
+      "url": "https://example.com/jobs/acme/4100004",
+      "scores": {
+        "D1": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E02"
+          ],
+          "note": "No trust and safety or policy operations experience."
+        },
+        "D2": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E07"
+          ],
+          "note": "Essays touch on AI risk but are not policy work."
+        },
+        "D3": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E10"
+          ],
+          "note": "One first-degree contact in an unrelated team."
+        },
+        "D4": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E07"
+          ],
+          "note": "Nothing specific to Acme's safeguards work."
+        },
+        "D5": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E07",
+            "E14"
+          ],
+          "note": "Site, essays and one recorded talk; a hiring manager would find something."
+        },
+        "D6": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E12"
+          ],
+          "note": "Willing to move; needs a visa."
+        },
+        "D7": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E17"
+          ],
+          "note": "Generic resume only."
+        }
+      },
+      "fit": 24.0,
+      "interview_band": "Very low",
+      "offer_band": "Very low",
+      "adjustments": [
+        "Hard requirement lacking (3+ years in trust and safety or policy operations): D1 capped at 1 and both bands down one step"
+      ],
+      "judged": true,
+      "awaiting_review": [],
+      "eligibility_blocked": false,
+      "hard_requirement_lacking": true,
+      "requires_heavy_coding": false,
+      "reviewer_note": ""
+    },
+    {
+      "role_id": "initech:i-0003",
+      "org": "initech",
+      "title": "Policy Lead, Robotics Safety Standards",
+      "family": "policy_safety",
+      "locations": [
+        "Austin, TX"
+      ],
+      "location_class": "us",
+      "url": "https://example.com/jobs/initech/i-0003",
+      "scores": {
+        "D1": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E02"
+          ],
+          "note": "No standards or regulatory work."
+        },
+        "D2": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E05"
+          ],
+          "note": "None relevant."
+        },
+        "D3": {
+          "score": 0,
+          "raw": 0,
+          "evidence": [
+            "E19"
+          ],
+          "note": "Nobody known yet."
+        },
+        "D4": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E01"
+          ],
+          "note": "Knows warehouse safety practice from operations."
+        },
+        "D5": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E07",
+            "E14"
+          ],
+          "note": "Site, essays and one recorded talk; a hiring manager would find something."
+        },
+        "D6": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E12"
+          ],
+          "note": "Willing to move; needs employer visa sponsorship."
+        },
+        "D7": {
+          "score": 3,
+          "raw": 3,
+          "evidence": [
+            "E18"
+          ],
+          "note": "Tailored resume and cover note ready for the fleet role."
+        }
+      },
+      "fit": 24.0,
+      "interview_band": "Very low",
+      "offer_band": "Very low",
+      "adjustments": [
+        "Hard requirement lacking (5+ years in safety policy or standards): D1 capped at 1 and both bands down one step"
+      ],
+      "judged": true,
+      "awaiting_review": [],
+      "eligibility_blocked": false,
+      "hard_requirement_lacking": true,
+      "requires_heavy_coding": false,
+      "reviewer_note": ""
+    },
+    {
+      "role_id": "acme:4100006",
+      "org": "acme",
+      "title": "Program Manager, Government Partnerships",
+      "family": "tpm",
+      "locations": [
+        "Washington, DC"
+      ],
+      "location_class": "us",
+      "url": "https://example.com/jobs/acme/4100006",
+      "scores": {
+        "D1": {
+          "score": 1,
+          "raw": 2,
+          "evidence": [
+            "E01"
+          ],
+          "note": "Program years fit; no government customers.",
+          "capped": "hard requirement lacking"
+        },
+        "D2": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E05"
+          ],
+          "note": "No public-sector proof."
+        },
+        "D3": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E10"
+          ],
+          "note": "One first-degree contact in an unrelated team."
+        },
+        "D4": {
+          "score": 0,
+          "raw": 0,
+          "evidence": [],
+          "note": "None."
+        },
+        "D5": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E07",
+            "E14"
+          ],
+          "note": "Site, essays and one recorded talk; a hiring manager would find something."
+        },
+        "D6": {
+          "score": 0,
+          "raw": 2,
+          "evidence": [
+            "E11"
+          ],
+          "note": "Alex is not a US person and holds no security clearance.",
+          "capped": "eligibility blocker"
+        },
+        "D7": {
+          "score": 1,
+          "raw": 1,
+          "evidence": [
+            "E17"
+          ],
+          "note": "Generic resume only."
+        }
+      },
+      "fit": 18.0,
+      "interview_band": "Very low",
+      "offer_band": "Very low",
+      "adjustments": [
+        "Eligibility blocker (Security clearance, US person or export control (ITAR)): D6 = 0",
+        "Hard requirement lacking (US citizenship and a security clearance): D1 capped at 1 and both bands down one step"
+      ],
+      "judged": true,
+      "awaiting_review": [],
+      "eligibility_blocked": true,
+      "hard_requirement_lacking": true,
+      "requires_heavy_coding": false,
+      "reviewer_note": ""
+    },
+    {
+      "role_id": "initech:i-0004",
+      "org": "initech",
+      "title": "Customer Success Manager, Fleet Operations",
+      "family": "applied_ai",
+      "locations": [
+        "Auckland, New Zealand"
+      ],
+      "location_class": "australia_nz",
+      "url": "https://example.com/jobs/initech/i-0004",
+      "scores": {
+        "D1": {
+          "score": 0,
+          "raw": 0,
+          "evidence": [],
+          "note": "Not yet judged."
+        },
+        "D2": {
+          "score": 0,
+          "raw": 0,
+          "evidence": [],
+          "note": "Not yet judged."
+        },
+        "D3": {
+          "score": 0,
+          "raw": 0,
+          "evidence": [
+            "E19"
+          ],
+          "note": "Nobody known yet."
+        },
+        "D4": {
+          "score": 0,
+          "raw": 0,
+          "evidence": [],
+          "note": "Not yet judged."
+        },
+        "D5": {
+          "score": 2,
+          "raw": 2,
+          "evidence": [
+            "E07",
+            "E14"
+          ],
+          "note": "Site, essays and one recorded talk; a hiring manager would find something."
+        },
+        "D6": {
+          "score": 5,
+          "raw": 5,
+          "evidence": [
+            "E11"
+          ],
+          "note": "Lives in Australia with full work rights; New Zealand is open to Australian citizens."
+        },
+        "D7": {
+          "score": 3,
+          "raw": 3,
+          "evidence": [
+            "E18"
+          ],
+          "note": "Tailored resume and cover note ready for the fleet role."
+        }
+      },
+      "fit": 17.0,
+      "interview_band": "Very low",
+      "offer_band": "Very low",
+      "adjustments": [
+        "Not yet judged: D1, D2 and D4 count as 0 until the scorer judges this role"
+      ],
+      "judged": false,
+      "awaiting_review": [],
+      "eligibility_blocked": false,
+      "hard_requirement_lacking": false,
+      "requires_heavy_coding": false,
+      "reviewer_note": ""
+    }
+  ],
+  "per_org": {
+    "acme": {
+      "role_id": "acme:4100001",
+      "title": "Technical Program Manager, Model Launches",
+      "fit": 46.0,
+      "interview_band": "Low",
+      "offer_band": "Very low"
+    },
+    "globex": {
+      "role_id": "globex:g-0003",
+      "title": "AI Success Manager, Asia",
+      "fit": 39.0,
+      "interview_band": "Very low",
+      "offer_band": "Very low"
+    },
+    "initech": {
+      "role_id": "initech:i-0001",
+      "title": "Program Manager, Robot Fleet Deployments",
+      "fit": 57.0,
+      "interview_band": "Moderate",
+      "offer_band": "Low"
+    }
+  },
+  "gaps": [
+    {
+      "id": "referral",
+      "title": "Turn a warm contact into a referral",
+      "why": "An agreed referral (D3 = 4) also moves the interview band up one step.",
+      "dimension": "D3",
+      "target_score": 4,
+      "points_gain": 144.0,
+      "roles_affected": 12
+    },
+    {
+      "id": "warm-intro",
+      "title": "Get a warm introduction at each target organisation",
+      "why": "A named insider who knows your work (D3 = 3) is the strongest single lift for a non-traditional candidate.",
+      "dimension": "D3",
+      "target_score": 3,
+      "points_gain": 96.0,
+      "roles_affected": 12
+    },
+    {
+      "id": "proof-piece",
+      "title": "Publish one verifiable proof-of-work piece for your target role family",
+      "why": "Shipped, checkable work relevant to the role (D2 = 3) is what screeners look for when the résumé is non-traditional.",
+      "dimension": "D2",
+      "target_score": 3,
+      "points_gain": 60.0,
+      "roles_affected": 9
+    },
+    {
+      "id": "org-edge",
+      "title": "Build one thing each target organisation specifically values",
+      "why": "An org-specific edge (D4 = 3) separates you from the general applicant pool.",
+      "dimension": "D4",
+      "target_score": 3,
+      "points_gain": 36.0,
+      "roles_affected": 10
+    },
+    {
+      "id": "initech-path",
+      "title": "Open a second-degree path into Initech Robotics",
+      "why": "Initech has the best-fit roles and Alex knows nobody there yet (D3 0 to 2).",
+      "dimension": "D3",
+      "target_score": 2,
+      "points_gain": 32.0,
+      "roles_affected": 4
+    },
+    {
+      "id": "tailored-application",
+      "title": "Tailor your résumé and story for each best-fit role",
+      "why": "A tailored application (D7 = 4) is cheap and lifts every role you apply for.",
+      "dimension": "D7",
+      "target_score": 4,
+      "points_gain": 28.0,
+      "roles_affected": 12
+    },
+    {
+      "id": "public-signal",
+      "title": "Make your work findable",
+      "why": "A hiring manager who searches for you should find your work (D5 = 3).",
+      "dimension": "D5",
+      "target_score": 3,
+      "points_gain": 24.0,
+      "roles_affected": 12
+    },
+    {
+      "id": "work-rights",
+      "title": "Confirm your work rights or visa route for the role locations",
+      "why": "Logistics (D6) often decide whether you are considered at all.",
+      "dimension": "D6",
+      "target_score": 3,
+      "points_gain": 10.0,
+      "roles_affected": 5
+    }
+  ],
+  "outlook": {
+    "band": "Low",
+    "text": "An offer at one of the three organisations within 12 months is possible but not likely yet. The best path is Initech Robotics in Australia, where Alex's work rights and warehouse background fit. It moves to Moderate if a warm path into Initech opens and the overstated LinkedIn claim is fixed.",
+    "reasons": [
+      "Strong domain fit for Initech's fleet program role (fit in the high 50s).",
+      "No warm path into Initech yet, so any offer there is capped at Low.",
+      "Acme and Globex roles are mostly overseas and need visas.",
+      "One public claim overstates team size, which can sink credibility at screening."
+    ],
+    "judged_on": "2026-11-01"
+  },
+  "verify_to_unlock": [
+    {
+      "id": "Q01",
+      "question": "What is your notice period at your current employer, and do you have any non-compete terms?",
+      "why": "Sets the earliest start date and whether some roles are off limits (D6, D7).",
+      "dimensions": [
+        "D6",
+        "D7"
+      ],
+      "source": "open_question"
+    },
+    {
+      "id": "Q02",
+      "question": "Do you know anyone who knows someone at Initech Robotics?",
+      "why": "A second-degree path someone agrees to open lifts D3 from 0 to 2 for four roles.",
+      "dimensions": [
+        "D3"
+      ],
+      "source": "open_question"
+    },
+    {
+      "id": "E06",
+      "question": "Can you point to a source for this? Cut late deliveries by 18 percent in 2023",
+      "why": "Counts as 0 until there is a source (feeds D2).",
+      "dimensions": [
+        "D2"
+      ],
+      "source": "unverified_evidence"
+    }
+  ],
+  "warnings": []
+}

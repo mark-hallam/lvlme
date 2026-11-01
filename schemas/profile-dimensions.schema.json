@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Per-organisation dimensions (eval/profile-dimensions.json)",
+  "description": "D3 (warm path), D5 (public signal) and D7 (application readiness) per target organisation, with an optional 'default' entry, and the D6 (eligibility and logistics) rules per location class.",
+  "type": "object",
+  "required": ["schema_version", "D3", "D5", "D7", "D6_rules"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "rubric_version": {"type": "string"},
+    "judged_on": {"$ref": "#/definitions/date"},
+    "reviewed_on": {"$ref": "#/definitions/date"},
+    "D3": {"$ref": "#/definitions/per_org"},
+    "D5": {"$ref": "#/definitions/per_org"},
+    "D7": {"$ref": "#/definitions/per_org"},
+    "D6_rules": {
+      "type": "object",
+      "required": ["classes"],
+      "additionalProperties": false,
+      "properties": {
+        "classes": {"type": "object", "additionalProperties": {"$ref": "#/definitions/entry"}},
+        "blocked": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "note": {"type": "string"},
+            "evidence": {"type": "array", "items": {"type": "string", "pattern": "^E[0-9]{2,}$"}}
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "per_org": {"type": "object", "additionalProperties": {"$ref": "#/definitions/entry"}},
+    "entry": {
+      "type": "object",
+      "required": ["score"],
+      "additionalProperties": false,
+      "properties": {
+        "score": {"type": "integer", "minimum": 0, "maximum": 5},
+        "evidence": {"type": "array", "items": {"type": "string", "pattern": "^E[0-9]{2,}$"}},
+        "note": {"type": "string"},
+        "judged_on": {"$ref": "#/definitions/date"},
+        "reviewed_on": {"$ref": "#/definitions/date"},
+        "reviewer_note": {"type": "string"}
+      }
+    }
+  }
+}

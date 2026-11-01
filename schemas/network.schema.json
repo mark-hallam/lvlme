@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Network map (profile/network.json)",
+  "description": "First-degree contacts at each target organisation (from the LinkedIn Connections.csv export) and second-degree paths the person has told the agent about. Stays in the workspace.",
+  "type": "object",
+  "required": ["schema_version", "orgs"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "generated_on": {"$ref": "#/definitions/date"},
+    "source": {"type": "string"},
+    "total_connections": {"type": "integer", "minimum": 0},
+    "matched_connections": {"type": "integer", "minimum": 0},
+    "orgs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["count", "first_degree"],
+        "additionalProperties": false,
+        "properties": {
+          "count": {"type": "integer", "minimum": 0},
+          "first_degree": {"type": "array", "items": {"$ref": "#/definitions/contact"}}
+        }
+      }
+    },
+    "second_degree": {"type": "array", "items": {"$ref": "#/definitions/path"}}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "contact": {
+      "type": "object",
+      "required": ["name", "company"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string"},
+        "position": {"type": "string"},
+        "company": {"type": "string"},
+        "connected_on": {"type": ["string", "null"]},
+        "months_connected": {"type": ["integer", "null"], "minimum": 0},
+        "profile_url": {"type": "string"},
+        "knows_my_work": {"type": "boolean"},
+        "note": {"type": "string"}
+      }
+    },
+    "path": {
+      "type": "object",
+      "required": ["org", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "org": {"type": "string"},
+        "via": {"type": "string", "description": "The first-degree contact who could open the path."},
+        "target_person": {"type": "string"},
+        "status": {"enum": ["idea", "asked", "agreed", "opened", "declined"]},
+        "note": {"type": "string"},
+        "updated_on": {"$ref": "#/definitions/date"}
+      }
+    }
+  }
+}

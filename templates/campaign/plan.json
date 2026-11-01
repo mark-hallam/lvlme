@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-01-01",
+  "principle": "Attack the binding constraint first: eligibility, then a warm path, then visible proof of work, then a tailored application.",
+  "max_active": 8,
+  "north_star": [
+    {
+      "id": "warm_intros",
+      "name": "Warm introductions",
+      "current": 0,
+      "target": 3
+    },
+    {
+      "id": "applications",
+      "name": "Applications to best-fit roles",
+      "current": 0,
+      "target": 5
+    },
+    {
+      "id": "interviews",
+      "name": "Interviews",
+      "current": 0,
+      "target": 2
+    },
+    {
+      "id": "offers",
+      "name": "Offers",
+      "current": 0,
+      "target": 1
+    },
+    {
+      "id": "proof_pieces",
+      "name": "Public proof-of-work pieces",
+      "current": 0,
+      "target": 3
+    },
+    {
+      "id": "credentials",
+      "name": "Credentials",
+      "current": 0,
+      "target": 1
+    }
+  ],
+  "actions": [],
+  "backlog": [],
+  "experiments_log": []
+}

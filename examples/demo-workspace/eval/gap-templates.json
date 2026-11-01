@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "gaps": [
+    {
+      "id": "initech-path",
+      "title": "Open a second-degree path into Initech Robotics",
+      "why": "Initech has the best-fit roles and Alex knows nobody there yet (D3 0 to 2).",
+      "dimension": "D3",
+      "target_score": 2,
+      "orgs": [
+        "initech"
+      ],
+      "families": "all"
+    },
+    {
+      "id": "warm-intro",
+      "title": "Get a warm introduction at each target organisation",
+      "why": "A named insider who knows your work (D3 = 3) is the strongest single lift for a non-traditional candidate.",
+      "dimension": "D3",
+      "target_score": 3,
+      "orgs": "all",
+      "families": "all"
+    },
+    {
+      "id": "referral",
+      "title": "Turn a warm contact into a referral",
+      "why": "An agreed referral (D3 = 4) also moves the interview band up one step.",
+      "dimension": "D3",
+      "target_score": 4,
+      "orgs": "all",
+      "families": "all"
+    },
+    {
+      "id": "proof-piece",
+      "title": "Publish one verifiable proof-of-work piece for your target role family",
+      "why": "Shipped, checkable work relevant to the role (D2 = 3) is what screeners look for when the résumé is non-traditional.",
+      "dimension": "D2",
+      "target_score": 3,
+      "orgs": "all",
+      "families": "all"
+    },
+    {
+      "id": "tailored-application",
+      "title": "Tailor your résumé and story for each best-fit role",
+      "why": "A tailored application (D7 = 4) is cheap and lifts every role you apply for.",
+      "dimension": "D7",
+      "target_score": 4,
+      "orgs": "all",
+      "families": "all"
+    },
+    {
+      "id": "public-signal",
+      "title": "Make your work findable",
+      "why": "A hiring manager who searches for you should find your work (D5 = 3).",
+      "dimension": "D5",
+      "target_score": 3,
+      "orgs": "all",
+      "families": "all"
+    },
+    {
+      "id": "org-edge",
+      "title": "Build one thing each target organisation specifically values",
+      "why": "An org-specific edge (D4 = 3) separates you from the general applicant pool.",
+      "dimension": "D4",
+      "target_score": 3,
+      "orgs": "all",
+      "families": "all"
+    },
+    {
+      "id": "work-rights",
+      "title": "Confirm your work rights or visa route for the role locations",
+      "why": "Logistics (D6) often decide whether you are considered at all.",
+      "dimension": "D6",
+      "target_score": 3,
+      "orgs": "all",
+      "families": "all",
+      "exclude_blocked": true
+    }
+  ]
+}

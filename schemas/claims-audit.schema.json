@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Public claims audit (profile/claims-audit.json)",
+  "description": "Claims found on the person's public pages, each checked against the evidence file. claims_audit.py adds new claims as pending; the agent judges them.",
+  "type": "object",
+  "required": ["schema_version", "claims"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "updated_on": {"$ref": "#/definitions/date"},
+    "claims": {"type": "array", "items": {"$ref": "#/definitions/claim"}}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "claim": {
+      "type": "object",
+      "required": ["id", "source", "text", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^C[0-9]{3,}$"},
+        "source": {"type": "string", "minLength": 1},
+        "text": {"type": "string", "minLength": 1},
+        "fingerprint": {"type": "string"},
+        "status": {"enum": ["pending", "supported", "overstated", "unsupported", "contradicted"]},
+        "evidence": {"type": "array", "items": {"type": "string", "pattern": "^E[0-9]{2,}$"}},
+        "suggested_wording": {"type": "string"},
+        "note": {"type": "string"},
+        "found_on": {"$ref": "#/definitions/date"},
+        "checked_on": {"$ref": "#/definitions/date"}
+      }
+    }
+  }
+}

@@ -1,0 +1,538 @@
+{
+  "schema_version": 1,
+  "fetched_on": "2026-11-01",
+  "fetched_at_utc": "2026-11-01T00:00:00Z",
+  "summary": {
+    "endpoints": {
+      "acme": "fixture acme.json",
+      "globex": "fixture globex.json",
+      "initech": "fixture initech.json"
+    },
+    "total_postings_fetched": {
+      "acme": 6,
+      "globex": 5,
+      "initech": 5
+    },
+    "matched_counts": {
+      "acme": {
+        "tpm": 2,
+        "product": 0,
+        "applied_ai": 1,
+        "policy_safety": 1,
+        "total": 4
+      },
+      "globex": {
+        "tpm": 1,
+        "product": 1,
+        "applied_ai": 1,
+        "policy_safety": 1,
+        "total": 4
+      },
+      "initech": {
+        "tpm": 1,
+        "product": 1,
+        "applied_ai": 1,
+        "policy_safety": 1,
+        "total": 4
+      }
+    },
+    "matched_total": 12,
+    "remote_true": 1,
+    "blocked_by_eligibility": 1,
+    "excluded_count": 1,
+    "endpoint_errors": {},
+    "previous_snapshot": "2026-10-25",
+    "new_role_ids": [
+      "initech:i-0004"
+    ],
+    "closed_role_ids": []
+  },
+  "roles": [
+    {
+      "id": "acme:4100002",
+      "org": "acme",
+      "title": "Applied AI Deployment Lead, Asia Pacific",
+      "family": "applied_ai",
+      "team_or_department": "Applied AI",
+      "locations": [
+        "Sydney, Australia"
+      ],
+      "location_classes": [
+        "australia_nz"
+      ],
+      "remote": false,
+      "url": "https://example.com/jobs/acme/4100002",
+      "updated_at": "2026-10-20T10:00:00-04:00",
+      "published_at": "2026-09-29T09:00:00-04:00",
+      "compensation": null,
+      "years_experience": 4,
+      "years_experience_basis": "required",
+      "degree_requirement": null,
+      "hard_requirements": [
+        "4+ years of customer-facing technical delivery or operations work",
+        "Comfort explaining technical trade-offs to non-technical leaders"
+      ],
+      "nice_to_haves": [
+        "Experience in logistics, retail or operations-heavy industries",
+        "This role is based in Sydney. Relocation support is available within Australia."
+      ],
+      "responsibilities": [
+        "Lead deployments with enterprise customers from pilot to rollout",
+        "Turn customer feedback into product requests"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [],
+      "eligibility_blockers": [],
+      "visa_or_relocation_note": "Relocation support is available within Australia.",
+      "description_text": "About the role\nHelp customers in Asia Pacific put Acme AI models into daily operations. You will not write production code; you will configure, test and roll out solutions with customer teams.\nResponsibilities\n- Lead deployments with enterprise customers from pilot to rollout\n- Turn customer feedback into product requests\nYou may be a good fit if you have\n- 4+ years of customer-facing technical delivery or operations work\n- Comfort explaining technical trade-offs to non-technical leaders\nStrong candidates may also have\n- Experience in logistics, retail or operations-heavy industries\nThis role is based in Sydney. Relocation support is available within Australia.",
+      "first_seen": "2026-10-04"
+    },
+    {
+      "id": "acme:4100004",
+      "org": "acme",
+      "title": "Policy Manager, Safeguards Operations",
+      "family": "policy_safety",
+      "team_or_department": "Safeguards",
+      "locations": [
+        "London, United Kingdom"
+      ],
+      "location_classes": [
+        "uk_eu"
+      ],
+      "remote": false,
+      "url": "https://example.com/jobs/acme/4100004",
+      "updated_at": "2026-10-20T10:00:00-04:00",
+      "published_at": "2026-09-29T09:00:00-04:00",
+      "compensation": null,
+      "years_experience": 3,
+      "years_experience_basis": "required",
+      "degree_requirement": "Bachelor's degree or equivalent experience",
+      "hard_requirements": [
+        "3+ years in trust and safety, content policy or policy operations",
+        "Bachelor's degree or equivalent experience"
+      ],
+      "nice_to_haves": [
+        "Experience with AI governance frameworks"
+      ],
+      "responsibilities": [
+        "Draft usage policies and enforcement guidelines",
+        "Run policy reviews with product teams"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [],
+      "eligibility_blockers": [],
+      "visa_or_relocation_note": null,
+      "description_text": "About the role\nWrite and run the policies that keep Acme AI products safe to use.\nResponsibilities\n- Draft usage policies and enforcement guidelines\n- Run policy reviews with product teams\nYou may be a good fit if you have\n- 3+ years in trust and safety, content policy or policy operations\n- Bachelor's degree or equivalent experience\nStrong candidates may also have\n- Experience with AI governance frameworks",
+      "first_seen": "2026-10-04"
+    },
+    {
+      "id": "acme:4100006",
+      "org": "acme",
+      "title": "Program Manager, Government Partnerships",
+      "family": "tpm",
+      "team_or_department": "Public Sector",
+      "locations": [
+        "Washington, DC"
+      ],
+      "location_classes": [
+        "us"
+      ],
+      "remote": false,
+      "url": "https://example.com/jobs/acme/4100006",
+      "updated_at": "2026-10-20T10:00:00-04:00",
+      "published_at": "2026-09-29T09:00:00-04:00",
+      "compensation": null,
+      "years_experience": 5,
+      "years_experience_basis": "required",
+      "degree_requirement": null,
+      "hard_requirements": [
+        "5+ years of program management with government customers",
+        "Must be a U.S. citizen and able to obtain and maintain a security clearance"
+      ],
+      "nice_to_haves": [
+        "Existing Secret clearance"
+      ],
+      "responsibilities": [
+        "Coordinate delivery of public-sector projects",
+        "Manage partner relationships"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [],
+      "eligibility_blockers": [
+        {
+          "type": "us_person_export_control",
+          "text": "Responsibilities Coordinate delivery of public-sector projects Manage partner relationships You may be a good fit if you have 5+ years of program management…"
+        },
+        {
+          "type": "security_clearance",
+          "text": "citizen and able to obtain and maintain a security clearance Strong candidates may also have Existing Secret clearance"
+        }
+      ],
+      "visa_or_relocation_note": null,
+      "description_text": "About the role\nRun programs with government customers.\nResponsibilities\n- Coordinate delivery of public-sector projects\n- Manage partner relationships\nYou may be a good fit if you have\n- 5+ years of program management with government customers\n- Must be a U.S. citizen and able to obtain and maintain a security clearance\nStrong candidates may also have\n- Existing Secret clearance",
+      "first_seen": "2026-10-04"
+    },
+    {
+      "id": "acme:4100001",
+      "org": "acme",
+      "title": "Technical Program Manager, Model Launches",
+      "family": "tpm",
+      "team_or_department": "Technical Program Management",
+      "locations": [
+        "San Francisco, CA",
+        "Sydney, Australia"
+      ],
+      "location_classes": [
+        "australia_nz",
+        "us"
+      ],
+      "remote": false,
+      "url": "https://example.com/jobs/acme/4100001",
+      "updated_at": "2026-10-20T10:00:00-04:00",
+      "published_at": "2026-09-29T09:00:00-04:00",
+      "compensation": "$190,000 to $240,000 USD",
+      "years_experience": 5,
+      "years_experience_basis": "required",
+      "degree_requirement": "Preferred: A degree in a technical field",
+      "hard_requirements": [
+        "5+ years of program or project management in a technical environment",
+        "Experience running cross-functional launches with many teams",
+        "Clear written communication"
+      ],
+      "nice_to_haves": [
+        "Experience with machine learning products or evaluation",
+        "A degree in a technical field"
+      ],
+      "responsibilities": [
+        "Own launch plans and timelines for new model releases",
+        "Run launch reviews and keep risks visible to leadership",
+        "Work with safety teams on evaluation sign-off"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [],
+      "eligibility_blockers": [],
+      "visa_or_relocation_note": null,
+      "description_text": "About the role\nCoordinate model launches across research, product and safety teams.\nResponsibilities\n- Own launch plans and timelines for new model releases\n- Run launch reviews and keep risks visible to leadership\n- Work with safety teams on evaluation sign-off\nYou may be a good fit if you have\n- 5+ years of program or project management in a technical environment\n- Experience running cross-functional launches with many teams\n- Clear written communication\nStrong candidates may also have\n- Experience with machine learning products or evaluation\n- A degree in a technical field",
+      "first_seen": "2026-10-04"
+    },
+    {
+      "id": "globex:g-0003",
+      "org": "globex",
+      "title": "AI Success Manager, Asia",
+      "family": "applied_ai",
+      "team_or_department": "Customer / AI Success",
+      "locations": [
+        "Singapore"
+      ],
+      "location_classes": [
+        "apac_other"
+      ],
+      "remote": false,
+      "url": "https://example.com/jobs/globex/g-0003",
+      "updated_at": "2026-10-01T00:00:00.000+00:00",
+      "published_at": "2026-10-01T00:00:00.000+00:00",
+      "compensation": null,
+      "years_experience": 4,
+      "years_experience_basis": "required",
+      "degree_requirement": null,
+      "hard_requirements": [
+        "4+ years in customer success, implementation or operations roles",
+        "Ability to learn technical products quickly"
+      ],
+      "nice_to_haves": [
+        "Experience in logistics or supply chain customers"
+      ],
+      "responsibilities": [
+        "Run onboarding for new enterprise customers",
+        "Report adoption to customer leaders"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [],
+      "eligibility_blockers": [],
+      "visa_or_relocation_note": null,
+      "description_text": "About Globex Labs\nGlobex Labs makes AI tools for engineering teams. A fictional company for the career-eval demo.\nAbout the role\nHelp customers across Asia get value from Globex Labs.\nWhat you'll do\n- Run onboarding for new enterprise customers\n- Report adoption to customer leaders\nWhat you'll bring\n- 4+ years in customer success, implementation or operations roles\n- Ability to learn technical products quickly\nNice to have\n- Experience in logistics or supply chain customers",
+      "first_seen": "2026-10-04"
+    },
+    {
+      "id": "globex:g-0004",
+      "org": "globex",
+      "title": "Trust and Safety Operations Lead",
+      "family": "policy_safety",
+      "team_or_department": "Trust & Safety / Operations",
+      "locations": [
+        "Dublin, Ireland"
+      ],
+      "location_classes": [
+        "uk_eu"
+      ],
+      "remote": false,
+      "url": "https://example.com/jobs/globex/g-0004",
+      "updated_at": "2026-10-01T00:00:00.000+00:00",
+      "published_at": "2026-10-01T00:00:00.000+00:00",
+      "compensation": null,
+      "years_experience": 3,
+      "years_experience_basis": "required",
+      "degree_requirement": null,
+      "hard_requirements": [
+        "3+ years leading trust and safety or content moderation operations"
+      ],
+      "nice_to_haves": [
+        "Experience writing enforcement guidelines"
+      ],
+      "responsibilities": [
+        "Run the review queue and its quality checks",
+        "Improve escalation playbooks"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [],
+      "eligibility_blockers": [],
+      "visa_or_relocation_note": null,
+      "description_text": "About Globex Labs\nGlobex Labs makes AI tools for engineering teams. A fictional company for the career-eval demo.\nAbout the role\nLead the team that reviews reports of misuse.\nWhat you'll do\n- Run the review queue and its quality checks\n- Improve escalation playbooks\nWhat you'll bring\n- 3+ years leading trust and safety or content moderation operations\nNice to have\n- Experience writing enforcement guidelines",
+      "first_seen": "2026-10-25"
+    },
+    {
+      "id": "globex:g-0001",
+      "org": "globex",
+      "title": "Product Manager, Developer Platform",
+      "family": "product",
+      "team_or_department": "Product / Platform",
+      "locations": [
+        "Remote"
+      ],
+      "location_classes": [
+        "remote"
+      ],
+      "remote": true,
+      "url": "https://example.com/jobs/globex/g-0001",
+      "updated_at": "2026-10-01T00:00:00.000+00:00",
+      "published_at": "2026-10-01T00:00:00.000+00:00",
+      "compensation": "$170K to $210K",
+      "years_experience": 5,
+      "years_experience_basis": "required",
+      "degree_requirement": null,
+      "hard_requirements": [
+        "5+ years of product management on developer tools",
+        "A record of shipping platform products"
+      ],
+      "nice_to_haves": [
+        "Experience with AI developer tools"
+      ],
+      "responsibilities": [
+        "Talk to developers every week",
+        "Write clear product specs"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [],
+      "eligibility_blockers": [],
+      "visa_or_relocation_note": null,
+      "description_text": "About Globex Labs\nGlobex Labs makes AI tools for engineering teams. A fictional company for the career-eval demo.\nAbout the role\nOwn the developer platform roadmap.\nWhat you'll do\n- Talk to developers every week\n- Write clear product specs\nWhat you'll bring\n- 5+ years of product management on developer tools\n- A record of shipping platform products\nNice to have\n- Experience with AI developer tools",
+      "first_seen": "2026-10-04"
+    },
+    {
+      "id": "globex:g-0002",
+      "org": "globex",
+      "title": "Technical Program Manager, Infrastructure",
+      "family": "tpm",
+      "team_or_department": "Technical Program Management / Infrastructure",
+      "locations": [
+        "Seattle, WA",
+        "Toronto, Canada"
+      ],
+      "location_classes": [
+        "us",
+        "canada"
+      ],
+      "remote": false,
+      "url": "https://example.com/jobs/globex/g-0002",
+      "updated_at": "2026-10-01T00:00:00.000+00:00",
+      "published_at": "2026-10-01T00:00:00.000+00:00",
+      "compensation": "$180K to $230K",
+      "years_experience": 6,
+      "years_experience_basis": "required",
+      "degree_requirement": "Bachelor's degree in Computer Science or related field, or equivalent experience",
+      "hard_requirements": [
+        "6+ years of technical program management in infrastructure or operations",
+        "Bachelor's degree in Computer Science or related field, or equivalent experience"
+      ],
+      "nice_to_haves": [
+        "Experience with hardware supply chains"
+      ],
+      "responsibilities": [
+        "Plan capacity programs with infrastructure teams",
+        "Track vendor deliveries"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [
+        "Computer Science or related"
+      ],
+      "eligibility_blockers": [],
+      "visa_or_relocation_note": null,
+      "description_text": "About Globex Labs\nGlobex Labs makes AI tools for engineering teams. A fictional company for the career-eval demo.\nAbout the role\nRun the programs that keep our compute fleet growing.\nWhat you'll do\n- Plan capacity programs with infrastructure teams\n- Track vendor deliveries\nWhat you'll bring\n- 6+ years of technical program management in infrastructure or operations\n- Bachelor's degree in Computer Science or related field, or equivalent experience\nNice to have\n- Experience with hardware supply chains",
+      "first_seen": "2026-10-04"
+    },
+    {
+      "id": "initech:i-0004",
+      "org": "initech",
+      "title": "Customer Success Manager, Fleet Operations",
+      "family": "applied_ai",
+      "team_or_department": "Customer / Success",
+      "locations": [
+        "Auckland, New Zealand"
+      ],
+      "location_classes": [
+        "australia_nz"
+      ],
+      "remote": false,
+      "url": "https://example.com/jobs/initech/i-0004",
+      "updated_at": "2025-11-01T00:00:00Z",
+      "published_at": "2025-11-01T00:00:00Z",
+      "compensation": null,
+      "years_experience": 3,
+      "years_experience_basis": "required",
+      "degree_requirement": null,
+      "hard_requirements": [
+        "3+ years in customer success or operations"
+      ],
+      "nice_to_haves": [
+        "Experience with warehouse management systems"
+      ],
+      "responsibilities": [
+        "Run quarterly reviews with customers",
+        "Spot problems before they become outages"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [],
+      "eligibility_blockers": [],
+      "visa_or_relocation_note": null,
+      "description_text": "Initech Robotics builds warehouse robots. A fictional company for the career-eval demo.\nKeep fleet customers in New Zealand successful.\nWhat you will do\n- Run quarterly reviews with customers\n- Spot problems before they become outages\nRequirements\n- 3+ years in customer success or operations\nNice to have\n- Experience with warehouse management systems",
+      "first_seen": "2026-11-01"
+    },
+    {
+      "id": "initech:i-0003",
+      "org": "initech",
+      "title": "Policy Lead, Robotics Safety Standards",
+      "family": "policy_safety",
+      "team_or_department": "Policy / Standards",
+      "locations": [
+        "Austin, TX"
+      ],
+      "location_classes": [
+        "us"
+      ],
+      "remote": false,
+      "url": "https://example.com/jobs/initech/i-0003",
+      "updated_at": "2025-10-05T00:00:00Z",
+      "published_at": "2025-10-05T00:00:00Z",
+      "compensation": null,
+      "years_experience": 5,
+      "years_experience_basis": "required",
+      "degree_requirement": null,
+      "hard_requirements": [
+        "5+ years in safety policy, standards or regulatory affairs"
+      ],
+      "nice_to_haves": [
+        "Experience with industrial safety"
+      ],
+      "responsibilities": [
+        "Track and shape robotics safety standards",
+        "Work with regulators and industry groups"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [],
+      "eligibility_blockers": [],
+      "visa_or_relocation_note": null,
+      "description_text": "Initech Robotics builds warehouse robots. A fictional company for the career-eval demo.\nRepresent Initech Robotics in safety standards work.\nWhat you will do\n- Track and shape robotics safety standards\n- Work with regulators and industry groups\nRequirements\n- 5+ years in safety policy, standards or regulatory affairs\nNice to have\n- Experience with industrial safety",
+      "first_seen": "2026-10-04"
+    },
+    {
+      "id": "initech:i-0002",
+      "org": "initech",
+      "title": "Product Manager, Warehouse Autonomy",
+      "family": "product",
+      "team_or_department": "Product / Autonomy",
+      "locations": [
+        "Brisbane, Australia"
+      ],
+      "location_classes": [
+        "australia_nz"
+      ],
+      "remote": false,
+      "url": "https://example.com/jobs/initech/i-0002",
+      "updated_at": "2025-10-05T00:00:00Z",
+      "published_at": "2025-10-05T00:00:00Z",
+      "compensation": null,
+      "years_experience": 3,
+      "years_experience_basis": "required",
+      "degree_requirement": null,
+      "hard_requirements": [
+        "3+ years in product management or operations roles close to product",
+        "Must hold a valid driver's licence for site visits"
+      ],
+      "nice_to_haves": [
+        "Background in logistics"
+      ],
+      "responsibilities": [
+        "Define the roadmap for autonomy features",
+        "Visit customer warehouses to learn their workflows"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [],
+      "eligibility_blockers": [
+        {
+          "type": "licence",
+          "text": "What you will do Define the roadmap for autonomy features Visit customer warehouses to learn their workflows Requirements 3+ years in product management or…"
+        }
+      ],
+      "visa_or_relocation_note": null,
+      "description_text": "Initech Robotics builds warehouse robots. A fictional company for the career-eval demo.\nShape how autonomous robots move goods through warehouses.\nWhat you will do\n- Define the roadmap for autonomy features\n- Visit customer warehouses to learn their workflows\nRequirements\n- 3+ years in product management or operations roles close to product\n- Must hold a valid driver's licence for site visits\nNice to have\n- Background in logistics",
+      "first_seen": "2026-10-04"
+    },
+    {
+      "id": "initech:i-0001",
+      "org": "initech",
+      "title": "Program Manager, Robot Fleet Deployments",
+      "family": "tpm",
+      "team_or_department": "Operations / Fleet",
+      "locations": [
+        "Melbourne, Australia"
+      ],
+      "location_classes": [
+        "australia_nz"
+      ],
+      "remote": false,
+      "url": "https://example.com/jobs/initech/i-0001",
+      "updated_at": "2025-10-19T00:00:00Z",
+      "published_at": "2025-10-19T00:00:00Z",
+      "compensation": "AUD 150,000 to 180,000 per year salary",
+      "years_experience": 4,
+      "years_experience_basis": "required",
+      "degree_requirement": null,
+      "hard_requirements": [
+        "4+ years of program or project management",
+        "Experience with hardware, logistics or warehouse operations",
+        "Comfort working on customer sites"
+      ],
+      "nice_to_haves": [
+        "Experience with robotics or automation projects"
+      ],
+      "responsibilities": [
+        "Run deployment programs across customer sites",
+        "Coordinate hardware, software and site teams"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [],
+      "eligibility_blockers": [],
+      "visa_or_relocation_note": null,
+      "description_text": "Initech Robotics builds warehouse robots. A fictional company for the career-eval demo.\nPlan and run robot fleet rollouts at customer warehouses.\nWhat you will do\n- Run deployment programs across customer sites\n- Coordinate hardware, software and site teams\nRequirements\n- 4+ years of program or project management\n- Experience with hardware, logistics or warehouse operations\n- Comfort working on customer sites\nNice to have\n- Experience with robotics or automation projects",
+      "first_seen": "2026-10-18"
+    }
+  ],
+  "excluded": [
+    {
+      "org": "acme",
+      "title": "Forward Deployed Engineer",
+      "url": "https://example.com/jobs/acme/4100003",
+      "reason": "the applied_ai family drops postings that expect production coding"
+    }
+  ]
+}

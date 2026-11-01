@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "rubric_version": "1.0",
+  "roles": {
+    "acme:4100001": {
+      "D1": {
+        "score": 3,
+        "evidence": [
+          "E01",
+          "E02"
+        ],
+        "note": "Ten years of operations and programs; launches were physical, not model launches."
+      },
+      "D2": {
+        "score": 2,
+        "evidence": [
+          "E04",
+          "E05"
+        ],
+        "note": "route-eval is relevant to evaluation sign-off; no launch case study yet."
+      },
+      "D4": {
+        "score": 2,
+        "evidence": [
+          "E04"
+        ],
+        "note": "Acme AI cares about evaluation, and route-eval is an evaluation tool."
+      },
+      "hard_requirement_lacking": false,
+      "judged_on": "2026-10-04",
+      "reviewed_on": "2026-10-05",
+      "reviewer_note": "Agreed D1 3: program years meet the ask, the domain gap keeps it at 3."
+    },
+    "acme:4100002": {
+      "D1": {
+        "score": 2,
+        "evidence": [
+          "E01"
+        ],
+        "note": "Customer-facing delivery is partial: internal operations, not customer deployments."
+      },
+      "D2": {
+        "score": 3,
+        "evidence": [
+          "E04"
+        ],
+        "note": "Verified tool used by outside contributors; close to what deployment leads show."
+      },
+      "D4": {
+        "score": 2,
+        "evidence": [
+          "E01",
+          "E04"
+        ],
+        "note": "Logistics customers are named as a plus in the posting."
+      },
+      "hard_requirement_lacking": false,
+      "judged_on": "2026-10-04",
+      "reviewed_on": "2026-10-05",
+      "reviewer_note": "Agreed D2 3 on the verified repository; D1 stays 2."
+    },
+    "acme:4100004": {
+      "D1": {
+        "score": 1,
+        "evidence": [
+          "E02"
+        ],
+        "note": "No trust and safety or policy operations experience."
+      },
+      "D2": {
+        "score": 1,
+        "evidence": [
+          "E07"
+        ],
+        "note": "Essays touch on AI risk but are not policy work."
+      },
+      "D4": {
+        "score": 1,
+        "evidence": [
+          "E07"
+        ],
+        "note": "Nothing specific to Acme's safeguards work."
+      },
+      "hard_requirement_lacking": true,
+      "judged_on": "2026-10-04",
+      "hard_requirement_note": "3+ years in trust and safety or policy operations"
+    },
+    "acme:4100006": {
+      "D1": {
+        "score": 2,
+        "evidence": [
+          "E01"
+        ],
+        "note": "Program years fit; no government customers."
+      },
+      "D2": {
+        "score": 1,
+        "evidence": [
+          "E05"
+        ],
+        "note": "No public-sector proof."
+      },
+      "D4": {
+        "score": 0,
+        "evidence": [],
+        "note": "None."
+      },
+      "hard_requirement_lacking": true,
+      "judged_on": "2026-10-04",
+      "hard_requirement_note": "US citizenship and a security clearance"
+    },
+    "globex:g-0001": {
+      "D1": {
+        "score": 1,
+        "evidence": [
+          "E02"
+        ],
+        "note": "No product management title; the posting asks for 5+ years of it."
+      },
+      "D2": {
+        "score": 2,
+        "evidence": [
+          "E04"
+        ],
+        "note": "route-eval is a developer tool, which helps a little."
+      },
+      "D4": {
+        "score": 1,
+        "evidence": [
+          "E04"
+        ],
+        "note": "Small overlap with the developer platform."
+      },
+      "hard_requirement_lacking": true,
+      "judged_on": "2026-10-04",
+      "hard_requirement_note": "5+ years of product management"
+    },
+    "globex:g-0002": {
+      "D1": {
+        "score": 2,
+        "evidence": [
+          "E01",
+          "E02"
+        ],
+        "note": "Programs were operations, not data-centre infrastructure."
+      },
+      "D2": {
+        "score": 2,
+        "evidence": [
+          "E05",
+          "E15"
+        ],
+        "note": "The scheduling rollout shows multi-site program delivery."
+      },
+      "D4": {
+        "score": 1,
+        "evidence": [
+          "E01"
+        ],
+        "note": "Hardware delivery tracking is adjacent."
+      },
+      "hard_requirement_lacking": false,
+      "judged_on": "2026-10-25"
+    },
+    "globex:g-0003": {
+      "D1": {
+        "score": 3,
+        "evidence": [
+          "E01",
+          "E02"
+        ],
+        "note": "Operations roles close to implementation work; customer success is a step across."
+      },
+      "D2": {
+        "score": 3,
+        "evidence": [
+          "E04",
+          "E15"
+        ],
+        "note": "Verified tool plus a corroborated case study."
+      },
+      "D4": {
+        "score": 2,
+        "evidence": [
+          "E01"
+        ],
+        "note": "Logistics customers are named as a plus."
+      },
+      "hard_requirement_lacking": false,
+      "judged_on": "2026-10-25"
+    },
+    "globex:g-0004": {
+      "D1": {
+        "score": 1,
+        "evidence": [
+          "E02"
+        ],
+        "note": "No trust and safety leadership."
+      },
+      "D2": {
+        "score": 1,
+        "evidence": [
+          "E07"
+        ],
+        "note": "None relevant."
+      },
+      "D4": {
+        "score": 1,
+        "evidence": [
+          "E07"
+        ],
+        "note": "None."
+      },
+      "hard_requirement_lacking": true,
+      "judged_on": "2026-10-25",
+      "hard_requirement_note": "3+ years leading trust and safety operations"
+    },
+    "initech:i-0001": {
+      "D1": {
+        "score": 4,
+        "evidence": [
+          "E01",
+          "E02"
+        ],
+        "note": "Warehouse and transport programs map closely to fleet rollouts at customer sites."
+      },
+      "D2": {
+        "score": 3,
+        "evidence": [
+          "E04",
+          "E15"
+        ],
+        "note": "Corroborated multi-site rollout case study."
+      },
+      "D4": {
+        "score": 4,
+        "evidence": [
+          "E01",
+          "E15"
+        ],
+        "note": "Warehouse operations is exactly the domain Initech sells into."
+      },
+      "hard_requirement_lacking": false,
+      "judged_on": "2026-10-25",
+      "reviewed_on": "2026-10-26",
+      "reviewer_note": "Agreed D1 4 and D4 4: same domain and scale; D2 held at 3, one case study is not a track record."
+    },
+    "initech:i-0002": {
+      "D1": {
+        "score": 2,
+        "evidence": [
+          "E01"
+        ],
+        "note": "Operations close to product, but no product title."
+      },
+      "D2": {
+        "score": 3,
+        "evidence": [
+          "E15"
+        ],
+        "note": "The rollout case study shows product-like work with users."
+      },
+      "D4": {
+        "score": 3,
+        "evidence": [
+          "E01",
+          "E15"
+        ],
+        "note": "Deep warehouse workflow knowledge."
+      },
+      "hard_requirement_lacking": false,
+      "judged_on": "2026-10-25",
+      "reviewed_on": "2026-10-26",
+      "reviewer_note": "Agreed: the licence blocker is cleared (E13)."
+    },
+    "initech:i-0003": {
+      "D1": {
+        "score": 1,
+        "evidence": [
+          "E02"
+        ],
+        "note": "No standards or regulatory work."
+      },
+      "D2": {
+        "score": 1,
+        "evidence": [
+          "E05"
+        ],
+        "note": "None relevant."
+      },
+      "D4": {
+        "score": 2,
+        "evidence": [
+          "E01"
+        ],
+        "note": "Knows warehouse safety practice from operations."
+      },
+      "hard_requirement_lacking": true,
+      "judged_on": "2026-10-04",
+      "hard_requirement_note": "5+ years in safety policy or standards"
+    }
+  }
+}

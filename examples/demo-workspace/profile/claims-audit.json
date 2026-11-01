@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-11-01",
+  "claims": [
+    {
+      "id": "C001",
+      "source": "https://example.com/in/alex-example",
+      "text": "Led a team of 40 across six warehouses.",
+      "fingerprint": "demo0000000000c1",
+      "status": "overstated",
+      "evidence": [
+        "E05",
+        "E16"
+      ],
+      "suggested_wording": "Led a team of 8 across six warehouses.",
+      "found_on": "2026-10-04",
+      "checked_on": "2026-10-05"
+    },
+    {
+      "id": "C002",
+      "source": "https://example.com/alex/about",
+      "text": "I built route-eval, an open-source tool with 14 releases.",
+      "fingerprint": "demo0000000000c2",
+      "status": "supported",
+      "evidence": [
+        "E04"
+      ],
+      "suggested_wording": "",
+      "found_on": "2026-10-04",
+      "checked_on": "2026-10-05"
+    },
+    {
+      "id": "C003",
+      "source": "https://example.com/alex/about",
+      "text": "I cut late deliveries by 18% in 2023.",
+      "fingerprint": "demo0000000000c3",
+      "status": "unsupported",
+      "evidence": [
+        "E06"
+      ],
+      "suggested_wording": "Helped reduce late deliveries in 2023 (figure being confirmed with my former manager).",
+      "found_on": "2026-10-04",
+      "checked_on": "2026-10-05"
+    },
+    {
+      "id": "C004",
+      "source": "https://example.com/alex/about",
+      "text": "I have spoken at three industry conferences.",
+      "fingerprint": "demo0000000000c4",
+      "status": "pending",
+      "evidence": [],
+      "suggested_wording": "",
+      "found_on": "2026-11-01"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "generated_on": "2026-11-01",
+  "source": "intake/sources/Connections.csv",
+  "total_connections": 10,
+  "matched_connections": 3,
+  "orgs": {
+    "acme": {
+      "count": 1,
+      "first_degree": [
+        {
+          "name": "Riley Placeholder",
+          "position": "Recruiting Coordinator",
+          "company": "ACME AI Inc",
+          "connected_on": "2023-06-20",
+          "months_connected": 40,
+          "profile_url": "https://example.com/in/riley-placeholder"
+        }
+      ]
+    },
+    "globex": {
+      "count": 2,
+      "first_degree": [
+        {
+          "name": "Jordan Sample",
+          "position": "Program Manager",
+          "company": "Globex Labs",
+          "connected_on": "2022-03-12",
+          "months_connected": 55,
+          "profile_url": "https://example.com/in/jordan-sample"
+        },
+        {
+          "name": "Casey Demo",
+          "position": "AI Success Manager",
+          "company": "Globex Labs, Inc.",
+          "connected_on": "2024-01-03",
+          "months_connected": 33,
+          "profile_url": "https://example.com/in/casey-demo"
+        }
+      ]
+    },
+    "initech": {
+      "count": 0,
+      "first_degree": []
+    }
+  },
+  "second_degree": [
+    {
+      "org": "globex",
+      "via": "Jordan Sample",
+      "target_person": "AI Success team lead",
+      "status": "agreed",
+      "note": "Agreed by email to introduce Alex once route-eval is shared.",
+      "updated_on": "2026-10-24"
+    },
+    {
+      "org": "initech",
+      "status": "idea",
+      "note": "Ask former logistics colleagues who works at Initech Robotics (action A07).",
+      "updated_on": "2026-10-25"
+    }
+  ]
+}
