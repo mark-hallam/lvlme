@@ -137,6 +137,8 @@ def profile_entry(ctx, section, org):
 
 
 def is_blocked(ctx, role, judgement):
+    if judgement and judgement.get("hard_eligibility_block"):
+        return True
     if judgement and judgement.get("eligibility_blocked") is not None:
         return bool(judgement["eligibility_blocked"])
     return any(b.get("type") not in ctx.cleared for b in role.get("eligibility_blockers") or [])

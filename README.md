@@ -138,18 +138,42 @@ Every script takes `--workspace PATH`. Without it, scripts use
 
 ## What you get
 
-`report/index.html` in your workspace, a self-contained page (no external
-requests) that works in light and dark mode and on a phone, with six views:
+`report/index.html` in your workspace: one self-contained page (no external
+requests), light by default with a readable dark mode, that works on a phone.
+It leads with the climb: your measured Day 1, every scored day since, and
+where the plan is expected to take you.
 
-- **Overview**: the outlook, your best role at each organisation, today's
-  actions and the campaign scoreboard.
-- **Trends**: how your fit and the market move over time.
-- **Roles**: every open role, its score on each factor, and why.
-- **SWOT**: strengths, weaknesses, opportunities and threats, plus the TOWS
-  strategies (the four ways of combining them) that turn the grid into moves.
-- **Plan**: the gaps worth closing, the action list and what was tried.
-- **Evidence**: what is verified, what is not, and the questions only you can
-  answer.
+![The demo dashboard on a desktop, light theme](docs/images/dashboard-desktop.png)
+
+<img src="docs/images/dashboard-phone.png" alt="The demo dashboard on a phone, light theme" width="320">
+
+*Screenshots of the fictional demo (Alex Example and three made-up
+organisations).*
+
+- **The journey**: your best chance today, a level badge, and a flight-path
+  chart. The black line is what was measured, one dot per scored day. From
+  today it splits into three paths to the end date: *expected* if you follow
+  the plan (each action weighted by its chance of working), *best case* if
+  every action lands, and *do nothing*. Diamonds are plan actions on their
+  target dates. The green dashed line at 70 is the offer zone.
+- **What if**: switch any plan action on or off and every number on the page
+  updates. Each switch shows what it adds to your best role and how many roles
+  it lifts.
+- **Verifiable record**: one chip per scored day. If your workspace is its own
+  git repository (a version history, with no remote), each chip also shows the
+  saved version that first recorded that day.
+- **Views**: Organisations; Path to the top band (if you add
+  `eval/ceilings.json`); What moves you; Roles (every role by factor, as a heat
+  map); SWOT and TOWS (strengths, weaknesses, opportunities and threats, and
+  the strategies that combine them); Plan; Evidence (with your public claims,
+  checked); Market.
+- **Drill down**: tap any organisation, role, factor, action or piece of
+  evidence to see why, in a side pane with breadcrumbs.
+
+The projection is deliberately cautious: each factor can rise only by a capped
+amount (`projection_caps` in `campaign/plan.json`), never above 5, and a role
+with an eligibility blocker you can't clear never gains eligibility. See
+[`method/CAMPAIGN.md`](method/CAMPAIGN.md).
 
 For your other agents: `report/for-agents/SUMMARY.md` (plain-text briefing)
 and `report/for-agents/dashboard.json` (every number, in JSON, short for

@@ -35,6 +35,7 @@ FILES = [
     ("eval/gap-templates.json", "gap-templates.schema.json", False),
     ("eval/outlook.json", "outlook.schema.json", False),
     ("eval/swot.json", "swot.schema.json", False),
+    ("eval/ceilings.json", "ceilings.schema.json", False),
     ("campaign/plan.json", "plan.schema.json", True),
 ]
 
@@ -283,6 +284,8 @@ def cross_checks(ws, docs, errors, warnings):
                             % (aid, a["gap_id"]))
         if a.get("draft") and not os.path.exists(C.wpath(ws, a["draft"])):
             warnings.append("campaign/plan.json: action %s names draft %s, which does not exist" % (aid, a["draft"]))
+        for e in a.get("effects") or []:
+            effect_checks(aid, e, targets, fams, classes + [default_class], errors, warnings)
 
     net = docs.get("profile/network.json")
     for org in (net or {}).get("orgs", {}):
@@ -296,6 +299,21 @@ def cross_checks(ws, docs, errors, warnings):
     for org in ((docs.get("market/orgs.json") or {}).get("orgs") or {}):
         if org not in targets:
             warnings.append("market/orgs.json: %s is not a target id" % org)
+    for r in (docs.get("eval/ceilings.json") or {}).get("roles", []):
+        if r.get("org") not in targets:
+            warnings.append("eval/ceilings.json: role %s belongs to %s, not a target id" % (r.get("role_id"), r.get("org")))
+
+
+def effect_checks(aid, e, targets, fams, classes, errors, warnings):
+    """One plan action effect: exactly one of delta or set_at_least, and a scope that names known ids."""
+    where = "campaign/plan.json: action %s effect on %s" % (aid, e.get("dimension"))
+    if ("delta" in e) == ("set_at_least" in e):
+        errors.append("%s needs exactly one of delta or set_at_least" % where)
+    scope = e.get("scope") or {}
+    for key, known in (("orgs", targets), ("families", fams), ("location_classes", classes)):
+        for v in scope.get(key) or []:
+            if v not in known:
+                warnings.append("%s names %s '%s', not in config.json" % (where, key.replace("_", " "), v))
 
 
 def scope_bad(scope, targets):

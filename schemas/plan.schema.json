@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Campaign plan (campaign/plan.json)",
-  "description": "North-star metrics, the action list (each one a bet with an expected gain, a chance and an effort), a backlog, and the experiments log. Priority = expected points x roles affected x chance / effort hours.",
+  "description": "North-star metrics, the action list (each one a bet with an expected gain, a chance and an effort), a backlog, the experiments log, and the projection settings the dashboard uses. Priority = expected points x roles affected x chance / effort hours.",
   "type": "object",
   "required": ["schema_version", "north_star", "actions"],
   "additionalProperties": false,
@@ -10,6 +10,28 @@
     "updated_on": {"$ref": "#/definitions/date"},
     "principle": {"type": "string"},
     "max_active": {"type": "integer", "minimum": 1, "maximum": 20},
+    "baseline_date": {"$ref": "#/definitions/date", "description": "Day 1 of the journey on the dashboard. Default: the first run date."},
+    "end_date": {"$ref": "#/definitions/date", "description": "Where the dashboard's projection ends. Default: 90 days after the latest run, or 14 days after the last open action's target date if later."},
+    "projection_caps": {
+      "type": "object",
+      "description": "The most the plan can raise each factor over today's score in the projection, so it cannot overpromise. Missing factors use the defaults D1 0, D2 1, D3 2, D4 1, D5 1, D6 1, D7 3.",
+      "additionalProperties": false,
+      "properties": {
+        "D1": {"type": "integer", "minimum": 0, "maximum": 5}, "D2": {"type": "integer", "minimum": 0, "maximum": 5},
+        "D3": {"type": "integer", "minimum": 0, "maximum": 5}, "D4": {"type": "integer", "minimum": 0, "maximum": 5},
+        "D5": {"type": "integer", "minimum": 0, "maximum": 5}, "D6": {"type": "integer", "minimum": 0, "maximum": 5},
+        "D7": {"type": "integer", "minimum": 0, "maximum": 5}
+      }
+    },
+    "eligibility_blockers": {
+      "type": "object",
+      "description": "Which eligibility blockers the plan can never clear. A blocked role with one of these types, or whose judgement sets hard_eligibility_block, keeps eligibility (D6) at 0 in the projection.",
+      "additionalProperties": false,
+      "properties": {
+        "hard_types": {"type": "array", "description": "Default: us_person_export_control, citizenship, security_clearance.",
+                       "items": {"enum": ["us_person_export_control", "security_clearance", "citizenship", "licence"]}}
+      }
+    },
     "north_star": {"type": "array", "items": {"$ref": "#/definitions/metric"}},
     "actions": {"type": "array", "items": {"$ref": "#/definitions/action"}},
     "backlog": {"type": "array", "items": {"type": "string"}},
@@ -48,6 +70,9 @@
         "expected_points": {"type": "number", "minimum": 0, "description": "Fit points gained per affected role if it works."},
         "roles_affected": {"type": "integer", "minimum": 0},
         "chance": {"type": "number", "minimum": 0, "maximum": 1},
+        "target_date": {"$ref": "#/definitions/date", "description": "When the action should land. The projection applies its effects on this date; open actions without one count at the end date."},
+        "effects": {"type": "array", "items": {"$ref": "#/definitions/effect"},
+                    "description": "What the action changes if it works. Without effects, the projection estimates one from expected_points on the action's dimension and orgs."},
         "done_when": {"type": "string", "minLength": 1},
         "done_evidence": {"type": "string", "description": "A link, file path or email reference. Required before status can be done."},
         "added_on": {"$ref": "#/definitions/date"},
@@ -55,6 +80,28 @@
         "finished_on": {"$ref": "#/definitions/date"},
         "draft": {"type": "string", "description": "Path to a draft in campaign/drafts/ for the person to send."},
         "notes": {"type": "string"}
+      }
+    },
+    "effect": {
+      "type": "object",
+      "description": "Raise one factor by delta, or to at least set_at_least, for the roles in scope. A missing or empty list in scope means all.",
+      "required": ["dimension"],
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {"enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]},
+        "delta": {"type": "number", "exclusiveMinimum": 0, "maximum": 5},
+        "set_at_least": {"type": "number", "minimum": 0, "maximum": 5},
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "orgs": {"type": "array", "items": {"type": "string"}},
+            "families": {"type": "array", "items": {"type": "string"}},
+            "location_classes": {"type": "array", "items": {"type": "string"}},
+            "role_ids": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "note": {"type": "string"}
       }
     },
     "experiment": {

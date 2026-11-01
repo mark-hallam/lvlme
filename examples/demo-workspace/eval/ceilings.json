@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "generated": "2026-11-01",
+  "target_fit": 85,
+  "how": "An 85 means Strong: a near perfect match on paper, plus someone inside who has seen Alex's work and will refer. Alex cannot get there on requirements alone, because years in the role cannot be added this year. The road runs through a warm path into Initech Robotics, verified proof of the scheduling rollout, and a tailored application for each best-fit role.",
+  "counts": [
+    {"value": 9, "label": "open roles without a blocker were checked"},
+    {"value": 0, "label": "can reach 85 on evidence Alex can show today"},
+    {"value": 1, "label": "can reach 85 once the work history is confirmed"},
+    {"value": 2, "label": "more top out between 70 and 84"}
+  ],
+  "roles": [
+    {"role_id": "initech:i-0001", "org": "initech", "title": "Program Manager, Robot Fleet Deployments", "locations": ["Melbourne, Australia"],
+     "likely_12_months": 66, "ceiling": 77, "ceiling_if_confirmed": 86, "binding_constraint": "D3"},
+    {"role_id": "initech:i-0002", "org": "initech", "title": "Product Manager, Warehouse Autonomy", "locations": ["Brisbane, Australia"],
+     "likely_12_months": 54, "ceiling": 70, "ceiling_if_confirmed": 74, "binding_constraint": "D1"},
+    {"role_id": "acme:4100002", "org": "acme", "title": "Applied AI Deployment Lead, Asia Pacific", "locations": ["Sydney, Australia"],
+     "likely_12_months": 53, "ceiling": 66, "ceiling_if_confirmed": 71, "binding_constraint": "D3"},
+    {"role_id": "acme:4100001", "org": "acme", "title": "Technical Program Manager, Model Launches", "locations": ["Sydney, Australia"],
+     "likely_12_months": 52, "ceiling": 63, "ceiling_if_confirmed": 67, "binding_constraint": "D1"},
+    {"role_id": "globex:g-0003", "org": "globex", "title": "AI Success Manager, Asia", "locations": ["Singapore"],
+     "likely_12_months": 50, "ceiling": 62, "ceiling_if_confirmed": 64, "binding_constraint": "D6"}
+  ],
+  "factors": [
+    {"dimension": "D3", "now": "Nobody at Initech yet; one agreed introduction at Globex.",
+     "five_looks_like": "A senior person at Initech who has seen Alex's work and has put Alex forward for a named role.",
+     "gap": "From no contact to a referral at the organisation with the best-fit roles.",
+     "moves": ["Ask three former logistics colleagues who they know at Initech (A07).", "Go to the warehouse operators meetup in Melbourne with the case study ready (A11).", "Share route-eval with the Globex contact before asking for anything (A02)."],
+     "effort": "About 6 hours over a month.", "chance": "About 40% for an agreed path; about 15% for a referral."},
+    {"dimension": "D2", "now": "One verified open-source tool and one checked case study.",
+     "five_looks_like": "Two or three pieces a reviewer can check, one of them used by a warehouse operator Initech sells to.",
+     "gap": "A second piece, with a real user, aimed at fleet deployments.",
+     "moves": ["Run route-eval on a public fleet dataset and publish the results.", "Ask a former manager to confirm the 18 percent late-delivery figure, or drop it."],
+     "effort": "About 10 hours.", "chance": "About 60%."},
+    {"dimension": "D1", "now": "Ten years of operations and programs, five of them with a program title.",
+     "five_looks_like": "Every hard requirement met and shown with a source.",
+     "gap": "Mostly fixed for this year: years in the role cannot be added. Confirming the earlier history is the only move.",
+     "moves": ["Ask the former employer to confirm the 2016 to 2021 role in writing."],
+     "effort": "1 hour.", "chance": "About 80%."},
+    {"dimension": "D5", "now": "A personal site, essays and one recorded talk.",
+     "five_looks_like": "A search for Alex finds the case study, route-eval and a talk about warehouse automation, and the public profile matches the résumé.",
+     "gap": "Fix the overstated team size, then make the work easy to find.",
+     "moves": ["Fix the LinkedIn headline (A04).", "Link route-eval and the case study from every profile."],
+     "effort": "2 hours.", "chance": "About 90%."}
+  ],
+  "phases": [
+    {"phase": "Today", "window": "1 Nov 2026", "steps": []},
+    {"phase": "Weeks 1 to 4", "window": "Nov 2026", "steps": ["Fix the public claims.", "Apply to the Initech fleet role.", "Open a path into Initech."]},
+    {"phase": "Months 2 to 3", "window": "Dec 2026 to Jan 2027", "steps": ["Meet Initech staff in person.", "Publish a second proof piece with a real user."]},
+    {"phase": "Months 4 to 12", "window": "Feb to Oct 2027", "steps": ["Turn the path into a referral.", "Confirm the earlier work history.", "Reapply with the referral if the first application stalls."]}
+  ],
+  "roadmap": [
+    {"role_id": "initech:i-0001", "label": "Program Manager, Robot Fleet Deployments (Initech Robotics)",
+     "phases": [
+       {"phase": "Today", "fit_likely": 57, "fit_if_every_step_lands": 57, "band_if_every_step_lands": "Moderate"},
+       {"phase": "Weeks 1 to 4", "fit_likely": 59, "fit_if_every_step_lands": 66, "band_if_every_step_lands": "Moderate"},
+       {"phase": "Months 2 to 3", "fit_likely": 63, "fit_if_every_step_lands": 74, "band_if_every_step_lands": "Good"},
+       {"phase": "Months 4 to 12", "fit_likely": 66, "fit_if_every_step_lands": 86, "band_if_every_step_lands": "Strong"}]},
+    {"role_id": "acme:4100002", "label": "Applied AI Deployment Lead, Asia Pacific (Acme AI)",
+     "phases": [
+       {"phase": "Today", "fit_likely": 45, "fit_if_every_step_lands": 45, "band_if_every_step_lands": "Low"},
+       {"phase": "Weeks 1 to 4", "fit_likely": 47, "fit_if_every_step_lands": 50, "band_if_every_step_lands": "Low"},
+       {"phase": "Months 2 to 3", "fit_likely": 50, "fit_if_every_step_lands": 58, "band_if_every_step_lands": "Moderate"},
+       {"phase": "Months 4 to 12", "fit_likely": 53, "fit_if_every_step_lands": 71, "band_if_every_step_lands": "Good"}]}
+  ],
+  "odds": {
+    "statement": "These are judgement calls, not statistics. They assume Alex does the plan's actions roughly on time, and that Initech keeps hiring in Australia.",
+    "reach_target_within_12_months": "about 1 in 6",
+    "reach_good": "about 1 in 3",
+    "reach_good_by": "2027-03-31",
+    "why_not_higher": ["No warm path into Initech yet, and referrals are never certain.", "Years in the role are fixed for this year.", "The best roles could close before the path opens."]
+  },
+  "create_the_role": [
+    {"strategy": "Pitch a fleet operations pilot to an Initech partner", "how": "Offer to run the scheduling playbook for one warehouse operator in Initech's partner programme, unpaid for four weeks, with the results written up.", "lifts": "Proof of work, warm path and organisation edge at Initech."}
+  ],
+  "watchlist": {
+    "title_patterns": ["Program Manager (Fleet, Deployments or Operations)", "Deployment Lead", "Customer Success (Fleet)"],
+    "locations_priority": ["Melbourne", "Brisbane", "Sydney", "Auckland", "Singapore"],
+    "requirement_patterns_good": ["warehouse or logistics operations", "rollouts across sites", "no production coding"],
+    "exclude": ["US citizenship or a security clearance", "production coding"],
+    "alert_rule": "Flag any new role that matches a title pattern in the first three places, and say how high it could go."
+  }
+}

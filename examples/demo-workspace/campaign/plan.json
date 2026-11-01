@@ -3,6 +3,24 @@
   "updated_on": "2026-11-01",
   "principle": "Attack the binding constraint first: eligibility, then a warm path, then visible proof of work, then a tailored application.",
   "max_active": 8,
+  "baseline_date": "2026-10-04",
+  "end_date": "2027-01-31",
+  "projection_caps": {
+    "D1": 0,
+    "D2": 1,
+    "D3": 3,
+    "D4": 1,
+    "D5": 1,
+    "D6": 1,
+    "D7": 2
+  },
+  "eligibility_blockers": {
+    "hard_types": [
+      "us_person_export_control",
+      "security_clearance",
+      "citizenship"
+    ]
+  },
   "north_star": [
     {
       "id": "warm_intros",
@@ -83,6 +101,19 @@
       "expected_points": 4,
       "roles_affected": 4,
       "chance": 0.5,
+      "target_date": "2026-11-15",
+      "effects": [
+        {
+          "dimension": "D3",
+          "set_at_least": 3,
+          "scope": {
+            "orgs": [
+              "globex"
+            ]
+          },
+          "note": "A named insider who has seen route-eval."
+        }
+      ],
       "done_when": "The AI Success lead has replied and seen route-eval (email)",
       "strategy_ids": [
         "SO2"
@@ -126,6 +157,8 @@
       "expected_points": 2,
       "roles_affected": 12,
       "chance": 0.9,
+      "target_date": "2026-11-05",
+      "effects": [],
       "done_when": "Headline changed (screenshot or link), claim C001 re-checked as supported",
       "strategy_ids": [
         "WT1"
@@ -168,6 +201,19 @@
       "expected_points": 1,
       "roles_affected": 1,
       "chance": 0.8,
+      "target_date": "2026-11-08",
+      "effects": [
+        {
+          "dimension": "D7",
+          "delta": 1,
+          "scope": {
+            "role_ids": [
+              "initech:i-0001"
+            ]
+          },
+          "note": "Submitted, tailored application."
+        }
+      ],
       "done_when": "Application submitted (confirmation email)",
       "strategy_ids": [
         "SO1",
@@ -191,6 +237,19 @@
       "expected_points": 8,
       "roles_affected": 4,
       "chance": 0.4,
+      "target_date": "2026-11-22",
+      "effects": [
+        {
+          "dimension": "D3",
+          "set_at_least": 2,
+          "scope": {
+            "orgs": [
+              "initech"
+            ]
+          },
+          "note": "An agreed second-degree path."
+        }
+      ],
       "done_when": "Someone has agreed to introduce you to a person at Initech (email or message)",
       "strategy_ids": [
         "WO1"
@@ -213,6 +272,7 @@
       "expected_points": 1,
       "roles_affected": 12,
       "chance": 0.9,
+      "target_date": "2026-11-04",
       "done_when": "Answer recorded in intake/answers.md and evidence.json",
       "added_on": "2026-10-25"
     },
@@ -245,6 +305,19 @@
       "expected_points": 2,
       "roles_affected": 3,
       "chance": 0.5,
+      "target_date": "2026-11-29",
+      "effects": [
+        {
+          "dimension": "D4",
+          "delta": 1,
+          "scope": {
+            "orgs": [
+              "acme"
+            ]
+          },
+          "note": "An Acme-specific demo."
+        }
+      ],
       "done_when": "Demo submitted to the challenge (link)",
       "strategy_ids": [
         "WO2"
@@ -267,6 +340,19 @@
       "expected_points": 8,
       "roles_affected": 4,
       "chance": 0.2,
+      "target_date": "2026-12-10",
+      "effects": [
+        {
+          "dimension": "D3",
+          "set_at_least": 3,
+          "scope": {
+            "orgs": [
+              "initech"
+            ]
+          },
+          "note": "Met someone at Initech who has seen the work."
+        }
+      ],
       "done_when": "Met at least one Initech employee who has seen your work (follow-up email)",
       "strategy_ids": [
         "WO1"

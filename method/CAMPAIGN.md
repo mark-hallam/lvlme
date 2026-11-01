@@ -38,6 +38,8 @@ Everything lives in `campaign/plan.json` (see `schemas/plan.schema.json`).
 | `effort_hours` | Hours of the person's time. |
 | `done_when` | The evidence that will prove it done. |
 | `done_evidence` | Filled in when it is done. |
+| `target_date` | When it should land. The dashboard's projection applies it on this date. |
+| `effects` | What it changes if it works (see "The projection" below). |
 | `started_on`, `finished_on`, `draft`, `notes` | Optional. |
 
 ## Prioritisation
@@ -63,6 +65,53 @@ nearly certain to work. Once it is done, the warm introduction leads.
 
 Be honest with `chance`. An inflated chance is the easiest way to fool the
 formula.
+
+## The projection
+
+The dashboard draws three paths from today to the plan's end date: expected,
+best case and do nothing. They come from each open action's `effects`:
+
+```json
+"effects": [
+  {"dimension": "D3", "set_at_least": 2, "scope": {"orgs": ["initech"]}},
+  {"dimension": "D7", "delta": 1, "scope": {"role_ids": ["initech:i-0001"]}}
+]
+```
+
+- `delta` raises the factor by that much; `set_at_least` raises it to that
+  level. `scope` can name `orgs`, `families`, `location_classes` and
+  `role_ids`; a missing or empty list means every role.
+- `"effects": []` says the action changes no score (for example fixing an
+  overclaim, which protects credibility). With no `effects` field at all, the
+  dashboard estimates one from `expected_points` on the action's `dimension`
+  and `orgs`, and says so.
+- Actions apply in `target_date` order. Open actions with no date count at the
+  end date. Done and dropped actions are left out: a done action is already in
+  today's scores.
+- **Expected** moves each factor by the action's `chance` times the rise.
+  **Best case** assumes every action lands. **Do nothing** stays flat.
+- **Caps keep it honest.** `projection_caps` sets the most the plan can add to
+  each factor over today's score (defaults: D1 0, D2 1, D3 2, D4 1, D5 1, D6 1,
+  D7 3), and no factor goes above 5. Years in a role don't change in a few
+  months, so D1 stays put by default.
+- **Blockers you can't clear stay blocked.** A role whose judgement sets
+  `hard_eligibility_block: true`, or that is blocked by a type listed in
+  `eligibility_blockers.hard_types` (default: export control, citizenship and
+  security clearance), keeps D6 at 0 in every path.
+- `baseline_date` (Day 1, default the first run) and `end_date` (default 90
+  days after the latest run, later if an action's target date needs it) frame
+  the chart.
+
+## Path to the top band (optional)
+
+`eval/ceilings.json` (see `schemas/ceilings.schema.json`) holds the agent's
+view of how high the promising roles could go: today, likely in 12 months,
+the ceiling on evidence the person can show, and the ceiling once unconfirmed
+history is confirmed; what 5 out of 5 looks like per factor; a phased
+roadmap; honest odds in words; and what each run should watch for. The
+dashboard shows it as the "Path to the top band" view (aimed at 85, where
+Strong starts, unless `target_fit` says otherwise) and hides that view when
+the file is absent. Revisit it when a role's picture changes, not every run.
 
 ## Experiments: keep, rework or drop
 
@@ -102,7 +151,8 @@ the evidence ids that prove the current value. The template uses these ids.
 | `credentials` | Credentials earned |
 
 The dashboard records their values each run in
-`campaign/metrics-history.json` and charts them in the Trends view.
+`campaign/metrics-history.json` and shows each one's change since Day 1 under
+"Campaign progress".
 
 ## Cadence
 

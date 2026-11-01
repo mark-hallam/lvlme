@@ -22,6 +22,13 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 - Globex Labs: AI Success Manager, Asia, fit 39, interview Very low, offer Very low
 - Initech Robotics: Program Manager, Robot Fleet Deployments, fit 57, interview Moderate, offer Low
 
+## Projection to 2027-01-31 (every open action on; expected weights each by its chance)
+- Program Manager, Robot Fleet Deployments: 57 today, 63 expected, 70 if every action lands
+- Technical Program Manager, Model Launches: 46 today, 47 expected, 48 if every action lands
+- Applied AI Deployment Lead, Asia Pacific: 45 today, 46 expected, 47 if every action lands
+- Product Manager, Warehouse Autonomy: 45 today, 50 expected, 57 if every action lands
+- AI Success Manager, Asia: 39 today, 42 expected, 44 if every action lands
+
 ## Active actions (highest priority first)
 - [todo] A04 Fix the LinkedIn headline: 'led a team of 40' should say 'led a team of 8' (owner: you; done when: Headline changed (screenshot or link), claim C001 re-checked as supported)
 - [todo] A08 Answer the notice period and non-compete question (Q01) (owner: you; done when: Answer recorded in intake/answers.md and evidence.json)

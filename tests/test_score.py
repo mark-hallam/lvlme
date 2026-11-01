@@ -185,6 +185,12 @@ class RuleTests(Base):
         self.assertEqual(by_id["acme:2"]["scores"]["D6"]["score"], 5)
         self.assertFalse(by_id["acme:3"]["eligibility_blocked"])
 
+    def test_hard_eligibility_block_counts_as_blocked(self):
+        self.judge("acme:1", e(3, ["E02"]), e(0, []), e(0, []), hard_eligibility_block=True)
+        r = self.run_score()["roles"][0]
+        self.assertTrue(r["eligibility_blocked"])
+        self.assertEqual(r["scores"]["D6"]["score"], 0)
+
     def test_best_location_class_and_override(self):
         self.roles = [role("acme:1", classes=("us", "australia_nz")), role("acme:2", classes=("us", "australia_nz"))]
         self.judge("acme:1", e(0, []), e(0, []), e(0, []))

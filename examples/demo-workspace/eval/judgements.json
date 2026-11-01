@@ -106,6 +106,7 @@
         "note": "None."
       },
       "hard_requirement_lacking": true,
+      "hard_eligibility_block": true,
       "judged_on": "2026-10-04",
       "hard_requirement_note": "US citizenship and a security clearance"
     },

@@ -139,7 +139,10 @@ The commands below omit it. Run them from the engine folder.
     - for each action the dashboard flags (3 runs, no movement), keep, rework
       or drop it, and log why in `experiments_log`;
     - add actions from the top gaps and new strategies, highest priority
-      first, keeping at most 8 active;
+      first, keeping at most 8 active, each with a `target_date` and its
+      `effects` so the projection is right;
+    - when a promising role's picture changes, update `eval/ceilings.json`
+      (optional; it feeds the "Path to the top band" view);
     - update the north-star metrics;
     - write any outreach as drafts in `campaign/drafts/`.
 
@@ -149,8 +152,8 @@ The commands below omit it. Run them from the engine folder.
     python3 scripts/build_dashboard.py
     ```
 
-    It rebuilds `report/index.html` from every run file plus the plan, SWOT
-    and evidence, writes `report/for-agents/SUMMARY.md` and
+    It rebuilds `report/index.html` from every run file plus the plan, SWOT,
+    ceilings and evidence, writes `report/for-agents/SUMMARY.md` and
     `report/for-agents/dashboard.json`, and records today's metric values in
     `campaign/metrics-history.json`. Open the page only if a browser is
     available, to check it renders.

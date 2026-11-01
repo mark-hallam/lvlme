@@ -1,73 +1,123 @@
 #!/usr/bin/env python3
-"""Build the dashboard and the agent briefing from the scored runs.
+"""Build the dashboard ("Mission control") and the agent briefing from the scored runs.
 
 Writes
-  report/index.html                 views: Overview, Trends, Roles, SWOT, Plan, Evidence
+  report/index.html                 the dashboard, one self-contained page
   report/for-agents/SUMMARY.md      plain-text briefing for the person's other AI agents
   report/for-agents/dashboard.json  every number on the dashboard, machine-readable
   campaign/metrics-history.json     north-star metric values per run date
 
-The page is self-contained (inline CSS and JavaScript, no external requests),
-has light and dark mode, and reads on a 320 pixel wide phone. Every chart has
-hover tooltips, direct labels and a "Show as a table" view.
+The page leads with the journey: the measured Day 1, every scored day since,
+and where the plan is expected to take the person (with a best case and a "do
+nothing" line). A what-if rail switches plan actions on and off, and every
+number on the page updates. Views: Organisations, Path to the top band (only
+if eval/ceilings.json exists), What moves you, Roles, SWOT and TOWS (only if
+eval/swot.json exists), Plan, Evidence, Market. A right-hand pane drills into
+any organisation, role, factor, action or piece of evidence.
+
+The page makes no external requests, is light by default with a readable dark
+switch, works on a phone, and its motion is optional: everything is drawn in
+its final state first, and reduced motion is respected.
+
+Projection (mirrored by project() in the page script): actions in target-date
+order; each effect raises a factor by `delta` or to `set_at_least`, only for
+roles in its scope; a factor never rises more than projection_caps over today
+or above 5; the expected path weights each rise by the action's chance, the
+best case assumes every action lands; done and dropped actions are already in
+(or out of) today's scores. A role whose eligibility blocker cannot be cleared
+(judgement hard_eligibility_block, or a blocker type in
+plan.eligibility_blockers.hard_types) keeps eligibility at 0.
 
 Sensitive mode (config privacy.sensitive_mode, on by default) applies to the
 two agent files: evidence text, contact names, compensation and claims-audit
 text are left out; privacy.redact_terms, contact names and money amounts are
-replaced in any remaining text.
+replaced in any remaining text. Contact names are hidden on the page too,
+unless privacy.show_contact_names_in_dashboard is true.
 
 Usage
   python3 scripts/build_dashboard.py --workspace PATH
 """
 import argparse
+import datetime as dt
 import glob
 import html
 import json
 import os
 import re
+import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 import _dashboard_assets as A  # noqa: E402
 
-BANDS = C.BANDS
+DIMS = C.DIMENSIONS
+DIM_HELP = {
+    "D1": "How well your experience meets the hard requirements in the posting: years in a similar role, domain, named skills, degree.",
+    "D2": "Shipped work a reviewer can check, relevant to this role and this organisation's products.",
+    "D3": "People inside the organisation who know your work and would vouch or refer. The single biggest lever.",
+    "D4": "Something this organisation values that most applicants lack.",
+    "D5": "What a hiring manager finds when they look you up: writing, code, posts, talks.",
+    "D6": "Work rights, visa route and location fit for where the role sits. A blocker you can't clear scores zero.",
+    "D7": "A résumé, portfolio and story tailored to this exact role.",
+}
 STATUS_ORDER = {"doing": 0, "todo": 1, "done": 2, "dropped": 3}
-STATUS_LABEL = {"todo": "To do", "doing": "In progress", "done": "Done", "dropped": "Dropped"}
-LEVELS = [("verified", "Verified"), ("corroborated", "Corroborated"), ("self_reported", "Self-reported"),
-          ("unverified", "Not yet verified"), ("contradicted", "Contradicted")]
+OWNERS = {"you": "You", "agent": "Your agent", "both": "You and your agent"}
+DEFAULT_CAPS = {"D1": 0, "D2": 1, "D3": 2, "D4": 1, "D5": 1, "D6": 1, "D7": 3}
+DEFAULT_HARD_TYPES = ["us_person_export_control", "citizenship", "security_clearance"]
 CLAIM_STATUSES = [("supported", "Supported"), ("overstated", "Overstated"), ("unsupported", "Unsupported"),
                   ("contradicted", "Contradicted"), ("pending", "Waiting to be checked")]
-TOWS = [("SO", "Strength meets opportunity", "Use a strength to seize an opportunity."),
-        ("ST", "Strength meets threat", "Use a strength to blunt a threat."),
-        ("WO", "Weakness meets opportunity", "Fix a weakness to unlock an opportunity."),
-        ("WT", "Weakness meets threat", "Avoid the trap where a weakness meets a threat.")]
-ICONS = {
-    "plus": '<path d="M12 7v10M7 12h10"/><circle cx="12" cy="12" r="9"/>',
-    "minus": '<path d="M7 12h10"/><circle cx="12" cy="12" r="9"/>',
-    "up": '<path d="M7 17 17 7M9 7h8v8"/>',
-    "warn": '<path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/>',
-}
+TOWS = {"SO": "Use a strength to seize an opportunity", "ST": "Use a strength to blunt a threat",
+        "WO": "Fix a weakness to unlock an opportunity", "WT": "Avoid the trap where a weakness meets a threat"}
+MAX_SLOTS = 8            # categorical colours; with more organisations the rest share "Other"
+OTHER_KEY = "+other"     # cannot clash with a target id (ids are [a-z0-9_])
+SAMPLE_UNTIL_RUNS = 7    # the made-up sample progress toggle shows only below this many runs
+MONTHS = {"January", "February", "March", "April", "May", "June", "July", "August", "September",
+          "October", "November", "December"}
+
+# --------------------------------------------------------------- text
 
 
-def esc(s):
-    return html.escape(str(s if s is not None else ""), quote=True)
+def clean(s):
+    """Visible copy: no markdown bold, no dashes as punctuation, factor names instead of codes."""
+    if s is None:
+        return ""
+    s = str(s).replace("**", "")
+    s = re.sub(r"(\d)\s*[–—]\s*(\d)", r"\1 to \2", s)
+    s = re.sub(r"\s*[–—]\s*", ", ", s)
+    s = re.sub(r"\s+-\s+", ", ", s)
+    return re.sub(r"\bD([1-7])\b(\s+(\w+))?", _factor_name, s).strip()
 
 
-def icon(name, size=16):
-    return ('<svg width="%d" height="%d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
-            'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">%s</svg>' % (size, size, ICONS[name]))
+def _factor_name(m):
+    """'D4' becomes 'Org-specific edge'; 'D4 edge' too, rather than 'Org-specific edge edge'."""
+    name, rest = C.DIMENSION_NAMES["D" + m.group(1)], m.group(2) or ""
+    if m.group(3) and m.group(3).lower() == name.split()[-1].lower():
+        return name
+    return name + rest
 
 
-def band_pill(band):
-    i = BANDS.index(band) if band in BANDS else -1
-    return '<span class="pill %s">%s</span>' % ("p%d" % i if i >= 0 else "pn", esc(band))
+def web_url(u):
+    return u if isinstance(u, str) and re.match(r"^https?://", u) else ""
 
 
-def table_view(head, rows):
-    body = "".join("<tr>" + "".join(rows_cells) + "</tr>" for rows_cells in rows)
-    return ("<details class='tableview'><summary>Show as a table</summary><div class='tablewrap'><table><tr>"
-            + "".join("<th>%s</th>" % esc(h) for h in head) + "</tr>" + body + "</table></div></details>")
+def hours(h):
+    try:
+        h = float(h)
+    except (TypeError, ValueError):
+        return ""
+    if h < 1:
+        return "%d minutes" % round(h * 60)
+    return "%s hour%s" % (("%g" % h), "" if h == 1 else "s")
+
+
+def add_days(iso, days):
+    return (dt.date.fromisoformat(iso) + dt.timedelta(days=days)).isoformat()
+
+
+def short_date(iso):
+    d = dt.date.fromisoformat(iso)
+    return "%d %s %d" % (d.day, d.strftime("%b"), d.year)
 
 # --------------------------------------------------------------- loading
 
@@ -81,39 +131,34 @@ class Data:
                        if re.match(r"\d{4}-\d{2}-\d{2}\.json$", os.path.basename(f)))
         if not files:
             raise SystemExit("career-eval: no runs in eval/runs/. Run scripts/score.py first.")
+        self.run_files = [os.path.basename(f) for f in files]
         self.runs = [C.load_json(f) for f in files]
         self.cur = self.runs[-1]
         self.prev = self.runs[-2] if len(self.runs) > 1 else None
-        self.plan = C.load_json(C.wpath(ws, "campaign", "plan.json"), {}) or {}
-        self.evidence = C.load_json(C.wpath(ws, "profile", "evidence.json"), {}) or {}
-        self.network = C.load_json(C.wpath(ws, "profile", "network.json"), None)
-        self.claims = (C.load_json(C.wpath(ws, "profile", "claims-audit.json"), {}) or {}).get("claims", [])
-        self.swot = C.load_json(C.wpath(ws, "eval", "swot.json"), None)
-        self.orgs_intel = (C.load_json(C.wpath(ws, "market", "orgs.json"), {}) or {}).get("orgs", {})
-        self.roles_doc = C.load_json(C.wpath(ws, "market", "roles", "latest.json"), {}) or {}
+        load = lambda *p: C.load_json(C.wpath(ws, *p), None)  # noqa: E731
+        self.plan = load("campaign", "plan.json") or {}
+        self.evidence = load("profile", "evidence.json") or {}
+        self.network = load("profile", "network.json")
+        self.claims = (load("profile", "claims-audit.json") or {}).get("claims", [])
+        self.swot = load("eval", "swot.json")
+        self.ceilings = load("eval", "ceilings.json")
+        self.judgements = (load("eval", "judgements.json") or {}).get("roles", {})
+        self.profile = load("eval", "profile-dimensions.json") or {}
+        self.roles_doc = load("market", "roles", "latest.json") or {}
         self.role_index = {r["id"]: r for r in self.roles_doc.get("roles", [])}
-        self.snapshots = []
-        for f in sorted(glob.glob(C.wpath(ws, "market", "roles", "snapshots", "*.json"))):
-            if re.match(r"\d{4}-\d{2}-\d{2}\.json$", os.path.basename(f)):
-                self.snapshots.append(C.load_json(f))
         self.targets = C.target_ids(config)
         self.org_names = C.target_names(config)
         self.fam_names = C.family_names(config)
-        self.colours = {t: (A.PALETTE[i] if i < len(A.PALETTE) else A.OTHER) for i, t in enumerate(self.targets)}
-        self.ev_index = {e["id"]: e for e in self.evidence.get("items", [])}
+        self.weights = C.weights_of(config)
         self.actions = sorted(self.plan.get("actions", []),
                               key=lambda a: (STATUS_ORDER.get(a.get("status"), 9), -priority(a), a.get("id", "")))
         self.active = sorted([a for a in self.actions if a.get("status") in ("todo", "doing")],
                              key=lambda a: (-priority(a), STATUS_ORDER.get(a.get("status"), 9), a.get("id", "")))
-        self.action_index = {a["id"]: a for a in self.actions}
         self.privacy = config.get("privacy") or {}
         self.metrics_history = []
 
     def org(self, oid):
         return self.org_names.get(oid, oid)
-
-    def fam(self, fid):
-        return self.fam_names.get(fid, fid)
 
 
 def priority(a):
@@ -132,12 +177,6 @@ def top_roles(run, n=5):
 def top5_avg(run):
     roles = top_roles(run)
     return round(sum(r["fit"] for r in roles) / len(roles), 1) if roles else 0.0
-
-
-def dim_avgs(run):
-    roles = top_roles(run)
-    return {d: (round(sum(r["scores"][d]["score"] for r in roles) / len(roles), 2) if roles else 0.0)
-            for d in C.DIMENSIONS}
 
 
 def update_metrics_history(data):
@@ -167,7 +206,7 @@ def stale_actions(data):
     score on the action's dimension, and its linked north-star metric (if any) did not change."""
     out = {}
     for a in data.actions:
-        if a.get("status") != "doing" or not a.get("started_on") or a.get("dimension") not in C.DIMENSIONS:
+        if a.get("status") != "doing" or not a.get("started_on") or a.get("dimension") not in DIMS:
             continue
         runs = [r for r in data.runs if r["run_date"] >= a["started_on"]]
         if len(runs) < 3:
@@ -183,492 +222,364 @@ def stale_actions(data):
             out[a["id"]] = len(runs)
     return out
 
-# ----------------------------------------------------------------- charts
+
+def git_first_commit(ws, rel):
+    """Short hash of the commit that first added rel, if the workspace is its own git repository."""
+    if not os.path.exists(os.path.join(ws, ".git")):
+        return None
+    try:
+        out = subprocess.run(["git", "-C", ws, "log", "--diff-filter=A", "--format=%h", "--", rel],
+                             capture_output=True, text=True, timeout=10).stdout.split()
+        return out[-1] if out else None
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+# ------------------------------------------------------------ projection
 
 
-def line_chart(cid, title, dates, series, ymax=100, unit="", compact=False, note=""):
-    """A chart drawn by the page script at the container's real width, plus a table view."""
-    nice = max(1, int(ymax))
-    step = max(1, nice // 4) if nice > 4 else 1
-    ticks = list(range(0, nice + 1, step))
-    if ticks[-1] != nice:
-        ticks.append(nice)
-    payload = {"title": title, "dates": dates, "ymax": nice, "ticks": ticks, "unit": unit, "compact": compact,
-               "series": [{"name": s["name"], "values": s["values"], "c": s["colour"][0], "cd": s["colour"][1]}
-                          for s in series]}
-    legend = ""
-    if len(series) > 1:
-        legend = '<div class="legend">' + "".join(
-            '<span><i class="lkey" style="--c:%s;--cd:%s"></i>%s</span>' % (s["colour"][0], s["colour"][1], esc(s["name"]))
-            for s in series) + "</div>"
-    rows = [["<td class='num'>%s</td>" % esc(d)] + [
-        "<td class='num'>%s</td>" % ("" if s["values"][i] is None else esc(s["values"][i])) for s in series]
-        for i, d in enumerate(dates)]
-    single = "" if len(dates) > 1 else "<p class='muted small'>Only one run so far. The line fills in as runs build up.</p>"
-    data_json = json.dumps(payload).replace("</", "<\\/")
-    return ('<div class="card chart"><div class="chart-title">%s</div>%s'
-            '<div class="plot" tabindex="0" data-src="d-%s" aria-label="%s. Use the arrow keys to read values."></div>'
-            '<script type="application/json" id="d-%s">%s</script>'
-            '<p class="noscript-note">The chart needs JavaScript; the table below has the same numbers.</p>%s%s%s</div>'
-            % (esc(title), legend, cid, esc(title), cid, data_json, single, note,
-               table_view(["Date"] + [s["name"] for s in series], rows)))
+def org_groups(targets, names):
+    """Colour slots follow config order. Up to 8 organisations get their own slot; with more,
+    the first 7 keep theirs and the rest share a neutral "Other"."""
+    own = targets if len(targets) <= MAX_SLOTS else targets[:MAX_SLOTS - 1]
+    groups, group_of = {}, {}
+    for i, t in enumerate(own):
+        groups[t] = {"name": names.get(t, t), "c": A.PALETTE[i][0], "cd": A.PALETTE[i][1], "members": [t]}
+        group_of[t] = t
+    rest = [t for t in targets if t not in group_of]
+    if rest:
+        groups[OTHER_KEY] = {"name": "Other", "c": A.OTHER[0], "cd": A.OTHER[1], "members": rest}
+        group_of.update({t: OTHER_KEY for t in rest})
+    return groups, group_of
 
 
-def bar_chart(title, rows, max_value, unit=""):
-    """rows: [{label, value, sub}]. One series, horizontal bars, direct value labels."""
-    if not rows:
-        return '<div class="card chart"><div class="chart-title">%s</div><p class="muted">Nothing to show yet.</p></div>' % esc(title)
-    body = ""
-    for r in rows:
-        frac = 0.0 if not max_value else max(0.0, min(1.0, r["value"] / float(max_value)))
-        tip = "%s: %s%s" % (r["label"], r["value"], unit) + (" (%s)" % r["sub"] if r.get("sub") else "")
-        body += ('<div class="brow" tabindex="0" data-tip="%s"><div class="blabel">%s</div>'
-                 '<div class="btrack"><div class="bfill" style="width:max(3px, calc((100%% - 64px) * %.4f))"></div>'
-                 '<span class="bval">%s%s</span></div></div>' % (esc(tip), esc(r["label"]), frac, esc(r["value"]), esc(unit)))
-    table = table_view(["Item", "Value", "Detail"], [
-        ["<td>%s</td>" % esc(r["label"]), "<td class='num'>%s%s</td>" % (esc(r["value"]), esc(unit)),
-         "<td>%s</td>" % esc(r.get("sub", ""))] for r in rows])
-    return '<div class="card chart"><div class="chart-title">%s</div><div class="bars">%s</div>%s</div>' % (esc(title), body, table)
-
-# ------------------------------------------------------------------ views
+def action_effects(a, weights):
+    """The action's effects (an empty list means no score change), or, when the plan lists none,
+    one estimated from expected_points on its dimension and orgs."""
+    if "effects" in a:
+        return [dict(e, scope=e.get("scope") or {}) for e in a["effects"] or []], False
+    dim, w, total = a.get("dimension"), weights.get(a.get("dimension"), 0), sum(weights.values()) or 100
+    if dim not in DIMS or not w or not a.get("expected_points"):
+        return [], False
+    delta = round(float(a["expected_points"]) * 5.0 * total / (100.0 * w), 2)
+    orgs = a.get("orgs")
+    return [{"dimension": dim, "delta": delta, "scope": {"orgs": orgs} if isinstance(orgs, list) else {}}], True
 
 
-def delta(cur, prev, unit=""):
-    if prev is None:
-        return '<span class="muted">first run</span>'
-    d = round(cur - prev, 1)
-    if d == 0:
-        return '<span class="muted">no change since the last run</span>'
-    return '<span class="%s">%s%s%s since the last run</span>' % ("up" if d > 0 else "down", "+" if d > 0 else "", d, unit)
+def in_scope(role, scope):
+    for key, value in (("orgs", role["org"]), ("families", role["family"]),
+                       ("location_classes", role["lc"]), ("role_ids", role["id"])):
+        allowed = scope.get(key) or []
+        if allowed and value not in allowed:
+            return False
+    return True
 
 
-def ev_chips(ids, data):
-    out = ""
-    for eid in ids or []:
-        item = data.ev_index.get(eid)
-        title = "%s (%s)" % (item["claim"], item["level"].replace("_", " ")) if item else "unknown evidence id"
-        out += '<span class="chip" title="%s">%s</span>' % (esc(title), esc(eid))
-    return out
+def r1(v):
+    return int(v * 10 + 0.5) / 10.0
 
 
-def status_pill(status):
-    mark = "&#10003; " if status == "done" else ""
-    return '<span class="st st-%s">%s%s</span>' % (esc(status), mark, esc(STATUS_LABEL.get(status, status)))
+def fit_of(s, weights):
+    total = sum(weights) or 1
+    return r1(sum(v / 5.0 * w for v, w in zip(s, weights)) * 100.0 / total)
 
 
-def action_row(a, data, stale, full=True):
-    pr = priority(a)
-    meta = ["Owner: %s" % esc(a.get("owner", "you")), "Effort: %s h" % esc(a.get("effort_hours")),
-            "Feeds %s %s" % (esc(a.get("dimension")), esc(C.DIMENSION_NAMES.get(a.get("dimension"), "")))]
-    strategies = "".join('<a class="chip" href="#swot">%s</a>' % esc(s) for s in a.get("strategy_ids") or [])
-    extra = ""
-    if full:
-        extra += ('<div class="row-sub small">Priority %s = %s points x %s roles x %d%% chance / %s hours</div>'
-                  % (esc(pr), esc(a.get("expected_points")), esc(a.get("roles_affected")),
-                     round(float(a.get("chance", 0)) * 100), esc(a.get("effort_hours"))))
-        extra += '<div class="row-sub small">Done when: %s</div>' % esc(a.get("done_when", ""))
-        if a.get("done_evidence"):
-            extra += '<div class="row-sub small">Evidence: %s</div>' % esc(a["done_evidence"])
-        if a.get("draft"):
-            extra += '<div class="row-sub small">Draft for you to send: %s</div>' % esc(a["draft"])
-    if a.get("id") in stale:
-        extra += ('<div class="flag">%s<span>No score or metric movement in %d runs. Rework or drop it, and log why.</span></div>'
-                  % (icon("warn", 14), stale[a["id"]]))
-    return ('<div class="row" id="act-%s"><div class="check %s"></div><div class="row-main">'
-            '<div class="row-title">%s %s</div><div class="row-sub">%s</div>'
-            '<div class="row-sub small">%s %s</div>%s</div></div>'
-            % (esc(a.get("id")), esc(a.get("status")), esc(a.get("title")), status_pill(a.get("status")),
-               esc(a.get("why", "")), " &middot; ".join(meta), strategies, extra))
-
-
-def view_overview(data, stale):
-    cur, outlook = data.cur, data.cur["outlook"]
-    horizon = (data.config.get("goal") or {}).get("horizon_months", 12)
-    t5, t5p = top5_avg(cur), (top5_avg(data.prev) if data.prev else None)
-    n = cur["counts"]
-    cards = ""
-    for oid in data.targets:
-        b = cur["per_org"].get(oid)
-        c = data.colours[oid]
-        head = '<div class="org-name"><i class="lkey" style="--c:%s;--cd:%s"></i>%s</div>' % (c[0], c[1], esc(data.org(oid)))
-        if not b:
-            cards += '<div class="card">%s<div class="muted small">No matching open role right now.</div></div>' % head
+def project(role, actions, caps, weights, mode="exp"):
+    """(fit, scores) at the end date. Mirrors project() in the page script."""
+    base, s = list(role["s"]), list(role["s"])
+    for a in actions:
+        if a["status"] not in ("todo", "doing"):
             continue
-        cards += ('<div class="card">%s<div class="org-role">%s</div><div class="kv"><span>Fit</span><strong class="num">%s</strong></div>'
-                  '<div class="kv"><span>Interview</span>%s</div><div class="kv"><span>Offer</span>%s</div></div>'
-                  % (head, esc(b["title"]), esc(round(b["fit"])), band_pill(b["interview_band"]), band_pill(b["offer_band"])))
-    today = "".join(action_row(a, data, stale, full=False) for a in data.active[:3]) or \
-        '<div class="row muted">No open actions. The next run adds some from the biggest gaps.</div>'
-    prev_m = data.metrics_history[-2]["metrics"] if len(data.metrics_history) > 1 else {}
-    tiles = ""
-    for m in data.plan.get("north_star", []):
-        pv = prev_m.get(m["id"])
-        tiles += ('<div class="tile"><div class="tile-label">%s</div><div class="tile-value">%s<span class="muted"> / %s</span></div>'
-                  '<div class="small">%s</div></div>' % (esc(m["name"]), esc(m["current"]), esc(m["target"]),
-                                                         "" if pv is None else delta(m["current"], pv)))
-    attention = []
-    if n.get("awaiting_review"):
-        attention.append("%d roles have scores above 2 waiting for the sceptical reviewer, so they count as 2 for now."
-                         % n["awaiting_review"])
-    if n.get("not_judged"):
-        attention.append("%d roles are not judged yet and score 0 on D1, D2 and D4." % n["not_judged"])
-    if stale:
-        attention.append("%d actions show no movement after 3 or more runs: rework or drop them." % len(stale))
-    pending = sum(1 for c in data.claims if c.get("status") == "pending")
-    if pending:
-        attention.append("%d public claims are waiting to be checked against your evidence." % pending)
-    for w in cur.get("warnings", [])[:5]:
-        attention.append(w)
-    attn = "" if not attention else ('<h2>Needs attention</h2><div class="card">' + "".join(
-        '<div class="flag">%s<span>%s</span></div>' % (icon("warn", 14), esc(t)) for t in attention) + "</div>")
-    return """
-<div class="grid2">
-  <div class="card"><div class="tile-label">Chance of reaching the goal within %s months, if the campaign is followed</div>
-    <div class="hero-num">%s</div><p>%s</p><ul class="small">%s</ul></div>
-  <div class="card"><div class="tile-label">Average fit of your 5 best roles, out of 100</div>
-    <div class="hero-num num">%s</div><div>%s</div>
-    <p class="muted small">%d open roles scored on %s. %d judged, %d waiting for review.</p></div>
-</div>
-<h2>Best chance at each organisation</h2><div class="grid3">%s</div>
-<h2>Today's actions</h2><div class="list">%s</div>
-<h2>Campaign scoreboard</h2><div class="grid3">%s</div>%s""" % (
-        esc(horizon), esc(outlook["band"]), esc(outlook["text"]),
-        "".join("<li>%s</li>" % esc(x) for x in outlook.get("reasons", [])),
-        esc(round(t5)), delta(t5, t5p), n["roles"], esc(cur["run_date"]), n["judged"], n["awaiting_review"],
-        cards, today, tiles, attn)
+        p = 1.0 if mode == "best" else a["p"]
+        for e in a["effects"]:
+            if e.get("dimension") not in DIMS or not in_scope(role, e.get("scope") or {}):
+                continue
+            k = DIMS.index(e["dimension"])
+            if k == 5 and role["hard"]:
+                continue  # a blocker the plan can't clear keeps eligibility at 0
+            cur = s[k]
+            new = cur + e["delta"] if "delta" in e else max(cur, e.get("set_at_least", 0))
+            new = min(5, new, base[k] + caps[k])
+            if new > cur:
+                s[k] = cur + p * (new - cur)
+    return fit_of(s, weights), s
+
+# ------------------------------------------------------------ page data
 
 
-def view_trends(data):
-    dates = [r["run_date"] for r in data.runs]
-    s1 = A.PALETTE[0]
-    out = line_chart("t5", "Average fit of your 5 best roles", dates,
-                     [{"name": "Top 5 average", "values": [top5_avg(r) for r in data.runs], "colour": s1}])
-    series = []
-    for oid in data.targets:
-        vals = [((r.get("per_org") or {}).get(oid) or {}).get("fit") for r in data.runs]
-        if any(v is not None for v in vals):
-            series.append({"name": data.org(oid), "values": vals, "colour": data.colours[oid]})
-    out += line_chart("orgs", "Best role fit at each organisation", dates, series)
-    if data.snapshots:
-        sdates = [s["date"] for s in data.snapshots]
-        counts = []
-        for oid in data.targets:
-            vals = [sum(1 for r in s.get("roles", {}).values() if r.get("org") == oid) for s in data.snapshots]
-            counts.append({"name": data.org(oid), "values": vals, "colour": data.colours[oid]})
-        top = max([v for s in counts for v in s["values"]] + [4])
-        summ = data.roles_doc.get("summary") or {}
-        new_ids, closed = summ.get("new_role_ids") or [], summ.get("closed_role_ids") or []
-        note = ""
-        if summ.get("previous_snapshot"):
-            items = "".join("<li>New: %s, %s</li>" % (esc(data.role_index.get(i, {}).get("title", i)),
-                                                      esc(data.org(i.split(":", 1)[0]))) for i in new_ids[:8])
-            note = ("<p class='small muted'>Since %s: %d new and %d closed matching roles.</p><ul class='small'>%s</ul>"
-                    % (esc(summ["previous_snapshot"]), len(new_ids), len(closed), items))
-        out += line_chart("vel", "Open matching roles at each organisation", sdates, counts, ymax=top, note=note)
-    avgs = dim_avgs(data.cur)
-    w = data.cur.get("weights") or C.DEFAULT_WEIGHTS
-    out += bar_chart("Where your 5 best roles score, by factor (out of 5)",
-                     [{"label": "%s %s" % (d, C.DIMENSION_NAMES[d]), "value": avgs[d], "sub": "weight %s" % w.get(d)}
-                      for d in C.DIMENSIONS], 5)
-    if data.prev and data.prev.get("weights") != data.cur.get("weights"):
-        out += '<div class="flag">%s<span>The weights changed since the last run, so fit scores before and after are not directly comparable.</span></div>' % icon("warn", 14)
-    tiles = ""
-    mdates = [m["date"] for m in data.metrics_history]
-    for i, m in enumerate(data.plan.get("north_star", [])):
-        vals = [h["metrics"].get(m["id"]) for h in data.metrics_history]
-        top = max([v for v in vals if v is not None] + [m.get("target", 1), 1])
-        tiles += line_chart("m%d" % i, "%s (target %s)" % (m["name"], m["target"]), mdates,
-                            [{"name": m["name"], "values": vals, "colour": s1}], ymax=top, compact=True)
-    if tiles:
-        out += '<h2>Campaign metrics over time</h2><div class="grid3">%s</div>' % tiles
+def build_roles(data, group_of, hard_types):
+    cleared = set((data.config.get("candidate") or {}).get("eligibility_cleared") or [])
+    roles = []
+    for r in data.cur["roles"]:
+        rid, j, p = r["role_id"], data.judgements.get(r["role_id"]) or {}, data.role_index.get(r["role_id"]) or {}
+        types = sorted({b.get("type") for b in p.get("eligibility_blockers") or []} - cleared - {None})
+        blocked = bool(r.get("eligibility_blocked"))
+        hard = bool(j.get("hard_eligibility_block")) or (blocked and any(t in hard_types for t in types))
+        roles.append({
+            "id": rid, "org": r["org"], "g": group_of.get(r["org"], OTHER_KEY), "on": data.org(r["org"]),
+            "title": clean(r["title"]), "family": r.get("family", ""),
+            "loc": [clean(x) for x in r.get("locations") or []][:3], "url": web_url(r.get("url")),
+            "lc": r.get("location_class") or "other", "blocked": blocked, "hard": hard,
+            "bt": ", ".join(C.BLOCKER_NAMES.get(t, t) for t in types),
+            "hrl": bool(r.get("hard_requirement_lacking")), "judged": r.get("judged", True),
+            "awaiting": r.get("awaiting_review") or [],
+            "s": [r["scores"][d]["score"] for d in DIMS], "n": [clean(r["scores"][d].get("note")) for d in DIMS],
+            "e": [r["scores"][d].get("evidence") or [] for d in DIMS],
+            "fit": r["fit"], "ib": r["interview_band"], "ob": r["offer_band"],
+            "adj": [clean(x) for x in r.get("adjustments") or []], "rn": clean(r.get("reviewer_note")),
+            "hardReq": [clean(h) for h in (p.get("hard_requirements") or [])[:5]],
+        })
+    roles.sort(key=lambda x: (-x["fit"], x["id"]))
+    return roles
+
+
+def build_actions(data, end):
+    acts = data.plan.get("actions", [])
+    slots = int(data.plan.get("max_active", 8))
+    now_ids = {a["id"] for a in data.active[:slots]}
+    stale = stale_actions(data)
+    metric_names = {m["id"]: m["name"] for m in data.plan.get("north_star", [])}
+
+    def when(a):
+        if a.get("target_date"):
+            return a["target_date"]
+        if a.get("status") in ("done", "dropped"):
+            return a.get("finished_on") or data.cur["run_date"]
+        return end
+    out = []
+    for a in sorted(acts, key=lambda a: (when(a), a["id"])):
+        effects, derived = action_effects(a, data.weights)
+        st = a.get("status", "todo")
+        out.append({
+            "id": a["id"], "title": clean(a["title"]), "why": clean(a.get("why")),
+            "owner": OWNERS.get(a.get("owner", "you"), "You"), "effort": hours(a.get("effort_hours")),
+            "status": st, "date": when(a), "dated": bool(a.get("target_date")), "p": float(a.get("chance", 0)),
+            "effects": effects, "derived": derived, "done_when": clean(a.get("done_when")),
+            "dim": a.get("dimension"), "priority": priority(a), "stale": stale.get(a["id"]),
+            "group": "now" if a["id"] in now_ids else st if st in ("done", "dropped") else "later",
+            "metric": clean(metric_names.get(a.get("metric"), "")), "draft": a.get("draft", ""),
+            "doneEvidence": clean(a.get("done_evidence")), "notes": clean(a.get("notes")),
+        })
     return out
 
 
-def view_roles(data):
-    run = data.cur
-    org_opts = "".join('<option value="%s">%s</option>' % (esc(o), esc(data.org(o))) for o in data.targets)
-    fam_opts = "".join('<option value="%s">%s</option>' % (esc(f), esc(n)) for f, n in data.fam_names.items())
-    rows = ""
+def end_date(data, run_date):
+    if data.plan.get("end_date"):
+        return max(data.plan["end_date"], add_days(run_date, 14))
+    dated = [a["target_date"] for a in data.plan.get("actions", [])
+             if a.get("target_date") and a.get("status") in ("todo", "doing")]
+    return max([add_days(run_date, 90)] + [add_days(d, 14) for d in dated])
+
+
+def build_orgs(data, roles, groups):
+    d3 = data.profile.get("D3") or {}
+    net = (data.network or {}).get("orgs") or {}
+    paths = (data.network or {}).get("second_degree") or []
+    out = {}
+    for g, info in groups.items():
+        lr = [x for x in roles if x["g"] == g]
+        if not lr:
+            continue
+        single = info["members"][0] if len(info["members"]) == 1 else None
+        best = ((data.cur.get("per_org") or {}).get(single) or {}).get("role_id") if single else None
+        out[g] = dict(info, count=len(lr), blocked=sum(1 for x in lr if x["blocked"]),
+                      best=best if best in {x["id"] for x in lr} else lr[0]["id"],
+                      network=clean((d3.get(single) or {}).get("note")) if single else "",
+                      first=(net.get(single) or {}).get("count") if single else None,
+                      paths=[{"status": clean(p.get("status")).replace("_", " "), "note": clean(p.get("note"))}
+                             for p in paths if single and p.get("org") == single])
+    return out
+
+
+def home_class(config):
+    classes = (config.get("locations") or {}).get("classes") or []
+    home = ((config.get("candidate") or {}).get("home_region") or "")
+    for c in classes:
+        if C.matches_any(c.get("keywords"), home):
+            return c["id"]
+    return classes[0]["id"] if classes else "other"
+
+
+def build_market(data, roles, groups, group_of, locations, home):
+    summ = data.roles_doc.get("summary") or {}
+    fetched = summ.get("total_postings_fetched") or {}
+    matched = summ.get("matched_counts") or {}
+    return {
+        "fetched": sum(fetched.values()) if fetched else None, "total": len(roles),
+        "home": home, "homeCount": sum(1 for x in roles if x["lc"] == home),
+        "new": len(summ.get("new_role_ids") or []), "closed": len(summ.get("closed_role_ids") or []),
+        "blocked": sum(1 for x in roles if x["blocked"]),
+        "byLocation": {k: sum(1 for x in roles if x["lc"] == k) for k in locations},
+        "byOrgFamily": {o: {f: (matched.get(o) or {}).get(f, 0) for f in data.fam_names} for o in data.targets},
+        "fetchedOn": data.roles_doc.get("fetched_on") or "",
+    }
+
+
+def build_runs(data, group_of):
+    out = []
+    for f, rr in zip(data.run_files, data.runs):
+        roles = rr.get("roles") or []
+        top = max(roles, key=lambda x: x["fit"]) if roles else {"fit": 0, "interview_band": "Very low", "title": ""}
+        by_group = {}
+        for x in roles:
+            g = group_of.get(x["org"], OTHER_KEY)
+            by_group[g] = max(by_group.get(g, 0), x["fit"])
+        out.append({"date": rr["run_date"], "top": top["fit"], "ib": top["interview_band"], "role": clean(top["title"]),
+                    "orgs": by_group, "commit": git_first_commit(data.ws, os.path.join("eval", "runs", f))})
+    return out
+
+
+def build_evidence(data):
+    items = []
+    for e in data.evidence.get("items", []):
+        items.append({"id": e["id"], "claim": clean(e.get("claim")), "cat": e.get("kind", "other"),
+                      "status": e.get("level", "unverified"), "dims": e.get("dimensions") or [],
+                      "notes": clean(e.get("notes")),
+                      "sources": [{"type": (s.get("type") or "").replace("_", " "), "ref": s.get("ref", ""),
+                                   "url": web_url(s.get("ref")), "note": clean(s.get("note")),
+                                   "checked": s.get("checked_on", "")} for s in e.get("sources") or []]})
+    return items
+
+
+def build_swot(data, actions):
+    sw = data.swot
+    if not sw:
+        return None
+    names = {"S": "strengths", "W": "weaknesses", "O": "opportunities", "T": "threats"}
+
+    def grid(scope, name, g):
+        return {"scope": scope, "name": name, **{k: [{"id": i.get("id"), "t": clean(i.get("text")),
+                                                     "ev": i.get("evidence") or [], "src": clean(i.get("source"))}
+                                                    for i in g.get(q) or []] for k, q in names.items()}}
+    grids = [grid("overall", "Overall", sw.get("overall") or {})]
+    for org, g in sorted((sw.get("per_org") or {}).items(), key=lambda kv: data.targets.index(kv[0])
+                         if kv[0] in data.targets else 99):
+        grids.append(grid(org, data.org(org), g))
+    known = {a["id"] for a in actions}
+    tows = [{"id": s.get("id"), "k": s.get("type", ""), "name": TOWS.get(s.get("type", ""), ""), "t": clean(s.get("text")),
+             "uses": s.get("uses") or [], "a": [x for x in s.get("actions") or [] if x in known],
+             "scope": "Overall" if s.get("scope") in (None, "overall") else data.org(s["scope"])}
+            for s in sw.get("strategies") or []]
+    return {"grids": grids, "tows": tows}
+
+
+def build_ceilings(data, roles_by_id, group_of):
+    """The "Path to the top band" view, from eval/ceilings.json (see schemas/ceilings.schema.json)."""
+    x = data.ceilings
+    if not x:
+        return None
+    target = int(x.get("target_fit", 85))
+    reach = []
+    for r in x.get("roles") or []:
+        cur = roles_by_id.get(r.get("role_id"))
+        reach.append({"id": r.get("role_id"), "g": group_of.get(r.get("org"), OTHER_KEY), "on": data.org(r.get("org")),
+                      "title": clean(r.get("title")), "loc": clean(", ".join((r.get("locations") or [])[:2])),
+                      "now": cur["fit"] if cur else r.get("now", 0), "likely": r.get("likely_12_months", 0),
+                      "ceil": r.get("ceiling", 0), "ceilHist": max(r.get("ceiling_if_confirmed", 0), r.get("ceiling", 0)),
+                      "open": bool(cur), "binding": C.DIMENSION_NAMES.get(r.get("binding_constraint"), "")})
+    reach.sort(key=lambda r: (-r["ceilHist"], -r["likely"], -r["now"]))
+    odds, wl = x.get("odds") or {}, x.get("watchlist") or {}
+    return {
+        "target": target, "generated": x.get("generated") or data.cur["run_date"], "how": clean(x.get("how")),
+        "counts": [[c.get("value"), clean(c.get("label"))] for c in x.get("counts") or []], "reach": reach,
+        "factors": [{"dim": f["dimension"], "now": clean(f.get("now")), "five": clean(f.get("five_looks_like")),
+                     "gap": clean(f.get("gap")), "moves": [clean(m) for m in f.get("moves") or []],
+                     "effort": clean(f.get("effort")), "chance": clean(f.get("chance"))}
+                    for f in x.get("factors") or [] if f.get("dimension") in DIMS],
+        "phases": [{"phase": clean(p.get("phase")), "window": clean(p.get("window")),
+                    "steps": [clean(s) for s in p.get("steps") or []]} for p in x.get("phases") or []],
+        "roadmap": [{"label": clean(r.get("label")),
+                     "phases": [{"phase": clean(ph.get("phase")), "likely": ph.get("fit_likely", 0),
+                                 "full": ph.get("fit_if_every_step_lands", 0), "band": ph.get("band_if_every_step_lands", "")}
+                                for ph in r.get("phases") or []]} for r in x.get("roadmap") or []],
+        "odds": {"statement": clean(odds.get("statement")), "top": clean(odds.get("reach_target_within_12_months")),
+                 "good": clean(odds.get("reach_good")), "goodBy": odds.get("reach_good_by") or "",
+                 "why": [clean(w) for w in odds.get("why_not_higher") or []]},
+        "create": [{"t": clean(c.get("strategy")), "how": clean(c.get("how")), "lifts": clean(c.get("lifts"))}
+                   for c in x.get("create_the_role") or []],
+        "watch": {"titles": [clean(t) for t in wl.get("title_patterns") or []],
+                  "places": [clean(t) for t in wl.get("locations_priority") or []],
+                  "good": [clean(t) for t in wl.get("requirement_patterns_good") or []],
+                  "exclude": [clean(t) for t in wl.get("exclude") or []], "rule": clean(wl.get("alert_rule"))},
+    }
+
+
+def build_data(data):
+    cfg, run, plan = data.config, data.cur, data.plan
+    run_date = run["run_date"]
+    groups, group_of = org_groups(data.targets, data.org_names)
     for r in run["roles"]:
-        src = data.role_index.get(r["role_id"], {})
-        dims = ""
-        for d in C.DIMENSIONS:
-            s = r["scores"][d]
-            raw = "" if s["raw"] == s["score"] else ' <span class="muted small">(judged %d)</span>' % s["raw"]
-            cap = '<div class="muted small">Capped: %s</div>' % esc(s["capped"]) if s.get("capped") else ""
-            dims += ("<tr><td class='lead'>%s %s</td><td class='num'>%d/5%s</td><td>%s%s<div>%s</div></td></tr>"
-                     % (d, esc(C.DIMENSION_NAMES[d]), s["score"], raw, esc(s["note"]), cap, ev_chips(s["evidence"], data)))
-        blockers = "".join("<li>%s: %s</li>" % (esc(C.BLOCKER_NAMES.get(b["type"], b["type"])), esc(b["text"]))
-                           for b in src.get("eligibility_blockers") or [])
-        facts = []
-        if src.get("compensation"):
-            facts.append("Pay: %s" % src["compensation"])
-        if src.get("years_experience") is not None:
-            facts.append("Years asked for: %s (%s)" % (src["years_experience"], src.get("years_experience_basis")))
-        if src.get("degree_requirement"):
-            facts.append("Degree: %s" % src["degree_requirement"])
-        body = ("<div class='tablewrap'><table class='dims stack'><tr class='head'><th>Factor</th><th class='num'>Score</th><th>Why</th></tr>%s</table></div>"
-                % dims)
-        body += "<p class='small'><strong>Fit %s</strong>, interview %s, offer %s.</p>" % (
-            esc(r["fit"]), band_pill(r["interview_band"]), band_pill(r["offer_band"]))
-        if r["adjustments"]:
-            body += "<ul class='small'>%s</ul>" % "".join("<li>%s</li>" % esc(a) for a in r["adjustments"])
-        if blockers:
-            body += "<p class='small'><strong>Eligibility blockers in the posting</strong></p><ul class='small'>%s</ul>" % blockers
-        if facts:
-            body += "<p class='small muted'>%s</p>" % " &middot; ".join(esc(f) for f in facts)
-        if r.get("reviewer_note"):
-            body += "<p class='small'><strong>Reviewer:</strong> %s</p>" % esc(r["reviewer_note"])
-        if r.get("url"):
-            body += "<p class='small'><a href='%s' rel='noopener noreferrer'>Open the job posting</a></p>" % esc(r["url"])
-        text = " ".join([r["title"], data.org(r["org"]), " ".join(r.get("locations") or [])]).lower()
-        rows += ('<details class="rrow" data-org="%s" data-family="%s" data-blocked="%s" data-text="%s"><summary>'
-                 '<span class="rtitle">%s<span class="row-sub">%s &middot; %s &middot; %s</span></span>'
-                 '<span class="rscore">%s</span>%s</summary><div class="rbody">%s</div></details>'
-                 % (esc(r["org"]), esc(r["family"]), "1" if r["eligibility_blocked"] else "0", esc(text),
-                    esc(r["title"]), esc(data.org(r["org"])), esc(data.fam(r["family"])),
-                    esc(", ".join((r.get("locations") or [])[:2]) or "Location not listed"),
-                    esc(round(r["fit"])), band_pill(r["interview_band"]), body))
-    if not rows:
-        rows = '<div class="row muted">No roles yet. Run scripts/fetch_roles.py and scripts/score.py.</div>'
-    return ("""<div class="toolbar"><input type="search" id="f-q" placeholder="Search roles" aria-label="Search roles">
-<select id="f-org" aria-label="Organisation"><option value="">All organisations</option>%s</select>
-<select id="f-fam" aria-label="Role type"><option value="">All role types</option>%s</select>
-<label><input type="checkbox" id="f-blocked"> Hide blocked</label><span id="f-count" class="muted small"></span></div>
-<div class="list" id="roles">%s</div>""" % (org_opts, fam_opts, rows))
-
-
-def roles_moved(item, quad, run, top_n):
-    top = run["roles"][:top_n]
-    orgs, fams = item.get("orgs", "all"), item.get("families", "all")
-    pool = [r for r in top if (orgs == "all" or r["org"] in orgs) and (fams == "all" or r["family"] in fams)]
-    d = item["dimension"]
-    hit = [r for r in pool if (r["scores"][d]["score"] >= 3 if quad == "strengths" else r["scores"][d]["score"] <= 2)]
-    return len(hit), len(pool)
-
-
-def swot_grid(grid, data, top_n, scope):
-    quads = [("strengths", "Strengths", "Internal, helps", "plus"), ("weaknesses", "Weaknesses", "Internal, hurts", "minus"),
-             ("opportunities", "Opportunities", "External, helps", "up"), ("threats", "Threats", "External, hurts", "warn")]
-    out = ""
-    for key, label, kind, ic in quads:
-        items = ""
-        for it in grid.get(key, []):
-            meta = []
-            if it.get("dimension"):
-                meta.append("Feeds %s %s" % (it["dimension"], C.DIMENSION_NAMES[it["dimension"]]))
-            if key in ("strengths", "weaknesses"):
-                n, of = roles_moved(it, key, data.cur, top_n)
-                meta.append("%s %d of the %d best roles in scope" % ("helps" if key == "strengths" else "holds back", n, of))
-                src = ev_chips(it.get("evidence"), data)
-            else:
-                src = '<span class="muted small">Source: %s</span>' % esc(it.get("source", ""))
-            items += ('<div class="qitem"><span class="qid">%s</span>%s<div class="row-sub small">%s</div><div>%s</div></div>'
-                      % (esc(it["id"]), esc(it["text"]), " &middot; ".join(esc(m) for m in meta), src))
-        out += ('<div class="quad"><div class="quad-head">%s<strong>%s</strong><span class="quad-kind">%s</span></div>%s</div>'
-                % (icon(ic, 18), label, kind, items or '<div class="muted small">None recorded yet.</div>'))
-    intel = ""
-    if scope != "overall":
-        info = data.orgs_intel.get(scope) or {}
-        bits = ["<li>Office: %s</li>" % esc(o) for o in info.get("offices", [])]
-        bits += ["<li>%s <span class='muted small'>(%s)</span></li>" % (esc(f["text"]), esc(f["source"]))
-                 for f in info.get("facts", [])]
-        if bits:
-            intel = '<div class="card"><h3>What we know about %s</h3><ul class="small">%s</ul></div>' % (
-                esc(data.org(scope)), "".join(bits))
-    return '<div class="swot">%s</div>%s' % (out, intel)
-
-
-def view_swot(data):
-    if not data.swot:
-        return '<div class="card muted">No SWOT yet. The agent writes eval/swot.json after the first scored run (method/SWOT.md).</div>'
-    top_n = int(((data.config.get("scoring") or {}).get("top_n_for_gaps")) or 25)
-    scopes = [("overall", "Overall", data.swot.get("overall") or {})]
-    for oid in data.targets:
-        if oid in (data.swot.get("per_org") or {}):
-            scopes.append((oid, data.org(oid), data.swot["per_org"][oid]))
-    buttons = "".join('<button type="button" data-scope="%s" class="%s" aria-pressed="%s">%s</button>'
-                      % (esc(s), "on" if i == 0 else "", "true" if i == 0 else "false", esc(label))
-                      for i, (s, label, _) in enumerate(scopes))
-    panels = "".join('<div class="swot-scope%s" id="scope-%s"><h3 class="muted">%s</h3>%s</div>'
-                     % (" on" if i == 0 else "", esc(s), esc(label), swot_grid(g, data, top_n, s))
-                     for i, (s, label, g) in enumerate(scopes))
-    texts = {}
-    for _, _, g in scopes:
-        for quad in ("strengths", "weaknesses", "opportunities", "threats"):
-            for it in g.get(quad, []):
-                texts[it["id"]] = it["text"]
-    blocks = ""
-    for kind, label, explain in TOWS:
-        items = ""
-        for s in [x for x in data.swot.get("strategies", []) if x.get("type") == kind]:
-            uses = "".join('<span class="chip" title="%s">%s</span>' % (esc(texts.get(u, "")), esc(u)) for u in s["uses"])
-            links = "".join('<a href="#plan/%s">%s %s</a>' % (esc(aid), esc(aid), esc(
-                data.action_index.get(aid, {}).get("title", "(not in the plan)"))) for aid in s.get("actions", []))
-            scope = s.get("scope") or "overall"
-            items += ('<div class="strategy"><span class="qid">%s</span>%s<div class="row-sub small">Uses %s &middot; Scope: %s</div>'
-                      '<div class="links small">Plan actions: %s</div></div>'
-                      % (esc(s["id"]), esc(s["text"]), uses, esc("Overall" if scope == "overall" else data.org(scope)),
-                         links or '<span class="muted">none yet</span>'))
-        blocks += ('<div class="card"><h3>%s (%s)</h3><p class="muted small">%s</p>%s</div>'
-                   % (label, kind, explain, items or '<div class="muted small">No strategy of this type yet.</div>'))
-    return ('<div class="scope" role="group" aria-label="SWOT scope">%s</div>%s<h2>TOWS strategies: turning the grid into moves</h2>'
-            '<div class="grid2">%s</div>' % (buttons, panels, blocks))
-
-
-def view_plan(data, stale):
-    gaps = data.cur.get("gaps", [])
-    by_gap = {}
-    for a in data.actions:
-        if a.get("gap_id"):
-            by_gap.setdefault(a["gap_id"], []).append(a["id"])
-    out = bar_chart("What would lift your odds most (fit points gained, summed over your best roles)",
-                    [{"label": g["title"], "value": g["points_gain"],
-                      "sub": "%d roles, %s%s" % (g["roles_affected"], g["dimension"],
-                                                 (", actions " + ", ".join(by_gap[g["id"]])) if g["id"] in by_gap else "")}
-                     for g in gaps], max([g["points_gain"] for g in gaps] or [1]), " pts")
-    cap = int(data.plan.get("max_active", 8))
-    out += '<h2>Active actions, by priority (%d of %d allowed)</h2><div class="list">%s</div>' % (
-        len(data.active), cap, "".join(action_row(a, data, stale) for a in data.active) or
-        '<div class="row muted">None.</div>')
-    cols = ""
-    for status in ("doing", "todo", "done", "dropped"):
-        items = [a for a in data.actions if a.get("status") == status]
-        cols += ('<div class="card"><div class="tile-label">%s (%d)</div>%s</div>'
-                 % (STATUS_LABEL[status], len(items), "".join(
-                     '<div class="kitem"><a href="#plan/%s" class="row-title" style="color:inherit;text-decoration:none">%s</a>'
-                     '<div class="row-sub small">%s</div></div>' % (esc(a["id"]), esc(a["title"]), esc(
-                         a.get("done_evidence") or "%s h, %s" % (a.get("effort_hours"), a.get("owner", "you"))))
-                     for a in items) or '<div class="muted small">None</div>'))
-    out += '<h2>Board</h2><div class="grid4">%s</div>' % cols
-    done_drop = [a for a in data.actions if a.get("status") in ("done", "dropped")]
-    if done_drop:
-        out += '<h2>Finished and dropped</h2><div class="list">%s</div>' % "".join(action_row(a, data, stale) for a in done_drop)
-    exp = data.plan.get("experiments_log", [])
-    rows = "".join("<tr><td class='num'>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" % (
-        esc(e.get("date")), esc(e.get("action") or e.get("action_id")), esc(e.get("result")), esc(e.get("decision")),
-        esc(e.get("why", ""))) for e in exp)
-    out += ("<h2>What we tried, and what we kept</h2><div class='card'>" + (
-        "<div class='tablewrap'><table class='dims'><tr><th>Date</th><th>Action</th><th>Result</th><th>Decision</th><th>Why</th></tr>%s</table></div>" % rows
-        if rows else "<p class='muted'>Nothing tried yet. This fills in as actions finish or get dropped.</p>") + "</div>")
-    if data.plan.get("backlog"):
-        out += "<h2>Backlog</h2><div class='card'><ul>%s</ul></div>" % "".join(
-            "<li>%s</li>" % esc(b) for b in data.plan["backlog"])
-    return out
-
-
-def view_evidence(data):
-    items = data.evidence.get("items", [])
-    counts = {}
-    for e in items:
-        counts[e.get("level")] = counts.get(e.get("level"), 0) + 1
-    out = '<div class="grid3">%s</div>' % "".join(
-        '<div class="tile"><div class="tile-label">%s</div><div class="tile-value">%d</div></div>' % (label, counts.get(k, 0))
-        for k, label in LEVELS)
-    verify = "".join("<li><strong>%s</strong> <span class='muted'>%s</span></li>" % (esc(v["question"]), esc(v["why"]))
-                     for v in data.cur.get("verify_to_unlock", []))
-    out += '<h2>Questions only you can answer</h2><div class="card"><ul>%s</ul></div>' % (
-        verify or "<li class='muted'>None right now.</li>")
-    if data.claims:
-        ccount = {}
-        for c in data.claims:
-            ccount[c["status"]] = ccount.get(c["status"], 0) + 1
-        flagged = [c for c in data.claims if c["status"] in ("overstated", "unsupported", "contradicted")]
-        rows = "".join("<div class='kitem'><span class='tag t-%s'>%s</span> %s<div class='row-sub small'>Honest wording: %s</div>"
-                       "<div class='muted small'>%s</div></div>" % (esc(c["status"]), esc(c["status"]), esc(c["text"]),
-                                                                   esc(c.get("suggested_wording") or "not written yet"),
-                                                                   esc(c["source"])) for c in flagged)
-        out += ('<h2>Public claims audit</h2><div class="grid3">%s</div><div class="card"><h3>Fix these first</h3>%s</div>'
-                % ("".join('<div class="tile"><div class="tile-label">%s</div><div class="tile-value">%d</div></div>'
-                           % (label, ccount.get(k, 0)) for k, label in CLAIM_STATUSES),
-                   rows or "<p class='muted small'>No overclaims found.</p>"))
-    if data.network:
-        names = bool(data.privacy.get("show_contact_names_in_dashboard"))
-        cards = ""
-        for oid in data.targets:
-            org = (data.network.get("orgs") or {}).get(oid) or {"count": 0, "first_degree": []}
-            people = "".join("<li>%s%s</li>" % (esc(c["name"] + ", ") if names else "", esc(c.get("position") or "position not listed"))
-                             for c in org["first_degree"][:5])
-            paths = [p for p in data.network.get("second_degree") or [] if p.get("org") == oid]
-            path_txt = "".join("<li>Second-degree path%s: %s</li>" % (
-                (" via " + esc(p["via"])) if names and p.get("via") else "", esc(p["status"])) for p in paths)
-            cards += ('<div class="card"><div class="org-name">%s</div><div class="tile-value">%d</div>'
-                      '<div class="tile-label">first-degree contacts</div><ul class="small">%s%s</ul></div>'
-                      % (esc(data.org(oid)), org["count"], people, path_txt))
-        out += '<h2>Your network at each organisation</h2><div class="grid3">%s</div>' % cards
-        if not names:
-            out += "<p class='muted small'>Names are hidden. Set privacy.show_contact_names_in_dashboard to true to show them here.</p>"
-    groups = {}
-    for e in items:
-        groups.setdefault(e.get("kind", "other"), []).append(e)
-    out += "<h2>All evidence</h2>"
-    for kind in sorted(groups):
-        rows = ""
-        for i in groups[kind]:
-            srcs = ", ".join(('<a href="%s" rel="noopener noreferrer">%s</a>' % (esc(s["ref"]), esc(s["type"].replace("_", " ")))
-                              if re.match(r"^https?://", s["ref"]) else esc("%s: %s" % (s["type"].replace("_", " "), s["ref"])))
-                             for s in i.get("sources", []))
-            rows += ("<tr><td class='num'>%s</td><td class='lead-tag'><span class='tag t-%s'>%s</span></td><td>%s<div class='muted small'>%s</div>"
-                     "<div class='muted small'>Feeds %s</div></td></tr>" % (
-                         esc(i["id"]), esc(i["level"]), esc(i["level"].replace("_", " ")), esc(i["claim"]), srcs,
-                         esc(", ".join(i.get("dimensions") or []) or "no dimension")))
-        out += ('<details class="card"><summary>%s (%d)</summary><div class="tablewrap"><table class="dims stack">%s</table></div></details>'
-                % (esc(kind.replace("_", " ").capitalize()), len(groups[kind]), rows))
-    if not items:
-        out += '<div class="card muted">No evidence yet. The intake (method/INTAKE.md) fills this in.</div>'
+        group_of.setdefault(r["org"], OTHER_KEY)
+    hard_types = (plan.get("eligibility_blockers") or {}).get("hard_types", DEFAULT_HARD_TYPES)
+    roles = build_roles(data, group_of, hard_types)
+    if any(x["g"] == OTHER_KEY for x in roles) and OTHER_KEY not in groups:
+        groups[OTHER_KEY] = {"name": "Other", "c": A.OTHER[0], "cd": A.OTHER[1], "members": []}
+    end = end_date(data, run_date)
+    actions = build_actions(data, end)
+    baseline = min(plan.get("baseline_date") or data.runs[0]["run_date"], data.runs[0]["run_date"])
+    caps = dict(DEFAULT_CAPS, **(plan.get("projection_caps") or {}))
+    locations = {c["id"]: c.get("name", c["id"]) for c in (cfg.get("locations") or {}).get("classes") or []}
+    default_class = (cfg.get("locations") or {}).get("default_class") or "other"
+    locations.setdefault(default_class, "Other")
+    home = home_class(cfg)
+    first = (data.metrics_history or [{}])[0].get("metrics", {})
+    goal, report, cand = cfg.get("goal") or {}, cfg.get("report") or {}, cfg.get("candidate") or {}
+    runs = build_runs(data, group_of)
+    out = {
+        "meta": {
+            "run_date": run_date, "baseline": baseline, "end": end, "title": clean(report.get("title")) or "Career campaign",
+            "subtitle": clean(report.get("subtitle")), "fictional": bool(cfg.get("fictional")),
+            "person": clean(cand.get("display_name")), "horizon": goal.get("horizon_months", 12),
+            "principle": clean(plan.get("principle")),
+            "outlook": {"band": run["outlook"]["band"], "text": clean(run["outlook"]["text"]),
+                        "reasons": [clean(x) for x in run["outlook"].get("reasons") or []]},
+            "sample_allowed": len(data.runs) < SAMPLE_UNTIL_RUNS, "git": os.path.exists(os.path.join(data.ws, ".git")),
+            "built": short_date(run_date),
+        },
+        "dims": DIMS, "dimNames": C.DIMENSION_NAMES, "dimHelp": DIM_HELP,
+        "weights": [data.weights[d] for d in DIMS], "caps": [caps.get(d, 0) for d in DIMS],
+        "families": data.fam_names, "locations": locations, "orgNames": data.org_names,
+        "orgs": build_orgs(data, roles, groups), "roles": roles, "actions": actions,
+        "metrics": [{"name": clean(m["name"]), "current": m["current"], "target": m["target"],
+                     "start": first.get(m["id"], m["current"])} for m in plan.get("north_star", [])],
+        "gaps": [{"title": clean(g["title"]), "why": clean(g.get("why")), "dim": g.get("dimension"),
+                  "points": g["points_gain"], "roles": g["roles_affected"]} for g in run.get("gaps", [])],
+        "vtu": [{"q": clean(v["question"]), "why": clean(v["why"])} for v in run.get("verify_to_unlock", [])],
+        "evidence": build_evidence(data),
+        "claims": [{"id": c["id"], "text": clean(c.get("text")), "status": c.get("status", "pending"),
+                    "better": clean(c.get("suggested_wording")), "url": web_url(c.get("source")),
+                    "ev": c.get("evidence") or []} for c in data.claims],
+        "market": build_market(data, roles, groups, group_of, locations, home),
+        "runs": runs, "swot": build_swot(data, actions),
+        "experiments": [{"date": x.get("date"), "action": clean(x.get("action") or x.get("action_id")),
+                         "result": clean(x.get("result")), "decision": x.get("decision", ""), "why": clean(x.get("why"))}
+                        for x in plan.get("experiments_log") or []],
+        "backlog": [clean(b) for b in plan.get("backlog") or []],
+    }
+    out["orgOrder"] = [g for g in groups if g in out["orgs"]]
+    out["ceil"] = build_ceilings(data, {x["id"]: x for x in roles}, group_of)
     return out
 
 
 def render_page(data):
-    stale = stale_actions(data)
-    cfg, cur = data.config, data.cur
-    report = cfg.get("report") or {}
-    goal = cfg.get("goal") or {}
-    title = report.get("title") or "Career campaign"
-    subtitle = " ".join(x for x in [goal.get("title", "") + ".", report.get("subtitle", "")] if x.strip(". "))
-    cadence = (cfg.get("cadence") or {}).get("mode", "daily")
-    banner = ""
-    if cfg.get("fictional"):
-        banner = ('<div class="banner">Demo with made-up data. %s and every organisation, role and contact here are '
-                  'fictional.</div>' % esc((cfg.get("candidate") or {}).get("display_name") or "This person"))
-    views = [("overview", "Overview", view_overview(data, stale)), ("trends", "Trends", view_trends(data)),
-             ("roles", "Roles", view_roles(data)), ("swot", "SWOT", view_swot(data)),
-             ("plan", "Plan", view_plan(data, stale)), ("evidence", "Evidence", view_evidence(data))]
+    page = build_data(data)
     if not data.privacy.get("show_contact_names_in_dashboard"):
-        hide = make_redactor(data, sensitive=False, hide_names=True)
-        views = [(v, label, hide(body)) for v, label, body in views]
-    nav = "".join('<a href="#%s">%s</a>' % (v, label) for v, label, _ in views)
-    sections = "".join('<section class="view" id="v-%s" aria-label="%s"><h2 class="view-title">%s</h2>%s</section>'
-                       % (v, label, label, body) for v, label, body in views)
-    return """<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark"><meta name="robots" content="noindex">
-<title>%s</title><script>document.documentElement.className += " js";</script>
-<style>%s</style></head><body><div class="wrap">
-<div class="muted small">Private &middot; last run %s &middot; rubric %s &middot; %s runs</div>
-<h1>%s</h1><div class="muted">%s</div>%s
-<nav class="seg" aria-label="Views">%s</nav>
-%s
-<p class="foot">How scores work: seven factors, each scored 0 to 5 from cited evidence, weighted into a fit score out of 100,
-then turned into chance bands. A separate sceptical reviewer must agree with every score above 2. Bands are judgement, not
-statistics. Rules: method/RUBRIC.md in the career-eval engine. Drafts only: the engine never applies, sends, posts or changes accounts.</p>
-</div><div class="tip" id="tip" role="status"></div>
-<script>%s</script></body></html>
-""" % (esc(title), A.CSS, esc(cur["run_date"]), esc(cur["rubric_version"]), esc(cadence), esc(title), esc(subtitle),
-       banner, nav, sections, A.JS)
+        page = _scrub_text(page, make_redactor(data, sensitive=False, hide_names=True, placeholder="a contact"))
+    blob = json.dumps(page, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
+    return A.TEMPLATE.replace("__TITLE__", html.escape(page["meta"]["title"])).replace("__DATA__", blob), page
 
 # ------------------------------------------------------------ agent files
 
 
-MONEY_RX = re.compile(r"(?:[$\u00a3\u20ac]\s?|\b(?:USD|AUD|EUR|GBP|CAD|NZD|SGD)\s?)\d[\d,.]*\s?[kKmM]?\b"
-                      r"(?:\s*(?:to|-|\u2013|\u2014)\s*(?:[$\u00a3\u20ac]\s?)?\d[\d,.]*\s?[kKmM]?\b)?")
+MONEY_RX = re.compile(r"(?:[$£€]\s?|\b(?:USD|AUD|EUR|GBP|CAD|NZD|SGD)\s?)\d[\d,.]*\s?[kKmM]?\b"
+                      r"(?:\s*(?:to|-|–|—)\s*(?:[$£€]\s?)?\d[\d,.]*\s?[kKmM]?\b)?")
 
 
-def make_redactor(data, sensitive, hide_names):
-    """Return a function that cleans one string for the agent files.
+def make_redactor(data, sensitive, hide_names, placeholder="[contact]"):
+    """Return a function that cleans one string.
 
-    Contact names are hidden unless the person opted in; redact_terms and money
-    amounts are hidden in sensitive mode."""
+    Contact names (full names, and first names of 3 or more letters that are
+    not the person's own or a month) are hidden unless the person opted in;
+    redact_terms and money amounts are hidden in sensitive mode."""
     terms = [t for t in data.privacy.get("redact_terms") or [] if t.strip()] if sensitive else []
     names = set()
     for org in ((data.network or {}).get("orgs") or {}).values():
@@ -677,32 +588,64 @@ def make_redactor(data, sensitive, hide_names):
                 names.add(c["name"])
     for p in (data.network or {}).get("second_degree") or []:
         for k in ("via", "target_person"):
-            if p.get(k):
+            if p.get(k) and re.match(r"^[A-Z][a-z]+(?:\s+[A-Z][\w'-]+)+$", p[k]):
                 names.add(p[k])
     if not hide_names:
         names = set()
-    names |= {esc(n) for n in names}  # also catch names as they appear in escaped HTML
+    own = set(((data.config.get("candidate") or {}).get("display_name") or "").split())
+    firsts = {n.split()[0] for n in names if len(n.split()) > 1}
+    firsts = {f for f in firsts if len(f) >= 3 and f not in own and f not in MONTHS}
     rules = [(re.compile(r"(?<!\w)%s(?!\w)" % re.escape(t), re.I), "[redacted]") for t in sorted(terms, key=len, reverse=True)]
-    rules += [(re.compile(r"(?<!\w)%s(?!\w)" % re.escape(n), re.I), "[contact]") for n in sorted(names, key=len, reverse=True)]
+    rules += [(re.compile(r"(?<!\w)%s(?!\w)" % re.escape(n), re.I), placeholder) for n in sorted(names, key=len, reverse=True)]
+    rules += [(re.compile(r"(?<!\w)%s(?!\w)" % re.escape(f)), placeholder) for f in sorted(firsts, key=len, reverse=True)]
 
-    def clean(text):
-        for rx, sub in rules:
-            text = rx.sub(sub, text)
+    def sub_for(word):
+        def at(m):  # a placeholder that starts a sentence starts with a capital
+            before = m.string[:m.start()].rstrip()
+            return word[:1].upper() + word[1:] if not before or before[-1] in ".!?:" else word
+        return at
+
+    def clean_text(text):
+        for rx, word in rules:
+            text = rx.sub(sub_for(word), text)
         return MONEY_RX.sub("[salary]", text) if sensitive else text
-    return clean
+    return clean_text
 
 
-def scrub(value, clean):
+def scrub(value, clean_text):
     if isinstance(value, str):
-        return clean(value)
+        return clean_text(value)
     if isinstance(value, list):
-        return [scrub(v, clean) for v in value]
+        return [scrub(v, clean_text) for v in value]
     if isinstance(value, dict):
-        return {k: scrub(v, clean) for k, v in value.items() if k != "compensation"}
+        return {k: scrub(v, clean_text) for k, v in value.items() if k != "compensation"}
     return value
 
 
-def agent_payload(data):
+def _scrub_text(value, clean_text):
+    """Like scrub, but keeps every field (used when only contact names are hidden)."""
+    if isinstance(value, str):
+        return clean_text(value)
+    if isinstance(value, list):
+        return [_scrub_text(v, clean_text) for v in value]
+    if isinstance(value, dict):
+        return {k: _scrub_text(v, clean_text) for k, v in value.items()}
+    return value
+
+
+def projection_summary(page):
+    """Expected and best-case fit by the end date for the top 5 roles, with every live action on."""
+    caps, weights = page["caps"], page["weights"]
+    out = []
+    for r in page["roles"][:5]:
+        exp, _ = project(r, page["actions"], caps, weights, "exp")
+        best, _ = project(r, page["actions"], caps, weights, "best")
+        out.append({"role_id": r["id"], "org": r["org"], "title": r["title"], "fit_today": r["fit"],
+                    "fit_expected": exp, "fit_best_case": best})
+    return {"end_date": page["meta"]["end"], "baseline_date": page["meta"]["baseline"], "roles": out}
+
+
+def agent_payload(data, page):
     sensitive = bool(data.privacy.get("sensitive_mode", True))
     share_names = bool(data.privacy.get("share_contact_names_with_agents")) and not sensitive
     cur, goal = data.cur, data.config.get("goal") or {}
@@ -720,6 +663,7 @@ def agent_payload(data):
         "top5_average_fit": top5_avg(cur),
         "top5_average_fit_previous": top5_avg(data.prev) if data.prev else None,
         "per_org": {o: (dict(b, org_name=data.org(o)) if b else None) for o, b in cur["per_org"].items()},
+        "projection": projection_summary(page),
         "gaps": cur.get("gaps", []),
         "verify_to_unlock": cur.get("verify_to_unlock", []),
         "actions_active": [dict(a, priority=priority(a)) for a in data.active],
@@ -732,7 +676,7 @@ def agent_payload(data):
         "roles": [{"role_id": r["role_id"], "org": r["org"], "title": r["title"], "family": r["family"],
                    "locations": r.get("locations", []), "url": r.get("url"), "fit": r["fit"],
                    "interview_band": r["interview_band"], "offer_band": r["offer_band"],
-                   "scores": {d: r["scores"][d]["score"] for d in C.DIMENSIONS},
+                   "scores": {d: r["scores"][d]["score"] for d in DIMS},
                    "adjustments": r["adjustments"], "reviewer_note": r.get("reviewer_note", "")} for r in cur["roles"]],
     }
     if data.swot:
@@ -745,20 +689,9 @@ def agent_payload(data):
     if share_names and data.network:
         payload["network"] = data.network
     if sensitive or not share_names:
-        clean = make_redactor(data, sensitive, hide_names=not share_names)
-        payload = scrub(payload, clean) if sensitive else _scrub_text(payload, clean)
+        clean_text = make_redactor(data, sensitive, hide_names=not share_names)
+        payload = scrub(payload, clean_text) if sensitive else _scrub_text(payload, clean_text)
     return payload
-
-
-def _scrub_text(value, clean):
-    """Like scrub, but keeps every field (used when only contact names are hidden)."""
-    if isinstance(value, str):
-        return clean(value)
-    if isinstance(value, list):
-        return [_scrub_text(v, clean) for v in value]
-    if isinstance(value, dict):
-        return {k: _scrub_text(v, clean) for k, v in value.items()}
-    return value
 
 
 def summary_md(data, p):
@@ -791,6 +724,11 @@ def summary_md(data, p):
     for oid, b in p["per_org"].items():
         lines.append("- %s: %s" % (data.org(oid), "%s, fit %s, interview %s, offer %s" % (
             b["title"], round(b["fit"]), b["interview_band"], b["offer_band"]) if b else "no matching open role"))
+    pr = p["projection"]
+    lines += ["", "## Projection to %s (every open action on; expected weights each by its chance)" % pr["end_date"]]
+    for r in pr["roles"]:
+        lines.append("- %s: %s today, %s expected, %s if every action lands" % (
+            r["title"], round(r["fit_today"]), round(r["fit_expected"]), round(r["fit_best_case"])))
     lines += ["", "## Active actions (highest priority first)"]
     for a in p["actions_active"]:
         lines.append("- [%s] %s %s (owner: %s; done when: %s)" % (a["status"], a["id"], a["title"], a.get("owner", "you"),
@@ -799,7 +737,7 @@ def summary_md(data, p):
     for g in p["gaps"]:
         lines.append("- %s: +%s fit points across %d roles. %s" % (g["title"], g["points_gain"], g["roles_affected"], g["why"]))
     lines += ["", "## Top 10 open roles"]
-    for r in p["roles"][:10]:
+    for r in sorted(p["roles"], key=lambda r: (-r["fit"], r["role_id"]))[:10]:
         lines.append("- %s  %s: %s (interview %s, offer %s) %s" % (round(r["fit"]), data.org(r["org"]), r["title"],
                                                                   r["interview_band"], r["offer_band"], r.get("url") or ""))
     lines += ["", "## Questions only the person can answer"]
@@ -819,8 +757,9 @@ def main(argv=None):
     ws, config = C.open_workspace(args.workspace)
     data = Data(ws, config)
     update_metrics_history(data)
-    C.write_text(C.wpath(ws, "report", "index.html"), render_page(data))
-    payload = agent_payload(data)
+    page_html, page = render_page(data)
+    C.write_text(C.wpath(ws, "report", "index.html"), page_html)
+    payload = agent_payload(data, page)
     C.write_json(C.wpath(ws, "report", "for-agents", "dashboard.json"), payload)
     C.write_text(C.wpath(ws, "report", "for-agents", "SUMMARY.md"), summary_md(data, payload))
     print("Wrote report/index.html, report/for-agents/SUMMARY.md, report/for-agents/dashboard.json "

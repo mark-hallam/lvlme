@@ -48,6 +48,52 @@
       "org_name": "Initech Robotics"
     }
   },
+  "projection": {
+    "end_date": "2027-01-31",
+    "baseline_date": "2026-10-04",
+    "roles": [
+      {
+        "role_id": "initech:i-0001",
+        "org": "initech",
+        "title": "Program Manager, Robot Fleet Deployments",
+        "fit_today": 57.0,
+        "fit_expected": 62.8,
+        "fit_best_case": 70.0
+      },
+      {
+        "role_id": "acme:4100001",
+        "org": "acme",
+        "title": "Technical Program Manager, Model Launches",
+        "fit_today": 46.0,
+        "fit_expected": 47.0,
+        "fit_best_case": 48.0
+      },
+      {
+        "role_id": "acme:4100002",
+        "org": "acme",
+        "title": "Applied AI Deployment Lead, Asia Pacific",
+        "fit_today": 45.0,
+        "fit_expected": 46.0,
+        "fit_best_case": 47.0
+      },
+      {
+        "role_id": "initech:i-0002",
+        "org": "initech",
+        "title": "Product Manager, Warehouse Autonomy",
+        "fit_today": 45.0,
+        "fit_expected": 50.0,
+        "fit_best_case": 57.0
+      },
+      {
+        "role_id": "globex:g-0003",
+        "org": "globex",
+        "title": "AI Success Manager, Asia",
+        "fit_today": 39.0,
+        "fit_expected": 41.9,
+        "fit_best_case": 44.0
+      }
+    ]
+  },
   "gaps": [
     {
       "id": "referral",
@@ -164,6 +210,8 @@
       "expected_points": 2,
       "roles_affected": 12,
       "chance": 0.9,
+      "target_date": "2026-11-05",
+      "effects": [],
       "done_when": "Headline changed (screenshot or link), claim C001 re-checked as supported",
       "strategy_ids": [
         "WT1"
@@ -182,6 +230,7 @@
       "expected_points": 1,
       "roles_affected": 12,
       "chance": 0.9,
+      "target_date": "2026-11-04",
       "done_when": "Answer recorded in intake/answers.md and evidence.json",
       "added_on": "2026-10-25",
       "priority": 21.6
@@ -197,6 +246,19 @@
       "expected_points": 8,
       "roles_affected": 4,
       "chance": 0.4,
+      "target_date": "2026-11-22",
+      "effects": [
+        {
+          "dimension": "D3",
+          "set_at_least": 2,
+          "scope": {
+            "orgs": [
+              "initech"
+            ]
+          },
+          "note": "An agreed second-degree path."
+        }
+      ],
       "done_when": "Someone has agreed to introduce you to a person at Initech (email or message)",
       "strategy_ids": [
         "WO1"
@@ -220,6 +282,19 @@
       "expected_points": 4,
       "roles_affected": 4,
       "chance": 0.5,
+      "target_date": "2026-11-15",
+      "effects": [
+        {
+          "dimension": "D3",
+          "set_at_least": 3,
+          "scope": {
+            "orgs": [
+              "globex"
+            ]
+          },
+          "note": "A named insider who has seen route-eval."
+        }
+      ],
       "done_when": "The AI Success lead has replied and seen route-eval (email)",
       "strategy_ids": [
         "SO2"
@@ -245,6 +320,19 @@
       "expected_points": 8,
       "roles_affected": 4,
       "chance": 0.2,
+      "target_date": "2026-12-10",
+      "effects": [
+        {
+          "dimension": "D3",
+          "set_at_least": 3,
+          "scope": {
+            "orgs": [
+              "initech"
+            ]
+          },
+          "note": "Met someone at Initech who has seen the work."
+        }
+      ],
       "done_when": "Met at least one Initech employee who has seen your work (follow-up email)",
       "strategy_ids": [
         "WO1"
@@ -268,6 +356,19 @@
       "expected_points": 1,
       "roles_affected": 1,
       "chance": 0.8,
+      "target_date": "2026-11-08",
+      "effects": [
+        {
+          "dimension": "D7",
+          "delta": 1,
+          "scope": {
+            "role_ids": [
+              "initech:i-0001"
+            ]
+          },
+          "note": "Submitted, tailored application."
+        }
+      ],
       "done_when": "Application submitted (confirmation email)",
       "strategy_ids": [
         "SO1",
@@ -292,6 +393,19 @@
       "expected_points": 2,
       "roles_affected": 3,
       "chance": 0.5,
+      "target_date": "2026-11-29",
+      "effects": [
+        {
+          "dimension": "D4",
+          "delta": 1,
+          "scope": {
+            "orgs": [
+              "acme"
+            ]
+          },
+          "note": "An Acme-specific demo."
+        }
+      ],
       "done_when": "Demo submitted to the challenge (link)",
       "strategy_ids": [
         "WO2"

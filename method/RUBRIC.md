@@ -179,6 +179,14 @@ when the detector misread the posting.
 A blocked role scores D6 = 0 and counts as a lacking hard requirement, so D1
 is capped at 1 and both bands move down one step.
 
+Some blockers no plan can clear in time, such as a citizenship rule. Set
+`hard_eligibility_block: true` in the role's judgement to say so (it also
+marks the role blocked). The dashboard's projection then keeps D6 at 0 for
+that role, whatever the plan does. Blocked roles whose blocker type is listed
+in `campaign/plan.json` under `eligibility_blockers.hard_types` (by default
+`us_person_export_control`, `citizenship` and `security_clearance`) are
+treated the same way; a `licence` blocker can be cleared by a plan action.
+
 ## Review cap (enforced)
 
 A dimension score above `scoring.review_required_above` (default 2) counts as

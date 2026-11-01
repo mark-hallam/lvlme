@@ -36,6 +36,7 @@
         "hard_requirement_lacking": {"type": "boolean"},
         "hard_requirement_note": {"type": "string"},
         "eligibility_blocked": {"type": ["boolean", "null"], "description": "Overrides the automatic blocker detection when set."},
+        "hard_eligibility_block": {"type": "boolean", "description": "The role has an eligibility blocker the plan can never clear (for example a citizenship rule). The role is scored as blocked, and the projection keeps eligibility (D6) at 0."},
         "location_class": {"type": "string", "description": "Overrides the automatic location class when set."},
         "judged_on": {"$ref": "#/definitions/date"},
         "reviewed_on": {"$ref": "#/definitions/date"},

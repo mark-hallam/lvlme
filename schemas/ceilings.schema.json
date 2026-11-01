@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Path to the top band (eval/ceilings.json)",
+  "description": "Optional. The agent's analysis of how high each promising role could go: today, likely in 12 months, the ceiling on evidence the person can show, and the ceiling once unconfirmed history is confirmed; what 5 out of 5 looks like per factor; a phased roadmap; honest odds; and what each run should watch for. The dashboard shows it as the 'Path to the top band' view, and hides that view when this file is absent.",
+  "type": "object",
+  "required": ["schema_version", "roles"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "generated": {"$ref": "#/definitions/date"},
+    "target_fit": {"type": "integer", "minimum": 55, "maximum": 100, "description": "The fit the view aims at. Default 85, where the Strong band starts."},
+    "how": {"type": "string", "description": "Plain-English explanation of what reaching the target takes."},
+    "counts": {
+      "type": "array",
+      "description": "Headline counts shown as tiles, for example 'roles open to you were checked'.",
+      "items": {
+        "type": "object",
+        "required": ["value", "label"],
+        "additionalProperties": false,
+        "properties": {"value": {"type": "integer", "minimum": 0}, "label": {"type": "string", "minLength": 1}}
+      }
+    },
+    "roles": {"type": "array", "items": {"$ref": "#/definitions/role"}},
+    "factors": {"type": "array", "items": {"$ref": "#/definitions/factor"}},
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["phase"],
+        "additionalProperties": false,
+        "properties": {
+          "phase": {"type": "string", "minLength": 1},
+          "window": {"type": "string"},
+          "steps": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "roadmap": {
+      "type": "array",
+      "description": "Anchor roles and where each lands at the end of each phase.",
+      "items": {
+        "type": "object",
+        "required": ["label", "phases"],
+        "additionalProperties": false,
+        "properties": {
+          "role_id": {"type": "string"},
+          "label": {"type": "string", "minLength": 1},
+          "phases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["phase", "fit_likely", "fit_if_every_step_lands"],
+              "additionalProperties": false,
+              "properties": {
+                "phase": {"type": "string"},
+                "fit_likely": {"type": "number", "minimum": 0, "maximum": 100},
+                "fit_if_every_step_lands": {"type": "number", "minimum": 0, "maximum": 100},
+                "band_if_every_step_lands": {"enum": ["Very low", "Low", "Moderate", "Good", "Strong"]}
+              }
+            }
+          }
+        }
+      }
+    },
+    "odds": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "statement": {"type": "string"},
+        "reach_target_within_12_months": {"type": "string", "description": "In words, for example 'about 1 in 5'."},
+        "reach_good": {"type": "string", "description": "Chance of reaching 70 (a good interview chance), in words."},
+        "reach_good_by": {"$ref": "#/definitions/date"},
+        "why_not_higher": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "create_the_role": {
+      "type": "array",
+      "description": "Ways to create a role that does not exist yet, and which factors each lifts.",
+      "items": {
+        "type": "object",
+        "required": ["strategy"],
+        "additionalProperties": false,
+        "properties": {"strategy": {"type": "string", "minLength": 1}, "how": {"type": "string"}, "lifts": {"type": "string"}}
+      }
+    },
+    "watchlist": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title_patterns": {"type": "array", "items": {"type": "string"}},
+        "locations_priority": {"type": "array", "items": {"type": "string"}},
+        "requirement_patterns_good": {"type": "array", "items": {"type": "string"}},
+        "exclude": {"type": "array", "items": {"type": "string"}},
+        "alert_rule": {"type": "string"}
+      }
+    }
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "dimension": {"enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]},
+    "role": {
+      "type": "object",
+      "required": ["role_id", "org", "title", "likely_12_months", "ceiling"],
+      "additionalProperties": false,
+      "properties": {
+        "role_id": {"type": "string"},
+        "org": {"type": "string"},
+        "title": {"type": "string", "minLength": 1},
+        "locations": {"type": "array", "items": {"type": "string"}},
+        "now": {"type": "number", "minimum": 0, "maximum": 100, "description": "Used only if the role is no longer open; otherwise the latest run's fit is shown."},
+        "likely_12_months": {"type": "number", "minimum": 0, "maximum": 100},
+        "ceiling": {"type": "number", "minimum": 0, "maximum": 100, "description": "Every factor at the most the person's current evidence could support."},
+        "ceiling_if_confirmed": {"type": "number", "minimum": 0, "maximum": 100, "description": "The ceiling once self-reported or unconfirmed history is confirmed."},
+        "binding_constraint": {"$ref": "#/definitions/dimension"}
+      }
+    },
+    "factor": {
+      "type": "object",
+      "required": ["dimension"],
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {"$ref": "#/definitions/dimension"},
+        "now": {"type": "string"},
+        "five_looks_like": {"type": "string"},
+        "gap": {"type": "string"},
+        "moves": {"type": "array", "items": {"type": "string"}},
+        "effort": {"type": "string"},
+        "chance": {"type": "string"}
+      }
+    }
+  }
+}

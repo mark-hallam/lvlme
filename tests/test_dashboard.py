@@ -1,0 +1,162 @@
+"""build_dashboard.py: projection rules, colour slots, optional views, the verifiable record, copy rules."""
+import json
+import os
+import re
+import shutil
+import subprocess
+import unittest
+from unittest import mock
+
+import helpers as H
+import build_dashboard as B
+
+WEIGHTS = [25, 20, 20, 10, 10, 10, 5]
+CAPS = [0, 1, 2, 1, 1, 1, 3]
+
+
+def role(s, org="acme", family="tpm", lc="australia_nz", rid="acme:1", hard=False):
+    return {"id": rid, "org": org, "family": family, "lc": lc, "s": list(s), "hard": hard,
+            "fit": B.fit_of(s, WEIGHTS)}
+
+
+def action(aid, effects, p=0.5, status="todo"):
+    return {"id": aid, "status": status, "p": p, "effects": effects}
+
+
+def page_data(ws):
+    with open(os.path.join(ws, "report", "index.html"), encoding="utf-8") as fh:
+        page = fh.read()
+    blob = re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1)
+    return page, json.loads(blob)
+
+
+class ProjectionTests(unittest.TestCase):
+    def test_expected_weights_by_chance_and_best_case_lands(self):
+        r = role([2, 2, 1, 2, 2, 5, 1])
+        acts = [action("A01", [{"dimension": "D3", "set_at_least": 3, "scope": {}}], p=0.5)]
+        exp, s = B.project(r, acts, CAPS, WEIGHTS, "exp")
+        self.assertAlmostEqual(s[2], 2.0)              # 1 + 0.5 x (3 - 1)
+        best, s = B.project(r, acts, CAPS, WEIGHTS, "best")
+        self.assertEqual(s[2], 3)
+        self.assertEqual(best, round(r["fit"] + 2 / 5.0 * 20, 1))
+        self.assertLess(exp, best)
+
+    def test_caps_and_five_limit(self):
+        r = role([3, 2, 4, 2, 2, 5, 1])
+        acts = [action("A01", [{"dimension": "D3", "delta": 5, "scope": {}}, {"dimension": "D1", "delta": 2, "scope": {}},
+                               {"dimension": "D7", "delta": 4, "scope": {}}], p=1)]
+        _, s = B.project(r, acts, CAPS, WEIGHTS, "best")
+        self.assertEqual(s[2], 5)   # cap 2 over 4 would be 6, but never above 5
+        self.assertEqual(s[0], 3)   # D1 cap 0: years in the role don't change
+        self.assertEqual(s[6], 4)   # D7 cap 3 over 1
+
+    def test_scope_and_done_actions(self):
+        r = role([2, 2, 1, 2, 2, 5, 1], org="globex", family="product")
+        acts = [action("A01", [{"dimension": "D2", "delta": 1, "scope": {"orgs": ["acme"]}}], p=1),
+                action("A02", [{"dimension": "D2", "delta": 1, "scope": {"families": ["tpm"]}}], p=1),
+                action("A03", [{"dimension": "D4", "delta": 1, "scope": {}}], p=1, status="done"),
+                action("A04", [{"dimension": "D5", "delta": 1, "scope": {"location_classes": ["australia_nz"]}}], p=1)]
+        _, s = B.project(r, acts, CAPS, WEIGHTS, "best")
+        self.assertEqual(s, [2, 2, 1, 2, 3, 5, 1])   # only A04 applies: out of scope, or already in today's scores
+
+    def test_hard_eligibility_block_keeps_d6_at_zero(self):
+        acts = [action("A01", [{"dimension": "D6", "set_at_least": 4, "scope": {}}], p=1)]
+        _, s = B.project(role([1, 1, 1, 0, 2, 0, 1], hard=True), acts, CAPS, WEIGHTS, "best")
+        self.assertEqual(s[5], 0)
+        _, s = B.project(role([1, 1, 1, 0, 2, 0, 1]), acts, CAPS, WEIGHTS, "best")
+        self.assertEqual(s[5], 1)   # a blocker the plan can clear, within the D6 cap
+
+    def test_effects_estimated_from_expected_points(self):
+        weights = dict(zip(B.DIMS, WEIGHTS))
+        effects, derived = B.action_effects({"dimension": "D3", "expected_points": 8, "orgs": ["acme"]}, weights)
+        self.assertTrue(derived)
+        self.assertEqual(effects, [{"dimension": "D3", "delta": 2.0, "scope": {"orgs": ["acme"]}}])
+        effects, derived = B.action_effects({"dimension": "D3", "expected_points": 8, "effects": []}, weights)
+        self.assertEqual((effects, derived), ([], False))   # an explicit empty list means no score change
+
+
+class SlotTests(unittest.TestCase):
+    def test_up_to_eight_orgs_get_their_own_colour(self):
+        ids = ["o%d" % i for i in range(8)]
+        groups, group_of = B.org_groups(ids, {})
+        self.assertEqual(list(groups), ids)
+        self.assertEqual(groups["o0"]["c"], "#2a78d6")
+        self.assertEqual(len({g["c"] for g in groups.values()}), 8)
+
+    def test_more_than_eight_fold_into_other(self):
+        ids = ["o%d" % i for i in range(11)]
+        groups, group_of = B.org_groups(ids, {"o0": "Zero"})
+        self.assertEqual(len(groups), 8)
+        self.assertEqual(groups["o0"]["name"], "Zero")
+        self.assertEqual(groups[B.OTHER_KEY]["members"], ["o7", "o8", "o9", "o10"])
+        self.assertEqual(group_of["o9"], B.OTHER_KEY)
+
+
+class CopyTests(unittest.TestCase):
+    def test_clean(self):
+        self.assertEqual(B.clean("Fix it — now, 2–3 weeks - then **ship**"), "Fix it, now, 2 to 3 weeks, then ship")
+        self.assertEqual(B.clean("the D4 edge most lack"), "the Org-specific edge most lack")
+        self.assertEqual(B.clean("raises D3 to 3"), "raises Warm path to 3")
+        self.assertEqual(B.clean("forward-deployed"), "forward-deployed")
+
+
+class DemoPageTests(unittest.TestCase):
+    def setUp(self):
+        self.ws = H.copy_demo(self)
+
+    def build(self):
+        with mock.patch("sys.stdout"):
+            self.assertEqual(B.main(["--workspace", self.ws]), 0)
+        return page_data(self.ws)
+
+    def test_page_data(self):
+        page, d = self.build()
+        acts = {a["id"]: a for a in d["actions"]}
+        self.assertEqual(acts["A10"]["stale"], 4)                 # no movement since 2026-10-11
+        self.assertEqual(acts["A04"]["effects"], [])
+        self.assertTrue(acts["A08"]["derived"])
+        self.assertEqual(acts["A01"]["group"], "done")
+        roles = {r["id"]: r for r in d["roles"]}
+        self.assertTrue(roles["acme:4100006"]["hard"])
+        self.assertEqual(d["orgOrder"], ["acme", "globex", "initech"])
+        self.assertEqual(d["orgs"]["initech"]["best"], "initech:i-0001")
+        self.assertEqual([r["date"] for r in d["runs"]][0], "2026-10-04")
+        self.assertEqual(d["meta"]["baseline"], "2026-10-04")
+        self.assertFalse(d["meta"]["git"])                        # a plain folder: dates only
+        self.assertTrue(all(r["commit"] is None for r in d["runs"]))
+        self.assertEqual(d["ceil"]["target"], 85)
+        self.assertEqual(d["swot"]["tows"][0]["a"], ["A05", "A06"])
+        self.assertEqual(d["caps"], [0, 1, 3, 1, 1, 1, 2])
+        self.assertNotIn("Jordan", page)                          # contact names, first names too, are hidden
+
+    def test_optional_views_hide_without_their_files(self):
+        os.remove(os.path.join(self.ws, "eval", "ceilings.json"))
+        os.remove(os.path.join(self.ws, "eval", "swot.json"))
+        _, d = self.build()
+        self.assertIsNone(d["ceil"])
+        self.assertIsNone(d["swot"])
+
+    @unittest.skipUnless(shutil.which("git"), "git is not installed")
+    def test_record_uses_commits_in_a_git_workspace(self):
+        git = ["git", "-C", self.ws, "-c", "user.name=Test", "-c", "user.email=test@example.com"]
+        for cmd in (["init", "-q"], ["add", "-A"], ["commit", "-q", "-m", "runs"]):
+            subprocess.run(git + cmd, check=True, capture_output=True)
+        head = subprocess.run(git + ["log", "--format=%h", "-1"], capture_output=True, text=True).stdout.strip()
+        _, d = self.build()
+        self.assertTrue(d["meta"]["git"])
+        self.assertEqual({r["commit"] for r in d["runs"]}, {head})
+
+    def test_projection_in_agent_files(self):
+        self.build()
+        payload = H.load(os.path.join(self.ws, "report", "for-agents", "dashboard.json"))
+        top = payload["projection"]["roles"][0]
+        self.assertEqual(top["role_id"], "initech:i-0001")
+        self.assertLessEqual(top["fit_today"], top["fit_expected"])
+        self.assertLessEqual(top["fit_expected"], top["fit_best_case"])
+        self.assertEqual(payload["projection"]["end_date"], "2027-01-31")
+        with open(os.path.join(self.ws, "report", "for-agents", "SUMMARY.md"), encoding="utf-8") as fh:
+            self.assertIn("## Projection to 2027-01-31", fh.read())
+
+
+if __name__ == "__main__":
+    unittest.main()

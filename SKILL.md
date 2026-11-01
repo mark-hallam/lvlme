@@ -62,7 +62,7 @@ Every script takes `--workspace <path>`; the commands below omit it.
 | 5. Review | A fresh sceptical agent checks every score above 2 | changes applied to the judgement files | `method/REVIEW.md` |
 | 6. Score | `python3 scripts/score.py` | `eval/runs/<date>.json` | `method/RUBRIC.md` |
 | 7. SWOT and TOWS | Update strengths, weaknesses, opportunities, threats and strategies | `eval/swot.json` | `method/SWOT.md` |
-| 8. Plan | Update actions, experiments and metrics | `campaign/plan.json` | `method/CAMPAIGN.md` |
+| 8. Plan | Update actions (with target dates and effects), experiments and metrics; optionally the path to the top band | `campaign/plan.json`, `eval/ceilings.json` | `method/CAMPAIGN.md` |
 | 9. Report | `python3 scripts/build_dashboard.py` | `report/` | |
 | 10. Tell the person | A short message | | below |
 

@@ -14,7 +14,7 @@ import score as S
 import validate as V
 
 DATE = "2026-11-01"
-VIEWS = ["overview", "trends", "roles", "swot", "plan", "evidence"]
+VIEWS = ["orgs", "top", "moves", "roles", "swot", "plan", "evidence", "market"]
 
 
 class EndToEndTests(unittest.TestCase):
@@ -41,20 +41,19 @@ class EndToEndTests(unittest.TestCase):
             committed = fh.read()
         self.assertEqual(self.read("eval", "runs", DATE + ".json"), committed)
 
-    def test_dashboard_has_six_views_and_no_external_requests(self):
+    def test_dashboard_views_and_no_external_requests(self):
         result = subprocess.run([sys.executable, os.path.join(H.ENGINE, "scripts", "build_dashboard.py"),
                                  "--workspace", self.ws], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         page = self.read("report", "index.html")
         for v in VIEWS:
             self.assertIn('id="v-%s"' % v, page)
-            self.assertIn('href="#%s"' % v, page)
-        self.assertNotRegex(page, r"<script[^>]+src=|<link[^>]+href=|@import|url\(\s*['\"]?https?:")
-        self.assertIn("prefers-color-scheme: dark", page)
-        self.assertIn("Show as a table", page)
-        self.assertIn("TOWS strategies", page)
-        self.assertIn('href="#plan/A04"', page)  # strategy WT1 links to its plan action
-        self.assertIn("No score or metric movement", page)  # A10 is a stale experiment
+        self.assertNotRegex(page, r"<script[^>]+src=|<link[^>]+href=|@import|url\(\s*['\"]?https?:|fetch\(|XMLHttpRequest")
+        self.assertIn(":root[data-theme=dark]", page)              # light by default, with a dark switch
+        self.assertIn("prefers-reduced-motion", page)
+        self.assertNotIn("IntersectionObserver", page)              # content never waits for scroll events
+        self.assertIn("Show the journey as a table", page)
+        self.assertIn("Path to the top band", page)
         self.assertNotIn("Jordan Sample", page)  # names hidden unless show_contact_names_in_dashboard
         self.assertNotIn(os.path.expanduser("~"), page)
         errors, _, _ = V.validate_workspace(self.ws)

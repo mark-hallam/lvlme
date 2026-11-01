@@ -48,7 +48,8 @@ Every script takes `--workspace PATH`.
    sees the scorer's reasoning.
 6. **Score**: `python3 scripts/score.py`, then `python3 scripts/validate.py`.
 7. **SWOT and TOWS**: `eval/swot.json`, using `method/SWOT.md`.
-8. **Plan**: `campaign/plan.json`, using `method/CAMPAIGN.md`.
+8. **Plan**: `campaign/plan.json` (each action with a `target_date` and its
+   `effects`), and optionally `eval/ceilings.json`, using `method/CAMPAIGN.md`.
 9. **Report**: `python3 scripts/build_dashboard.py`.
 10. **Tell the person**: under 150 words, the outlook, today's 1 to 3 actions,
     anything that needs their answer, and the path to `report/index.html`.
