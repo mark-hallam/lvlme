@@ -1,4 +1,5 @@
 """build_dashboard.py: projection rules, colour slots, optional views, the verifiable record, copy rules."""
+import html
 import json
 import os
 import re
@@ -65,6 +66,11 @@ class ProjectionTests(unittest.TestCase):
         self.assertEqual(s[5], 0)
         _, s = B.project(role([1, 1, 1, 0, 2, 0, 1]), acts, CAPS, WEIGHTS, "best")
         self.assertEqual(s[5], 1)   # a blocker the plan can clear, within the D6 cap
+
+    def test_parked_actions_are_left_out(self):
+        r = role([2, 2, 1, 2, 2, 5, 1])
+        acts = [action("A01", [{"dimension": "D3", "set_at_least": 3, "scope": {}}], p=1, status="later")]
+        self.assertEqual(B.project(r, acts, CAPS, WEIGHTS, "best")[1], r["s"])   # off until switched on in the page
 
     def test_effects_estimated_from_expected_points(self):
         weights = dict(zip(B.DIMS, WEIGHTS))
@@ -156,6 +162,87 @@ class DemoPageTests(unittest.TestCase):
         self.assertEqual(payload["projection"]["end_date"], "2027-01-31")
         with open(os.path.join(self.ws, "report", "for-agents", "SUMMARY.md"), encoding="utf-8") as fh:
             self.assertIn("## Projection to 2027-01-31", fh.read())
+
+
+
+class ParkedAndStaticTests(unittest.TestCase):
+    def setUp(self):
+        self.ws = H.copy_demo(self)
+
+    def build(self):
+        with mock.patch("sys.stdout"):
+            self.assertEqual(B.main(["--workspace", self.ws]), 0)
+        return page_data(self.ws)
+
+    def payload(self):
+        return H.load(os.path.join(self.ws, "report", "for-agents", "dashboard.json"))
+
+    def set_status(self, aid, status):
+        plan = H.load(os.path.join(self.ws, "campaign", "plan.json"))
+        next(a for a in plan["actions"] if a["id"] == aid)["status"] = status
+        H.save(os.path.join(self.ws, "campaign", "plan.json"), plan)
+
+    def test_parked_action_is_off_the_projection_and_the_next_level(self):
+        self.set_status("A11", "dropped")
+        self.build()
+        dropped = self.payload()
+        self.set_status("A11", "later")
+        page, d = self.build()
+        parked = self.payload()
+        a11 = next(a for a in d["actions"] if a["id"] == "A11")
+        self.assertEqual((a11["status"], a11["group"]), ("later", "later"))
+        self.assertEqual(parked["projection"], dropped["projection"])          # no effect until switched on
+        self.assertEqual(parked["levels"]["best_role"], dropped["levels"]["best_role"])
+        self.assertNotIn("A11", [q["id"] for q in parked["levels"]["quests"]])
+        self.assertNotIn("A11", [a["id"] for a in parked["actions_active"]])
+        self.assertEqual(sorted(a["id"] for a in parked["actions_later"]), ["A11", "A12"])   # the demo parks A12 already
+        with open(os.path.join(self.ws, "report", "for-agents", "SUMMARY.md"), encoding="utf-8") as fh:
+            self.assertIn("## Parked for later", fh.read())
+        script = page.split('<script type="application/json"')[1]
+        self.assertIn('const switchable = a => live(a) || a.status === "later";', script)
+        self.assertIn("const enabled = new Set(D.actions.filter(live)", script)   # parked starts switched off
+        self.assertIn("if (!switchable(a)) return;", script)                     # but counts once switched on
+
+    def test_static_summary_reads_without_javascript(self):
+        page, d = self.build()
+        body = page.split('<script type="application/json"')[0]
+        section = re.search(r'<section class="card static-sum" id="staticSummary"[^>]*>(.*?)</section>', body, re.S).group(1)
+        text = html.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", section)))
+        run = H.load(os.path.join(self.ws, "eval", "runs", "2026-11-01.json"))
+        best = run["roles"][0]
+        self.assertIn("Your numbers on 1 Nov 2026", text)
+        self.assertIn("%d / 100 fit" % int(best["fit"] + 0.5), text)
+        self.assertIn("Interview chance %s, offer chance %s" % (best["interview_band"], best["offer_band"]), text)
+        self.assertIn("Level 3, Moderate", text)
+        for org, b in run["per_org"].items():
+            title = next(r["title"] for r in d["roles"] if r["id"] == b["role_id"])
+            self.assertIn("%s %s %d %s %s" % (d["orgNames"][org], title, int(b["fit"] + 0.5), b["interview_band"],
+                                              b["offer_band"]), text)
+        plan = H.load(os.path.join(self.ws, "campaign", "plan.json"))
+        top3 = sorted([a for a in plan["actions"] if a["status"] in ("todo", "doing")],
+                      key=lambda a: (-B.priority(a), B.STATUS_ORDER[a["status"]], a["id"]))[:3]
+        for a in top3:
+            self.assertIn(B.clean(a["title"]), text)
+        self.assertIn('<th scope="col">Organisation</th>', section)
+        self.assertIn('$("#staticSummary").hidden = true;', page)                 # hidden once the live page runs
+        self.assertNotIn("__STATIC__", page)
+        self.assertNotIn("Jordan", section)
+        self.assertNotRegex(text, "[\u2013\u2014]| - ")
+
+    def test_extension_fields_pass_through(self):
+        for rel, fn in (("profile/evidence.json", lambda d: d["items"][0].update(x_original_id="G01")),
+                        ("eval/judgements.json", lambda d: next(iter(d["roles"].values())).update(x_old="kept")),
+                        ("campaign/plan.json", lambda d: d["actions"][1].update(x_old_rank=2)),
+                        ("config.json", lambda d: d.update(x_note="mine"))):
+            doc = H.load(os.path.join(self.ws, rel))
+            fn(doc)
+            H.save(os.path.join(self.ws, rel), doc)
+        import score as S
+        with mock.patch("sys.stdout"):
+            self.assertEqual(S.main(["--workspace", self.ws, "--date", "2026-11-01"]), 0)
+        self.build()
+        import validate as V
+        self.assertEqual(V.validate_workspace(self.ws)[0], [])
 
 
 if __name__ == "__main__":

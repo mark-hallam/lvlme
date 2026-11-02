@@ -23,6 +23,7 @@ can support (see `RUBRIC.md`).
 |---|---|---|
 | `verified` | Primary source checked: a repository, a certificate address, a live product, an email from the issuer. | 5 |
 | `corroborated` | Two independent sources agree, for example LinkedIn plus a referee or a press article. | 4 |
+| `partially_verified` | Some of the facts in the claim were checked against a source, some were not. Say which in `notes`. | The higher of the kind's self-reported cap and 2, never above 4 (see `RUBRIC.md`). Record eligibility and preference facts as `self_reported` instead. |
 | `self_reported` | The person's own résumé, LinkedIn or interview answers. | 3 for job history and education; 5 for eligibility and preferences; 1 for specific achievement claims and everything else. |
 | `unverified` | A claim with no source. | 0 |
 | `contradicted` | Evidence says otherwise. | 0, and flagged in the claims audit. |
@@ -30,6 +31,12 @@ can support (see `RUBRIC.md`).
 Move an item up the ladder only when you have actually checked the new
 source. An agent's say-so (including a note in `campaign/inbox.md`) is not a
 source.
+
+Use `partially_verified` when you checked part of a claim and the rest is
+still the person's word: for example the company register confirms that the
+business exists and who its director is, but nothing confirms its revenue.
+Better still, split the claim into two items, one `verified` and one
+`self_reported`, when the two parts support different scores.
 
 ## The source catalogue
 
@@ -104,7 +111,7 @@ One fact per item in `profile/evidence.json` under `items`:
 
 | Field | What to put |
 |---|---|
-| `id` | `E01`, `E02` and so on. Never reuse or renumber an id. |
+| `id` | `E01`, `E02` and so on. Never reuse or renumber an id. An id is 1 to 3 capital letters and then digits, so items imported from a source with its own numbering can keep it (for example `G01` for email findings). Avoid `D`, `A` and `Q`, which Climb uses for factors, actions and questions. |
 | `claim` | The fact in one plain sentence. |
 | `kind` | One of `job_history`, `education`, `credential`, `artefact`, `achievement`, `network`, `public_signal`, `eligibility`, `preference`, `other`. |
 | `level` | One of the five ladder levels. |
@@ -112,6 +119,7 @@ One fact per item in `profile/evidence.json` under `items`:
 | `orgs` | Optional: the target organisation ids it relates to. |
 | `sources` | Each with a `type` (for example `resume`, `github`, `email`, `interview`), a `ref` (an address, a workspace file path, or a pointer such as `intake/answers.md#work-rights`) and a `checked_on` date. |
 | `added_on`, `notes` | Optional. |
+| `x_...` | Optional extension fields: any key starting `x_` (for example `x_original_category`) holds data the engine never reads, such as a field from an older system. Allowed on evidence items, their sources and open questions, and on the main object of each judgement, plan, run and config file. |
 
 Rules:
 

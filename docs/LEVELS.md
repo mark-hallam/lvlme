@@ -51,7 +51,8 @@ picked in the selector):
 
 1. **Which actions can help.** Only open actions (to do, or in progress) that are switched
    on in the What if rail, and only those that raise at least one of this role's factors if
-   they work. Done actions are already in today's score; dropped ones never count.
+   they work. Done actions are already in today's score; dropped ones never count. Parked
+   actions (status `later`) start switched off and count only once switched on in the rail.
 2. **The smallest set.** Every combination is tried, smallest first, using the same
    projection as the journey chart: actions apply in target date order, each effect is
    weighted by the action's chance of working, no factor rises more than the plan's
@@ -150,8 +151,10 @@ the rest of the file.
 3. The page says plainly when the next level is not reachable, and shows what is missing.
 4. Level downs and days without progress are shown, not hidden.
 5. A tick on the page is never treated as done. Only the plan file, with evidence, is.
-6. The level view and level card are rendered into the HTML file, so they read the same
-   with JavaScript off.
+6. The level view, the level card and a static summary of the key numbers (best chance,
+   level, outlook, today's actions, best role at each organisation) are rendered into the
+   HTML file, so they read the same with JavaScript off. The page script hides the static
+   summary once it has drawn the live page.
 
 ## Known limits
 
@@ -161,5 +164,5 @@ the rest of the file.
 - An evidence item's check date is the latest `checked_on` among its sources, so
   re-checking an old source counts as newly checked evidence on that day.
 - The streak counts progress on any role; the level history follows the selected one.
-- Only the level card and the Level up view have a no-JavaScript render. The rest of the
-  dashboard still needs JavaScript.
+- Without JavaScript the page shows the static summary, the level card and the Level up
+  view. The journey chart, the What if switches and the other views still need JavaScript.

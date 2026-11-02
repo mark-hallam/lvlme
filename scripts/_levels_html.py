@@ -12,7 +12,7 @@ import html
 
 import _levels as L
 
-STATUS = {"doing": "In progress", "done": "Done", "dropped": "Dropped"}
+STATUS = {"doing": "In progress", "later": "Parked for later", "done": "Done", "dropped": "Dropped"}
 
 
 def esc(s):

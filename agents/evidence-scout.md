@@ -31,6 +31,9 @@ Tag every finding:
 - `UNVERIFIED`: anything else (a search snippet, a second-hand report, the
   person's own CV or profile, a page that only implies it).
 
+If the source states only part of the claim, tag it `UNVERIFIED`, suggest
+`partially_verified`, and say in the claim line which part the source states.
+
 Return exactly this, one block per finding:
 
 ```
@@ -38,7 +41,7 @@ FINDING <n>
 claim: <one plain sentence, no adjectives>
 source: <link, file path and line, or email date and subject>
 tag: VERIFIED | UNVERIFIED
-suggested_level: verified | corroborated | self_reported | unverified | contradicted
+suggested_level: verified | corroborated | partially_verified | self_reported | unverified | contradicted
 feeds: <dimensions, for example D2, D5>
 updates: <existing evidence id, or new>
 load_bearing: yes | no  (yes if it could raise a score, clear or set an eligibility blocker, or appear in a draft)

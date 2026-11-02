@@ -41,6 +41,15 @@ class CheckTests(unittest.TestCase):
         self.assertIn("above the maximum", "\n".join(V.check({"a": 6}, self.SCHEMA)))
         self.assertIn("$.d[0]: missing required field 'id'", "\n".join(V.check({"a": 1, "d": [{}]}, self.SCHEMA)))
 
+    def test_pattern_properties(self):
+        schema = {"type": "object", "additionalProperties": False, "properties": {"a": {"type": "integer"}},
+                  "patternProperties": {"^x_": {}, "^n_": {"type": "number"}}}
+        self.assertEqual(V.check({"a": 1, "x_anything": {"deep": [1, None]}, "n_ok": 2.5}, schema), [])
+        text = "\n".join(V.check({"a": 1, "y_no": 1, "n_bad": "two", "X_case": 1}, schema))
+        self.assertIn("unexpected field 'y_no'", text)
+        self.assertIn("$.n_bad: expected number", text)
+        self.assertIn("unexpected field 'X_case'", text)      # the prefix is lower case x_
+
     def test_all_schemas_load_and_templates_validate(self):
         names = sorted(os.listdir(os.path.join(H.ENGINE, "schemas")))
         self.assertGreaterEqual(len(names), 10)
@@ -55,7 +64,12 @@ class WorkspaceTests(unittest.TestCase):
         errors, _, checked = V.validate_workspace(H.DEMO)
         self.assertEqual(errors, [])
         self.assertIn("eval/swot.json", checked)
+        self.assertIn("eval/reviews/2026-10-26.json", checked)     # the dispute log, middle of three
         self.assertIsNone(C.location_problem(H.DEMO))
+        levels = {e["level"] for e in H.load(os.path.join(H.DEMO, "profile", "evidence.json"))["items"]}
+        self.assertIn("partially_verified", levels)
+        statuses = {a["status"] for a in H.load(os.path.join(H.DEMO, "campaign", "plan.json"))["actions"]}
+        self.assertIn("later", statuses)
 
     def test_cross_file_errors(self):
         ws = H.copy_demo(self)
@@ -71,10 +85,68 @@ class WorkspaceTests(unittest.TestCase):
         errors, _, _ = V.validate_workspace(ws)
         text = "\n".join(errors)
         self.assertIn("A01 is done but has no done_evidence", text)
-        self.assertIn("more than the cap of 2", text)
+        self.assertNotIn("more than the cap", text)                     # over the cap is a warning (method/CAMPAIGN.md)
         self.assertIn("names strategy SO9", text)
         self.assertIn("strategy SO1 is SO", text)
         self.assertIn("cites evidence E99", text)
+
+    def test_active_cap_warns_and_later_is_off_the_cap(self):
+        ws = H.copy_demo(self)
+        plan = H.load(os.path.join(ws, "campaign", "plan.json"))
+        active = [a for a in plan["actions"] if a["status"] in ("todo", "doing")]
+        plan["max_active"] = len(active) - 1
+        H.save(os.path.join(ws, "campaign", "plan.json"), plan)
+        errors, warnings, _ = V.validate_workspace(ws)
+        self.assertEqual(errors, [])
+        self.assertTrue(any("more than the cap of %d" % (len(active) - 1) in w and "later" in w for w in warnings))
+        next(a for a in plan["actions"] if a["status"] == "todo")["status"] = "later"   # park one
+        H.save(os.path.join(ws, "campaign", "plan.json"), plan)
+        errors, warnings, _ = V.validate_workspace(ws)
+        self.assertEqual(errors, [])
+        self.assertFalse(any("more than the cap" in w for w in warnings))
+        plan["actions"][1]["status"] = "parked"
+        H.save(os.path.join(ws, "campaign", "plan.json"), plan)
+        self.assertTrue(any("is not one of" in x for x in V.validate_workspace(ws)[0]))
+
+    def test_extension_fields_are_kept_and_validated(self):
+        ws = H.copy_demo(self)
+        edits = {
+            "config.json": lambda d: (d.update(x_owner_note="mine"), d["candidate"].update(x_pronounce="AL-ex"),
+                                      d["targets"][0].update(x_crm_id=42), d["families"][0].update(x_old_regex="re:x")),
+            "profile/evidence.json": lambda d: (d.update(x_migrated_from="old tool"),
+                                                d["items"][0].update(x_original_id="G01", x_detail={"a": [1]}),
+                                                d["items"][0]["sources"][0].update(x_page=3),
+                                                d["open_questions"][0].update(x_label="Notice")),
+            "eval/judgements.json": lambda d: (d.update(x_batch="b1"), next(iter(d["roles"].values())).update(x_itar=False),
+                                               next(iter(d["roles"].values()))["D1"].update(x_reason="kept")),
+            "eval/profile-dimensions.json": lambda d: (d.update(x_file_note="n"), d["D3"]["acme"].update(x_why="w"),
+                                                       d["D6_rules"].setdefault("blocked", {}).update(x_score=0)),
+            "campaign/plan.json": lambda d: (d.update(x_mandate="m", x_story="s"), d["actions"][0].update(x_old_rank=3),
+                                             d["north_star"][0].update(x_label="l")),
+        }
+        for rel, fn in edits.items():
+            doc = H.load(os.path.join(ws, rel))
+            fn(doc)
+            H.save(os.path.join(ws, rel), doc)
+        run_rel = os.path.join("eval", "runs", "2026-11-01.json")
+        run = H.load(os.path.join(ws, run_rel))
+        run["x_legacy_per_lab"] = {"acme": None}
+        run["roles"][0]["x_note"] = "from the old run"
+        H.save(os.path.join(ws, run_rel), run)
+        errors, _, _ = V.validate_workspace(ws)
+        self.assertEqual(errors, [])
+        # an unknown field without the prefix is still an error, and so is x_ where the schema does not allow it
+        doc = H.load(os.path.join(ws, "campaign", "plan.json"))
+        doc["actions"][0]["mandate"] = "m"
+        doc["actions"][0]["effects"] = [{"dimension": "D3", "delta": 1, "x_ok": True}]
+        H.save(os.path.join(ws, "campaign", "plan.json"), doc)
+        roles = H.load(os.path.join(ws, "market", "roles", "latest.json"))
+        roles["x_not_here"] = 1
+        H.save(os.path.join(ws, "market", "roles", "latest.json"), roles)
+        text = "\n".join(V.validate_workspace(ws)[0])
+        self.assertIn("unexpected field 'mandate'", text)
+        self.assertNotIn("x_ok", text)
+        self.assertIn("unexpected field 'x_not_here'", text)
 
     def test_main_exit_codes(self):
         with mock.patch("sys.stdout"):

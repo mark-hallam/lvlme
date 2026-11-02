@@ -419,6 +419,39 @@
       "priority": 0.5
     }
   ],
+  "actions_later": [
+    {
+      "id": "A12",
+      "title": "Take Acme AI's evaluation practitioner course once the route-eval demo ships",
+      "why": "Parked until A10 lands: the course is worth more once there is a demo to point to, and the active list is full.",
+      "status": "later",
+      "owner": "you",
+      "dimension": "D4",
+      "orgs": [
+        "acme"
+      ],
+      "effort_hours": 20,
+      "expected_points": 2,
+      "roles_affected": 4,
+      "chance": 0.6,
+      "target_date": "2027-01-15",
+      "effects": [
+        {
+          "dimension": "D4",
+          "delta": 1,
+          "scope": {
+            "orgs": [
+              "acme"
+            ]
+          }
+        }
+      ],
+      "done_when": "Course certificate address",
+      "added_on": "2026-11-01",
+      "x_parked_until": "A10 done",
+      "priority": 0.24
+    }
+  ],
   "levels": {
     "how": "Levels are the rubric's fit bands (1 Very low, 2 Low from 40, 3 Moderate from 55, 4 Good from 70, 5 Strong from 85). The smallest set is the fewest open actions whose expected effects (each weighted by its chance, within the projection caps) reach the next level; the date assumes they land on their target dates. Quest points are fit points on the best role, on top of the other open actions. Nothing here is made up: it all comes from the runs and the plan.",
     "best_role": {
@@ -1055,7 +1088,8 @@
     "self_reported": 6,
     "verified": 9,
     "unverified": 1,
-    "contradicted": 1
+    "contradicted": 1,
+    "partially_verified": 1
   },
   "claims_audit_counts": {
     "supported": 1,

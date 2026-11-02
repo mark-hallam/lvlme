@@ -132,6 +132,7 @@ best evidence it cites supports.
 |---|---|---|
 | `verified` | Primary source checked (a repository, a certificate address, a live product, an email from the issuer). | 5 |
 | `corroborated` | Two independent sources agree (for example LinkedIn plus a referee or a press article). | 4 |
+| `partially_verified` | Some of the facts in the claim were checked against a source, some were not (for example the company register confirms the business exists, but not the revenue). | The higher of its kind's self-reported cap and 2, never above 4. See below. |
 | `self_reported` | The person's own résumé, LinkedIn or answers. | Depends on the kind, see below. |
 | `unverified` | A claim with no source. | 0 |
 | `contradicted` | Evidence says otherwise. Also flagged in the claims audit. | 0 |
@@ -146,6 +147,28 @@ For `self_reported` evidence, the cap depends on the evidence kind, set in
 | `eligibility` | 5 | Work rights and where the person lives are taken on the applicant's word at screening too. |
 | `preference` | 5 | Willingness to move or travel is only knowable from the person. |
 | everything else | 1 | Specific achievements, credentials, artefacts and network claims need a second source. |
+
+For `partially_verified` evidence the rule is: the checked part counts, the
+unchecked part does not.
+
+- It supports the higher of its kind's self-reported cap and
+  `scoring.partially_verified_cap` (default 2): a partly checked achievement
+  supports 2 where a self-reported one supports 1, and a partly checked job
+  history supports 3, as a self-reported one does.
+- It never supports more than 4, what corroborated evidence supports. A claim
+  that is only partly checked can never outrank one that two independent
+  sources agree on.
+- For eligibility and preference, which the person's word already supports at
+  5, that ceiling is lower than self-reported, so record those facts as
+  `self_reported` (or `verified` once the rest is checked).
+  `scripts/validate.py` warns about any partially verified item it would
+  under-count.
+- Say in the item's `notes` which part was checked and which was not. Checking
+  the rest moves the item up the ladder.
+
+Evidence ids are 1 to 3 capital letters, then digits. New items use `E`
+(`E01`, `E02`); another prefix keeps a source's own numbering, for example
+`G01` for findings from an email search. Never renumber an id.
 
 Unknown evidence ids are reported as warnings and ignored.
 
@@ -239,6 +262,14 @@ the size of each gap, so effort goes where it moves the number most.
    score. A D1 target is capped at 1 on roles with a lacking hard requirement,
    and a D6 gap skips roles with an eligibility blocker (raising D6 there
    means clearing the blocker, which is its own gap).
+   By default there is one pool, the top roles overall, so a gap at an
+   organisation with no role in that pool scores 0. With
+   `scoring.gap_pool` set to `per_org`, each target organisation gets its own
+   pool, its top `scoring.top_n_per_org_for_gaps` roles (default
+   `top_n_for_gaps`), and each gap adds up over the pools it applies to. The
+   run file then also shows each organisation's share (`by_org`). Use it when
+   the targets differ a lot in how well they fit, so an organisation-specific
+   warm introduction is not hidden behind the best organisation's roles.
 4. **Outlook**: a plain-English estimate of the chance of reaching the goal
    within `goal.horizon_months` if the campaign is followed, with the main
    reasons. The agent writes it in `eval/outlook.json`. Without it the report

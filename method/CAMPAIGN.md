@@ -15,7 +15,9 @@ Everything lives in `campaign/plan.json` (see `schemas/plan.schema.json`).
    candidates the order is: eligibility, a warm path, visible proof of work,
    then a tailored application.
 3. **At most 8 active actions** (`max_active`, todo plus doing).
-   `scripts/validate.py` warns above the cap. A short list gets done.
+   `scripts/validate.py` warns above the cap. A short list gets done. Park
+   the rest with status `later` instead of raising the cap: they stay in the
+   plan with their effects and dates, ready to switch on.
 4. **Done needs evidence.** An action can be marked `done` only with
    `done_evidence`: a link, a file path or an email reference.
    `scripts/validate.py` reports an error otherwise.
@@ -28,7 +30,7 @@ Everything lives in `campaign/plan.json` (see `schemas/plan.schema.json`).
 |---|---|
 | `id` | `A01`, `A02` and so on. Never reuse an id. |
 | `title`, `why` | What to do, and why it matters, in plain words. |
-| `status` | `todo`, `doing`, `done` or `dropped`. |
+| `status` | `todo`, `doing`, `later`, `done` or `dropped`. `todo` and `doing` are active. `later` is parked (see below). |
 | `owner` | `you`, `agent` or `both`. |
 | `dimension` | The dimension it should raise. |
 | `orgs`, `gap_id`, `strategy_ids`, `metric` | Optional links: the organisations, the gap in the leaderboard, the TOWS strategies, and the north-star metric id it should move. |
@@ -41,6 +43,23 @@ Everything lives in `campaign/plan.json` (see `schemas/plan.schema.json`).
 | `target_date` | When it should land. The dashboard's projection applies it on this date. |
 | `effects` | What it changes if it works (see "The projection" below). |
 | `started_on`, `finished_on`, `draft`, `notes` | Optional. |
+
+## Parked actions (`later`)
+
+An action with status `later` is a real plan action that is not being worked
+on yet, for example the next phase of a roadmap. It keeps its id, effects,
+target date and chance, so nothing has to be written again when it starts.
+
+- It does **not** count towards `max_active`.
+- It is left out of the projection, the next-level sets, the quests and
+  "today's actions", and starts switched off in the dashboard's What if rail.
+  Switch it on there to see what it would add; it then counts like any open
+  action, on that page only. The agent files (`report/for-agents/`) list it
+  under "Parked for later".
+- To start it, set `status` to `todo` (or `doing` with `started_on`), keeping
+  the active list at or under the cap.
+- Prefer `later` to the plain-text `backlog`: the backlog is for ideas that
+  are not yet actions (no effects, no done-when).
 
 ## Prioritisation
 
@@ -87,7 +106,8 @@ best case and do nothing. They come from each open action's `effects`:
   and `orgs`, and says so.
 - Actions apply in `target_date` order. Open actions with no date count at the
   end date. Done and dropped actions are left out: a done action is already in
-  today's scores.
+  today's scores. Parked (`later`) actions are left out too, unless switched
+  on in the What if rail.
 - **Expected** moves each factor by the action's `chance` times the rise.
   **Best case** assumes every action lands. **Do nothing** stays flat.
 - **Caps keep it honest.** `projection_caps` sets the most the plan can add to
@@ -247,6 +267,8 @@ the person's own time. Adapt the wording; keep the done-when.
 1. Mark actions done only with evidence.
 2. Decide keep, rework or drop for flagged actions, and log why.
 3. Add actions from the top of the gap leaderboard and the new TOWS
-   strategies, highest priority first, until the active list is full.
+   strategies, highest priority first, until the active list is full. Park
+   anything beyond the cap as `later`; when an active action is done or
+   dropped, start the highest priority parked one.
 4. Update the north-star metric values, with evidence ids.
 5. Write any outreach as drafts in `campaign/drafts/`.

@@ -5,11 +5,12 @@
   "type": "object",
   "required": ["schema_version", "north_star", "actions"],
   "additionalProperties": false,
+  "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
   "properties": {
     "schema_version": {"const": 1},
     "updated_on": {"$ref": "#/definitions/date"},
     "principle": {"type": "string"},
-    "max_active": {"type": "integer", "minimum": 1, "maximum": 20},
+    "max_active": {"type": "integer", "minimum": 1, "maximum": 20, "description": "The most active actions (todo plus doing). validate.py warns above it; park the rest as later. Default 8."},
     "baseline_date": {"$ref": "#/definitions/date", "description": "Day 1 of the journey on the dashboard. Default: the first run date."},
     "end_date": {"$ref": "#/definitions/date", "description": "Where the dashboard's projection ends. Default: 90 days after the latest run, or 14 days after the last open action's target date if later."},
     "projection_caps": {
@@ -38,28 +39,32 @@
     "experiments_log": {"type": "array", "items": {"$ref": "#/definitions/experiment"}}
   },
   "definitions": {
+    "extension": {"description": "Extension field: any key starting x_ holds data the engine never reads (for example a field from an older system). Kept as is."},
     "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
     "metric": {
       "type": "object",
       "required": ["id", "name", "current", "target"],
       "additionalProperties": false,
+      "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
       "properties": {
         "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
         "name": {"type": "string", "minLength": 1},
         "current": {"type": "integer", "minimum": 0},
         "target": {"type": "integer", "minimum": 0},
-        "evidence": {"type": "array", "items": {"type": "string", "pattern": "^E[0-9]{2,}$"}}
+        "evidence": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z]{1,3}[0-9]+$"}}
       }
     },
     "action": {
       "type": "object",
       "required": ["id", "title", "status", "dimension", "effort_hours", "expected_points", "roles_affected", "chance", "done_when"],
       "additionalProperties": false,
+      "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
       "properties": {
         "id": {"type": "string", "pattern": "^A[0-9]{2,}$"},
         "title": {"type": "string", "minLength": 1},
         "why": {"type": "string"},
-        "status": {"enum": ["todo", "doing", "done", "dropped"]},
+        "status": {"enum": ["todo", "doing", "later", "done", "dropped"],
+                   "description": "todo and doing are active: they count against max_active and are in the projection. later is parked: off the cap, out of the projection, the next-level sets and the quests unless switched on in the dashboard's what-if rail. done needs done_evidence."},
         "owner": {"enum": ["you", "agent", "both"]},
         "dimension": {"enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]},
         "orgs": {"anyOf": [{"const": "all"}, {"type": "array", "items": {"type": "string"}}]},
@@ -87,6 +92,7 @@
       "description": "Raise one factor by delta, or to at least set_at_least, for the roles in scope. A missing or empty list in scope means all.",
       "required": ["dimension"],
       "additionalProperties": false,
+      "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
       "properties": {
         "dimension": {"enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]},
         "delta": {"type": "number", "exclusiveMinimum": 0, "maximum": 5},
@@ -108,6 +114,7 @@
       "type": "object",
       "required": ["date", "action_id", "result", "decision"],
       "additionalProperties": false,
+      "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
       "properties": {
         "date": {"$ref": "#/definitions/date"},
         "action_id": {"type": "string"},

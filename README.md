@@ -118,12 +118,15 @@ Most career advice flatters. Climb is built to do the opposite.
   an email, or your own answer to an interview question. A claim with no
   source counts as absent and becomes a "verify to unlock" question.
 - **A verification ladder.** Evidence is graded `verified`, `corroborated`,
-  `self_reported`, `unverified` or `contradicted`. A score can never be higher
-  than its best evidence supports. An achievement only you have claimed
-  supports at most 1 point out of 5.
+  `partially_verified`, `self_reported`, `unverified` or `contradicted`. A
+  score can never be higher than its best evidence supports. An achievement
+  only you have claimed supports at most 1 point out of 5; one that is only
+  partly checked never supports more than corroborated evidence would.
 - **A separate, sceptical reviewer.** A fresh agent, which never sees the
-  campaign's scores or reasoning, scores every point above 2 for itself. The
-  lower score stands. Until the review is done, the score counts as 2.
+  campaign's scores or reasoning, scores every point above 2 for itself.
+  Where it disagrees, a second fresh reviewer scores it too and the middle of
+  the three stands, with every dispute logged. Until the review is done, the
+  score counts as 2.
 - **Helpers are checked, not trusted.** Helper agents return every finding
   with its source, tagged verified or unverified, and the lead agent opens the
   source of anything that matters before it counts.

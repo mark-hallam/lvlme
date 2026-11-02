@@ -174,7 +174,7 @@ Follow `method/REVIEW.md`, run blind as `docs/ORCHESTRATION.md` describes:
 each fresh reviewer gets the rubric, the evidence, the postings and the list
 of items, and scores them itself. Where scores differ, a second fresh
 reviewer breaks the tie and the middle of the three stands (no built-in
-downward bias); log disputes in `eval/reviews/<date>.json`. Record `reviewed_on` and `reviewer_note` on every item reviewed. A
+downward bias); log disputes in `eval/reviews/<date>.json` (`schemas/reviews.schema.json`). Record `reviewed_on` and `reviewer_note` on every item reviewed. A
 score above 2 counts as 2 until it is reviewed, and you do not run stage 6
 until every score above 2 has been challenged.
 
@@ -195,7 +195,7 @@ source; every strategy names the plan actions it creates.
 Update `campaign/plan.json` following `method/CAMPAIGN.md`: an action is done
 only with evidence; rework or drop actions the dashboard flags as showing no
 movement for 3 runs and log why; add actions from the top gaps; keep at most 8
-active; update the north-star metrics. Draft profile fixes as
+active and park the rest with status `later`; update the north-star metrics. Draft profile fixes as
 `method/PROFILE_FIXES.md` says and outreach in `campaign/drafts/`.
 
 ### 9. Report

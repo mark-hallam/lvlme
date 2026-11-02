@@ -98,6 +98,7 @@ repeatable and auditable; only changed or new items are re-judged each run.
 |---|---|---|
 | `verified` | primary source checked (repo, certificate URL, live product, email from the issuer) | 5 |
 | `corroborated` | two independent sources agree (e.g. LinkedIn + a referee or press) | 4 |
+| `partially_verified` | some facts in the claim checked, some not | the higher of the kind's self-reported cap and 2, never above 4 |
 | `self_reported` | the user's own résumé / LinkedIn / answers | 3 for job history (screening accepts it); 1 for specific achievement claims |
 | `unverified` | a claim with no source | 0 |
 | `contradicted` | evidence says otherwise | 0, and flagged in the claims audit |
@@ -188,7 +189,8 @@ the scorer's reasoning, and must justify every change).
   event; D2: open-source a project, write a verifiable case study; D6: confirm
   degree / visa route; D7: tailored résumé per role).
 - **Priority** = expected fit points gained × roles affected × chance it works
-  ÷ effort hours. Cap 8 active actions.
+  ÷ effort hours. Cap 8 active actions (the validator warns above it); park
+  the rest with status `later`, outside the projection until switched on.
 - **Done needs evidence.** An action is done only with a link, file or email.
 - **Experiments.** Every action is a bet. If it shows no score or metric
   movement for 3 runs, rework or drop it, and log why.
@@ -200,7 +202,12 @@ the scorer's reasoning, and must justify every change).
 ## 10. Outputs
 
 - `report/index.html`: Overview, Trends, Roles, SWOT, Plan, Evidence. Self-contained,
-  no external requests, light and dark mode, readable on a phone.
+  no external requests, light and dark mode, readable on a phone. The key numbers,
+  the level card and the Level up view are also in the HTML itself, so they read
+  without JavaScript.
+- `eval/reviews/<date>.json`: the reviewer disputes and the score that stood.
+- Every main workspace file accepts extension keys starting `x_` for data the
+  engine never reads.
 - `report/for-agents/SUMMARY.md` and `dashboard.json`: for the user's other
   agents. `campaign/inbox.md`: the only file agents may write to.
 
