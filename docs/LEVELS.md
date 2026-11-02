@@ -152,7 +152,7 @@ the rest of the file.
 4. Level downs and days without progress are shown, not hidden.
 5. A tick on the page is never treated as done. Only the plan file, with evidence, is.
 6. The level view, the level card and a static summary of the key numbers (best chance,
-   level, outlook, today's actions, best role at each organisation) are rendered into the
+   level, outlook, top actions by priority, best role at each organisation) are rendered into the
    HTML file, so they read the same with JavaScript off. The page script hides the static
    summary once it has drawn the live page.
 

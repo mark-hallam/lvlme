@@ -3,8 +3,11 @@
 build_dashboard.py puts it under the journey card. It shows what the latest run
 and the plan say, with every open action at its plan setting (the same default
 the live page and the agent briefing use): the best chance today with its bands,
-the level and the points to the next one, the outlook, today's top actions (the
-plan's highest priority open actions) and the best role at each organisation.
+the level and the points to the next one, the outlook, the top actions (the
+plan's highest priority active actions, by expected points x roles affected x
+chance / effort hours, as method/CAMPAIGN.md ranks them; the live page's "Do
+next" card orders by what each adds to the best role instead) and the best role
+at each organisation.
 
 The page script hides it once it has drawn the live page, which shows the same
 numbers and lets the what-if switches change them, so with JavaScript on nobody
@@ -84,5 +87,5 @@ def render(page, per_org, action_order):
     r = page["roles"][0]
     nl = L.next_level(r, page["actions"], page["caps"], page["weights"], page["meta"]["run_date"])
     return (head + note + _key_numbers(page, nl)
-            + '<h3>Today\'s actions</h3>' + _actions(page, action_order)
+            + '<h3>Top actions, highest priority first</h3>' + _actions(page, action_order)
             + '<h3 id="staticOrgsH">Best role at each organisation</h3>' + _per_org(page, per_org))
