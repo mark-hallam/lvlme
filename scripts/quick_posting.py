@@ -282,6 +282,8 @@ def http_get(url, accept):
 def fetch(url, saved=None):
     """Return (role, source) for a posting link. saved: a saved API response or page, read instead of the network."""
     link = parse_link(url)
+    if saved and not os.path.isfile(saved):
+        raise PostingError("No saved response at %s. Check the path, then run this again." % C.show_path(saved))
     if link["ats"] != "page":
         where = api_url(link)
         try:
@@ -298,7 +300,8 @@ def fetch(url, saved=None):
                                    "Check the link, or paste the posting text." % (link["ats"].capitalize(), link["board"]))
         except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError) as exc:
             if saved:
-                raise PostingError("Could not read the saved response %s: %s" % (saved, exc))
+                raise PostingError("Could not read the saved response %s: %s" % (
+                    C.show_path(saved), getattr(exc, "detail", exc)))
         # the API was unreachable or changed shape: try the page itself, once
     if saved:
         with open(saved, encoding="utf-8") as fh:
@@ -330,7 +333,7 @@ def main(argv=None):
     args = ap.parse_args(argv)
     try:
         if args.text:
-            text = sys.stdin.read() if args.text == "-" else open(args.text, encoding="utf-8").read()
+            text = C.read_input(args.text, "posting text file")
             role, source = from_text(text, args.title, args.org, args.url)
         elif args.url:
             role, source = fetch(args.url, args.saved)
@@ -344,4 +347,4 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(C.run_main(main, workspace_check=False))

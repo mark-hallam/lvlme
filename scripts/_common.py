@@ -1,13 +1,15 @@
 """Shared helpers for the LVLme scripts. Standard library only.
 
 Covers: finding the workspace, the workspace location guard, JSON input and
-output, keyword matching, dates, and constants shared by several scripts.
+output, one-line error messages, keyword matching, dates, and constants shared
+by several scripts.
 """
 import datetime as dt
 import json
 import os
 import re
 import sys
+import traceback
 
 ENGINE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCHEMA_DIR = os.path.join(ENGINE_ROOT, "schemas")
@@ -54,19 +56,73 @@ NO_TARGETS = "No target organisations yet. Say to your agent: run the LVLme inte
 NO_FAMILIES = "No role families yet. Say to your agent: run the LVLme interview."
 
 
+# Set LVLME_DEBUG=1 to see the full Python details of a failure instead of the one plain line.
+DEBUG_ENV = "LVLME_DEBUG"
+
+
 class WorkspaceError(Exception):
     """Raised when a workspace cannot be found or is in an unsafe place."""
+
+
+class FileProblem(ValueError):
+    """A file cannot be used: not found, unreadable, or not valid JSON. Its text is one plain line.
+
+    A ValueError, so code that already caught bad JSON as ValueError keeps working.
+
+    >>> str(FileProblem("/x/config.json", "not valid JSON (line 1, column 2: Expecting value)"))
+    '/x/config.json: not valid JSON (line 1, column 2: Expecting value). Fix that spot in the file, then run this again.'
+    """
+
+    def __init__(self, path, detail, hint="Fix that spot in the file, then run this again."):
+        self.path, self.detail, self.hint = path, detail, hint
+        super().__init__("%s: %s. %s" % (show_path(path), detail, hint))
+
+
+def show_path(path):
+    """A path for a message, with ~ for the home folder."""
+    path = str(path)
+    home = os.path.expanduser("~").rstrip(os.sep)
+    if home and home != "~" and (path == home or path.startswith(home + os.sep)):
+        return "~" + path[len(home):]
+    return path
 
 
 # ------------------------------------------------------------------ files
 
 
 def load_json(path, default=None):
-    """Read a JSON file; return default if it does not exist."""
+    """Read a JSON file; return default if it does not exist.
+
+    Raises FileProblem (one plain line) if the file cannot be read or is not valid JSON.
+    """
     if not os.path.exists(path):
         return default
-    with open(path, encoding="utf-8") as fh:
-        return json.load(fh)
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+    except json.JSONDecodeError as exc:
+        raise FileProblem(path, "not valid JSON (line %d, column %d: %s)" % (exc.lineno, exc.colno, exc.msg)) from None
+    except UnicodeDecodeError:
+        raise FileProblem(path, "not valid JSON (it is not UTF-8 text)") from None
+    except OSError as exc:
+        raise FileProblem(path, "cannot be read (%s)" % (exc.strerror or exc),
+                          "Check the file is there and you can open it, then run this again.") from None
+
+
+def read_input(path, what="file"):
+    """Text of a file the person named ('-' reads standard input). Raises FileProblem if it cannot be read."""
+    if path == "-":
+        return sys.stdin.read()
+    hint = "Check the path, then run this again."
+    if not os.path.exists(path):
+        raise FileProblem(path, "no %s at this path" % what, hint)
+    if os.path.isdir(path):
+        raise FileProblem(path, "this is a folder, not a %s" % what, hint)
+    try:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            return fh.read()
+    except OSError as exc:
+        raise FileProblem(path, "cannot be read (%s)" % (exc.strerror or exc), hint) from None
 
 
 def dump_json(data):
@@ -188,7 +244,10 @@ def location_problem(workspace, config=None):
     or inside any git repository that has a remote configured.
     """
     if config is None:
-        config = load_json(wpath(workspace, "config.json"), {}) or {}
+        try:
+            config = load_json(wpath(workspace, "config.json"), {}) or {}
+        except FileProblem:
+            config = {}  # an unreadable config never earns the demo's exception
     demo = bool(config.get("fictional")) and _is_within(workspace, os.path.join(ENGINE_ROOT, "examples"))
     if demo:
         return None
@@ -213,12 +272,61 @@ def open_workspace(arg, need_config=True):
     cfg_path = wpath(ws, "config.json")
     if need_config and not os.path.exists(cfg_path):
         sys.exit("lvlme: no config.json in %s. Run scripts/init.py first." % ws)
-    config = load_json(cfg_path, {}) or {}
+    try:
+        config = load_json(cfg_path, {}) or {}
+    except FileProblem as exc:
+        sys.exit("lvlme: %s" % exc)
     problem = location_problem(ws, config)
     if problem:
         print("lvlme: refused. " + problem, file=sys.stderr)
         sys.exit(2)
     return ws, config
+
+
+# --------------------------------------------------------------- messages
+
+
+def run_main(main, argv=None, workspace_check=True):
+    """Run a script's main(argv) and return its exit code, with any failure as one plain line on stderr.
+
+    A file problem (not found, unreadable, not valid JSON) says which file and what to do, and
+    returns 1. Anything unexpected says what and where, and what to do next, also on one line.
+    Ctrl-C returns 130 with "lvlme: stopped." Set LVLME_DEBUG=1 to see the full Python traceback.
+    workspace_check: point the person at scripts/validate.py first (scripts that read a workspace).
+
+    >>> run_main(lambda argv: 0)
+    0
+    """
+    if os.environ.get(DEBUG_ENV):
+        return main(argv)
+    try:
+        return main(argv)
+    except KeyboardInterrupt:
+        print("lvlme: stopped.", file=sys.stderr)
+        return 130
+    except FileProblem as exc:
+        print("lvlme: %s" % exc, file=sys.stderr)
+        return 1
+    except Exception as exc:  # noqa: BLE001 (the point is that nothing reaches the person as a traceback)
+        if isinstance(exc, OSError) and exc.filename:
+            print("lvlme: could not open or save %s (%s). Check the file is there and you can open it, "
+                  "then run this again." % (show_path(exc.filename), exc.strerror or exc), file=sys.stderr)
+        else:
+            print("lvlme: " + unexpected_line(exc, workspace_check), file=sys.stderr)
+        return 1
+
+
+def unexpected_line(exc, workspace_check=True):
+    """One line for an error nobody planned for: what it was, where in the engine, what to do next."""
+    scripts = os.path.join(ENGINE_ROOT, "scripts")
+    frames = traceback.extract_tb(exc.__traceback__)
+    frames = [f for f in frames if _is_within(f.filename, scripts) and f.name != "run_main"]
+    where = ", in %s line %d" % (os.path.basename(frames[-1].filename), frames[-1].lineno) if frames else ""
+    text = " ".join(str(exc).split())
+    what = "%s: %s" % (type(exc).__name__, text[:160]) if text else type(exc).__name__
+    then = ("Check the workspace with scripts/validate.py. If it says Valid, rerun with %s=1 and report what "
+            "it shows." if workspace_check else "Rerun with %s=1 and report what it shows.") % DEBUG_ENV
+    return "unexpected error (%s%s). %s" % (what, where, then)
 
 
 # ------------------------------------------------------------------ dates

@@ -119,6 +119,10 @@ first stage not yet done today).
   in `fetch_roles.py` (public job-board APIs, or application programming
   interfaces), `claims_audit.py` (addresses the person passes) and
   `quick_posting.py` (the one posting link the person gives LVLme quick).
+- Every script ends `sys.exit(C.run_main(main))`, so a failure reaches the
+  person as one plain `lvlme:` line, never a traceback (a Python error
+  listing). Read workspace JSON with `C.load_json`, which names the file, line
+  and column of a mistake. `tests/test_cli_errors.py` checks every script.
 - Tests run offline: `python3 -m unittest discover -s tests`.
   `tests/test_packaging.py` checks the plugin manifests, the skill and
   subagent files, and that every engine path the packaging docs name exists.

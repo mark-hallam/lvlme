@@ -413,6 +413,9 @@ def main(argv=None):
     ap.add_argument("--date", help="run date YYYY-MM-DD (default: today in the candidate's time zone)")
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)
+    if C.setup_problem(config):
+        print(C.setup_problem(config), file=sys.stderr)
+        return 1
     run_date = C.check_date(args.date) if args.date else C.today_in(config)
     run = build_run(ws, config, run_date)
     n = run["counts"]
@@ -435,4 +438,4 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(C.run_main(main))

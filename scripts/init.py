@@ -100,4 +100,4 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(C.run_main(main, workspace_check=False))

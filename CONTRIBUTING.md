@@ -15,6 +15,11 @@ run.
 - **Drafts only.** No feature may apply, send, post or change an account.
 - **Deterministic maths.** `score.py` must give the same output for the same
   inputs. Judgement belongs in workspace files, not in code.
+- **One plain line when something goes wrong.** A new script ends with
+  `sys.exit(C.run_main(main))`, reads JSON with `C.load_json` and files the
+  person names with `C.read_input`. Then a missing file, bad JSON or a missing
+  workspace prints one line that says what to do, not a traceback (a Python
+  error listing). `LVLME_DEBUG=1` shows the full details.
 
 ## Before you open a pull request
 

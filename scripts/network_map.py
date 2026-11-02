@@ -145,6 +145,9 @@ def main(argv=None):
     ap.add_argument("--today", help="date to measure 'months connected' from (default: today)")
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)
+    if not config.get("targets"):
+        print(C.NO_TARGETS, file=sys.stderr)
+        return 1
     today = dt.date.fromisoformat(C.check_date(args.today) if args.today else C.today_in(config))
     csv_path = args.csv
     if not os.path.exists(csv_path) and os.path.exists(C.wpath(ws, csv_path)):
@@ -164,4 +167,4 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(C.run_main(main))

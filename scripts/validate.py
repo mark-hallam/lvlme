@@ -444,14 +444,15 @@ def validate_workspace(ws):
             continue
         try:
             data = C.load_json(path)
-        except ValueError as exc:
-            errors.append("%s: not valid JSON (%s)" % (rel, exc))
+        except C.FileProblem as exc:
+            errors.append("%s: %s" % (rel, exc.detail))
             continue
         schema = C.load_json(os.path.join(C.SCHEMA_DIR, schema_name))
         errors.extend("%s: %s" % (rel, e) for e in check(data, schema))
         docs[rel] = data
         checked.append(rel)
-    cross_checks(ws, docs, errors, warnings)
+    if "config.json" in docs:  # every cross-file check compares against the config: without it they only add noise
+        cross_checks(ws, docs, errors, warnings)
     return errors, warnings, checked
 
 
@@ -487,4 +488,4 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(C.run_main(main, workspace_check=False))

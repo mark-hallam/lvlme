@@ -99,6 +99,12 @@ of the `/lvlme-*` commands), run only that part, with the hard rules.
 
 Every script takes `--workspace <path>`; the commands below omit it.
 
+When a script stops, it prints one line that starts `lvlme:` and says which
+file and what to do (for example a file that is not valid JSON, with the line
+and column). Fix that and run it again; tell the person in plain words only if
+they need to act. To see the full Python details, run it again with
+`LVLME_DEBUG=1` in front.
+
 ## Run it in parallel
 
 You are the lead. Fan out the independent work, join it, and pass the gates.

@@ -88,11 +88,9 @@ def rel_folder(folder):
     return os.path.abspath(os.path.expanduser(folder))
 
 
-def read_text(path):
-    if path == "-":
-        return sys.stdin.read()
-    with open(path, encoding="utf-8", errors="replace") as fh:
-        return fh.read()
+def read_text(path, what="file"):
+    """Text of a file the person named ('-' reads standard input). Raises C.FileProblem, one plain line."""
+    return C.read_input(path, what)
 
 
 def folder_name(date, org_name, title):
@@ -139,9 +137,19 @@ def skeleton(role, date):
 
 def new(args):
     date = C.check_date(args.date) if args.date else dt.date.today().isoformat()
+    # check every file the person named before anything is fetched or written
+    if args.cv and not os.path.isfile(args.cv):
+        print("lvlme: no CV file at %s. Check the path, then run this again." % C.show_path(args.cv), file=sys.stderr)
+        return 1
     try:
-        if args.posting_text:
-            role, source = QP.from_text(read_text(args.posting_text), args.title, args.org, args.posting)
+        posting_text = read_text(args.posting_text, "posting text file") if args.posting_text else None
+        cv_text = read_text(args.cv_text, "CV text file") if args.cv_text and not args.cv else None
+    except C.FileProblem as exc:
+        print("lvlme: %s" % exc, file=sys.stderr)
+        return 1
+    try:
+        if posting_text is not None:
+            role, source = QP.from_text(posting_text, args.title, args.org, args.posting)
         elif args.posting:
             role, source = QP.fetch(args.posting, args.saved_response)
         else:
@@ -174,15 +182,12 @@ def new(args):
     C.write_json(os.path.join(folder, "eval", "quick.json"), skeleton(role, date))
     cv = None
     if args.cv:
-        if not os.path.isfile(args.cv):
-            print("lvlme: no CV file at %s" % args.cv, file=sys.stderr)
-            return 1
         cv = os.path.join(folder, "intake", "sources", os.path.basename(args.cv))
         os.makedirs(os.path.dirname(cv), exist_ok=True)
         shutil.copyfile(args.cv, cv)
-    elif args.cv_text:
+    elif cv_text is not None:
         cv = os.path.join(folder, "intake", "sources", "cv.txt")
-        C.write_text(cv, read_text(args.cv_text))
+        C.write_text(cv, cv_text)
     print(json.dumps({
         "folder": folder, "role_id": role["id"], "org": role["org"], "org_name": org_name, "title": role["title"],
         "locations": role.get("locations"), "remote": role.get("remote"),
@@ -199,7 +204,10 @@ def new(args):
 def load(folder):
     """Every input in a quick folder, checked against its schema. Raises QuickError."""
     folder = rel_folder(folder)
-    config = C.load_json(os.path.join(folder, "config.json"))
+    try:
+        config = C.load_json(os.path.join(folder, "config.json"))
+    except C.FileProblem as exc:
+        raise QuickError(str(exc))
     if not config or not config.get("quick"):
         raise QuickError("%s is not a LVLme quick folder (no config.json with \"quick\": true)." % folder)
     problem = C.location_problem(folder, config)
@@ -212,8 +220,8 @@ def load(folder):
                              ("quick", "eval/quick.json", "quick.schema.json")):
         try:
             data = C.load_json(os.path.join(folder, rel))
-        except ValueError as exc:
-            raise QuickError("%s is not valid JSON: %s" % (rel, exc))
+        except C.FileProblem as exc:
+            raise QuickError(str(exc))
         if data is None:
             raise QuickError("%s is missing. Run quick.py new first." % rel)
         errors += ["%s: %s" % (rel, e) for e in V.check(data, C.load_json(os.path.join(C.SCHEMA_DIR, schema)))]
@@ -618,4 +626,4 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(C.run_main(main, workspace_check=False))

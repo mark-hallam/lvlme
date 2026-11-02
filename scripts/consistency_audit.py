@@ -843,8 +843,11 @@ def main(argv=None):
     try:
         doc = C.load_json(path)
         report = run_audit(doc, args.tolerance_months, args.gap_months, today, label, evidence_ids)
+    except C.FileProblem as exc:
+        print("lvlme: %s" % exc, file=sys.stderr)
+        return 1
     except ValueError as exc:
-        print("lvlme: %s is not valid JSON (%s)" % (path, exc), file=sys.stderr)
+        print("lvlme: %s: %s" % (label, exc), file=sys.stderr)
         return 1
     except InputError as exc:
         for msg in exc.args[0]:
@@ -862,4 +865,4 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(C.run_main(main))

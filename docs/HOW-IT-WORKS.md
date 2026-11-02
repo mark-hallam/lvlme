@@ -305,6 +305,22 @@ Every campaign script takes `--workspace PATH`. Without it, scripts use
 before Climb became LVLme, `$CLIMB_HOME` and `~/climb-workspaces/`, still work
 (see [Coming from Climb](INSTALL.md#coming-from-climb)).
 
+When a script cannot go on, it stops with one plain line that starts `lvlme:`,
+never a page of Python details. The line says what is wrong and what to do:
+
+```text
+lvlme: No workspace found. Run scripts/init.py first, or pass --workspace PATH, or set LVLME_HOME.
+lvlme: ~/lvlme-workspaces/acme/config.json: not valid JSON (line 12, column 5: Expecting value). Fix that spot in the file, then run this again.
+lvlme: cv.txt: no CV text file at this path. Check the path, then run this again.
+No target organisations yet. Say to your agent: run the LVLme interview.
+```
+
+LVLme quick checks every file you name before it makes a folder, so a wrong
+path leaves nothing half made. If the line says "unexpected error", run
+`python3 scripts/validate.py` first: it lists every file that breaks the rules.
+If that says Valid, it is a bug in LVLme. Put `LVLME_DEBUG=1` in front of the
+command to see the full details, and include them when you report it.
+
 ## Commands
 
 | Command | Does |
