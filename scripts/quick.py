@@ -589,7 +589,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description="LVLme quick: honest odds for one job posting.")
     sub = ap.add_subparsers(dest="cmd", required=True)
     n = sub.add_parser("new", help="make the quick folder, read the posting, copy the CV")
-    n.add_argument("--posting", help="the posting link (Greenhouse, Ashby, Lever, Workday, SmartRecruiters or any public page)")
+    n.add_argument("--posting", help="the posting link (Greenhouse, Ashby, Lever, Workday, SmartRecruiters, Workable or any public page)")
     n.add_argument("--posting-text", help="a file holding pasted posting text ('-' reads standard input)")
     n.add_argument("--title", help="the role title, for pasted text")
     n.add_argument("--org", help="the organisation's name (overrides the one the board gives)")

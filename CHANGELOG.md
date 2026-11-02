@@ -46,6 +46,18 @@ Work on top of 0.3.0 that is not in a released version yet.
   the job description is not read as a requirement either, a posting written
   entirely under the company description is still read, a closed posting gets
   a plain message, and the apply page's link works too.
+- **LVLme quick reads Workable links.** Hugging Face and many smaller
+  employers post jobs on Workable (`apply.workable.com`). Its pages are drawn
+  in the browser and hold no posting text, so LVLme quick could not read them
+  at all and asked for pasted text. It now reads the posting through
+  Workable's public job feed: the description, the requirements (read as
+  requirements even when the employer gives them no heading), any nice to
+  haves, and the benefits last, never as a requirement. It also gives every
+  city listed, whether the role is hybrid, remote or on site, the department,
+  the date it was posted, and the employer's name as the employer writes it
+  ("Hugging Face", not "huggingface"). The short `apply.workable.com/j/` links
+  and the older `<employer>.workable.com` links work too, and a closed posting
+  gets a plain message.
 
 ### Changed
 
@@ -54,7 +66,8 @@ Work on top of 0.3.0 that is not in a released version yet.
   "Ways to stand out" and "Good to have" list nice to haves, and "What you'll
   actually be doing" lists duties, "You're probably a match if" lists
   requirements, "This role is focused on" lists duties, and "What you'll
-  learn" is about the role, not a requirement. Nothing about the scoring
+  learn" is about the role, not a requirement, and "Your missions" lists
+  duties. Nothing about the scoring
   maths changed.
 
 - **LVLme quick says what it could not check.** Public signal and

@@ -1,4 +1,5 @@
-"""LVLme quick's posting fetcher, offline: saved Greenhouse, Ashby, Lever, Workday and SmartRecruiters API responses and a saved page."""
+"""LVLme quick's posting fetcher, offline: saved Greenhouse, Ashby, Lever, Workday, SmartRecruiters and Workable API
+responses and a saved page."""
 import io
 import os
 import unittest
@@ -16,6 +17,7 @@ LEVER = "https://jobs.lever.co/initech/7c1d2e3f-4a5b-4c6d-9e8f-000000000101"
 WORKDAY = ("https://globex.wd3.myworkdayjobs.com/en-AU/Globex_Careers/job/Australia-NSW-Sydney/"
            "Senior-Program-Manager--Fleet-Rollouts_JR0004242")
 SMART = "https://jobs.smartrecruiters.com/InitechRobotics/744000000004242-operations-program-lead-robot-fleets"
+WORKABLE = "https://apply.workable.com/globexlabs/j/A1B2C3D4E5/"
 
 
 def fx(name):
@@ -344,8 +346,138 @@ class SmartRecruitersTests(unittest.TestCase):
 
     def test_more_headings(self):
         for heading, cat in (("You're probably a match if", "req"), ("At the moment, this role is focused on:", "resp"),
-                             ("What you'll learn and how you'll develop at Initech", "about")):
+                             ("What you'll learn and how you'll develop at Initech", "about"),
+                             ("Your missions:", "resp"), ("Our mission", None)):
             self.assertEqual(Q.FR.heading_category(heading), cat, heading)
+
+    def tmp(self):
+        return FetchTests.tmp(self)
+
+
+class WorkableTests(unittest.TestCase):
+    """A Workable page is drawn in the browser and holds no posting text, so LVLme quick reads its job feed."""
+
+    def test_links(self):
+        self.assertEqual(Q.parse_link(WORKABLE), {"ats": "workable", "board": "globexlabs", "job_id": "A1B2C3D4E5",
+                                                  "region": None})
+        for same in ("https://apply.workable.com/globexlabs/j/a1b2c3d4e5/apply/",   # the apply page, any case
+                     "https://apply.workable.com/globexlabs/j/A1B2C3D4E5?utm_source=x",
+                     "https://globexlabs.workable.com/j/A1B2C3D4E5"):                 # the older address
+            link = Q.parse_link(same)
+            self.assertEqual((link["ats"], link["board"], link["job_id"]), ("workable", "globexlabs", "A1B2C3D4E5"), same)
+        short = Q.parse_link("https://apply.workable.com/j/A1B2C3D4E5")
+        self.assertEqual((short["ats"], short["board"]), ("workable", None))     # the account comes from following it
+        for page in ("https://apply.workable.com/globexlabs/",                      # the board, not a job
+                     "https://apply.workable.com/api/v2/accounts/globexlabs",
+                     "https://www.workable.com/j/A1B2C3D4E5",                       # Workable's own site
+                     "https://apply.workable.com/globexlabs/j/x/"):                  # too short to be a code
+            self.assertEqual(Q.parse_link(page)["ats"], "page", page)
+
+    def test_api_address(self):
+        self.assertEqual(Q.api_url(Q.parse_link(WORKABLE)),
+                         "https://apply.workable.com/api/v2/accounts/globexlabs/jobs/A1B2C3D4E5")
+
+    def test_feed_gives_requirements_and_keeps_benefits_out(self):
+        role, source = Q.fetch(WORKABLE, saved=fx("workable-job.json"))
+        self.assertEqual(source["kind"], "workable")
+        self.assertEqual(source["endpoint"], Q.api_url(Q.parse_link(WORKABLE)))
+        self.assertEqual(source["org_name"], "Globex Labs")   # how the posting writes the account's name
+        self.assertEqual(role["id"], "globexlabs:A1B2C3D4E5")
+        self.assertEqual(role["title"], "Research Program Manager, Model Evaluations")
+        self.assertEqual(role["locations"], ["Sydney, New South Wales, Australia", "Melbourne, Victoria, Australia"])
+        self.assertIs(role["remote"], False)                    # hybrid is not remote
+        self.assertEqual(role["published_at"], "2026-10-30")
+        self.assertEqual(role["team_or_department"], "Research Operations")
+        self.assertEqual(role["url"], WORKABLE)
+        self.assertEqual(role["years_experience"], 5)
+        # the requirements field has no heading of its own: it is still read as the requirements
+        self.assertEqual(role["hard_requirements"], [
+            "5+ years of program management in a research or technical setting.",
+            "Clear written communication for both technical and non-technical readers.",
+            "Experience coordinating work across research, engineering and customer teams."])
+        self.assertEqual(role["nice_to_haves"], ["Familiarity with machine learning evaluation methods."])
+        self.assertEqual(len(role["responsibilities"]), 3)
+        # the benefits come last, kept for the reader and never read as a requirement
+        text = role["description_text"]
+        self.assertIn("four day week", text)
+        self.assertGreater(text.index("four day week"), text.index("evaluation methods"))
+        self.assertFalse(any("four day week" in r for r in role["hard_requirements"] + role["nice_to_haves"]))
+        self.assertEqual(schema_errors(role), [])
+
+    def test_the_account_feed_gives_the_name(self):
+        calls = []
+
+        def get(url, accept):
+            calls.append(url)
+            if url.endswith("/api/v1/accounts/globexlabs"):
+                return Q.json.dumps({"subdomain": "globexlabs", "name": "Globex Labs Pty Ltd"})
+            with open(fx("workable-job.json"), encoding="utf-8") as fh:
+                return fh.read()
+        with mock.patch.object(Q, "http_get", get):
+            role, source = Q.fetch(WORKABLE)
+        self.assertEqual(source["org_name"], "Globex Labs Pty Ltd")
+        self.assertEqual(calls, ["https://apply.workable.com/api/v2/accounts/globexlabs/jobs/A1B2C3D4E5",
+                                 "https://apply.workable.com/api/v1/accounts/globexlabs"])
+
+        def no_account(url, accept):   # the account feed cannot be read: the posting's own spelling stands
+            if "/api/v1/accounts/" in url:
+                raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)
+            return get(url, accept)
+        with mock.patch.object(Q, "http_get", no_account):
+            _, source = Q.fetch(WORKABLE)
+        self.assertEqual(source["org_name"], "Globex Labs")
+
+    def test_org_name_from_the_account(self):
+        self.assertEqual(Q.workable_org_name("acmeai", "Join Acme AI. Visit acmeai.example to learn more."), "Acme AI")
+        self.assertEqual(Q.workable_org_name("acme-ai", "<p>At ACME-AI we build</p>"), "ACME-AI")
+        self.assertEqual(Q.workable_org_name("initech", "No mention here."), "Initech")
+        self.assertEqual(Q.workable_org_name("globexlabs", "Globex Labsmith is not the name"), "Globexlabs")
+
+    def test_short_link_is_followed_once(self):
+        with mock.patch.object(Q, "follow_short_link", return_value=WORKABLE) as follow, \
+                mock.patch.object(Q, "workable_account_name", return_value=None), \
+                mock.patch.object(Q, "http_get", lambda url, accept: open(fx("workable-job.json"), encoding="utf-8").read()):
+            role, source = Q.fetch("https://apply.workable.com/j/A1B2C3D4E5")
+        follow.assert_called_once_with("https://apply.workable.com/j/A1B2C3D4E5")
+        self.assertEqual(source["endpoint"], "https://apply.workable.com/api/v2/accounts/globexlabs/jobs/A1B2C3D4E5")
+        self.assertEqual(role["id"], "globexlabs:A1B2C3D4E5")
+        with mock.patch.object(Q, "follow_short_link", return_value=None):
+            with self.assertRaises(Q.PostingError) as cm:
+                Q.fetch("https://apply.workable.com/j/A1B2C3D4E5")
+        self.assertIn("Give the full link", str(cm.exception))
+
+    def test_closed_or_empty_posting_asks_for_pasted_text(self):
+        data = Q.C.load_json(fx("workable-job.json"))
+        for change in ({"state": "closed"}, {"description": "", "requirements": "<p></p>", "benefits": None}):
+            path = os.path.join(self.tmp(), "job.json")
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(Q.json.dumps(dict(data, **change)))
+            with self.assertRaises(Q.PostingError) as cm:
+                Q.fetch(WORKABLE, saved=path)
+            self.assertIn("Workable board 'globexlabs' gave no posting", str(cm.exception))
+
+    def test_a_closed_link_names_the_board_plainly(self):
+        def gone(url, accept):
+            raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)
+        with mock.patch.object(Q, "http_get", gone):
+            with self.assertRaises(Q.PostingError) as cm:
+                Q.fetch(WORKABLE)
+        self.assertIn("no longer open on the Workable board 'globexlabs'", str(cm.exception))
+
+    def test_remote_and_on_site(self):
+        data = Q.C.load_json(fx("workable-job.json"))
+        link = Q.parse_link(WORKABLE)
+        for change, want in (({"workplace": "remote"}, ("Remote", True)), ({"workplace": "on_site"}, ("Onsite", False)),
+                             ({"workplace": None, "remote": True}, ("Remote", True)),
+                             ({"workplace": None, "remote": False}, (None, None))):
+            base = Q.workable_base(link, dict(data, **change))
+            self.assertEqual((base["workplace_type"], base["is_remote"]), want, change)
+
+    def test_posting_file_names_the_board(self):
+        import quick
+        role, source = Q.fetch(WORKABLE, saved=fx("workable-job.json"))
+        text = quick.posting_md(role, source["org_name"], source, "2026-11-03")
+        self.assertIn("from the public Workable job board, read only", text)
 
     def tmp(self):
         return FetchTests.tmp(self)

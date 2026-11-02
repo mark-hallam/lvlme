@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """Fetch one job posting for LVLme quick, read only.
 
-Give it a posting link. Greenhouse, Ashby, Lever, Workday and SmartRecruiters
-links are read through their public job-board APIs (application programming
+Give it a posting link. Greenhouse, Ashby, Lever, Workday, SmartRecruiters and
+Workable links are read through their public job-board APIs (application programming
 interfaces, the feeds the boards publish). A Workday careers page gives only a
 flat summary of the posting, so its feed is read instead: the full posting,
 with its headings and lists, and the organisation's everyday name rather than
 the legal entity Workday lists. A SmartRecruiters page puts the employer's
 welcome first, so its posting API is read instead: the job description and
 qualifications as their own sections, the city and whether the role is
-hybrid or remote, and the date it was posted. Any other link is fetched once as a public web page: a
+hybrid or remote, and the date it was posted. A Workable page is drawn in the
+browser and holds no posting text at all, so its job feed is read: the
+description, the requirements under their own heading, and the benefits last,
+never as requirements. Any other link is fetched once as a public web page: a
 JobPosting block in the page (structured data many careers sites embed) is
 used when there is one, otherwise the page text. Pasted text works too.
 
@@ -25,6 +28,7 @@ Usage
   python3 scripts/quick_posting.py https://jobs.lever.co/example/0000-1111
   python3 scripts/quick_posting.py https://example.wd3.myworkdayjobs.com/en-US/Careers/job/Sydney/Analyst_R100
   python3 scripts/quick_posting.py https://jobs.smartrecruiters.com/ExampleCo/744000000000001-analyst
+  python3 scripts/quick_posting.py https://apply.workable.com/exampleco/j/0A1B2C3D4E/
   python3 scripts/quick_posting.py --text posting.txt --org "Example Co" --title "Program Manager"
   python3 scripts/quick_posting.py URL --saved response.json   # offline: a saved API response
 """
@@ -56,8 +60,13 @@ WORKDAY_HOST = re.compile(r"^([a-z0-9][a-z0-9-]*)\.(wd\d+)\.myworkdayjobs\.com$"
 LANG = re.compile(r"^[a-z]{2}(-[a-z]{2})?$", re.I)
 SMARTRECRUITERS_HOST = "jobs.smartrecruiters.com"
 SR_POSTING = re.compile(r"^(\d{6,})(?:-|$)")   # {posting id}-{title slug}
+WORKABLE_HOST = "apply.workable.com"
+WORKABLE_OLD_HOST = re.compile(r"^([a-z0-9][a-z0-9-]*)\.workable\.com$")   # {account}.workable.com/j/{code}
+WORKABLE_CODE = re.compile(r"^[A-Za-z0-9]{6,12}$")
+WORKABLE_NOT_ACCOUNT = {"j", "api", "careers", "www", "apply"}
+WORKABLE_PLACES = {"remote": "Remote", "hybrid": "Hybrid", "on_site": "Onsite", "onsite": "Onsite"}
 BOARD_NAMES = {"greenhouse": "Greenhouse", "ashby": "Ashby", "lever": "Lever", "workday": "Workday",
-               "smartrecruiters": "SmartRecruiters"}
+               "smartrecruiters": "SmartRecruiters", "workable": "Workable"}
 SR_SECTIONS = ("jobDescription", "qualifications", "additionalInformation")  # the employer's welcome goes last
 
 
@@ -105,6 +114,9 @@ def parse_link(url):
         sr = smartrecruiters_link(segs)
         if sr:
             return sr
+    wk = workable_link(host, segs)
+    if wk:
+        return wk
     return {"ats": "page", "board": None, "job_id": None, "region": None}
 
 
@@ -119,9 +131,25 @@ def smartrecruiters_link(segs):
     return None
 
 
+def workable_link(host, segs):
+    """A Workable posting link: apply.workable.com/{account}/j/{code}, the short apply.workable.com/j/{code}
+    (account None until the link is followed), or the older {account}.workable.com/j/{code}."""
+    old = WORKABLE_OLD_HOST.match(host)
+    if old and old.group(1) not in WORKABLE_NOT_ACCOUNT and len(segs) >= 2 and segs[0] == "j" \
+            and WORKABLE_CODE.match(segs[1]):
+        return {"ats": "workable", "board": old.group(1), "job_id": segs[1].upper(), "region": None}
+    if host != WORKABLE_HOST:
+        return None
+    if len(segs) >= 2 and segs[0] == "j" and WORKABLE_CODE.match(segs[1]):
+        return {"ats": "workable", "board": None, "job_id": segs[1].upper(), "region": None}
+    if len(segs) >= 3 and segs[0] not in WORKABLE_NOT_ACCOUNT and segs[1] == "j" and WORKABLE_CODE.match(segs[2]):
+        return {"ats": "workable", "board": segs[0], "job_id": segs[2].upper(), "region": None}
+    return None
+
+
 def api_url(link):
-    """The public API address for a parsed Greenhouse, Ashby, Lever, Workday or SmartRecruiters link."""
-    board = urllib.parse.quote(link["board"], safe="")
+    """The public API address for a parsed Greenhouse, Ashby, Lever, Workday, SmartRecruiters or Workable link."""
+    board = urllib.parse.quote(link["board"] or "", safe="")
     job = urllib.parse.quote(link["job_id"], safe="")
     if link["ats"] == "greenhouse":
         return "https://boards-api.greenhouse.io/v1/boards/%s/jobs/%s" % (board, job)
@@ -136,6 +164,8 @@ def api_url(link):
             urllib.parse.quote(link["job_id"], safe="/"))
     if link["ats"] == "smartrecruiters":
         return "https://api.smartrecruiters.com/v1/companies/%s/postings/%s" % (board, job)
+    if link["ats"] == "workable":
+        return "https://apply.workable.com/api/v2/accounts/%s/jobs/%s" % (board, job)
     return None
 
 
@@ -171,7 +201,7 @@ def workday_org_name(tenant, *texts):
 
 
 def base_from_api(link, data):
-    """One posting (the fetch_roles base shape) from a Greenhouse, Ashby, Lever, Workday or SmartRecruiters API response."""
+    """One posting (the fetch_roles base shape) from a Greenhouse, Ashby, Lever, Workday, SmartRecruiters or Workable API response."""
     ats, job_id = link["ats"], str(link["job_id"])
     if ats == "greenhouse":
         jobs = data.get("jobs") if isinstance(data, dict) and "jobs" in data else [data]
@@ -189,11 +219,11 @@ def base_from_api(link, data):
             raise PostingError("The Workday board %r gave no posting at that link. It may have closed. "
                                "Paste the posting text instead." % link["board"])
         return base
-    elif ats == "smartrecruiters":  # the API answers for this one posting only
-        base = smartrecruiters_base(link, data)
+    elif ats in ("smartrecruiters", "workable"):  # the API answers for this one posting only
+        base = (smartrecruiters_base if ats == "smartrecruiters" else workable_base)(link, data)
         if base is None:
-            raise PostingError("The SmartRecruiters board %r gave no posting at that link. It may have closed. "
-                               "Paste the posting text instead." % link["board"])
+            raise PostingError("The %s board %r gave no posting at that link. It may have closed. "
+                               "Paste the posting text instead." % (BOARD_NAMES[ats], link["board"]))
         return base
     else:
         raise PostingError("Unknown job board %r." % ats)
@@ -263,6 +293,87 @@ def smartrecruiters_base(link, data):
         base["depts"], base["team_or_department"] = [dept["label"]], dept["label"]
     base["workplace_type"], base["is_remote"] = workplace, loc.get("remote") if workplace else None
     return base
+
+
+def workable_base(link, data):
+    """One posting from a Workable job feed response ({"title", "description", "requirements", "benefits", ...}), or None.
+
+    Workable keeps the requirements and the benefits in their own fields, often
+    with no heading of their own, so each gets its heading here: the
+    requirements are read as requirements, and the benefits come last, where
+    they are never read as one. The feed does not name the organisation, so
+    the name is the account's (see workable_org_name), until fetch() asks
+    the account feed for the name it gives itself.
+    """
+    if not isinstance(data, dict) or str(data.get("state") or "published") != "published":
+        return None
+    parts = []
+    for key, heading in (("description", None), ("requirements", "Requirements"), ("benefits", "Benefits")):
+        text = data.get(key) if isinstance(data.get(key), str) else ""
+        if FR.clean(re.sub(r"<[^>]+>", " ", text)):
+            parts.append(("<h2>%s</h2>" % heading if heading else "") + text)
+    if not parts:
+        return None
+    places = [data.get("location")] + list(data.get("locations") or [])
+    where = [", ".join(FR.clean(str(p[k])) for k in ("city", "region", "country") if p.get(k))
+             for p in places if isinstance(p, dict)]
+    workplace = WORKABLE_PLACES.get(str(data.get("workplace") or "").lower()) or (
+        "Remote" if data.get("remote") is True else None)
+    published = str(data.get("published") or "")[:10]
+    title = FR.clean(data.get("title") or "")
+    raw = "".join(parts)
+    base = _base(str(data.get("shortcode") or link["job_id"]).upper(), title, [w for w in dict.fromkeys(where) if w],
+                 "https://apply.workable.com/%s/j/%s/" % (link["board"], str(data.get("shortcode") or link["job_id"])),
+                 raw, workable_org_name(link["board"], title, raw),
+                 published=published if re.match(r"^\d{4}-\d{2}-\d{2}$", published) else None)
+    depts = [FR.clean(str(d)) for d in (data.get("department") or []) if FR.clean(str(d))] \
+        if isinstance(data.get("department"), list) else [FR.clean(str(data["department"]))] if data.get("department") else []
+    if depts:
+        base["depts"], base["team_or_department"] = depts, depts[0]
+    base["workplace_type"] = workplace
+    base["is_remote"] = True if workplace == "Remote" else (False if workplace else None)
+    return base
+
+
+def workable_org_name(account, *texts):
+    """The organisation's name for a Workable account, from how the posting writes it.
+
+    An account is the name run together in lower case ("acmeai" for "Acme
+    AI"), so the posting's own spelling is found by allowing a space, a hyphen
+    or a full stop between its letters. Written in lower case does not count
+    (that is a web address); with no match, the account in capitals.
+    """
+    letters = re.sub(r"[^a-z0-9]", "", (account or "").lower())
+    if len(letters) < 3:
+        return nice_name(account)
+    word = re.compile(r"(?<![A-Za-z0-9])%s(?![A-Za-z0-9])" % r"[ .-]?".join(re.escape(ch) for ch in letters), re.I)
+    seen = {}
+    for text in texts:
+        for m in word.finditer(FR.clean(re.sub(r"<[^>]+>", " ", text)) if text else ""):
+            if m.group(0) != m.group(0).lower() and not m.group(0).endswith((" ", "-", ".")):
+                seen[m.group(0)] = seen.get(m.group(0), 0) + 1
+    return max(seen, key=seen.get) if seen else nice_name(account)
+
+
+def workable_account_name(account):
+    """The name a Workable account gives itself in its public account feed, or None when it cannot be read."""
+    try:
+        data = json.loads(http_get("https://apply.workable.com/api/v1/accounts/%s" % urllib.parse.quote(account, safe=""),
+                                   "application/json"))
+    except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError):
+        return None
+    name = FR.clean(data.get("name") or "") if isinstance(data, dict) and isinstance(data.get("name"), str) else ""
+    return name or None
+
+
+def follow_short_link(url):
+    """The address a short apply.workable.com/j/{code} link leads to (it names the account), or None."""
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html"})
+        with urllib.request.urlopen(req, timeout=45) as resp:
+            return resp.geturl()
+    except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError):
+        return None
 
 
 # ------------------------------------------------------ any other page
@@ -418,6 +529,13 @@ def fetch(url, saved=None):
     link = parse_link(url)
     if saved and not os.path.isfile(saved):
         raise PostingError("No saved response at %s. Check the path, then run this again." % C.show_path(saved))
+    if link["ats"] == "workable" and not link["board"]:  # a short link: follow it once to learn the account
+        longer = None if saved else follow_short_link(url)
+        resolved = parse_link(longer) if longer else {}
+        if resolved.get("ats") != "workable" or not resolved.get("board"):
+            raise PostingError("Could not follow this short Workable link to its posting. Give the full link "
+                               "(apply.workable.com/<employer>/j/<code>), or paste the posting text.")
+        link = resolved
     if link["ats"] != "page":
         where = api_url(link)
         try:
@@ -426,6 +544,8 @@ def fetch(url, saved=None):
             else:
                 data = json.loads(http_get(where, "application/json"))
             base = base_from_api(link, data)
+            if link["ats"] == "workable" and not saved:
+                base["org_name"] = workable_account_name(link["board"]) or base["org_name"]
             return check_text(role_from_base(base, slug(link["board"]))), {
                 "kind": link["ats"], "link": url, "endpoint": where, "org_name": base["org_name"]}
         except urllib.error.HTTPError as exc:

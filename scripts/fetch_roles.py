@@ -191,7 +191,7 @@ REQ_H = re.compile(r"qualifications|requirements?\b|good fit|thrive|looking for|
                    r"(?:probably|might be) a (?:good )?match|you.?re a match", re.I)
 RESP_H = re.compile(r"responsib|what you.?ll (actually )?(do|be doing|work on)|in this role|you will|"
                     r"key duties|day[- ]to[- ]day|representative projects|your impact|the work|"
-                    r"role is focused on", re.I)
+                    r"role is focused on|^your missions?\b", re.I)
 
 
 def heading_category(text, org_stop=None):

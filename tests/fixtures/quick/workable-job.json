@@ -1,0 +1,24 @@
+{
+  "id": 4242001,
+  "shortcode": "A1B2C3D4E5",
+  "title": "Research Program Manager, Model Evaluations",
+  "remote": false,
+  "location": {"city": "Sydney", "country": "Australia", "countryCode": "AU", "region": "New South Wales"},
+  "locations": [
+    {"city": "Sydney", "country": "Australia", "countryCode": "AU", "hidden": false, "region": "New South Wales"},
+    {"city": "Melbourne", "country": "Australia", "countryCode": "AU", "hidden": false, "region": "Victoria"}
+  ],
+  "state": "published",
+  "isInternal": false,
+  "code": "",
+  "published": "2026-10-30T00:00:00.000Z",
+  "type": "full",
+  "language": "en",
+  "department": ["Research Operations"],
+  "accountUid": "00000000-0000-4000-8000-000000004242",
+  "approvalStatus": "approved",
+  "workplace": "hybrid",
+  "description": "<p>At Globex Labs, we build tools that help teams check how well their AI models behave. This fictional posting is test data for LVLme.</p><p></p><p><strong>About the Role</strong></p><p>You will run the program that turns our research team's evaluation ideas into repeatable checks our customers rely on.</p><p><strong>What you'll do</strong></p><ul><li>Plan and run the quarterly evaluation roadmap with research and engineering leads.</li><li>Keep a single source of truth for every evaluation, its owner and its status.</li><li>Write the monthly update for customers and the leadership team.</li></ul>",
+  "requirements": "<ul><li>5+ years of program management in a research or technical setting.</li><li>Clear written communication for both technical and non-technical readers.</li><li>Experience coordinating work across research, engineering and customer teams.</li></ul><p><strong>Bonus points if you have</strong></p><ul><li>Familiarity with machine learning evaluation methods.</li></ul>",
+  "benefits": "<p><strong>Why Globex Labs</strong></p><ul><li>Experience a four day week every second Friday.</li><li>Equity for every employee.</li></ul><p>Globex Labs is an equal opportunity employer.</p>"
+}

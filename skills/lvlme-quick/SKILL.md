@@ -46,8 +46,8 @@ would raise it most. Aim for a couple of minutes and at most two questions.
 
    For pasted posting text, save it to a file first and use
    `--posting-text <file> --org "<organisation>"`; for a pasted CV use
-   `--cv-text <file>`. Greenhouse, Ashby, Lever, Workday and SmartRecruiters
-   links are read through their public job-board APIs; any other link is fetched once as a public
+   `--cv-text <file>`. Greenhouse, Ashby, Lever, Workday, SmartRecruiters and
+   Workable links are read through their public job-board APIs; any other link is fetched once as a public
    page. If it prints that the page gave too little text, ask for the pasted
    text. It prints the folder; everything below happens there.
 3. **Read `posting.md` and the CV.** Write 4 to 8 evidence items to
