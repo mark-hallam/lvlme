@@ -1,6 +1,6 @@
 # Climb
 
-**Honest odds for the job you want, checked by a second opinion, and the steps that raise them.**
+**For the job you can't get yet.** Climb works out honestly how far you are from it, gives you the steps to climb there, and re-measures as you go.
 
 ![Climb quick's answer for one job: a low chance of an interview and a very low chance of an offer, in plain words (fictional demo)](docs/images/quick-result-hero.png)
 
@@ -14,6 +14,16 @@ Then say: **run Climb quick**, and paste a job link.
 
 In about five minutes you get honest odds for that one job. Codex and Cursor
 work too (see [Install](#install)).
+
+## Why Climb is different
+
+Most job tools help you apply for jobs you are already close to: they match
+your CV to a posting and tailor it. Climb is for a reach, often outside your
+normal career path. It works out how far away you really are, then turns the
+gap into things to go out and do: build proof people can check, meet people
+inside, earn what is missing, get a referral. Then it measures again, so you
+can see yourself climb. Its author is using it on his own reach, starting from
+a very low score.
 
 ## What you get
 
