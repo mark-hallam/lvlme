@@ -404,9 +404,10 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
 .modal.on{display:grid}
 .modal .panel{background:var(--card);border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.3);width:min(640px,94vw);padding:22px}
 .share-card{border-radius:18px;padding:22px;background:var(--card2);border:1px solid var(--rule);margin:12px 0}
-.share-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-.share-row div{background:var(--card);border-radius:12px;padding:10px 12px}
+.share-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.share-row div{background:var(--card);border-radius:12px;padding:10px 12px;min-width:0}
 .share-row b{display:block;font-size:28px;letter-spacing:-.02em}
+.share-row .pill{white-space:normal;max-width:100%}
 
 /* motion: only while .animate is on the body (visible tab, motion allowed); every
    animated element also loses its .enter class on a timer, so nothing stays hidden */
@@ -448,6 +449,8 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
  .best-v{font-size:46px}
  .level{max-width:none}
  .brand span{display:none}
+ .share-row{gap:8px}
+ .share-row div{padding:8px 9px}
  .share-row b{font-size:22px}
 }
 @media (max-width:759px){
@@ -466,6 +469,9 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
 }
 @media (max-width:420px){.top-in{padding:10px 16px;gap:10px}.brand h1{font-size:16px}.seg.small button{padding:4px 8px}.top .btn{padding:6px 12px}.card{padding:16px}.tiles4{gap:10px}.tile .v{font-size:24px}}
 @media (max-width:360px){.seg button{padding:6px 8px;font-size:13px}}
+@media (max-width:420px){.share-row div{padding:8px 7px}.share-row b{font-size:20px}.share-row .pill{font-size:11px;padding:2px 6px}}
+@media (max-width:360px){.share-row{gap:6px}.share-row div{padding:8px 6px}.share-row .pill{padding:2px 5px}}
+@media (max-width:340px){.share-row{grid-template-columns:minmax(0,1fr)}}
 .sheet-grip{display:none;width:40px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 4px}
 .sheet-done{display:none}
 @media (max-width:759px){.sheet-grip{display:block}.sheet-done{display:block;margin:0 4px 8px auto}}
@@ -800,6 +806,16 @@ function buildChartFrame(){
   $("#hit").addEventListener("pointerleave", () => { hideTip(); $("#cross").setAttribute("visibility", "hidden"); });
   chartBuilt = true;
 }
+// Phone end labels sit inside the plot, right aligned: best case and do nothing above their line, expected
+// below its own. They are then stacked at least 13px apart (like the desktop labels), so equal values, as on
+// every first run, read as three separate labels, and the stack stays between top and bottom of the plot.
+function phoneEndLabels(ends, top, bottom){
+  const GAP = 13, out = ends.map((e, i) => [e[0], e[1] + (i === 1 ? 14 : -6), e[1], i]);
+  const order = out.slice().sort((a, b) => a[2] - b[2] || a[3] - b[3]);   // by line height, ties keep best, expected, do nothing
+  order.forEach((e, i) => { e[1] = Math.max(e[1], top + i * GAP); if (i) e[1] = Math.max(e[1], order[i - 1][1] + GAP); });
+  for (let i = order.length - 1; i >= 0; i--) order[i][1] = Math.min(order[i][1], i === order.length - 1 ? bottom : order[i + 1][1] - GAP);
+  return out.map(e => [e[0], e[1]]);
+}
 function drawChart(){
   if (!chartBuilt) buildChartFrame();
   const r = headlineRole(), c = orgColour(r.g), exp = P[r.id].exp, best = P[r.id].best;
@@ -858,11 +874,8 @@ function drawChart(){
   txt(xT(hist.length ? hist[0].t : T0) + 10, Math.min(PT + IH - 6, yOf(d1) + 24), "Day 1: " + BANDS[bandIdx(d1)] + ", fit " + Math.round(d1), true);
   // end labels: outside the plot on wide screens, inside it (right aligned, above each line) on a phone
   const ends = [[Math.round(best.end) + " Best case", yOf(best.end)], [Math.round(exp.end) + " Expected", yOf(exp.end)], [Math.round(r.fit) + " Do nothing", yOf(r.fit)]];
-  if (SMALL){                                                  // best case and do nothing sit above their line, expected below its own
-    ends[0][1] -= 6; ends[1][1] += 14; ends[2][1] -= 6;
-    if (Math.abs(ends[2][1] - ends[1][1]) < 13) ends[2][1] = ends[1][1] + 13;
-    if (Math.abs(ends[0][1] - ends[1][1]) < 13) ends[0][1] = ends[1][1] - 13;
-    ends.forEach(e => txt(PL + IW - 4, Math.min(PT + IH - 4, e[1]), e[0], false, "var(--sub)", "end"));
+  if (SMALL){
+    phoneEndLabels(ends, PT + 12, PT + IH - 4).forEach(e => txt(PL + IW - 4, e[1], e[0], false, "var(--sub)", "end"));
   } else {                                                     // the offer zone label joins the end labels, so none overlap
     const items = ends.map(e => ({y: e[1] + 4, h: 15, draw: y => txt(PL + IW + 8, y, e[0], false, "var(--sub)")}));
     items.push({y: yOf(70) - 4, h: 29, draw: y => { txt(PL + IW + 8, y, "Offer zone", true, "var(--ok)"); txt(PL + IW + 8, y + 14, "fit 70 and up", false, "var(--sub)"); }});
