@@ -18,7 +18,7 @@
     {"id": "anthropic", "name": "Anthropic", "ats": "greenhouse", "slug": "anthropic", "aliases": ["Anthropic PBC"],
      "ai_policy": {"first_draft_by_person": true, "source": "https://www.anthropic.com/candidate-ai-guidance", "checked_on": "2026-11-02"}},
     {"id": "openai", "name": "OpenAI", "ats": "ashby", "slug": "openai", "aliases": ["OpenAI LP", "OpenAI Inc"]},
-    {"id": "xai", "name": "xAI", "ats": "greenhouse", "slug": "xai", "aliases": ["X.AI", "xAI Corp"]}
+    {"id": "xai", "name": "xAI", "ats": "greenhouse", "slug": "xai", "aliases": ["X.AI", "xAI Corp", "SpaceXSI"]}
   ],
   "families": [
     {

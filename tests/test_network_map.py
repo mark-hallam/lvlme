@@ -35,6 +35,13 @@ class NetworkMapTests(unittest.TestCase):
         self.assertIsNone(match("Initech Consulting Group"))
         self.assertIsNone(match(""))
 
+    def test_example_config_matches_the_xai_board_name(self):
+        """xAI's public Greenhouse board (slug xai) is named SpaceXSI, so a contact listing it counts for xAI."""
+        match = N.org_matcher(H.example_config())
+        self.assertEqual(match("SpaceXSI"), "xai")
+        self.assertEqual(match("xAI Corp"), "xai")
+        self.assertIsNone(match("SpaceX AI"))          # not seen on the board, so not an alias
+
     def test_build_network(self):
         rows = N.read_connections(CSV)
         self.assertEqual(len(rows), 6)
