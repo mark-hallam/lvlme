@@ -31,7 +31,8 @@ The commands below omit it. Run them from the engine folder.
 - Evidence or it scores zero (see `RUBRIC.md`). Never invent experience,
   numbers, contacts or stories.
 - Never ask about, infer or score protected attributes.
-- Connectors (email, calendar, browser) are opt in and read only.
+- Connectors (email, calendar, browser) are opt in and read only. Never open
+  LinkedIn in a browser: use the person's data export and what they paste.
 - Plain English for the person: spell out abbreviations, keep it short, report
   times in the person's own time zone (`candidate.timezone`).
 - The workspace is private. Never copy it anywhere public.
@@ -85,8 +86,8 @@ The commands below omit it. Run them from the engine folder.
    - email, read only, since the last run date: messages from target
      organisations' domains and from job boards (Greenhouse, Ashby, Lever),
      and words such as interview, referral, introduction, recruiter;
-   - their LinkedIn profile, only if a signed-in browser is available, read
-     only;
+   - a fresh LinkedIn data export, if the person has downloaded one (Climb
+     never opens LinkedIn itself: automated access breaks LinkedIn's terms);
    - `campaign/plan.json`: actions the person marked done, and their notes.
 
 4. **Network** (when there is a new export, or a new second-degree path):

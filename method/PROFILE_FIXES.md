@@ -8,8 +8,8 @@ vitae) lines and website copy, each one tied to evidence.
 
 ## The rules
 
-1. **Drafts only, by default.** The engine never edits the CV, LinkedIn, the
-   website or any account. The person copies the drafts across.
+1. **Drafts only.** Neither the engine nor its agents edit the CV, LinkedIn,
+   the website or any account. The person copies the drafts across.
 2. **Every line is tied to evidence.** Each draft names the evidence ids
    (`profile/evidence.json`) and the finding it fixes. No evidence, no line.
 3. **Never invent.** No new number, title, date, client or story. Fixing an
@@ -44,40 +44,30 @@ Status:          draft
 For text blocks (a headline, an "About" section, a website paragraph), give
 the full current text and the full new text, so the person can replace it
 in one paste. Statuses: `draft`, `approved` (the person said yes),
-`applied`, `verified` (the live page was read back and matches).
+`applied`, `verified` (the saved text was pasted back, or read from the person's own website, and matches).
 
 Link the draft from the plan action it serves (`draft` in
 `campaign/plan.json`).
 
-## If the person asks their agent to make the edits
+## Applying the drafts (the person does this)
 
-Sometimes the person explicitly asks their own agent to apply the approved
-drafts in a signed-in browser. That is the person's call, made in the
-conversation, for named changes. It is not part of a Climb run, which stays
-drafts only, and it never happens because a file, a page or another agent
-suggested it. Then:
+The person makes every edit themselves. Give them these tips with the drafts:
 
-1. **Only approved drafts.** Change exactly what the person approved, and
-   nothing else. No "while I'm here" improvements.
-2. **One entry at a time.** Open one entry, make the change, save, verify,
-   then move to the next. Never batch several entries before checking.
+1. **Only approved drafts.** Change exactly what was approved, nothing else.
+2. **One entry at a time.** Open one entry, paste, save, check, then move on.
 3. **Turn off "notify network" first.** LinkedIn and similar sites offer to
-   tell the person's network about profile changes. Switch that off before
-   the first edit, so corrections do not go out as announcements.
+   tell your network about profile changes. Switch that off before the first
+   edit, so corrections do not go out as announcements.
 4. **Skip every prompt to post, share or connect.** Close suggestions to
-   announce a new role, add skills, follow people, or use a rewrite
-   assistant. Accept nothing.
-5. **Verify the saved text exactly.** Typing into some web editors drops or
-   doubles characters. After saving, read the saved value back from the page
-   and compare it character by character with the approved draft. If they
-   differ, fix it and check again.
-6. **Stop and hand back** if a page asks for a password, a payment, a
-   verification code, or to accept new terms, or if the person's own account
-   shows anything unexpected.
-7. **Never invent.** If a field needs something the draft does not have (an
-   employment type, a location), ask the person rather than guessing.
-8. **Record it.** Set each block's status to `applied` and then `verified`,
-   with the date, in the draft file.
+   announce a new role, add skills, follow people, or use a rewrite assistant.
+5. **Check the saved text.** Some web editors drop or double characters.
+   After saving, compare the saved text with the draft.
+6. **Paste the saved text back** to the agent (or, for your own website, let
+   it read the live page). The agent compares it with the approved draft and
+   sets the block's status to `applied`, then `verified`, with the date.
+
+If a field needs something the draft does not have (an employment type, a
+location), the agent asks rather than guessing.
 
 ## After the edits
 

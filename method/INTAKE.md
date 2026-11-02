@@ -48,7 +48,7 @@ anything). "Feeds" lists the dimensions the source usually informs.
 | Interview questions | The question bank below | Eligibility, constraints, motivation, story, notice period, intellectual property and non-compete terms | D6, D7, SWOT |
 | Résumé or CV (curriculum vitae) | A file the person supplies, saved in `intake/sources/` | Roles, dates, claims to verify | D1 |
 | LinkedIn data export | The official "Get a copy of your data" ZIP file: `Positions.csv`, `Education.csv`, `Certifications.csv`, `Skills.csv`, `Connections.csv` | Job history, degree, certificates, and the network map | D1, D3, D6 |
-| LinkedIn profile page | A signed-in browser, read only | Headline, about, posts, followers | D5, claims audit |
+| LinkedIn profile text | `Profile.csv` in the same export (headline, summary); the person types in their follower count and post reach | Headline, about, followers, posts | D5, claims audit |
 | GitHub | The `gh` command or the public API (application programming interface) | Repositories, commits, merged pull requests, releases, licences, stars, followers, public or private | D2, D5 |
 | Personal site, product sites, app stores | Fetch the page | Live products, claims, download counts | D2, D5, claims audit |
 | Publications | Google Scholar, ORCID, arXiv, SSRN | Papers, citations | D2, D5 |

@@ -4,8 +4,10 @@ From a very low starting score to your dream job, one verified step at a time.
 
 Climb answers one question honestly: **how likely am I to land this kind of
 role at these organisations, and what would raise my odds?** Then it runs the
-campaign with you. You, or a personal artificial intelligence (AI) agent
-working for you, run it on your own computer.
+campaign with you, on your own computer, through an artificial intelligence
+(AI) agent such as Claude Code, Codex or Cursor. The agent does the judging;
+the Python scripts only do the arithmetic, so without an agent every role
+scores zero.
 
 Author: Mark Hallam. Licence: MIT (see `LICENSE`).
 
@@ -40,7 +42,9 @@ Along the way Climb runs:
 
 The first example goal is getting hired at a frontier AI lab. The engine does
 not care what the goal is: the target organisations, role types and weights
-are all settings in one file.
+are all settings in one file. A new workspace starts with the example's
+organisations; the interview replaces them with yours (or edit
+`config.json`).
 
 ![The demo dashboard on a desktop, light theme](docs/images/dashboard-desktop.png)
 
@@ -51,7 +55,15 @@ organisations).*
 
 ## Install
 
-You need Python 3.9 or newer (Climb uses only its standard library) and git.
+You need an AI agent (Claude Code, Codex or Cursor), Python 3.9 or newer
+(Climb uses only its standard library) and git. Climb is tested on macOS; the
+scripts should work on Linux, and Windows is untested.
+
+**What a run uses.** A full run starts many helper agents: about 40 for a goal
+with around 300 open roles (one role judge per batch, plus scouts and
+reviewers). That is a noticeable share of an AI plan's usage, so check your
+plan's limits before you schedule daily runs.
+
 Full details for every agent, and the documentation they follow, are in
 [`docs/INSTALL.md`](docs/INSTALL.md).
 
@@ -84,8 +96,10 @@ Then say **"run Climb"**, or use a command:
 | `/climb-audit` | The consistency audit and the public claims audit. |
 | `/climb-dashboard` | Rebuild the dashboard. |
 
-In Codex and Cursor, say the same words: "run the Climb interview", and so
-on.
+With the plugin, these short names work. With the cloned folder, use the
+prefixed name (`/climb:climb-interview`) or the words after `/climb`
+(`/climb interview`). In Codex and Cursor, say the same words: "run the Climb
+interview", and so on.
 
 ## Your privacy
 
@@ -121,8 +135,9 @@ Most career advice flatters. Climb is built to do the opposite.
   score can never be higher than its best evidence supports. An achievement
   only you have claimed supports at most 1 point out of 5; one that is only
   partly checked never supports more than corroborated evidence would.
-- **A separate, sceptical reviewer.** A fresh agent, which never sees the
-  campaign's scores or reasoning, scores every point above 2 for itself.
+- **A separate, sceptical reviewer.** A fresh agent, given only the rubric,
+  the evidence and the postings and told not to open the campaign's scores or
+  reasoning, scores every point above 2 for itself.
   Where it disagrees, a second fresh reviewer scores it too and the middle of
   the three stands, with every dispute logged. Until the review is done, the
   score counts as 2.
@@ -185,7 +200,7 @@ python3 examples/build_demo.py
 python3 scripts/init.py --goal "Frontier AI labs"     # creates your private workspace
 export CLIMB_HOME=~/climb-workspaces/frontier-ai-labs
 python3 scripts/fetch_roles.py                        # open roles from public job boards
-python3 scripts/network_map.py --csv ~/Downloads/Connections.csv
+python3 scripts/network_map.py --csv ~/Downloads/Connections.csv   # optional: needs your LinkedIn export
 python3 scripts/claims_audit.py https://your-site.example/about
 python3 scripts/score.py                              # deterministic scoring
 python3 scripts/build_dashboard.py                    # report/index.html
