@@ -55,6 +55,14 @@ The result is a one-page `index.html` and a short message:
 
 <img src="images/quick-result-phone.png" alt="The same page on a phone" width="320">
 
+The page is light by default, with a dark mode that follows your device.
+Every piece of text passes WCAG AA contrast (the usual web accessibility
+standard) in both. If your device's "increase contrast" setting is on, the
+grey text takes the main text colour and the dividers get darker. In a Windows
+contrast theme the meters, score dots and fit bar keep their shape. Headings
+come in order and each card is named by its heading, so a screen reader can
+jump between them. `tests/test_quick_page_a11y.py` checks all of this.
+
 LVLme quick gives fixes and a brief, never application answers. Some
 employers publish guidance on how candidates may use AI when applying; check
 theirs, and write your answers in your own words.

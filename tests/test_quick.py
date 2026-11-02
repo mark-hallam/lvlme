@@ -116,7 +116,7 @@ class DemoTests(Base):
         page = open(os.path.join(self.folder, "index.html"), encoding="utf-8").read()
         self.assertNotRegex(page, r"<script|<link[^>]+href=|@import|url\(\s*['\"]?https?:|<img")
         self.assertIn("prefers-color-scheme:dark", page)
-        self.assertIn('Say "run LVLme"', page)
+        self.assertIn('Say to your agent</span> <b>"run LVLme"</b>', page)
         self.assertNotIn(os.path.expanduser("~"), page)
         self.assertIsNone(re.search("[–—]", re.sub(r"<[^>]+>", "", page)))
         message = open(os.path.join(self.folder, "message.md"), encoding="utf-8").read()

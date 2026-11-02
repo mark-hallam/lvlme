@@ -5,6 +5,12 @@ requests (no fonts, images or styles loaded from anywhere). Light by default,
 with a dark mode that follows the device. Plain semantic HTML: headings,
 lists and one table, so a screen reader or a text browser reads it in order.
 The colours are the dashboard's tokens, so the two pages look like one product.
+
+Accessibility (tests/test_quick_page_a11y.py keeps it so): every text colour
+pair passes WCAG AA contrast in both themes, no text is under 12px, the
+meters and bars stay visible in forced colours (Windows contrast themes), the
+device's "increase contrast" setting darkens the grey text, the one link has
+a larger tap area, and nothing that is not a control looks like a button.
 """
 import html
 
@@ -41,12 +47,13 @@ html,body{margin:0;background:var(--bg);color:var(--ink)}
 body{font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
 -webkit-font-smoothing:antialiased;overflow-wrap:break-word}
 a{color:var(--accent)}
+a.posting{padding:10px 4px;margin:0 -4px}
 .wrap{max-width:780px;margin:0 auto;padding:20px 16px 48px}
 .top{display:flex;align-items:center;gap:10px;margin:4px 2px 16px}
-.mark{width:28px;height:28px;border-radius:8px;background:var(--accent);display:grid;place-items:center}
+.mark{width:28px;height:28px;border-radius:8px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center}
 .mark svg{width:16px;height:16px}
 .top b{font-size:17px;letter-spacing:-.01em;white-space:nowrap}
-.top .sub{margin-left:auto;font-size:13px;text-align:right}
+.top .sub{margin-left:auto;font-size:13px;text-align:right}.nw{white-space:nowrap}
 .sub{color:var(--sub)}.small{font-size:14px}.tiny{font-size:13px}.num{font-variant-numeric:tabular-nums}
 .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:20px 22px}
 .card+.card,section+section{margin-top:16px}
@@ -62,7 +69,7 @@ p{margin:6px 0}
 .meter{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
 .meter i{height:6px;border-radius:3px;background:var(--pip)}
 .meter i.on{background:var(--accent)}
-.meter-l{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:4px}
+.meter-l{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:4px}
 .lead{font-size:17px}
 .fit{margin:14px 0 4px}
 .fit-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;font-size:14px}
@@ -103,14 +110,22 @@ table{border-collapse:collapse;width:100%;font-size:14px;margin-top:8px}
 th,td{text-align:left;padding:7px 8px;border-top:1px solid var(--rule);vertical-align:top}
 th{font-weight:600;color:var(--sub)}
 .deeper{display:flex;gap:16px;align-items:center}
-.deeper .say{background:var(--accent);color:var(--on-accent);border-radius:12px;padding:10px 14px;font-weight:650;white-space:nowrap}
+.say{margin:0;background:var(--accent-soft);border-radius:12px;padding:10px 16px;white-space:nowrap}
+.say .k{display:block;font-size:12px;font-weight:600;color:var(--sub)}
+.say b{font-size:17px;font-weight:650}
 footer{margin-top:20px;font-size:13px;color:var(--sub);padding:0 4px}
 @media (max-width:560px){h1{font-size:24px}.tile{padding:12px}.tile .b{font-size:21px}
-.deeper{flex-direction:column;align-items:flex-start}.card{padding:18px 16px}}
-@media (max-width:340px){.odds{grid-template-columns:1fr}}
+.deeper{flex-direction:column;align-items:flex-start}.card{padding:18px 16px}.top .nw{display:block}.top .sep{display:none}}
+@media (max-width:340px){.odds{grid-template-columns:1fr}th,td{padding:7px 4px}}
+@media (prefers-contrast:more){:root{--sub:var(--ink);--rule:#8e8e93;--pip:#8e8e93}}
+@media (prefers-contrast:more) and (prefers-color-scheme:dark){:root{--pip:#636366}}
+@media (forced-colors:active){.card,.tile,.note,.all,.say,.banner,.chip,.mark,ol.fixes li::before{border:1px solid CanvasText}
+.meter i,.pips i,.track{forced-color-adjust:none;background:Canvas;border:1px solid CanvasText}
+.meter i.on,.pips i.on,.track .now{background:Highlight}
+.track .maybe{background:repeating-linear-gradient(135deg,Highlight 0 2px,Canvas 2px 5px)}}
 """
 
-LOGO = ('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 13 L6 7 L9 10 L14 3" fill="none" stroke="#fff" '
+LOGO = ('<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 13 L6 7 L9 10 L14 3" fill="none" stroke="currentColor" '
         'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>')
 
 
@@ -167,9 +182,9 @@ def meter(band, label):
     i = BANDS.index(band)
     pips = "".join('<i class="on"></i>' if k <= i else "<i></i>" for k in range(5))
     return ('<div class="tile"><div class="k">%s</div><div class="b">%s</div>'
-            '<div class="meter" role="img" aria-label="%s: %s, step %d of 5">%s</div>'
+            '<div class="meter" role="img" aria-label="Step %d of 5, from Very low to Strong">%s</div>'
             '<div class="meter-l" aria-hidden="true"><span>Very low</span><span>Strong</span></div></div>'
-            % (label, esc(band), label, esc(band), i + 1, pips))
+            % (label, esc(band), i + 1, pips))
 
 
 def pips(score):
@@ -202,13 +217,13 @@ def hero(result):
     locs = ", ".join(r["locations"])
     remote = "Remote" if r.get("remote") is True and "remote" not in locs.lower() else ""
     where = " · ".join(x for x in [esc(r["org_name"]), esc(locs), remote] if x)
-    link = (' · <a href="%s">Open the posting</a>' % esc(r["url"])) if str(r.get("url") or "").startswith(
+    link = (' · <a class="posting" href="%s">Open the posting</a>' % esc(r["url"])) if str(r.get("url") or "").startswith(
         ("http://", "https://")) else ""
     banners = "".join('<div class="banner">%s</div>' % esc(a) for a in adjustments(result))
     return ('<section class="card" aria-labelledby="oddsH"><p class="eyebrow">Your honest odds today</p>'
-            '<h1>%s</h1><p class="sub small">%s%s</p>'
+            '<h1 id="oddsH">%s</h1><p class="sub small">%s%s</p>'
             '<div class="odds">%s%s</div>'
-            '<p class="lead" id="oddsH"><b>%s.</b> %s</p>%s'
+            '<p class="lead"><b>%s.</b> %s</p>%s'
             '<p class="sub small">The chances are for today\'s fit. They are judgement estimates, not statistics. '
             'Most applicants to competitive roles are turned down, so LVLme starts from "unlikely" and only evidence '
             'moves it.</p>%s</section>'
@@ -294,7 +309,8 @@ def band_change(result, f):
 
 def fixes(result):
     if not result["fixes"]:
-        return ('<section class="card"><p class="eyebrow">What would raise your odds</p><h2>No fix found</h2>'
+        return ('<section class="card" aria-labelledby="fixH"><p class="eyebrow">What would raise your odds</p>'
+                '<h2 id="fixH">No fix found</h2>'
                 '<p class="small sub">None of the fixes considered adds fit points. Say "run LVLme" for the full '
                 'campaign, which looks wider.</p></section>')
     items = []
@@ -359,15 +375,15 @@ def checked(result):
 
 def deeper():
     return ('<section class="card" aria-labelledby="deepH"><div class="deeper"><div><p class="eyebrow">Go deeper</p>'
-            '<h2 id="deepH">Want the whole climb?</h2><p class="small sub">The full campaign checks every open role at '
+            '<h2 id="deepH">Want the full picture?</h2><p class="small sub">The full campaign checks every open role at '
             'the organisations you choose, gathers evidence from the sources you approve, adds a recruiter screen and a '
             'consistency audit of your CV, LinkedIn and website, and re-scores as you act on the plan.</p></div>'
-            '<div class="say">Say "run LVLme"</div></div></section>')
+            '<p class="say"><span class="k">Say to your agent</span> <b>"run LVLme"</b></p></div></section>')
 
 
 def render(result):
     r = result["role"]
-    demo = " · fictional demo" if result.get("fictional") else ""
+    demo = '<span class="sep"> · </span><span class="nw">fictional demo</span>' if result.get("fictional") else ""
     foot = ("Drafts only: LVLme never applies, sends or posts for you. Your CV and this page stay on your computer. "
             "Inputs fingerprint %s." % esc(result["inputs_digest"][:19]))
     body = "".join([hero(result), factors(result), fixes(result), brief(result), checked(result), deeper()])
@@ -376,5 +392,6 @@ def render(result):
             "<meta name=\"color-scheme\" content=\"light dark\">"
             "<title>LVLme quick: %s</title><style>%s</style></head><body><div class=\"wrap\">"
             "<header class=\"top\"><span class=\"mark\">%s</span><b>LVLme quick</b>"
-            "<span class=\"sub\">%s%s</span></header><main>%s</main><footer>%s</footer></div></body></html>\n" % (
+            "<span class=\"sub\"><span class=\"nw\">%s</span>%s</span></header><main>%s</main><footer>%s</footer>"
+            "</div></body></html>\n" % (
                 esc("%s at %s" % (r["title"], r["org_name"])), CSS, LOGO, esc(long_date(result["date"])), demo, body, foot))
