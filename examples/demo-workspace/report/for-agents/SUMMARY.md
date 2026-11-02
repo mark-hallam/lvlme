@@ -38,6 +38,9 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 - [todo] A06 Apply to the Initech Robotics fleet deployments role once A04 is done (owner: you; done when: Application submitted (confirmation email))
 - [doing] A10 Build a small route-eval demo for Acme AI's quarterly evaluation challenge (owner: you; done when: Demo submitted to the challenge (link))
 
+## Parked for later (not in the projection or the next-level sets until switched on)
+- A12 Take Acme AI's evaluation practitioner course once the route-eval demo ships (owner: you; done when: Course certificate address)
+
 ## Next level (fit bands of the rubric; nothing here is made up)
 - Best role: Program Manager, Robot Fleet Deployments (initech), Level 3 Moderate, fit 57. Level 4 Good starts at 70: 13 points to go.
   No set of open actions gets there counting their chances: the whole plan is expected to reach 62.8, 7.2 short.
@@ -99,5 +102,5 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 - Can you point to a source for this? Cut late deliveries by 18 percent in 2023 (Counts as 0 until there is a source (feeds D2).)
 
 ## Evidence and network
-- Evidence items by level: contradicted 1, corroborated 2, self_reported 6, unverified 1, verified 9
+- Evidence items by level: contradicted 1, corroborated 2, partially_verified 1, self_reported 6, unverified 1, verified 9
 - First-degree contacts per organisation: Acme AI 1, Globex Labs 2, Initech Robotics 0

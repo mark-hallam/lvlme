@@ -6,8 +6,13 @@ demo under examples/) or inside any git repository that has a remote.
 
 Schema checks use a small hand-written validator for the subset of JSON
 Schema the engine's schemas use: type, enum, const, properties, required,
-additionalProperties, items, minItems, maxItems, minLength, maxLength,
-pattern, minimum, maximum, exclusiveMinimum, anyOf and local $ref.
+additionalProperties, patternProperties, items, minItems, maxItems,
+minLength, maxLength, pattern, minimum, maximum, exclusiveMinimum, anyOf and
+local $ref. Keys starting x_ (extension fields) are allowed on the main
+objects through patternProperties and are never read by the engine.
+
+Also checks the review dispute logs, eval/reviews/<date>.json
+(schemas/reviews.schema.json), against the middle-of-three rule.
 
 Usage
   python3 scripts/validate.py --workspace PATH [--json]
@@ -22,6 +27,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
+import score as S  # noqa: E402  (the evidence caps, so the warnings match the scoring)
 
 FILES = [
     ("config.json", "config.schema.json", True),
@@ -103,14 +109,20 @@ def _check(x, s, root, path, errs):
             return
     if isinstance(x, dict):
         props = s.get("properties") or {}
+        patterns = s.get("patternProperties") or {}
         for key in s.get("required") or []:
             if key not in x:
                 errs.append("%s: missing required field '%s'" % (path, key))
         extra = s.get("additionalProperties", True)
         for key, val in x.items():
             sub = "%s.%s" % (path, key)
+            matched = [p for p in patterns if re.search(p, key)]
+            for p in matched:
+                _check(val, patterns[p], root, sub, errs)
             if key in props:
                 _check(val, props[key], root, sub, errs)
+            elif matched:
+                continue
             elif extra is False:
                 errs.append("%s: unexpected field '%s'" % (path, key))
             elif isinstance(extra, dict):
@@ -164,6 +176,7 @@ def cross_checks(ws, docs, errors, warnings):
             errors.append("duplicate %s id %s" % (label, d))
     if "default" in targets:
         errors.append("config.json: 'default' is reserved and cannot be a target id")
+    evidence_checks(cfg, ev, warnings)
     weights = C.weights_of(cfg)
     if sum(weights.values()) != 100:
         warnings.append("config.json: weights add up to %d, not 100 (fit is rescaled to 100)" % sum(weights.values()))
@@ -220,11 +233,12 @@ def cross_checks(ws, docs, errors, warnings):
         errors.append("campaign/plan.json: duplicate action id %s" % d)
     for m in plan.get("north_star", []):
         cite("campaign/plan.json metric %s" % m.get("id"), m.get("evidence"))
-    active = [a for a in actions if a.get("status") in ("todo", "doing")]
+    active = [a for a in actions if a.get("status") in C.ACTIVE_STATUSES]
     cap = int(plan.get("max_active", 8))
     if len(active) > cap:
-        errors.append("campaign/plan.json: %d active actions, more than the cap of %d. Move some to the backlog."
-                      % (len(active), cap))
+        warnings.append("campaign/plan.json: %d active actions (to do or in progress), more than the cap of %d. "
+                        "Park the lowest priority ones as status later, or move them to the backlog."
+                        % (len(active), cap))
 
     swot = docs.get("eval/swot.json")
     strat_ids = set()
@@ -302,6 +316,94 @@ def cross_checks(ws, docs, errors, warnings):
     for r in (docs.get("eval/ceilings.json") or {}).get("roles", []):
         if r.get("org") not in targets:
             warnings.append("eval/ceilings.json: role %s belongs to %s, not a target id" % (r.get("role_id"), r.get("org")))
+    review_checks(docs, ev_ids, errors, warnings)
+
+
+# Evidence id prefixes Climb already uses for other ids, so an evidence id with one reads as something else.
+RESERVED_PREFIXES = {"D": "the factor codes D1 to D7", "A": "plan actions (A01)", "Q": "open questions (Q01)"}
+
+
+def evidence_checks(cfg, ev, warnings):
+    """Evidence ids with a confusing prefix, and partially verified items that support less than self-reported ones."""
+    scoring = cfg.get("scoring") or {}
+    self_caps = dict(S.DEFAULT_SELF_CAPS, **(scoring.get("self_reported_caps") or {}))
+    partial = int(scoring.get("partially_verified_cap", S.DEFAULT_PARTIAL_CAP))
+    for e in ev.get("items", []):
+        eid, kind = e.get("id") or "", e.get("kind") or "other"
+        prefix = re.match(r"^[A-Z]*", eid).group(0)
+        if prefix in RESERVED_PREFIXES:
+            warnings.append("profile/evidence.json: evidence id %s starts with %s, which Climb uses for %s; prefer E "
+                            "(or another prefix) so it is not misread" % (eid, prefix, RESERVED_PREFIXES[prefix]))
+        if e.get("level") == "partially_verified":
+            mine = S.level_cap("partially_verified", kind, self_caps, partial)
+            theirs = S.level_cap("self_reported", kind, self_caps, partial)
+            if mine < theirs:
+                warnings.append("profile/evidence.json: %s is partially_verified, which supports at most %d for %s "
+                                "evidence, less than self_reported (%d). Record it as self_reported, or verified "
+                                "once the rest is checked." % (eid, mine, kind.replace("_", " "), theirs))
+
+
+def review_checks(docs, ev_ids, errors, warnings):
+    """eval/reviews/<date>.json: the file date, the middle-of-three rule, cited evidence and the judgement files."""
+    jud = (docs.get("eval/judgements.json") or {}).get("roles", {})
+    prof = docs.get("eval/profile-dimensions.json") or {}
+    for rel in sorted(k for k in docs if k.startswith("eval/reviews/")):
+        doc, day = docs[rel], os.path.basename(rel)[:-5]
+        if doc.get("date") != day:
+            errors.append("%s: date %s does not match the file name" % (rel, doc.get("date")))
+        for n, d in enumerate(doc.get("disputes") or []):
+            item = d.get("item_id", "")
+            where = "%s dispute %d (%s)" % (rel, n + 1, item)
+            s, r, t = (d.get(k) or {} for k in ("scorer", "reviewer", "tie_break"))
+            scores = [x.get("score") for x in (s, r, t) if "score" in x]
+            for who, x in (("scorer", s), ("reviewer", r), ("tie-break", t)):
+                for eid in x.get("evidence") or []:
+                    if eid not in ev_ids:
+                        errors.append("%s: the %s cites evidence %s, which is not in profile/evidence.json" % (where, who, eid))
+            if s.get("score") == r.get("score"):
+                warnings.append("%s: the scorer and the reviewer agree, so it is not a dispute" % where)
+            how, stands = d.get("decided_by"), d.get("stands")
+            if how == "middle_of_three":
+                if "score" not in t:
+                    errors.append("%s: decided by the middle of three, but there is no tie-break score" % where)
+                elif stands != sorted(scores)[1]:
+                    errors.append("%s: the middle of %s is %d, but %s stands" % (where, scores, sorted(scores)[1], stands))
+                for who, x in (("scorer", s), ("reviewer", r), ("tie-break", t)):
+                    if x and not x.get("anchor"):
+                        warnings.append("%s: the %s's score names no rubric anchor" % (where, who))
+            elif how == "awaiting_tie_break" and "score" in t:
+                errors.append("%s: awaiting a tie-break, but a tie-break score is recorded (use middle_of_three)" % where)
+            elif how == "earlier_rule" and stands not in scores:
+                warnings.append("%s: %s stands, which none of the recorded scores gave" % (where, stands))
+            entry, container = review_entry(item, jud, prof)
+            when = d.get("date") or day
+            if entry is None:
+                warnings.append("%s: no such judgement entry in eval/judgements.json or eval/profile-dimensions.json" % where)
+                continue
+            judged = entry.get("judged_on") or container.get("judged_on") or ""
+            reviewed = entry.get("reviewed_on") or container.get("reviewed_on") or ""
+            if judged > when:
+                continue  # judged again since this review: the dispute is history
+            if how == "middle_of_three" and entry.get("score") != stands:
+                warnings.append("%s: %s stands, but the judgement file has %s" % (where, stands, entry.get("score")))
+            if how == "middle_of_three" and reviewed < when:
+                warnings.append("%s: decided, but the judgement entry has no reviewed_on on or after %s" % (where, when))
+            if how == "awaiting_tie_break" and reviewed >= when:
+                warnings.append("%s: still awaiting a tie-break, but the judgement entry is marked reviewed on %s"
+                                % (where, reviewed))
+
+
+def review_entry(item_id, jud, prof):
+    """(entry, the object that holds its fallback judged_on and reviewed_on) for a review item id, or (None, None)."""
+    m = re.match(r"^(D[3567])/([a-z0-9_]+)$", item_id or "")
+    if m:
+        dim, key = m.groups()
+        sec = ((prof.get("D6_rules") or {}).get("classes") or {}) if dim == "D6" else (prof.get(dim) or {})
+        return (sec.get(key), prof) if key in sec else (None, None)
+    m = re.match(r"^(.+)/(D[124])$", item_id or "")
+    if m and m.group(1) in jud and m.group(2) in jud[m.group(1)]:
+        return jud[m.group(1)][m.group(2)], jud[m.group(1)]
+    return None, None
 
 
 def effect_checks(aid, e, targets, fams, classes, errors, warnings):
@@ -327,6 +429,8 @@ def validate_workspace(ws):
     errors, warnings, checked, docs = [], [], [], {}
     entries = list(FILES) + [(os.path.relpath(p, ws), "run.schema.json", False)
                              for p in sorted(glob.glob(C.wpath(ws, "eval", "runs", "*.json")))]
+    entries += [(os.path.relpath(p, ws), "reviews.schema.json", False)
+                for p in sorted(glob.glob(C.wpath(ws, "eval", "reviews", "*.json")))]
     for rel, schema_name, required in entries:
         path = C.wpath(ws, rel)
         if not os.path.exists(path):

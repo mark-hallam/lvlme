@@ -10,7 +10,10 @@ and metrics as they stood then, and runs the real scripts on them.
 Hand-written inputs: config.json, intake/, profile/evidence.json,
 profile/claims-audit.json, profile/network.json (second_degree only),
 eval/judgements.json, eval/profile-dimensions.json, eval/gap-templates.json,
-eval/outlook.json, eval/swot.json, campaign/, market/orgs.json, market/fixtures/.
+eval/outlook.json, eval/swot.json, eval/reviews/ (a dispute settled by the middle of
+three), campaign/ (including a parked action, status later), market/orgs.json,
+market/fixtures/. profile/evidence.json has a partially verified item and an
+extension field (x_...).
 Generated: market/roles/, profile/network.json (orgs), eval/runs/,
 campaign/metrics-history.json, report/.
 

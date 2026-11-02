@@ -5,6 +5,7 @@
   "type": "object",
   "required": ["schema_version", "goal", "targets", "families", "locations"],
   "additionalProperties": false,
+  "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
   "properties": {
     "schema_version": {"const": 1},
     "fictional": {"type": "boolean", "description": "True only for the bundled demo workspace. Lets the demo live inside the engine repo."},
@@ -23,6 +24,7 @@
     "candidate": {
       "type": "object",
       "additionalProperties": false,
+      "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
       "properties": {
         "display_name": {"type": "string"},
         "home_region": {"type": "string"},
@@ -71,7 +73,12 @@
           }
         },
         "review_required_above": {"type": "integer", "minimum": 0, "maximum": 5},
-        "top_n_for_gaps": {"type": "integer", "minimum": 1, "maximum": 500},
+        "top_n_for_gaps": {"type": "integer", "minimum": 1, "maximum": 500, "description": "How many top roles the gap leaderboard adds up over (per pool). Default 25."},
+        "gap_pool": {"enum": ["overall", "per_org"],
+                     "description": "overall (the default): one pool, the top roles overall. per_org: one pool per target organisation (its own top roles), so a gap at an organisation whose roles are not in the overall top still counts."},
+        "top_n_per_org_for_gaps": {"type": "integer", "minimum": 1, "maximum": 500, "description": "With gap_pool per_org: how many top roles per organisation. Default: top_n_for_gaps."},
+        "partially_verified_cap": {"type": "integer", "minimum": 0, "maximum": 4,
+                                   "description": "Highest score a partially_verified item supports when its kind's self-reported cap is lower. Default 2. Never above 4, what corroborated evidence supports."},
         "self_reported_caps": {
           "type": "object",
           "additionalProperties": {"type": "integer", "minimum": 0, "maximum": 5}
@@ -107,12 +114,14 @@
     }
   },
   "definitions": {
+    "extension": {"description": "Extension field: any key starting x_ holds data the engine never reads (for example a field from an older system). Kept as is."},
     "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
     "blocker_type": {"enum": ["us_person_export_control", "security_clearance", "citizenship", "licence"]},
     "target": {
       "type": "object",
       "required": ["id", "name", "ats"],
       "additionalProperties": false,
+      "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
       "properties": {
         "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
         "name": {"type": "string", "minLength": 1},
@@ -128,6 +137,7 @@
       "type": "object",
       "required": ["id", "name", "title_keywords"],
       "additionalProperties": false,
+      "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
       "properties": {
         "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
         "name": {"type": "string", "minLength": 1},

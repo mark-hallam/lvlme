@@ -83,6 +83,47 @@ The scoring agent applies the agreed changes to the judgement files:
   open question or a plan action that would produce the missing evidence.
 - Record each disputed item in `eval/reviews/<date>.json`: item id, the three
   scores, the anchor and evidence ids each cited, and the score that stands.
+  The format is below; `scripts/validate.py` checks it.
+
+## The dispute log: `eval/reviews/<date>.json`
+
+One file per review date (`schemas/reviews.schema.json`). Only disputed
+scores go in it; agreed scores are recorded as `reviewed_on` and
+`reviewer_note` on the entry, as above.
+
+```json
+{
+  "schema_version": 1,
+  "date": "2026-10-26",
+  "disputes": [
+    {
+      "item_id": "initech:i-0001/D2",
+      "scorer":    {"score": 4, "anchor": "D2 anchor 4: better than most shortlisted applicants", "evidence": ["E04", "E15"], "by": "scorer"},
+      "reviewer":  {"score": 3, "anchor": "D2 anchor 3: meets it, one case study", "evidence": ["E15"], "by": "reviewer"},
+      "tie_break": {"score": 3, "anchor": "D2 anchor 3: comparable to a typical shortlisted applicant", "evidence": ["E04", "E15"], "by": "tie-break reviewer"},
+      "stands": 3,
+      "decided_by": "middle_of_three"
+    }
+  ]
+}
+```
+
+- `item_id` names the judgement entry: `<role id>/D1` (or `D2`, `D4`) in
+  `eval/judgements.json`; `D3/<organisation id>` (or `D5`, `D7`, with
+  `default` allowed) or `D6/<location class>` in
+  `eval/profile-dimensions.json`.
+- Each score names the anchor it claims to meet and the evidence ids it
+  cites (an empty list means "no evidence").
+- `decided_by` is `middle_of_three` once the tie-break has run;
+  `awaiting_tie_break` while it has not (`tie_break` is then
+  `{"absent": true, "why": "..."}`, and the entry gets no `reviewed_on`, so
+  a score above 2 counts as 2); or `earlier_rule` for history decided under
+  an older rule, such as one imported from another campaign, with a `note`
+  saying how. Never write a tie-break score that did not happen.
+- `validate.py` checks that the file date matches its name, that the middle
+  of three is the score that stands, that every evidence id exists, and that
+  the judgement file agrees (the same score, and `reviewed_on` set) unless the
+  entry has been judged again since.
 
 ## Copy-paste reviewer prompt
 

@@ -365,6 +365,30 @@
       "orgs": [
         "initech"
       ]
+    },
+    {
+      "id": "E20",
+      "claim": "Ran the 2024 peak-season staffing plan for the same 6 warehouses, cutting overtime by 12 percent",
+      "kind": "achievement",
+      "level": "partially_verified",
+      "dimensions": [
+        "D2"
+      ],
+      "sources": [
+        {
+          "type": "website",
+          "ref": "https://example.com/alex/case-study-scheduling",
+          "checked_on": "2026-11-01",
+          "note": "The case study names the 6 sites and Alex's role in the peak-season plan."
+        },
+        {
+          "type": "interview",
+          "ref": "intake/answers.md#proof-of-work"
+        }
+      ],
+      "added_on": "2026-11-01",
+      "notes": "Checked: the 6 sites and Alex's role, in the case study. Not checked: the 12 percent overtime saving, which is Alex's own figure. Ask the former manager to confirm it (it would make the item corroborated).",
+      "x_unchecked_part": "the 12 percent overtime saving"
     }
   ],
   "open_questions": [

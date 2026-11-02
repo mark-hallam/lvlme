@@ -15,12 +15,19 @@ Writes
 
 Rules (method/RUBRIC.md v1.0), applied in this order per dimension:
   1. evidence cap: a score can be no higher than its best cited evidence
-     supports (verified 5, corroborated 4, self-reported by kind, else 0);
+     supports (verified 5, corroborated 4, partially verified the higher of
+     the kind's self-reported cap and scoring.partially_verified_cap (default
+     2) but never above 4, self-reported by kind, else 0);
   2. review cap: a score above the review threshold (default 2) counts as the
      threshold until reviewed_on is set, on or after judged_on;
   3. hard requirement lacking (or an eligibility blocker): D1 capped at 1.
 Then fit = sum(score / 5 x weight), bands from the fit table, and the three
 adjustments: warm referral up, hard requirement lacking down, cold-only cap.
+
+Gap leaderboard: over the top scoring.top_n_for_gaps roles overall (the
+default, scoring.gap_pool "overall"), or, with gap_pool "per_org", over each
+target organisation's own top scoring.top_n_per_org_for_gaps roles, so a gap
+at an organisation whose roles are not in the overall top still counts.
 
 Usage
   python3 scripts/score.py --workspace PATH [--date YYYY-MM-DD]
@@ -40,7 +47,9 @@ INTERVIEW_TABLE = [(85, "Strong"), (70, "Good"), (55, "Moderate"), (40, "Low"), 
 OFFER_TABLE = [(85, "Good"), (70, "Moderate"), (55, "Low"), (40, "Very low"), (0, "Very low")]
 LEVEL_CAPS = {"verified": 5, "corroborated": 4, "unverified": 0, "contradicted": 0}
 DEFAULT_SELF_CAPS = {"job_history": 3, "education": 3, "eligibility": 5, "preference": 5, "default": 1}
+DEFAULT_PARTIAL_CAP = 2
 DEFAULT_TOP_N = 25
+GAP_POOLS = ("overall", "per_org")
 NOT_JUDGED = "Not yet judged."
 
 
@@ -67,6 +76,9 @@ class Ctx:
         self.review_above = int(scoring.get("review_required_above", 2))
         self.top_n = int(scoring.get("top_n_for_gaps", DEFAULT_TOP_N))
         self.self_caps = dict(DEFAULT_SELF_CAPS, **(scoring.get("self_reported_caps") or {}))
+        self.partial_cap = int(scoring.get("partially_verified_cap", DEFAULT_PARTIAL_CAP))
+        self.gap_pool = scoring.get("gap_pool") or "overall"
+        self.top_n_per_org = int(scoring.get("top_n_per_org_for_gaps", self.top_n))
         self.cleared = set(cand.get("eligibility_cleared") or [])
         self.writes_code = bool(cand.get("writes_production_code", False))
         self.evidence = {e["id"]: e for e in (evidence or {}).get("items", [])}
@@ -79,6 +91,22 @@ class Ctx:
         self.warnings.add(text)
 
 
+def level_cap(level, kind, self_caps, partial_cap=DEFAULT_PARTIAL_CAP):
+    """Highest score one evidence item supports, from its level and kind.
+
+    partially_verified (some facts in the claim checked, some not) supports the
+    higher of its kind's self-reported cap and partial_cap, but never more than
+    corroborated evidence (4): a claim that is only partly checked can never
+    outrank one that two independent sources agree on."""
+    kind = kind or "other"
+    self_cap = int(self_caps.get(kind, self_caps.get("default", 1)))
+    if level == "self_reported":
+        return self_cap
+    if level == "partially_verified":
+        return min(LEVEL_CAPS["corroborated"], max(self_cap, int(partial_cap)))
+    return LEVEL_CAPS.get(level, 0)
+
+
 def evidence_cap(ctx, ids, where):
     """Highest score the cited evidence can support, and why."""
     best, why = 0, "no evidence cited"
@@ -88,13 +116,13 @@ def evidence_cap(ctx, ids, where):
         if item is None:
             ctx.warn("%s: unknown evidence id %s (ignored)" % (where, eid))
             continue
-        level = item.get("level")
-        if level == "self_reported":
-            kind = item.get("kind") or "other"
-            cap = int(ctx.self_caps.get(kind, ctx.self_caps.get("default", 1)))
-            label = "self-reported %s" % kind.replace("_", " ")
+        level, kind = item.get("level"), item.get("kind") or "other"
+        cap = level_cap(level, kind, ctx.self_caps, ctx.partial_cap)
+        if level in ("self_reported", "partially_verified"):
+            label = "%s %s" % ("self-reported" if level == "self_reported" else "partially verified",
+                               kind.replace("_", " "))
         else:
-            cap, label = LEVEL_CAPS.get(level, 0), str(level)
+            label = str(level)
         if not seen_known or cap > best:
             best, why = cap, "best cited evidence is %s, which supports at most %d" % (label, cap)
             seen_known = True
@@ -233,31 +261,58 @@ def sort_key(r):
     return (-r["fit"], -BANDS.index(r["interview_band"]), r["role_id"])
 
 
+def gap_pools(ctx, scored):
+    """The roles the gap leaderboard adds up over: {pool key: roles}, in run order.
+
+    overall (the default): one pool, the top top_n_for_gaps roles overall.
+    per_org: one pool per target organisation (config order, then any other
+    organisation with roles), each its own top top_n_per_org_for_gaps roles."""
+    if ctx.gap_pool != "per_org":
+        return {None: scored[:ctx.top_n]}
+    orgs = list(C.target_ids(ctx.config))
+    orgs += sorted({r["org"] for r in scored} - set(orgs))
+    return {o: [r for r in scored if r["org"] == o][:ctx.top_n_per_org] for o in orgs}
+
+
+def gap_gain(ctx, g, r):
+    """Fit points one role gains if the gap closes (0 if the gap does not apply to it)."""
+    orgs, fams = g.get("orgs", "all"), g.get("families", "all")
+    dim, target = g["dimension"], int(g["target_score"])
+    if orgs != "all" and r["org"] not in orgs:
+        return 0.0
+    if fams != "all" and r["family"] not in fams:
+        return 0.0
+    if r["eligibility_blocked"] and (g.get("exclude_blocked") or dim == "D6"):
+        return 0.0
+    if g.get("location_classes") and r["location_class"] not in g["location_classes"]:
+        return 0.0
+    tgt = min(target, 1) if dim == "D1" and r["hard_requirement_lacking"] else target
+    return max(0.0, (tgt - r["scores"][dim]["score"]) / 5.0 * ctx.weights[dim] * 100.0 / ctx.total_weight)
+
+
 def compute_gaps(ctx, scored, templates):
-    top = scored[:ctx.top_n]
+    if ctx.gap_pool not in GAP_POOLS:
+        ctx.warn("scoring.gap_pool %r is not one of %s; using overall" % (ctx.gap_pool, ", ".join(GAP_POOLS)))
+        ctx.gap_pool = "overall"
+    pools = gap_pools(ctx, scored)
     gaps = []
     for g in templates:
-        orgs, fams = g.get("orgs", "all"), g.get("families", "all")
-        locs = g.get("location_classes")
-        dim, target = g["dimension"], int(g["target_score"])
-        weight = ctx.weights[dim] * 100.0 / ctx.total_weight
-        total, affected = 0.0, 0
-        for r in top:
-            if orgs != "all" and r["org"] not in orgs:
-                continue
-            if fams != "all" and r["family"] not in fams:
-                continue
-            if r["eligibility_blocked"] and (g.get("exclude_blocked") or dim == "D6"):
-                continue
-            if locs and r["location_class"] not in locs:
-                continue
-            tgt = min(target, 1) if dim == "D1" and r["hard_requirement_lacking"] else target
-            gain = max(0.0, (tgt - r["scores"][dim]["score"]) / 5.0 * weight)
-            if gain > 0:
-                total += gain
-                affected += 1
-        gaps.append({"id": g["id"], "title": g["title"], "why": g.get("why", ""), "dimension": dim,
-                     "target_score": target, "points_gain": round(total, 1), "roles_affected": affected})
+        total, affected, by_org = 0.0, 0, {}
+        for key, roles in pools.items():
+            pts, n = 0.0, 0
+            for r in roles:
+                gain = gap_gain(ctx, g, r)
+                if gain > 0:
+                    pts += gain
+                    n += 1
+            total, affected = total + pts, affected + n
+            if key is not None and n:
+                by_org[key] = {"points_gain": round(pts, 1), "roles_affected": n}
+        gap = {"id": g["id"], "title": g["title"], "why": g.get("why", ""), "dimension": g["dimension"],
+               "target_score": int(g["target_score"]), "points_gain": round(total, 1), "roles_affected": affected}
+        if ctx.gap_pool == "per_org":
+            gap.update(pool="per_org", by_org=by_org)
+        gaps.append(gap)
     return sorted(gaps, key=lambda x: (-x["points_gain"], x["id"]))
 
 

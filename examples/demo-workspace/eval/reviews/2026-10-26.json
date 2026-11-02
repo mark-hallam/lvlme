@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-26",
+  "rubric_version": "1.0",
+  "disputes": [
+    {
+      "item_id": "initech:i-0001/D2",
+      "scorer": {
+        "score": 4,
+        "anchor": "D2 anchor 4: better than most shortlisted applicants",
+        "evidence": [
+          "E04",
+          "E15"
+        ],
+        "by": "scorer"
+      },
+      "reviewer": {
+        "score": 3,
+        "anchor": "D2 anchor 3: meets it; one corroborated case study is not a track record",
+        "evidence": [
+          "E15"
+        ],
+        "by": "reviewer"
+      },
+      "tie_break": {
+        "score": 3,
+        "anchor": "D2 anchor 3: comparable to a typical shortlisted applicant",
+        "evidence": [
+          "E04",
+          "E15"
+        ],
+        "by": "tie-break reviewer"
+      },
+      "stands": 3,
+      "decided_by": "middle_of_three"
+    }
+  ]
+}

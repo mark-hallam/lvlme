@@ -19,7 +19,15 @@ any organisation, role, factor, action or piece of evidence.
 
 The page makes no external requests, is light by default with a readable dark
 switch, works on a phone, and its motion is optional: everything is drawn in
-its final state first, and reduced motion is respected.
+its final state first, and reduced motion is respected. The key numbers (best
+chance, level, outlook, today's top actions, best role per organisation), the
+level card and the Level up view are also rendered into the HTML here, so they
+read the same without JavaScript; the page script hides the static summary
+once it has drawn the live page.
+
+Plan actions with status later are parked: off the active cap, and out of the
+projection, the next-level sets and the quests unless switched on in the
+what-if rail (they start switched off).
 
 Projection (mirrored by project() in the page script): actions in target-date
 order; each effect raises a factor by `delta` or to `set_at_least`, only for
@@ -54,6 +62,7 @@ import _common as C  # noqa: E402
 import _dashboard_assets as A  # noqa: E402
 import _levels as L  # noqa: E402
 import _levels_html as LH  # noqa: E402
+import _static_html as ST  # noqa: E402
 
 DIMS = C.DIMENSIONS
 DIM_HELP = {
@@ -65,7 +74,7 @@ DIM_HELP = {
     "D6": "Work rights, visa route and location fit for where the role sits. A blocker you can't clear scores zero.",
     "D7": "A résumé, portfolio and story tailored to this exact role.",
 }
-STATUS_ORDER = {"doing": 0, "todo": 1, "done": 2, "dropped": 3}
+STATUS_ORDER = {"doing": 0, "todo": 1, "later": 2, "done": 3, "dropped": 4}
 OWNERS = {"you": "You", "agent": "Your agent", "both": "You and your agent"}
 DEFAULT_CAPS = {"D1": 0, "D2": 1, "D3": 2, "D4": 1, "D5": 1, "D6": 1, "D7": 3}
 DEFAULT_HARD_TYPES = ["us_person_export_control", "citizenship", "security_clearance"]
@@ -156,8 +165,10 @@ class Data:
         self.weights = C.weights_of(config)
         self.actions = sorted(self.plan.get("actions", []),
                               key=lambda a: (STATUS_ORDER.get(a.get("status"), 9), -priority(a), a.get("id", "")))
-        self.active = sorted([a for a in self.actions if a.get("status") in ("todo", "doing")],
+        self.active = sorted([a for a in self.actions if a.get("status") in C.ACTIVE_STATUSES],
                              key=lambda a: (-priority(a), STATUS_ORDER.get(a.get("status"), 9), a.get("id", "")))
+        self.parked = sorted([a for a in self.actions if a.get("status") == "later"],
+                             key=lambda a: (-priority(a), a.get("id", "")))
         self.privacy = config.get("privacy") or {}
         self.metrics_history = []
 
@@ -544,11 +555,13 @@ def render_page(data):
         page = _scrub_text(page, make_redactor(data, sensitive=False, hide_names=True, placeholder="a contact"))
     blob = json.dumps(page, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
     card, view = LH.render(page)          # first render, readable without JavaScript; the page script redraws it
+    static = ST.render(page, data.cur.get("per_org") or {}, [a["id"] for a in data.active])
     top = page["roles"][0] if page["roles"] else None
     out = A.TEMPLATE.replace("__TITLE__", html.escape(page["meta"]["title"]))
     out = out.replace("__BESTFIT__", str(int(top["fit"] + 0.5)) if top else "0")
     out = out.replace("__BESTROLE__", html.escape("%s: %s" % (top["on"], top["title"])) if top else "")
-    return out.replace("__LEVELCARD__", card).replace("__LEVELUP__", view).replace("__DATA__", blob), page
+    out = out.replace("__LEVELCARD__", card).replace("__LEVELUP__", view).replace("__STATIC__", static)
+    return out.replace("__DATA__", blob), page
 
 # ------------------------------------------------------------ agent files
 
@@ -710,6 +723,7 @@ def agent_payload(data, page):
         "gaps": cur.get("gaps", []),
         "verify_to_unlock": cur.get("verify_to_unlock", []),
         "actions_active": [dict(a, priority=priority(a)) for a in data.active],
+        "actions_later": [dict(a, priority=priority(a)) for a in data.parked],
         "levels": levels_payload(data, page),
         "actions_done": [a for a in data.actions if a.get("status") == "done"],
         "north_star": data.plan.get("north_star", []),
@@ -840,6 +854,10 @@ def summary_md(data, p):
     for a in p["actions_active"]:
         lines.append("- [%s] %s %s (owner: %s; done when: %s)" % (a["status"], a["id"], a["title"], a.get("owner", "you"),
                                                                  a.get("done_when", "")))
+    if p.get("actions_later"):
+        lines += ["", "## Parked for later (not in the projection or the next-level sets until switched on)"]
+        for a in p["actions_later"]:
+            lines.append("- %s %s (owner: %s; done when: %s)" % (a["id"], a["title"], a.get("owner", "you"), a.get("done_when", "")))
     lines += levels_md(data, p.get("levels"))
     lines += ["", "## Biggest gaps"]
     for g in p["gaps"]:

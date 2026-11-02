@@ -363,6 +363,36 @@
         "initech"
       ],
       "added_on": "2026-11-01"
+    },
+    {
+      "id": "A12",
+      "title": "Take Acme AI's evaluation practitioner course once the route-eval demo ships",
+      "why": "Parked until A10 lands: the course is worth more once there is a demo to point to, and the active list is full.",
+      "status": "later",
+      "owner": "you",
+      "dimension": "D4",
+      "orgs": [
+        "acme"
+      ],
+      "effort_hours": 20,
+      "expected_points": 2,
+      "roles_affected": 4,
+      "chance": 0.6,
+      "target_date": "2027-01-15",
+      "effects": [
+        {
+          "dimension": "D4",
+          "delta": 1,
+          "scope": {
+            "orgs": [
+              "acme"
+            ]
+          }
+        }
+      ],
+      "done_when": "Course certificate address",
+      "added_on": "2026-11-01",
+      "x_parked_until": "A10 done"
     }
   ],
   "backlog": [

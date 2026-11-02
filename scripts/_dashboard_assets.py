@@ -202,7 +202,13 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
 .tag{display:inline-block;font-size:12px;font-weight:650;padding:1px 8px;border-radius:7px;background:var(--card2);color:var(--sub);white-space:nowrap}
 .t-verified,.t-corroborated,.t-supported{background:var(--tv-bg);color:var(--tv-t)}
 .t-contradicted,.t-unsupported{background:var(--tc-bg);color:var(--tc-t)}
-.t-self_reported,.t-overstated{background:var(--tp-bg);color:var(--tp-t)}
+.t-self_reported,.t-partially_verified,.t-overstated{background:var(--tp-bg);color:var(--tp-t)}
+.static-sum h2{font-size:17px;margin:2px 0 4px}.static-sum h3{font-size:15px;margin:16px 0 6px}
+.static-sum table{width:100%;border-collapse:collapse;font-size:14px}
+.static-sum th,.static-sum td{text-align:left;padding:7px 8px 7px 0;border-top:1px solid var(--rule);vertical-align:top}
+.static-sum thead th{border-top:none;font-size:12px;color:var(--sub);font-weight:650}
+.static-sum ol{margin:4px 0 0;padding-left:22px}.static-sum li{margin:6px 0}
+.static-sum .num{font-variant-numeric:tabular-nums}
 .chip{display:inline-block;border:1px solid var(--rule);background:var(--card2);border-radius:999px;padding:2px 10px;font-size:13px;margin:3px 4px 0 0;cursor:pointer;color:var(--ink)}
 .chip:hover{border-color:var(--accent);color:var(--accent)}
 .chip.plain{cursor:default}.chip.plain:hover{border-color:var(--rule);color:var(--ink)}
@@ -440,7 +446,7 @@ BODY = r"""
    <div class="grp-h"><span>Now</span><span class="tiny" id="nowCount"></span></div>
    <div class="grp-note">The open actions, highest priority first. Work these first.</div>
    <div id="switchesNow"></div>
-   <details class="grp" id="laterBox"><summary><span id="laterLabel">Later</span><span class="chev">›</span></summary><div class="grp-note">Later actions. They still count in the projection while switched on.</div><div id="switchesLater"></div></details>
+   <details class="grp" id="laterBox"><summary><span id="laterLabel">Later</span><span class="chev">›</span></summary><div class="grp-note">Over the active cap, or parked for later. Parked actions start switched off; any action here counts in the projection only while switched on.</div><div id="switchesLater"></div></details>
    <details class="grp" id="doneBox" hidden><summary><span id="doneLabel">Done</span><span class="chev">›</span></summary><div class="grp-note">Already in today's scores.</div><div id="switchesDone"></div></details>
   </div>
   <div class="card">
@@ -475,6 +481,7 @@ BODY = r"""
    <details class="tableview"><summary>Show the journey as a table</summary><div id="journeyTable"></div></details>
   </section>
 
+  <section class="card static-sum" id="staticSummary" aria-labelledby="staticSummaryH">__STATIC__</section>
   <div class="tiles4" id="tiles4"></div>
   <div class="grid2 pair">
    <div class="card"><div class="eyebrow">Do next</div><div id="doNext"></div></div>
@@ -547,6 +554,8 @@ function inScope(r, sc){
 }
 const hardBlock = (r, k) => k === 5 && r.hard;              // a blocker the plan can't clear keeps eligibility at 0
 const live = a => a.status === "todo" || a.status === "doing";
+// Parked (status later): off by default, and in the projection, the next level and the quests only while switched on.
+const switchable = a => live(a) || a.status === "later";
 const enabled = new Set(D.actions.filter(live).map(a => a.id));
 const TODAY = D.meta.run_date;
 // Apply a list of actions (in target-date order). sure: one action id treated as certain to work.
@@ -555,7 +564,7 @@ function walkL(r, acts, mode, sure){
   const base = r.s.slice(), s = r.s.slice();
   const pts = [{d: TODAY, v: r.fit}];
   acts.forEach(a => {
-    if (!live(a)) return;
+    if (!switchable(a)) return;
     const p = (mode === "best" || a.id === sure) ? 1 : a.p;
     a.effects.forEach(e => {
       if (!inScope(r, e.scope || {})) return;
@@ -752,7 +761,7 @@ function drawChart(){
   const g = $("#wps"); g.textContent = "";
   const dz = SMALL ? 5 : 7;
   D.actions.forEach(a => {
-    if (!enabled.has(a.id) || !live(a)) return;
+    if (!enabled.has(a.id) || !switchable(a)) return;
     const when = a.date < TODAY ? TODAY : a.date;
     const x = xOf(when), y = yOf(valueAt(exp.pts, tOf(when)));
     const fill = a.status === "doing" ? c : "var(--card)";
@@ -847,7 +856,7 @@ function renderTiles4(){
   $("#tiles4").innerHTML = tiles.map(t => `<div class="tile"><div class="v num" data-to="${t[1]}">${Math.round(t[1])}</div><div class="l">${esc(t[0])}</div></div>`).join("");
   $("#tiles4").querySelectorAll("[data-to]").forEach(n => countTo(n, +n.dataset.to));
 }
-function actionLift(a, r){ if (!live(a)) return 0; const w = new Set(enabled); w.add(a.id); const wo = new Set(enabled); wo.delete(a.id); return r1(project(r, "exp", w).end - project(r, "exp", wo).end); }
+function actionLift(a, r){ if (!switchable(a)) return 0; const w = new Set(enabled); w.add(a.id); const wo = new Set(enabled); wo.delete(a.id); return r1(project(r, "exp", w).end - project(r, "exp", wo).end); }
 const byWhen = a => a.dated ? "by " + shortDate(a.date) : "no target date yet";
 // Do next and Biggest unlocks live in the right pane on wide screens (its home state)
 // and in the centre column on narrower screens, so they are rendered as strings.
@@ -906,7 +915,7 @@ function renderSwitches(){
       let lifted = 0; D.roles.forEach(r => { if (project(r, "exp", w).end - project(r, "exp", wo).end > 0.05) lifted++; });
       row.innerHTML = `<div class="sw-main"><div class="sw-title">${esc(a.title)}</div>
         <div class="sw-lift">${lift > 0 ? `<b>+${lift.toFixed(1)}</b> on your best role${lifted ? `, lifts <b>${lifted}</b> ${lifted === 1 ? "role" : "roles"}` : ""}` : !a.effects.length ? "Protects credibility, no score change" : `Little extra on your best role${lifted ? `, but lifts <b>${lifted}</b> ${lifted === 1 ? "role" : "roles"}` : ""}`}</div>
-        <div class="sw-meta"><span class="status-dot ${esc(a.status)}"></span>${a.status === "doing" ? "In progress" : "To do"} · ${esc(byWhen(a))}${a.stale ? ` · <span class="stale">No movement in ${a.stale} runs</span>` : ""}</div></div>
+        <div class="sw-meta"><span class="status-dot ${esc(a.status)}"></span>${a.status === "doing" ? "In progress" : a.status === "later" ? "Parked for later" : "To do"} · ${esc(byWhen(a))}${a.stale ? ` · <span class="stale">No movement in ${a.stale} runs</span>` : ""}</div></div>
         <button class="tog" role="switch" aria-checked="${on}" aria-label="${esc(a.title)}"></button>`;
       row.querySelector(".tog").addEventListener("click", () => { if (enabled.has(a.id)) enabled.delete(a.id); else enabled.add(a.id); refresh(); });
     }
@@ -916,7 +925,7 @@ function renderSwitches(){
   renderBottomBar();
 }
 function renderBottomBar(){
-  const open = D.actions.filter(live), on = open.filter(a => enabled.has(a.id)).length, r = D.roles[0];
+  const open = D.actions.filter(switchable), on = open.filter(a => enabled.has(a.id)).length, r = D.roles[0];
   $("#bbMain").textContent = `${on} of ${open.length} actions on`;
   $("#bbSub").textContent = `Best role expected ${Math.round(P[r.id].exp.end)} by ${shortDate(D.meta.end)}`;
 }
@@ -1092,7 +1101,7 @@ function renderSwot(){
     ${rest.length ? `<div class="grids">${rest.map(G => `<details><summary>${esc(G.name)}: its own grid</summary>${swotGrid(G)}</details>`).join("")}</div>` : ""}`;
   bindChips($("#v-swot"));
 }
-const stName = s => s === "doing" ? "In progress" : s === "done" ? "Done" : s === "dropped" ? "Dropped" : "To do";
+const stName = s => s === "doing" ? "In progress" : s === "later" ? "Parked for later" : s === "done" ? "Done" : s === "dropped" ? "Dropped" : "To do";
 function renderPlan(){
   const r = D.roles[0], acts = D.actions.filter(a => a.status !== "dropped");
   const PW = Math.max(300, ($("#hero").clientWidth || 760) - 40), PH = 40 + acts.length * 34;
@@ -1112,7 +1121,7 @@ function renderPlan(){
     ${acts.length ? `<div class="card"><div class="eyebrow">Plan timeline</div>${svg}</div>` : ""}
     <div class="list" style="margin-top:16px">${D.actions.map(a => { const lift = actionLift(a, r);
       return `<div class="row" tabindex="0" data-act="${esc(a.id)}"><span class="status-dot ${esc(a.status)}"></span><div class="row-main"><div class="row-title">${esc(a.title)}</div>
-      <div class="row-sub">${a.group === "now" ? "Now · " : a.group === "later" ? "Later · " : ""}${stName(a.status)} · ${esc(a.owner)}${a.effort ? " · " + esc(a.effort) : ""} · ${a.status === "done" ? "done " + esc(fmtDate(a.date)) : a.dated ? "target " + esc(fmtDate(a.date)) : "no target date"} · ${Math.round(a.p * 100)}% chance</div>
+      <div class="row-sub">${a.group === "now" ? "Now · " : a.group === "later" && a.status !== "later" ? "Later · " : ""}${stName(a.status)} · ${esc(a.owner)}${a.effort ? " · " + esc(a.effort) : ""} · ${a.status === "done" ? "done " + esc(fmtDate(a.date)) : a.dated ? "target " + esc(fmtDate(a.date)) : "no target date"} · ${Math.round(a.p * 100)}% chance</div>
       ${a.stale ? `<div class="tiny stale">No score or metric movement in ${a.stale} runs: rework it or drop it.</div>` : ""}</div>
       <div class="row-side"><span class="dn-p">${liftText(a, lift)}</span></div><span class="chev">›</span></div>`; }).join("")}</div>
     <div class="grid2" style="margin-top:16px">
@@ -1120,14 +1129,14 @@ function renderPlan(){
       <div class="card"><div class="eyebrow">Backlog</div>${D.backlog.length ? li(D.backlog) : '<div class="small sub">Empty.</div>'}</div></div>`;
   $("#v-plan").querySelectorAll("[data-act]").forEach(c => c.addEventListener("click", () => openDetail({type: "action", id: c.dataset.act}, true)));
 }
-const LEVELS = [["verified","Verified"],["corroborated","Corroborated"],["self_reported","Self-reported"],["unverified","Not verified yet"],["contradicted","Contradicted"]];
+const LEVELS = [["verified","Verified"],["corroborated","Corroborated"],["partially_verified","Partly verified"],["self_reported","Self-reported"],["unverified","Not verified yet"],["contradicted","Contradicted"]];
 const levelName = s => (LEVELS.find(l => l[0] === s) || [s, s.replace(/_/g, " ")])[1];
 const CLAIMS = {supported: "Supported", overstated: "Overstated", unsupported: "Unsupported", contradicted: "Contradicted", pending: "Waiting to be checked"};
 const evFilter = {cat: ""};
 function renderEvidence(){
   const counts = {}; D.evidence.forEach(e => counts[e.status] = (counts[e.status] || 0) + 1);
   const cats = [...new Set(D.evidence.map(e => e.cat))], lbl = s => cap1(s.replace(/_/g, " "));
-  $("#v-evidence").innerHTML = `<div class="tiles5">${LEVELS.map(([k, l]) => `<div class="tile"><div class="v num">${counts[k] || 0}</div><div class="l">${l}</div></div>`).join("")}</div>
+  $("#v-evidence").innerHTML = `<div class="tiles5">${LEVELS.filter(([k]) => k !== "partially_verified" || counts[k]).map(([k, l]) => `<div class="tile"><div class="v num">${counts[k] || 0}</div><div class="l">${l}</div></div>`).join("")}</div>
     <div class="filters" style="margin-top:16px"><select id="evCat" aria-label="Kind of evidence"><option value="">All kinds</option>${cats.map(c => `<option value="${esc(c)}" ${evFilter.cat === c ? "selected" : ""}>${esc(lbl(c))}</option>`).join("")}</select></div><div class="list" id="evList"></div>
     ${D.claims.length ? `<div class="card" style="margin-top:16px"><div class="eyebrow">Your public claims, checked</div><div class="small sub" style="margin-bottom:6px">What you say about yourself in public, checked against the evidence. Fix overstated claims before you apply.</div>
       ${D.claims.map(c => `<div style="padding:10px 0;border-top:1px solid var(--rule)"><div class="small" style="font-weight:550">${esc(c.text)} <span class="tag t-${esc(c.status)}">${esc(CLAIMS[c.status] || c.status)}</span></div>${c.better ? `<div class="small sub">Better: ${esc(c.better)}</div>` : ""}<div>${c.ev.map(evChip).join("")}${c.url ? ` <a class="tiny" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">Where it appears</a>` : ""}</div></div>`).join("")}</div>` : ""}`;
@@ -1207,7 +1216,7 @@ function chanceOf(r, acts, T){
   return total;
 }
 function nextLevel(r){
-  const acts = D.actions.filter(a => live(a) && enabled.has(a.id));
+  const acts = D.actions.filter(a => switchable(a) && enabled.has(a.id));
   const idx = bandIdx(r.fit), o = {r, fit: r.fit, level: idx + 1, band: BANDS[idx], top: idx >= 4};
   if (o.top) return o;
   const T = THRESH[idx + 1], rel = acts.filter(a => raisesL(r, a)), every = walkL(r, acts, "exp");
@@ -1227,7 +1236,8 @@ function nextLevel(r){
   return o;
 }
 function questsFor(r, nl){
-  const crit = new Set(nl.set ? nl.set.ids : []), bc = new Set(nl.bestCase ? nl.bestCase.ids : []), acts = D.actions.filter(live);
+  const crit = new Set(nl.set ? nl.set.ids : []), bc = new Set(nl.bestCase ? nl.bestCase.ids : []);
+  const acts = D.actions.filter(a => live(a) || (a.status === "later" && enabled.has(a.id)));   // parked: only while switched on
   return acts.map(a => {
     const w = acts.filter(x => enabled.has(x.id) || x.id === a.id), wo = acts.filter(x => enabled.has(x.id) && x.id !== a.id);
     const base = walkL(r, wo, "exp").end, exp = r1(walkL(r, w, "exp").end - base), works = r1(walkL(r, w, "exp", a.id).end - base);
@@ -1419,7 +1429,7 @@ function detailOrg(g){
     <div class="eyebrow" style="margin-top:16px">Best roles</div>
     ${D.roles.filter(x => x.g === g).slice(0, 10).map(x => `<div class="row" style="padding:10px 0" data-role-open="${esc(x.id)}"><div class="row-main"><div class="small" style="font-weight:600">${esc(x.title)}</div><div class="tiny sub">${esc(x.loc.slice(0, 2).join(", "))}${x.blocked ? " · eligibility blocker" : ""}</div></div><div class="row-side"><b>${Math.round(fitM(x))}</b></div><span class="chev">›</span></div>`).join("")}`;
 }
-function raisingActions(r, k){ if (CAPS[k] === 0 || hardBlock(r, k)) return []; return D.actions.filter(a => enabled.has(a.id) && live(a) && a.effects.some(e => e.dimension === DIMS[k] && inScope(r, e.scope || {}))); }
+function raisingActions(r, k){ if (CAPS[k] === 0 || hardBlock(r, k)) return []; return D.actions.filter(a => enabled.has(a.id) && switchable(a) && a.effects.some(e => e.dimension === DIMS[k] && inScope(r, e.scope || {}))); }
 function dotRow(score, proj){ let s = ""; for (let i = 1; i <= 5; i++){ const on = i <= Math.round(score), pj = !on && i <= Math.round(proj); s += `<i class="${on ? "on" : pj ? "proj" : ""}"></i>`; } return `<span class="dots" aria-label="${score} of 5">${s}</span>`; }
 function detailRole(id){
   const r = roleById[id], exp = P[r.id].exp, best = P[r.id].best;
@@ -1543,7 +1553,7 @@ function applyTheme(){
   $("#themeSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.t === theme)));
 }
 $("#themeSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { theme = b.dataset.t; try { localStorage.setItem("climb-theme", theme); } catch (e) {} applyTheme(); chartBuilt = false; lastVals = null; refresh(); }));
-$("#allOn").addEventListener("click", () => { D.actions.forEach(a => { if (live(a)) enabled.add(a.id); }); refresh(); });
+$("#allOn").addEventListener("click", () => { D.actions.forEach(a => { if (switchable(a)) enabled.add(a.id); }); refresh(); });
 $("#allOff").addEventListener("click", () => { enabled.clear(); refresh(); });
 $("#sampleTog").addEventListener("click", () => { state.sample = !state.sample; $("#sampleTog").setAttribute("aria-checked", String(state.sample)); renderTopline(); drawChart(); renderHistory(); });
 $("#railDone").addEventListener("click", () => { $("#rail").classList.remove("open"); if (!detail.classList.contains("open")) scrim.classList.remove("on"); });
@@ -1580,6 +1590,7 @@ if (motionOK()) document.body.classList.add("animate");
 document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "visible") document.body.classList.remove("animate"); else if (!reduce) document.body.classList.add("animate"); });
 $("#sampleRow").hidden = !D.meta.sample_allowed;
 recompute(); renderSegs(); renderViewSeg(); renderMetrics(); renderSwitches(); renderTopline(); drawChart(); renderTiles4(); renderDoNext(); renderHistory(); showView();
+$("#staticSummary").hidden = true;   // the live page has rendered the same numbers; the static copy is for readers without JavaScript
 enter($("#hero"), 1500);
 })();
 """

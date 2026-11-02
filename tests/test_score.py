@@ -31,6 +31,9 @@ EVIDENCE = {"schema_version": 1, "items": [
      "dimensions": ["D2"]},
     {"id": "E06", "claim": "contradicted claim", "kind": "achievement", "level": "contradicted", "sources": []},
     {"id": "E07", "claim": "lives here", "kind": "eligibility", "level": "self_reported", "sources": []},
+    {"id": "E08", "claim": "partly checked achievement", "kind": "achievement", "level": "partially_verified", "sources": []},
+    {"id": "E09", "claim": "partly checked job", "kind": "job_history", "level": "partially_verified", "sources": []},
+    {"id": "G01", "claim": "email finding, own numbering", "kind": "artefact", "level": "verified", "sources": []},
 ], "open_questions": [{"id": "Q01", "question": "Notice period?", "status": "open", "dimensions": ["D6"]},
                       {"id": "Q02", "question": "Done already?", "status": "answered"}]}
 
@@ -243,6 +246,131 @@ class RuleTests(Base):
         self.assertEqual(V.check(run, H.schema("run.schema.json")), [])
         self.assertTrue(run["inputs_digest"].startswith("sha256:"))
         self.assertEqual(run["counts"]["not_judged"], 1)
+
+
+class PartiallyVerifiedTests(Base):
+    """Some facts in the claim checked, some not: between self-reported and corroborated, never above corroborated."""
+
+    def test_caps_by_kind(self):
+        self.judge("acme:1", e(4, ["E09"]), e(4, ["E08"]), e(4, ["E08", "E04"]))
+        r = self.run_score()["roles"][0]
+        self.assertEqual(r["scores"]["D1"]["score"], 3)  # job history: what self-reported supports (3)
+        self.assertEqual(r["scores"]["D2"]["score"], 2)  # achievement: lifted from 1 to the partial cap, 2
+        self.assertEqual(r["scores"]["D4"]["score"], 2)  # the best cited item counts
+        self.assertIn("partially verified achievement, which supports at most 2", r["scores"]["D2"]["capped"])
+
+    def test_cap_is_configurable_and_never_above_corroborated(self):
+        self.cfg["scoring"]["partially_verified_cap"] = 1
+        self.judge("acme:1", e(2, ["E02"]), e(4, ["E08"]), e(1, ["E01"]))
+        self.assertEqual(self.run_score()["roles"][0]["scores"]["D2"]["score"], 1)
+        kinds = ["job_history", "education", "eligibility", "preference", "achievement", "artefact", "other"]
+        for self_cap in range(6):
+            caps = {k: self_cap for k in kinds}
+            caps["default"] = self_cap
+            for partial in range(5):
+                for kind in kinds:
+                    got = S.level_cap("partially_verified", kind, caps, partial)
+                    self.assertLessEqual(got, S.level_cap("corroborated", kind, caps, partial))
+                    self.assertGreaterEqual(got, min(self_cap, 4))       # never below self-reported, unless that is above 4
+                    self.assertGreaterEqual(got, min(partial, 4))
+
+    def test_eligibility_partial_is_flagged(self):
+        ev = H.deep(EVIDENCE)
+        ev["items"].append({"id": "E30", "claim": "lives here, partly checked", "kind": "eligibility",
+                            "level": "partially_verified", "sources": [{"type": "interview", "ref": "intake/answers.md"}]})
+        H.save(os.path.join(self.ws, "profile", "evidence.json"), ev)
+        errors, warnings, _ = V.validate_workspace(self.ws)
+        self.assertEqual(errors, [])
+        self.assertTrue(any("E30 is partially_verified, which supports at most 4" in w for w in warnings))
+
+
+class EvidenceIdTests(Base):
+    def test_source_prefixed_ids_score_and_validate(self):
+        self.judge("acme:1", e(2, ["E02"]), e(4, ["G01"]), e(1, ["G01"]))
+        run = self.run_score()
+        self.assertEqual(run["roles"][0]["scores"]["D2"]["score"], 4)  # verified G01; review cap holds above 2
+        self.assertFalse([w for w in run["warnings"] if "G01" in w])
+        errors, _, _ = V.validate_workspace(self.ws)
+        self.assertEqual(errors, [])
+
+    def test_pattern(self):
+        rx = H.C.EVIDENCE_ID
+        for good in ("E01", "E1", "G01", "ABC123", "E901"):
+            self.assertRegex(good, rx)
+        for bad in ("e01", "ABCD1", "E", "E1a", "01", "E-01", "Q01x"):
+            self.assertNotRegex(bad, rx)
+
+    def test_every_schema_reference_uses_the_shared_pattern(self):
+        found = []
+
+        def walk(node, path):
+            if isinstance(node, dict):
+                pat = node.get("pattern")
+                where = path.split(":", 1)[1]
+                if pat and ("evidence" in where or (path.startswith("evidence.") and where.endswith("item.properties.id"))):
+                    found.append((path, pat))
+                for k, v in node.items():
+                    walk(v, path + "." + k)
+            elif isinstance(node, list):
+                for v in node:
+                    walk(v, path)
+        for name in sorted(os.listdir(os.path.join(H.ENGINE, "schemas"))):
+            text = json.dumps(H.schema(name))
+            self.assertNotIn("^E[0-9]", text, name)
+            walk(H.schema(name), name + ":")
+        self.assertGreaterEqual(len(found), 10)
+        for path, pat in found:
+            self.assertEqual(pat, H.C.EVIDENCE_ID, path)
+
+    def test_confusing_prefix_warns(self):
+        ev = H.deep(EVIDENCE)
+        ev["items"].append({"id": "D3", "claim": "looks like a factor code", "kind": "other", "level": "verified",
+                            "sources": [{"type": "other", "ref": "x"}]})
+        H.save(os.path.join(self.ws, "profile", "evidence.json"), ev)
+        _, warnings, _ = V.validate_workspace(self.ws)
+        self.assertTrue(any("evidence id D3 starts with D" in w for w in warnings))
+
+
+class GapPoolTests(Base):
+    def setUp(self):
+        super().setUp()
+        # Acme has the three best roles; Globex's only role is outside an overall top 2.
+        self.roles = [role("acme:1"), role("acme:2"), role("acme:3"), role("globex:1", org="globex")]
+        for rid in ("acme:1", "acme:2", "acme:3"):
+            self.judge(rid, e(3, ["E02"]), e(2, ["E01"]), e(1, ["E01"]))
+        self.judge("globex:1", e(1, ["E02"]), e(1, ["E01"]), e(1, ["E01"]))
+        self.cfg["scoring"]["top_n_for_gaps"] = 2
+        self.gaps = [{"id": "intro-globex", "title": "Warm intro at Globex", "dimension": "D3", "target_score": 3,
+                      "orgs": ["globex"]},
+                     {"id": "intro-all", "title": "Warm intro everywhere", "dimension": "D3", "target_score": 3}]
+
+    def test_default_is_one_overall_pool(self):
+        gaps = {g["id"]: g for g in self.run_score()["gaps"]}
+        self.assertEqual((gaps["intro-globex"]["points_gain"], gaps["intro-globex"]["roles_affected"]), (0.0, 0))
+        self.assertEqual((gaps["intro-all"]["points_gain"], gaps["intro-all"]["roles_affected"]), (24.0, 2))
+        self.assertNotIn("pool", gaps["intro-all"])          # the run file is unchanged for existing workspaces
+        self.assertNotIn("by_org", gaps["intro-all"])
+
+    def test_per_org_pool_counts_every_organisation(self):
+        self.cfg["scoring"]["gap_pool"] = "per_org"
+        self.cfg["scoring"]["top_n_per_org_for_gaps"] = 2
+        run = self.run_score()
+        gaps = {g["id"]: g for g in run["gaps"]}
+        self.assertEqual((gaps["intro-globex"]["points_gain"], gaps["intro-globex"]["roles_affected"]), (12.0, 1))
+        self.assertEqual(gaps["intro-globex"]["by_org"], {"globex": {"points_gain": 12.0, "roles_affected": 1}})
+        g = gaps["intro-all"]
+        self.assertEqual((g["points_gain"], g["roles_affected"], g["pool"]), (36.0, 3, "per_org"))  # 2 at Acme, 1 at Globex
+        self.assertEqual(g["by_org"], {"acme": {"points_gain": 24.0, "roles_affected": 2},
+                                       "globex": {"points_gain": 12.0, "roles_affected": 1}})
+        self.assertEqual(V.check(run, H.schema("run.schema.json")), [])
+
+    def test_per_org_size_defaults_to_top_n(self):
+        self.cfg["scoring"]["gap_pool"] = "per_org"
+        self.cfg["scoring"]["top_n_for_gaps"] = 3
+        gaps = {g["id"]: g for g in self.run_score()["gaps"]}
+        self.assertEqual(gaps["intro-all"]["by_org"]["acme"]["roles_affected"], 3)
+        errors, _, _ = V.validate_workspace(self.ws)
+        self.assertEqual(errors, [])
 
 
 if __name__ == "__main__":

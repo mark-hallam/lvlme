@@ -165,7 +165,9 @@ Climb runs the review **blind**, which is the strict form of
    score still obeys the verification ladder.
    Record each disputed item in `eval/reviews/<date>.json` with the item id,
    the three scores, the anchors and evidence ids each cited, and the score
-   that stands.
+   that stands (format: `method/REVIEW.md`, `schemas/reviews.schema.json`).
+   A dispute still waiting for its tie-break is recorded as
+   `awaiting_tie_break`, and its score stays unreviewed.
 5. The lead writes `reviewed_on` (today) and a one-line `reviewer_note` on
    every item reviewed.
 

@@ -27,6 +27,14 @@ DIMENSION_NAMES = {
 DEFAULT_WEIGHTS = {"D1": 25, "D2": 20, "D3": 20, "D4": 10, "D5": 10, "D6": 10, "D7": 5}
 BANDS = ["Very low", "Low", "Moderate", "Good", "Strong"]
 BLOCKER_TYPES = ["us_person_export_control", "security_clearance", "citizenship", "licence"]
+# Evidence ids: 1 to 3 capital letters, then digits. E is the default for new items (E01, E02, ...);
+# other prefixes keep a source's own numbering (for example G01 for email findings).
+EVIDENCE_ID = r"^[A-Z]{1,3}[0-9]+$"
+EVIDENCE_LEVELS = ["verified", "corroborated", "partially_verified", "self_reported", "unverified", "contradicted"]
+# Plan action statuses. Active (counted against max_active, in the projection by default): todo and doing.
+# later is parked: off the active cap and out of every projection until switched on in the what-if rail.
+ACTIVE_STATUSES = ("todo", "doing")
+EXTENSION_PREFIX = "x_"
 BLOCKER_NAMES = {
     "us_person_export_control": "US person or export control (ITAR)",
     "security_clearance": "Security clearance",

@@ -134,7 +134,9 @@ The commands below omit it. Run them from the engine folder.
 7. **Review.** Start a separate, fresh, sceptical reviewer agent with the
    prompt in `REVIEW.md`. Give it the rubric, the evidence and the scores, not
    the scorer's notes. Apply the changes it justifies, and record
-   `reviewed_on` and `reviewer_note`.
+   `reviewed_on` and `reviewer_note`. Where the two scores differ, run the
+   tie-break and log the dispute in `eval/reviews/<YYYY-MM-DD>.json`
+   (`REVIEW.md`).
 
 8. **Score.**
 
@@ -154,7 +156,8 @@ The commands below omit it. Run them from the engine folder.
       or drop it, and log why in `experiments_log`;
     - add actions from the top gaps and new strategies, highest priority
       first, keeping at most 8 active, each with a `target_date` and its
-      `effects` so the projection is right;
+      `effects` so the projection is right; park the rest with status
+      `later` (they stay out of the projection until switched on);
     - when a promising role's picture changes, update `eval/ceilings.json`
       (optional; it feeds the "Path to the top band" view);
     - update the north-star metrics;
