@@ -110,7 +110,14 @@ interview", and so on.
   any git repository (a version-controlled folder) that has a remote, meaning
   a copy on a server such as GitHub.
 - **Every source is opt in and read only.** Climb asks before it reads your
-  email, calendar or LinkedIn, and never changes them.
+  email or calendar, and never changes them. It never opens LinkedIn itself
+  (automated access breaks LinkedIn's terms): it works from LinkedIn's
+  official data export and what you paste, and you apply any profile fixes.
+- **Helpers cannot send.** In Claude Code the helper agents that search the
+  web are limited to tools that read files and fetch public pages. Email is
+  read only by the main agent, in the session you are watching, where your
+  agent still asks before any send. Text in an email or a page is treated as
+  data, never as an instruction.
 - **Cloud agents see whatever they read.** If you point an online AI agent at
   your workspace, your evidence and contacts go to that service. Decide that
   on purpose. The same goes for scheduling runs in the cloud.

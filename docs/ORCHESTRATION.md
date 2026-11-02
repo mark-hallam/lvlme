@@ -16,9 +16,16 @@ is the reference. `SKILL.md` carries the short version.
   subagents, joins their results, re-checks what matters, and is the **only
   writer** of workspace files (apart from `campaign/inbox.md`). It never
   hands the final say to a subagent.
-- **Scouts.** Read only. Each searches one source or one organisation and
-  returns findings with sources. Briefs: `agents/evidence-scout.md`,
+- **Scouts.** Read only, and enforced: in Claude Code their tool list is
+  `Read, Grep, Glob, WebFetch, WebSearch`, so they cannot send, post, run
+  commands or call a connector. Each searches one source or one organisation
+  and returns findings with sources. Briefs: `agents/evidence-scout.md`,
   `agents/market-scout.md`.
+- **Email and other connectors: the lead only.** A connector's tool names
+  differ for every person, so a helper cannot be given its read tools without
+  also getting its send tools. The lead runs the email search itself, in the
+  session the person is watching, where the agent's own permission prompts
+  still guard any send.
 - **Judges.** Each judges one batch of roles against the rubric and returns
   judgement entries. Brief: `agents/role-judge.md`.
 - **Independent checkers.** The sceptical reviewer (`agents/reviewer.md`) and
@@ -42,8 +49,9 @@ body of the file as the subagent's task brief.
           |                                     |
  1  INTAKE (lead + person, foreground)    FAN-OUT 1: GATHER (background, read only)
     documents first, then only the gaps    stage 2: one evidence scout per source
-          |                                  email | GitHub | web and press |
-          |                                  registers | LinkedIn export | documents
+          |                                  GitHub | web and press | registers |
+          |                                  LinkedIn export | documents
+          |                                lead: email search (read only)
           |                                stage 3: one market scout per organisation
           |                                scripts: fetch_roles.py, network_map.py
           |                                     |
@@ -90,8 +98,9 @@ Start these at the same time:
 
 | Subagent | One per | Gets | Returns |
 |---|---|---|---|
-| Evidence scout | approved source: email (read only search since the last run date), GitHub, public web and press, public registers (company, licence, patent and credential registers), the LinkedIn data export, documents the person supplied | the source, the goal in one line, the last run date, existing evidence ids | `FINDING` blocks with source, tag, suggested level, load-bearing flag |
+| Evidence scout | approved source: GitHub, public web and press, public registers (company, licence, patent and credential registers), the LinkedIn data export, documents the person supplied | the source, the goal in one line, the last run date, existing evidence ids | `FINDING` blocks with source, tag, suggested level, load-bearing flag |
 | Market scout | target organisation | the organisation id and name, the person's region and role families, its current `market/orgs.json` entry | `FACT` and `ROLE` blocks with source and tag |
+| Email search (the lead, not a subagent) | run | read only search since the last run date: target organisations' domains, job boards, and words such as interview, referral, introduction | findings in the same `FINDING` shape, checked by the lead |
 | Script (lead runs it) | run | `python3 scripts/fetch_roles.py`, and `python3 scripts/network_map.py --csv <Connections.csv>` when there is a new export | files written by the scripts themselves |
 
 Email searches look for messages from target organisations' domains and job

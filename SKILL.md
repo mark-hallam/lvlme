@@ -93,10 +93,11 @@ Full detail, the stage graph and the subagent briefs:
 `docs/ORCHESTRATION.md`.
 
 - **Fan-out 1, gather (stages 2 and 3).** One evidence scout per source the
-  person approved (email, GitHub, public web and press, public registers, the
+  person approved (GitHub, public web and press, public registers, the
   LinkedIn data export, documents they supplied), one market scout per target
   organisation, and the scripts `fetch_roles.py` and `network_map.py`, all at
-  once. It may start as soon as the person has approved the sources, while
+  once. Email, if approved, you search yourself, read only: never hand a
+  connector to a helper, because its read and send tools come together. It may start as soon as the person has approved the sources, while
   the interview carries on.
 - **Fan-out 2, assess (stage 4).** Role judges in batches of about 8 roles,
   the claims audit, the consistency audit and the recruiter screen, all at
