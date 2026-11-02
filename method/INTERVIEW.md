@@ -31,8 +31,9 @@ the answers can be trusted. Where the interview sits in a first run is in
 
 ## The first message
 
-The first thing the person reads from LVLme is one short message: about
-120 words at most, three parts, in this order.
+Once the workspace exists (after the one sentence goal question, if LVLme
+had to ask it), the first thing the person reads from LVLme is one short
+message: about 120 words at most, three parts, in this order.
 
 1. **Three facts from the CV, to confirm.** Pick facts the scores depend
    on: the latest title and employer with dates, the highest qualification,
