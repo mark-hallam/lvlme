@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Role records for the consistency audit (profile/role-records.json)",
+  "description": "The person's work history copied, exactly as written, from each source (CV, LinkedIn, website, official forms, references, and what the person confirmed). scripts/consistency_audit.py compares the sources. See method/CONSISTENCY.md.",
+  "type": "object",
+  "required": ["schema_version", "sources"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "updated_on": {"$ref": "#/definitions/date"},
+    "truth_order": {
+      "type": "array",
+      "description": "Source ids, most trusted first. Default: confirmed, official_form, references, cv, linkedin, website, then any others in file order.",
+      "items": {"$ref": "#/definitions/source_id"}
+    },
+    "organisation_aliases": {
+      "type": "object",
+      "description": "Other names for the same organisation, for example a renamed employer: {\"Fabrikam Air\": [\"Fabrikam Airlines\"]}.",
+      "additionalProperties": {"type": "array", "items": {"type": "string", "minLength": 1}}
+    },
+    "explained_gaps": {"type": "array", "items": {"$ref": "#/definitions/gap"}},
+    "sources": {
+      "type": "object",
+      "description": "One entry per source, keyed by a source id such as cv, linkedin, website, official_form, references or confirmed.",
+      "additionalProperties": {"$ref": "#/definitions/source"}
+    }
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "month": {
+      "type": ["string", "null"],
+      "description": "As the source shows it: 'Oct 2007', 'October 2007', '2007-10', '10/2007' or a year alone '2007'. 'present' for a current role. Null or missing means not given."
+    },
+    "source_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "evidence_id": {"type": "string", "pattern": "^E[0-9]{2,}$"},
+    "source": {
+      "type": "object",
+      "required": ["records"],
+      "additionalProperties": false,
+      "properties": {
+        "label": {"type": "string", "minLength": 1, "description": "A short name for the report, for example 'CV (October 2026 version)'."},
+        "ref": {"type": "string", "description": "Where the copy came from: a workspace path such as intake/sources/cv.pdf, or an address."},
+        "captured_on": {"$ref": "#/definitions/date"},
+        "complete": {"type": "boolean", "description": "True if this source should list every role in the period it covers. Default true for confirmed, official_form, cv and linkedin; false otherwise."},
+        "editable": {"type": "boolean", "description": "False for records the person cannot change (a signed form, a referee's letter). Default false for official_form and references."},
+        "covers": {
+          "type": "object",
+          "description": "The period the source asks about, for example an official form that asks for the last 10 years.",
+          "additionalProperties": false,
+          "properties": {"from": {"$ref": "#/definitions/month"}, "to": {"$ref": "#/definitions/month"}}
+        },
+        "records": {"type": "array", "items": {"$ref": "#/definitions/record"}}
+      }
+    },
+    "record": {
+      "type": "object",
+      "required": ["organisation"],
+      "additionalProperties": false,
+      "properties": {
+        "organisation": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "description": "Exactly as the source writes it. Do not correct it while copying."},
+        "start": {"$ref": "#/definitions/month"},
+        "end": {"$ref": "#/definitions/month"},
+        "kind": {"enum": ["role", "business", "volunteer", "education"], "description": "Default role."},
+        "key": {"type": "string", "minLength": 1, "description": "Optional. Records with the same key in different sources are the same role. Use it when the automatic match gets it wrong."},
+        "concurrent": {"type": "boolean", "description": "True if this role really ran at the same time as another (for example a part-time board seat)."},
+        "claims": {"type": "array", "items": {"type": "string", "minLength": 1}, "description": "Achievement lines from this source for this role, copied exactly."},
+        "denies": {"type": "array", "items": {"type": "string", "minLength": 1}, "description": "Usually on the confirmed source: things other sources say that the person says are not true."},
+        "evidence": {"type": "array", "items": {"$ref": "#/definitions/evidence_id"}},
+        "note": {"type": "string"}
+      }
+    },
+    "gap": {
+      "type": "object",
+      "required": ["start", "end", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "start": {"type": "string", "minLength": 1},
+        "end": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "minLength": 1},
+        "evidence": {"type": "array", "items": {"$ref": "#/definitions/evidence_id"}}
+      }
+    }
+  }
+}

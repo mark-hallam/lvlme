@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-11-02",
+  "sources": {
+    "confirmed": {
+      "label": "Confirmed by the person",
+      "ref": "intake/answers.md#history",
+      "captured_on": "2026-11-02",
+      "records": [
+        {"organisation": "Example University", "title": "Bachelor of Science", "start": "2001", "end": "2004", "kind": "education"},
+        {"organisation": "Fabrikam Air", "title": "Quality Officer", "start": "Feb 2005", "end": "Jun 2008"},
+        {"organisation": "Fabrikam Air", "title": "Deputy Quality Manager", "start": "Jul 2008", "end": "Mar 2012",
+         "denies": ["Ran the external audit program"],
+         "note": "Offer letter and last-day farewell email both found in the person's email"},
+        {"organisation": "Northwind Consulting", "title": "Founder", "start": "Jan 2013", "end": "Dec 2015", "kind": "business"},
+        {"organisation": "Woodgrove Bank", "title": "Operations Analyst", "start": "Jan 2016", "end": "Aug 2019"},
+        {"organisation": "Tailspin Robotics", "title": "Program Manager", "start": "Sep 2019", "end": "present",
+         "claims": ["Cut supplier defects by 30% in 2022"]}
+      ]
+    },
+    "official_form": {
+      "label": "Official form (signed Aug 2019)",
+      "ref": "intake/sources/history-form-photos/",
+      "covers": {"from": "2009", "to": "Aug 2019"},
+      "records": [
+        {"organisation": "Fabrikam Air Pty Ltd", "title": "Deputy Quality Manager", "start": "07/2008", "end": "03/2012"},
+        {"organisation": "Woodgrove Bank", "title": "Operations Analyst", "start": "01/2016", "end": "08/2019"}
+      ]
+    },
+    "cv": {
+      "label": "CV",
+      "ref": "intake/sources/cv.pdf",
+      "records": [
+        {"organisation": "Example University", "title": "Bachelor of Science", "start": "2001", "end": "2004", "kind": "education"},
+        {"organisation": "Fabrikam Air", "title": "Quality Officer", "start": "2005", "end": "2008"},
+        {"organisation": "Fabrikam Air", "title": "Deputy Quality Manager", "start": "Jul 2008", "end": "Mar 2012",
+         "claims": ["Prepared the quality team for three regulator audits"]},
+        {"organisation": "Northwind Consulting", "title": "Founder", "start": "Jan 2013", "end": "Dec 2015", "kind": "business"},
+        {"organisation": "Woodgrove Bank", "title": "Operations Analyst", "start": "Jan 2016", "end": "Dec 2019"},
+        {"organisation": "Tailspin Robotics", "title": "Program Manager", "start": "Sep 2019", "end": "present",
+         "claims": ["Cut supplier defects by 30% in 2022", "Ran a weekly risk review for 4 product teams"]}
+      ]
+    },
+    "linkedin": {
+      "label": "LinkedIn",
+      "ref": "intake/sources/linkedin-profile.pdf",
+      "records": [
+        {"organisation": "Fabrikam Air", "title": "Quality Officer", "start": "Feb 2005", "end": "Jun 2008"},
+        {"organisation": "Fabrikam Air", "title": "Quality Manager", "start": "Jul 2008", "end": "May 2012",
+         "claims": ["Ran the airline's external audit program"]},
+        {"organisation": "Northwind Consulting", "title": "Founder", "start": "Jan 2013", "end": "Mar 2016"},
+        {"organisation": "Woodgrove Bank", "title": "Operations Analyst", "start": "Jan 2016", "end": "Aug 2019"},
+        {"organisation": "Adventure Works", "title": "Advisory Board Member", "start": "2018", "end": "2019"},
+        {"organisation": "Tailspin Robotics", "title": "Program Manager", "start": "Sep 2019", "end": "Present",
+         "claims": ["Cut supplier defects by 40% in 2022", "Managed a team of 12 engineers"]}
+      ]
+    },
+    "website": {
+      "label": "Website",
+      "ref": "https://example.com/about",
+      "records": [
+        {"organisation": "Woodgrove Bank", "title": "Operations Lead", "start": "2016", "end": "2019"},
+        {"organisation": "Tailspin Robotics", "title": "Program Manager", "start": "2019", "end": "present"}
+      ]
+    }
+  }
+}
