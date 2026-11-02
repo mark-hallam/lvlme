@@ -20,7 +20,7 @@ any organisation, role, factor, action or piece of evidence.
 The page makes no external requests, is light by default with a readable dark
 switch, works on a phone, and its motion is optional: everything is drawn in
 its final state first, and reduced motion is respected. The key numbers (best
-chance, level, outlook, today's top actions, best role per organisation), the
+chance, level, outlook, top actions by priority, best role per organisation), the
 level card and the Level up view are also rendered into the HTML here, so they
 read the same without JavaScript; the page script hides the static summary
 once it has drawn the live page.

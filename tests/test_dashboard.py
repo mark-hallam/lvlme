@@ -221,6 +221,7 @@ class ParkedAndStaticTests(unittest.TestCase):
         plan = H.load(os.path.join(self.ws, "campaign", "plan.json"))
         top3 = sorted([a for a in plan["actions"] if a["status"] in ("todo", "doing")],
                       key=lambda a: (-B.priority(a), B.STATUS_ORDER[a["status"]], a["id"]))[:3]
+        self.assertIn("Top actions, highest priority first", text)
         for a in top3:
             self.assertIn(B.clean(a["title"]), text)
         self.assertIn('<th scope="col">Organisation</th>', section)
