@@ -42,8 +42,10 @@ Work on top of 0.3.0 that is not in a released version yet.
   find no location. It now reads the posting through SmartRecruiters' public
   posting API: the job description and qualifications as their own sections,
   the welcome last (never as a requirement), the city, whether the role is
-  hybrid or remote, and the date it was posted. A closed posting gets a plain
-  message, and the apply page's link works too.
+  hybrid or remote, and the date it was posted. A welcome placed at the top of
+  the job description is not read as a requirement either, a posting written
+  entirely under the company description is still read, a closed posting gets
+  a plain message, and the apply page's link works too.
 
 ### Changed
 

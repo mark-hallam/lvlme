@@ -240,16 +240,18 @@ def smartrecruiters_base(link, data):
         sec = sections.get(key) if isinstance(sections.get(key), dict) else {}
         if FR.clean(re.sub(r"<[^>]+>", " ", sec.get("text") or "")):
             parts.append("<h2>%s</h2>%s" % (html.escape(sec.get("title") or key), sec["text"]))
-    if not parts:
-        return None
     welcome = sections.get("companyDescription") if isinstance(sections.get("companyDescription"), dict) else {}
+    if not parts:  # some employers put the whole posting under the company description
+        if not FR.clean(re.sub(r"<[^>]+>", " ", welcome.get("text") or "")):
+            return None
+        parts, welcome = [welcome["text"]], {}
     lines = [text for _, text, _ in FR.blocks_of(welcome.get("text") or "", skip_boilerplate=False)]
     if lines:  # plain paragraphs, so a bold welcome line is never taken for a requirements heading
         parts.append("<h2>About %s</h2>%s" % (html.escape(org_name),
                                                "".join("<p>%s</p>" % html.escape(t.rstrip(":")) for t in lines)))
     loc = data.get("location") if isinstance(data.get("location"), dict) else {}
-    where = FR.clean(loc.get("fullLocation") or ", ".join(
-        str(loc[k]) for k in ("city", "region", "country") if loc.get(k)))
+    where = ", ".join(p for p in (FR.clean(x) for x in str(loc.get("fullLocation") or ", ".join(
+        str(loc[k]) for k in ("city", "region", "country") if loc.get(k))).split(",")) if p)  # "Sydney, , Australia"
     workplace = "Remote" if loc.get("remote") is True else "Hybrid" if loc.get("hybrid") is True else (
         "Onsite" if loc.get("remote") is False else None)
     released = str(data.get("releasedDate") or "")[:10]

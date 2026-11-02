@@ -309,6 +309,39 @@ class SmartRecruitersTests(unittest.TestCase):
                 Q.fetch(SMART)
         self.assertIn("no longer open on the SmartRecruiters board 'InitechRobotics'", str(cm.exception))
 
+    def test_welcome_inside_the_job_description(self):
+        # Canva puts its welcome at the top of the job description, after a bold line about "experiences"
+        data = Q.C.load_json(fx("smartrecruiters-posting.json"))
+        jd = data["jobAd"]["sections"]["jobDescription"]
+        jd["text"] = ("<p><strong>Join the team changing how the world experiences warehouses.</strong></p>"
+                      "<p>Hello, g'day, kia ora!</p><p>Thanks for stopping by.</p>" + jd["text"])
+        data["jobAd"]["sections"]["companyDescription"]["text"] = ""
+        self.assertIsNone(Q.FR.heading_category("Join the team changing how the world experiences warehouses."))
+        path = os.path.join(self.tmp(), "posting.json")
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(Q.json.dumps(data))
+        role, _ = Q.fetch(SMART, saved=path)
+        self.assertEqual(len(role["hard_requirements"]), 3)
+        self.assertFalse(any("g'day" in r or "stopping by" in r or "Join the team" in r
+                             for r in role["hard_requirements"]))
+
+    def test_whole_posting_under_the_company_description(self):
+        # an open posting whose every section but the company description is empty is still read
+        data = Q.C.load_json(fx("smartrecruiters-posting.json"))
+        secs = data["jobAd"]["sections"]
+        secs["companyDescription"]["text"] = (secs["jobDescription"]["text"] + "<h3>Qualifications</h3>"
+                                             + secs["qualifications"]["text"])
+        for key in Q.SR_SECTIONS:
+            secs[key]["text"] = ""
+        data["location"]["fullLocation"] = "Melbourne, , Australia"
+        path = os.path.join(self.tmp(), "posting.json")
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write(Q.json.dumps(data))
+        role, _ = Q.fetch(SMART, saved=path)
+        self.assertEqual(len(role["hard_requirements"]), 3)
+        self.assertEqual(role["nice_to_haves"], ["Experience deploying autonomous mobile robots."])
+        self.assertEqual(role["locations"], ["Melbourne, Australia"])   # an empty region is dropped
+
     def test_more_headings(self):
         for heading, cat in (("You're probably a match if", "req"), ("At the moment, this role is focused on:", "resp"),
                              ("What you'll learn and how you'll develop at Initech", "about")):
