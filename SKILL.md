@@ -240,9 +240,11 @@ On the weekly comparison day, also write `campaign/weekly/<date>.md` (see
 
 ## Cadence
 
-Daily during build-up (the first `cadence.build_up_weeks` weeks, default 4),
-then weekly. Each run writes one run file, `eval/runs/<date>.json`. When daily
-runs stop producing score changes or new evidence, suggest the switch. The
-person decides; never change the schedule yourself. A run with nobody
+Weekly, plus a run whenever something changes: an action done, new evidence,
+a new export. Scores only move when evidence changes, and a full run can
+start about 40 helper agents (for around 300 open roles), so a run with
+nothing new costs a lot and moves nothing. Each run writes one run file,
+`eval/runs/<date>.json`. The person decides the rhythm (`cadence.mode`);
+never change the schedule yourself. A run with nobody
 present asks nothing, opts in to nothing and takes no step that needs the
 person: it lists those in its message instead (see `docs/ORCHESTRATION.md`).

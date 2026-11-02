@@ -35,7 +35,7 @@
     "top_n_for_gaps": 25,
     "self_reported_caps": {"job_history": 3, "education": 3, "eligibility": 5, "preference": 5, "default": 1}
   },
-  "cadence": {"mode": "daily", "build_up_weeks": 4, "run_time": "07:00"},
+  "cadence": {"mode": "weekly", "run_time": "07:00"},
   "privacy": {
     "sensitive_mode": true,
     "share_contact_names_with_agents": false,

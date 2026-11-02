@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Open roles (market/roles/latest.json)",
-  "description": "Open roles at the target organisations that match a role family, written by fetch_roles.py. Daily snapshots of role ids go to market/roles/snapshots/<date>.json.",
+  "description": "Open roles at the target organisations that match a role family, written by fetch_roles.py. Snapshots of role ids, one per fetch date, go to market/roles/snapshots/<date>.json.",
   "type": "object",
   "required": ["schema_version", "fetched_on", "summary", "roles"],
   "additionalProperties": false,

@@ -10,18 +10,19 @@ The commands below omit it. Run them from the engine folder.
 
 ## Run modes
 
-- **Build-up (daily).** For the first `cadence.build_up_weeks` weeks (default
-  4), run every step every day, including the independent reviewer. Write one
-  run file per day: the trend charts are built from them.
-- **Steady state (weekly).** After build-up, one full run a week.
+- **Default: weekly, plus a run when something changes.** One full run a
+  week, every step including the independent reviewer, and another whenever
+  an action is done, new evidence arrives or the person supplies a new
+  export. Scores only move when evidence changes, and a full run can start
+  about 40 helper agents (for around 300 open roles). Each run writes one run
+  file: the trend charts are built from them.
 - **Weekly comparison.** Once a week (on the same weekday), also write
   `campaign/weekly/<YYYY-MM-DD>.md`: what moved since the last comparison,
   what did not, what was dropped and why, and the 3 most important actions for
   the week.
-- **Switching to weekly.** After build-up, if the last 7 daily runs produced
-  no score change and no new evidence, say so and suggest weekly runs. Do not
-  change the schedule yourself. The person decides, and records it in
-  `config.json` under `cadence.mode`.
+- **Changing the rhythm.** The person decides (for example daily runs
+  during a burst of applications) and records it in `config.json` under
+  `cadence.mode`. Do not change the schedule yourself.
 
 ## Hard rules
 

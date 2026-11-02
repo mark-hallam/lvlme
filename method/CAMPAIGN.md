@@ -231,12 +231,11 @@ The self-check list, for the person, before they submit:
 
 ## Cadence
 
-- **Daily** during build-up: the first `cadence.build_up_weeks` weeks
-  (default 4).
-- **Weekly** after that.
-- When daily runs stop producing score changes or new evidence (for example
-  7 runs in a row), the agent suggests switching to weekly. The person
-  decides. The agent never changes the schedule itself.
+- **Weekly**, plus a run whenever something changes: an action done, new
+  evidence, a new export. Scores only move when evidence changes, and a full
+  run can start about 40 helper agents (for around 300 open roles).
+- The person decides the rhythm. The agent never changes the schedule
+  itself.
 
 ## Action library
 

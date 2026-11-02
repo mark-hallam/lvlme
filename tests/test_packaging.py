@@ -238,6 +238,18 @@ class DocTests(unittest.TestCase):
             self.assertIn("code.claude.com/docs/en/" + page.lstrip("/"), text)
         self.assertIn("cursor.com/docs", text)
 
+    def test_default_cadence_is_weekly_plus_changes(self):
+        """The docs state one default: weekly, plus a run when something changes. No daily build-up."""
+        for rel in ("SKILL.md", "method/RUNBOOK.md", "docs/ORCHESTRATION.md", "method/CAMPAIGN.md"):
+            text = " ".join(read(rel).split())
+            with self.subTest(doc=rel):
+                self.assertRegex(text, r"when(ever)? something changes")
+                self.assertIn("Scores only move when evidence changes", text)
+                self.assertNotIn("build_up_weeks", text)
+                self.assertNotRegex(text, r"(?i)daily during build-up|build-up \(daily\)")
+        for cfg in (H.template_config(), H.example_config()):
+            self.assertEqual(cfg["cadence"], {"mode": "weekly", "run_time": "07:00"})
+
     def test_plain_punctuation(self):
         """No em or en dashes, and no spaced hyphen used as a dash, outside code."""
         for rel in packaging_docs():

@@ -91,8 +91,8 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "mode": {"enum": ["daily", "weekly"]},
-        "build_up_weeks": {"type": "integer", "minimum": 0, "maximum": 52},
+        "mode": {"enum": ["daily", "weekly"], "description": "weekly (the default): one full run a week, plus a run whenever something changes. The person decides."},
+        "build_up_weeks": {"type": "integer", "minimum": 0, "maximum": 52, "description": "Older configs: weeks of daily runs at the start. Default 0."},
         "run_time": {"type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$"}
       }
     },
