@@ -34,7 +34,11 @@ run.
 
    ```bash
    python3 examples/build_demo.py
+   python3 examples/build_quick_demo.py
+   python3 examples/build_demo_site.py
    ```
+
+   The last one refreshes `docs/demo/`, the static demo folder.
 
 3. If you changed a workspace file format, update the matching file in
    `schemas/` and the template in `templates/`.

@@ -134,5 +134,6 @@ first stage not yet done today).
   (the `/lvlme-*` commands), `agents/` (subagent briefs), `.cursor/rules/`
   (Cursor), this file (Codex and others).
 - The demo in `examples/demo-workspace/` is fictional. Rebuild it with
-  `python3 examples/build_demo.py`.
+  `python3 examples/build_demo.py`, then `python3 examples/build_demo_site.py`
+  to refresh `docs/demo/` (the static demo folder; fictional workspaces only).
 - See [`CONTRIBUTING.md`](CONTRIBUTING.md).

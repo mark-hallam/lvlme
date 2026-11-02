@@ -283,7 +283,13 @@ Rebuild the whole demo from its inputs (offline):
 ```bash
 python3 examples/build_demo.py
 python3 examples/build_quick_demo.py
+python3 examples/build_demo_site.py
 ```
+
+The last one copies both demo pages into `docs/demo/`, with an index page
+that introduces them: a static folder that works opened from disk or served
+as a website. It copies a page only from a workspace whose `config.json` says
+`"fictional": true`, so a real dashboard can never end up there.
 
 ## By hand, in a terminal
 
@@ -366,8 +372,10 @@ schemas/    JSON Schema files (rules for every workspace file)
 scripts/    init, fetch_roles, network_map, claims_audit, consistency_audit,
             score, build_dashboard, validate, quick, quick_posting
 templates/  the workspace skeleton that init.py copies, and agent prompts
-docs/       INSTALL.md, HOW-IT-WORKS.md, ORCHESTRATION.md, LEVELS.md, DESIGN.md
-examples/   demo-workspace/ and quick-demo/ (fictional), build_demo.py, build_quick_demo.py
+docs/       INSTALL.md, HOW-IT-WORKS.md, ORCHESTRATION.md, LEVELS.md, DESIGN.md,
+            for-you/ (guides for people who are not technical), demo/ (the static demo folder)
+examples/   demo-workspace/ and quick-demo/ (fictional), build_demo.py, build_quick_demo.py,
+            build_demo_site.py
 tests/      offline tests: python3 -m unittest discover -s tests
 ```
 

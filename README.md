@@ -142,7 +142,8 @@ for each stage are in [`method/`](method/), starting with the rubric,
 Try it with no data of your own: both demos are for the fictional Alex
 Example. Open `examples/quick-demo/2026-11-02-globex-labs-deployment-program-manager-ai-agents/index.html`
 (LVLme quick) or `examples/demo-workspace/report/index.html` (the full
-campaign's dashboard) in your browser.
+campaign's dashboard) in your browser. `docs/demo/index.html` puts both
+behind one page, as a static folder ready to serve as a website.
 
 Author: Mark Hallam. Licence: MIT (see `LICENSE`). Contributing: see
 [`CONTRIBUTING.md`](CONTRIBUTING.md).
