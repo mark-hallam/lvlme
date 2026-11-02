@@ -156,10 +156,16 @@ Climb runs the review **blind**, which is the strict form of
    conversation or the person's hopes.
 3. Each reviewer scores every item itself and names the anchor and evidence
    ids.
-4. The lead compares. Reviewer lower: the lower score stands. Reviewer equal
-   or higher: the score is agreed. The scorer may not argue the point again in
-   the same run; it adds an open question or a plan action instead. A raise
-   needs evidence the scorer missed, and still obeys the ladder.
+4. The lead compares. Same score: agreed. Different scores: a second fresh
+   reviewer scores that item blind (a tie-break, run in parallel for all
+   disputed items), and the **middle of the three scores** stands. Taking the
+   lower of two would drag every score down over time; the middle of three is
+   honest without a built-in bias. The scorer may not argue the point again in
+   the same run; it adds an open question or a plan action instead. Every
+   score still obeys the verification ladder.
+   Record each disputed item in `eval/reviews/<date>.json` with the item id,
+   the three scores, the anchors and evidence ids each cited, and the score
+   that stands.
 5. The lead writes `reviewed_on` (today) and a one-line `reviewer_note` on
    every item reviewed.
 

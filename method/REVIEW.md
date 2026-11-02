@@ -72,11 +72,17 @@ The scoring agent applies the agreed changes to the judgement files:
 
 ## When the scorer and reviewer disagree
 
-- **The lower score stands** until new evidence arrives.
+- **Same score:** agreed.
+- **Different scores:** a second fresh reviewer scores the item blind, and the
+  **middle of the three scores** stands (scorer, reviewer, tie-break). Taking
+  the lower of two would build a downward bias into every run; the middle of
+  three is honest in both directions.
+- Every score, whichever way it moves, still needs evidence that meets its
+  anchor under the verification ladder.
 - The scorer may not argue the point again in the same run. Instead, add an
   open question or a plan action that would produce the missing evidence.
-- If the reviewer raises a score, it must cite evidence the scorer missed,
-  and the raise still needs that evidence to support it under the ladder.
+- Record each disputed item in `eval/reviews/<date>.json`: item id, the three
+  scores, the anchor and evidence ids each cited, and the score that stands.
 
 ## Copy-paste reviewer prompt
 

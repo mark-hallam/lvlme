@@ -172,8 +172,9 @@ without an adapter go in `market/roles/manual.json`.
 
 Follow `method/REVIEW.md`, run blind as `docs/ORCHESTRATION.md` describes:
 each fresh reviewer gets the rubric, the evidence, the postings and the list
-of items, and scores them itself. Where its score is lower, the lower score
-stands. Record `reviewed_on` and `reviewer_note` on every item reviewed. A
+of items, and scores them itself. Where scores differ, a second fresh
+reviewer breaks the tie and the middle of the three stands (no built-in
+downward bias); log disputes in `eval/reviews/<date>.json`. Record `reviewed_on` and `reviewer_note` on every item reviewed. A
 score above 2 counts as 2 until it is reviewed, and you do not run stage 6
 until every score above 2 has been challenged.
 
