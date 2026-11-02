@@ -419,6 +419,461 @@
       "priority": 0.5
     }
   ],
+  "levels": {
+    "how": "Levels are the rubric's fit bands (1 Very low, 2 Low from 40, 3 Moderate from 55, 4 Good from 70, 5 Strong from 85). The smallest set is the fewest open actions whose expected effects (each weighted by its chance, within the projection caps) reach the next level; the date assumes they land on their target dates. Quest points are fit points on the best role, on top of the other open actions. Nothing here is made up: it all comes from the runs and the plan.",
+    "best_role": {
+      "role_id": "initech:i-0001",
+      "org": "initech",
+      "title": "Program Manager, Robot Fleet Deployments",
+      "fit": 57.0,
+      "level": 3,
+      "band": "Moderate",
+      "top_level": false,
+      "next_level": 4,
+      "next_band": "Good",
+      "next_level_starts_at": 70,
+      "points_to_next": 13.0,
+      "reachable_on_expected_odds": false,
+      "whole_plan": {
+        "fit_expected": 62.8,
+        "fit_best_case": 70.0,
+        "level_reached_on": null
+      },
+      "best_case_set": {
+        "actions": [
+          {
+            "id": "A06",
+            "title": "Apply to the Initech Robotics fleet deployments role once A04 is done",
+            "target_date": "2026-11-08"
+          },
+          {
+            "id": "A11",
+            "title": "Go to the Initech warehouse operators meetup in Melbourne",
+            "target_date": "2026-12-10"
+          }
+        ],
+        "level_reached_on": "2026-12-10",
+        "fit_if_all_work": 70.0,
+        "chance_it_happens": 0.16,
+        "exact_search": true
+      },
+      "missing": {
+        "points_short": 7.2,
+        "ceiling_within_caps": 79.0,
+        "room_by_factor": [
+          {
+            "dimension": "D3",
+            "name": "Warm path",
+            "points": 7.0,
+            "open_action_covers_it": true
+          },
+          {
+            "dimension": "D2",
+            "name": "Proof of work",
+            "points": 4.0,
+            "open_action_covers_it": false
+          },
+          {
+            "dimension": "D4",
+            "name": "Org-specific edge",
+            "points": 2.0,
+            "open_action_covers_it": false
+          },
+          {
+            "dimension": "D5",
+            "name": "Public signal",
+            "points": 2.0,
+            "open_action_covers_it": false
+          },
+          {
+            "dimension": "D7",
+            "name": "Application readiness",
+            "points": 1.2,
+            "open_action_covers_it": true
+          }
+        ]
+      }
+    },
+    "per_org": {
+      "acme": {
+        "role_id": "acme:4100001",
+        "org": "acme",
+        "title": "Technical Program Manager, Model Launches",
+        "fit": 46.0,
+        "level": 2,
+        "band": "Low",
+        "top_level": false,
+        "next_level": 3,
+        "next_band": "Moderate",
+        "next_level_starts_at": 55,
+        "points_to_next": 9.0,
+        "reachable_on_expected_odds": false,
+        "whole_plan": {
+          "fit_expected": 47.0,
+          "fit_best_case": 48.0,
+          "level_reached_on": null
+        },
+        "best_case_set": null,
+        "missing": {
+          "points_short": 8.0,
+          "ceiling_within_caps": 68.0,
+          "room_by_factor": [
+            {
+              "dimension": "D3",
+              "name": "Warm path",
+              "points": 12.0,
+              "open_action_covers_it": false
+            },
+            {
+              "dimension": "D2",
+              "name": "Proof of work",
+              "points": 4.0,
+              "open_action_covers_it": false
+            },
+            {
+              "dimension": "D5",
+              "name": "Public signal",
+              "points": 2.0,
+              "open_action_covers_it": false
+            },
+            {
+              "dimension": "D7",
+              "name": "Application readiness",
+              "points": 2.0,
+              "open_action_covers_it": false
+            },
+            {
+              "dimension": "D4",
+              "name": "Org-specific edge",
+              "points": 1.0,
+              "open_action_covers_it": true
+            }
+          ]
+        }
+      },
+      "globex": {
+        "role_id": "globex:g-0003",
+        "org": "globex",
+        "title": "AI Success Manager, Asia",
+        "fit": 39.0,
+        "level": 1,
+        "band": "Very low",
+        "top_level": false,
+        "next_level": 2,
+        "next_band": "Low",
+        "next_level_starts_at": 40,
+        "points_to_next": 1.0,
+        "reachable_on_expected_odds": true,
+        "whole_plan": {
+          "fit_expected": 41.9,
+          "fit_best_case": 44.0,
+          "level_reached_on": "2026-11-15"
+        },
+        "smallest_set": {
+          "actions": [
+            {
+              "id": "A02",
+              "title": "Ask [contact] for the introduction to the Globex AI Success lead, and send route-eval first",
+              "target_date": "2026-11-15"
+            }
+          ],
+          "level_reached_on": "2026-11-15",
+          "fit_expected": 41.0,
+          "chance_it_happens": 0.5,
+          "exact_search": true
+        }
+      },
+      "initech": {
+        "role_id": "initech:i-0001",
+        "org": "initech",
+        "title": "Program Manager, Robot Fleet Deployments",
+        "fit": 57.0,
+        "level": 3,
+        "band": "Moderate",
+        "top_level": false,
+        "next_level": 4,
+        "next_band": "Good",
+        "next_level_starts_at": 70,
+        "points_to_next": 13.0,
+        "reachable_on_expected_odds": false,
+        "whole_plan": {
+          "fit_expected": 62.8,
+          "fit_best_case": 70.0,
+          "level_reached_on": null
+        },
+        "best_case_set": {
+          "actions": [
+            {
+              "id": "A06",
+              "title": "Apply to the Initech Robotics fleet deployments role once A04 is done",
+              "target_date": "2026-11-08"
+            },
+            {
+              "id": "A11",
+              "title": "Go to the Initech warehouse operators meetup in Melbourne",
+              "target_date": "2026-12-10"
+            }
+          ],
+          "level_reached_on": "2026-12-10",
+          "fit_if_all_work": 70.0,
+          "chance_it_happens": 0.16,
+          "exact_search": true
+        },
+        "missing": {
+          "points_short": 7.2,
+          "ceiling_within_caps": 79.0,
+          "room_by_factor": [
+            {
+              "dimension": "D3",
+              "name": "Warm path",
+              "points": 7.0,
+              "open_action_covers_it": true
+            },
+            {
+              "dimension": "D2",
+              "name": "Proof of work",
+              "points": 4.0,
+              "open_action_covers_it": false
+            },
+            {
+              "dimension": "D4",
+              "name": "Org-specific edge",
+              "points": 2.0,
+              "open_action_covers_it": false
+            },
+            {
+              "dimension": "D5",
+              "name": "Public signal",
+              "points": 2.0,
+              "open_action_covers_it": false
+            },
+            {
+              "dimension": "D7",
+              "name": "Application readiness",
+              "points": 1.2,
+              "open_action_covers_it": true
+            }
+          ]
+        }
+      }
+    },
+    "quests": [
+      {
+        "id": "A07",
+        "title": "Ask your three closest logistics contacts whether they know anyone at Initech Robotics",
+        "status": "todo",
+        "owner": "you",
+        "effort_hours": 2,
+        "target_date": "2026-11-22",
+        "chance": 0.4,
+        "done_when": "Someone has agreed to introduce you to a person at Initech (email or message)",
+        "points_expected": 2.6,
+        "points_if_it_works": 6.4,
+        "points_per_hour": 1.3,
+        "on_path_to_next_level": false,
+        "needed_for_best_case": false,
+        "tell_your_agent": "Mark action A07 done (\"Ask your three closest logistics contacts whether they know anyone at Initech Robotics\"). Evidence: <paste a link, file path or email reference>. Done when: Someone has agreed to introduce you to a person at Initech (email or message)"
+      },
+      {
+        "id": "A06",
+        "title": "Apply to the Initech Robotics fleet deployments role once A04 is done",
+        "status": "todo",
+        "owner": "you",
+        "effort_hours": 1,
+        "target_date": "2026-11-08",
+        "chance": 0.8,
+        "done_when": "Application submitted (confirmation email)",
+        "points_expected": 0.8,
+        "points_if_it_works": 1.0,
+        "points_per_hour": 0.8,
+        "on_path_to_next_level": false,
+        "needed_for_best_case": true,
+        "tell_your_agent": "Mark action A06 done (\"Apply to the Initech Robotics fleet deployments role once A04 is done\"). Evidence: <paste a link, file path or email reference>. Done when: Application submitted (confirmation email)"
+      },
+      {
+        "id": "A11",
+        "title": "Go to the Initech warehouse operators meetup in Melbourne",
+        "status": "todo",
+        "owner": "you",
+        "effort_hours": 4,
+        "target_date": "2026-12-10",
+        "chance": 0.2,
+        "done_when": "Met at least one Initech employee who has seen your work (follow-up email)",
+        "points_expected": 1.8,
+        "points_if_it_works": 8.8,
+        "points_per_hour": 0.45,
+        "on_path_to_next_level": false,
+        "needed_for_best_case": true,
+        "tell_your_agent": "Mark action A11 done (\"Go to the Initech warehouse operators meetup in Melbourne\"). Evidence: <paste a link, file path or email reference>. Done when: Met at least one Initech employee who has seen your work (follow-up email)"
+      },
+      {
+        "id": "A04",
+        "title": "Fix the LinkedIn headline: 'led a team of 40' should say 'led a team of 8'",
+        "status": "todo",
+        "owner": "you",
+        "effort_hours": 0.5,
+        "target_date": "2026-11-05",
+        "chance": 0.9,
+        "done_when": "Headline changed (screenshot or link), claim C001 re-checked as supported",
+        "points_expected": 0.0,
+        "points_if_it_works": 0.0,
+        "points_per_hour": 0.0,
+        "on_path_to_next_level": false,
+        "needed_for_best_case": false,
+        "tell_your_agent": "Mark action A04 done (\"Fix the LinkedIn headline: 'led a team of 40' should say 'led a team of 8'\"). Evidence: <paste a link, file path or email reference>. Done when: Headline changed (screenshot or link), claim C001 re-checked as supported"
+      },
+      {
+        "id": "A08",
+        "title": "Answer the notice period and non-compete question (Q01)",
+        "status": "todo",
+        "owner": "you",
+        "effort_hours": 0.5,
+        "target_date": "2026-11-04",
+        "chance": 0.9,
+        "done_when": "Answer recorded in intake/answers.md and evidence.json",
+        "points_expected": 0.0,
+        "points_if_it_works": 0.0,
+        "points_per_hour": 0.0,
+        "on_path_to_next_level": false,
+        "needed_for_best_case": false,
+        "tell_your_agent": "Mark action A08 done (\"Answer the notice period and non-compete question (Q01)\"). Evidence: <paste a link, file path or email reference>. Done when: Answer recorded in intake/answers.md and evidence.json"
+      },
+      {
+        "id": "A02",
+        "title": "Ask [contact] for the introduction to the Globex AI Success lead, and send route-eval first",
+        "status": "doing",
+        "owner": "you",
+        "effort_hours": 2,
+        "target_date": "2026-11-15",
+        "chance": 0.5,
+        "done_when": "The AI Success lead has replied and seen route-eval (email)",
+        "points_expected": 0.0,
+        "points_if_it_works": 0.0,
+        "points_per_hour": 0.0,
+        "on_path_to_next_level": false,
+        "needed_for_best_case": false,
+        "tell_your_agent": "Mark action A02 done (\"Ask [contact] for the introduction to the Globex AI Success lead, and send route-eval first\"). Evidence: <paste a link, file path or email reference>. Done when: The AI Success lead has replied and seen route-eval (email)"
+      },
+      {
+        "id": "A10",
+        "title": "Build a small route-eval demo for Acme AI's quarterly evaluation challenge",
+        "status": "doing",
+        "owner": "you",
+        "effort_hours": 6,
+        "target_date": "2026-11-29",
+        "chance": 0.5,
+        "done_when": "Demo submitted to the challenge (link)",
+        "points_expected": 0.0,
+        "points_if_it_works": 0.0,
+        "points_per_hour": 0.0,
+        "on_path_to_next_level": false,
+        "needed_for_best_case": false,
+        "tell_your_agent": "Mark action A10 done (\"Build a small route-eval demo for Acme AI's quarterly evaluation challenge\"). Evidence: <paste a link, file path or email reference>. Done when: Demo submitted to the challenge (link)"
+      }
+    ],
+    "level_history": [
+      {
+        "date": "2026-10-04",
+        "fit": 40.0,
+        "level": 2,
+        "band": "Low",
+        "change": null,
+        "from_level": null
+      },
+      {
+        "date": "2026-10-11",
+        "fit": 44.0,
+        "level": 2,
+        "band": "Low",
+        "change": null,
+        "from_level": 2
+      },
+      {
+        "date": "2026-10-18",
+        "fit": 46.0,
+        "level": 2,
+        "band": "Low",
+        "change": null,
+        "from_level": 2
+      },
+      {
+        "date": "2026-10-25",
+        "fit": 55.0,
+        "level": 3,
+        "band": "Moderate",
+        "change": "up",
+        "from_level": 2
+      },
+      {
+        "date": "2026-11-01",
+        "fit": 57.0,
+        "level": 3,
+        "band": "Moderate",
+        "change": null,
+        "from_level": 3
+      }
+    ],
+    "streak": 4,
+    "progress_days": [
+      {
+        "date": "2026-10-04",
+        "start": true,
+        "progress": false,
+        "roles_up": 0,
+        "evidence": [],
+        "actions": []
+      },
+      {
+        "date": "2026-10-11",
+        "start": false,
+        "progress": true,
+        "roles_up": 8,
+        "evidence": [
+          "E09",
+          "E10",
+          "E19"
+        ],
+        "actions": [
+          "A01"
+        ]
+      },
+      {
+        "date": "2026-10-18",
+        "start": false,
+        "progress": true,
+        "roles_up": 10,
+        "evidence": [
+          "E14"
+        ],
+        "actions": []
+      },
+      {
+        "date": "2026-10-25",
+        "start": false,
+        "progress": true,
+        "roles_up": 4,
+        "evidence": [
+          "E09",
+          "E15"
+        ],
+        "actions": [
+          "A03"
+        ]
+      },
+      {
+        "date": "2026-11-01",
+        "start": false,
+        "progress": true,
+        "roles_up": 3,
+        "evidence": [
+          "E18"
+        ],
+        "actions": [
+          "A05"
+        ]
+      }
+    ]
+  },
   "actions_done": [
     {
       "id": "A01",

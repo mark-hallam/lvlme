@@ -10,7 +10,9 @@ Writes
 The page leads with the journey: the measured Day 1, every scored day since,
 and where the plan is expected to take the person (with a best case and a "do
 nothing" line). A what-if rail switches plan actions on and off, and every
-number on the page updates. Views: Organisations, Path to the top band (only
+number on the page updates. Views: Level up (the next level, the quests that
+get there, level history and the progress streak; see docs/LEVELS.md),
+Organisations, Path to the top band (only
 if eval/ceilings.json exists), What moves you, Roles, SWOT and TOWS (only if
 eval/swot.json exists), Plan, Evidence, Market. A right-hand pane drills into
 any organisation, role, factor, action or piece of evidence.
@@ -50,6 +52,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 import _dashboard_assets as A  # noqa: E402
+import _levels as L  # noqa: E402
+import _levels_html as LH  # noqa: E402
 
 DIMS = C.DIMENSIONS
 DIM_HELP = {
@@ -265,43 +269,8 @@ def action_effects(a, weights):
     return [{"dimension": dim, "delta": delta, "scope": {"orgs": orgs} if isinstance(orgs, list) else {}}], True
 
 
-def in_scope(role, scope):
-    for key, value in (("orgs", role["org"]), ("families", role["family"]),
-                       ("location_classes", role["lc"]), ("role_ids", role["id"])):
-        allowed = scope.get(key) or []
-        if allowed and value not in allowed:
-            return False
-    return True
-
-
-def r1(v):
-    return int(v * 10 + 0.5) / 10.0
-
-
-def fit_of(s, weights):
-    total = sum(weights) or 1
-    return r1(sum(v / 5.0 * w for v, w in zip(s, weights)) * 100.0 / total)
-
-
-def project(role, actions, caps, weights, mode="exp"):
-    """(fit, scores) at the end date. Mirrors project() in the page script."""
-    base, s = list(role["s"]), list(role["s"])
-    for a in actions:
-        if a["status"] not in ("todo", "doing"):
-            continue
-        p = 1.0 if mode == "best" else a["p"]
-        for e in a["effects"]:
-            if e.get("dimension") not in DIMS or not in_scope(role, e.get("scope") or {}):
-                continue
-            k = DIMS.index(e["dimension"])
-            if k == 5 and role["hard"]:
-                continue  # a blocker the plan can't clear keeps eligibility at 0
-            cur = s[k]
-            new = cur + e["delta"] if "delta" in e else max(cur, e.get("set_at_least", 0))
-            new = min(5, new, base[k] + caps[k])
-            if new > cur:
-                s[k] = cur + p * (new - cur)
-    return fit_of(s, weights), s
+# The projection maths lives in _levels.py, shared with the level-up view.
+in_scope, r1, fit_of, project = L.in_scope, L.r1, L.fit_of, L.project
 
 # ------------------------------------------------------------ page data
 
@@ -352,6 +321,7 @@ def build_actions(data, end):
         out.append({
             "id": a["id"], "title": clean(a["title"]), "why": clean(a.get("why")),
             "owner": OWNERS.get(a.get("owner", "you"), "You"), "effort": hours(a.get("effort_hours")),
+            "hours": _num(a.get("effort_hours")),
             "status": st, "date": when(a), "dated": bool(a.get("target_date")), "p": float(a.get("chance", 0)),
             "effects": effects, "derived": derived, "done_when": clean(a.get("done_when")),
             "dim": a.get("dimension"), "priority": priority(a), "stale": stale.get(a["id"]),
@@ -360,6 +330,13 @@ def build_actions(data, end):
             "doneEvidence": clean(a.get("done_evidence")), "notes": clean(a.get("notes")),
         })
     return out
+
+
+def _num(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return 0.0
 
 
 def end_date(data, run_date):
@@ -524,6 +501,7 @@ def build_data(data):
     first = (data.metrics_history or [{}])[0].get("metrics", {})
     goal, report, cand = cfg.get("goal") or {}, cfg.get("report") or {}, cfg.get("candidate") or {}
     runs = build_runs(data, group_of)
+    days, streak = L.progress_days(data.runs, data.evidence.get("items", []), plan.get("actions", []))
     out = {
         "meta": {
             "run_date": run_date, "baseline": baseline, "end": end, "title": clean(report.get("title")) or "Career campaign",
@@ -549,7 +527,7 @@ def build_data(data):
                     "better": clean(c.get("suggested_wording")), "url": web_url(c.get("source")),
                     "ev": c.get("evidence") or []} for c in data.claims],
         "market": build_market(data, roles, groups, group_of, locations, home),
-        "runs": runs, "swot": build_swot(data, actions),
+        "runs": runs, "swot": build_swot(data, actions), "progress": days, "streak": streak,
         "experiments": [{"date": x.get("date"), "action": clean(x.get("action") or x.get("action_id")),
                          "result": clean(x.get("result")), "decision": x.get("decision", ""), "why": clean(x.get("why"))}
                         for x in plan.get("experiments_log") or []],
@@ -565,7 +543,12 @@ def render_page(data):
     if not data.privacy.get("show_contact_names_in_dashboard"):
         page = _scrub_text(page, make_redactor(data, sensitive=False, hide_names=True, placeholder="a contact"))
     blob = json.dumps(page, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
-    return A.TEMPLATE.replace("__TITLE__", html.escape(page["meta"]["title"])).replace("__DATA__", blob), page
+    card, view = LH.render(page)          # first render, readable without JavaScript; the page script redraws it
+    top = page["roles"][0] if page["roles"] else None
+    out = A.TEMPLATE.replace("__TITLE__", html.escape(page["meta"]["title"]))
+    out = out.replace("__BESTFIT__", str(int(top["fit"] + 0.5)) if top else "0")
+    out = out.replace("__BESTROLE__", html.escape("%s: %s" % (top["on"], top["title"])) if top else "")
+    return out.replace("__LEVELCARD__", card).replace("__LEVELUP__", view).replace("__DATA__", blob), page
 
 # ------------------------------------------------------------ agent files
 
@@ -645,6 +628,66 @@ def projection_summary(page):
     return {"end_date": page["meta"]["end"], "baseline_date": page["meta"]["baseline"], "roles": out}
 
 
+def _found_json(found, by_id, fit_key):
+    if not found:
+        return None
+    return {"actions": [{"id": i, "title": by_id[i].get("title", ""), "target_date": by_id[i].get("target_date")} for i in found["ids"]],
+            "level_reached_on": found["date"], fit_key: found["fit"],
+            "chance_it_happens": None if found.get("chance") is None else round(found["chance"], 3),
+            "exact_search": found["exact"]}
+
+
+def _next_level_json(page, role, by_id):
+    nl = L.next_level(role, page["actions"], page["caps"], page["weights"], page["meta"]["run_date"])
+    out = {"role_id": role["id"], "org": role["org"], "title": role["title"], "fit": role["fit"],
+           "level": nl["level"], "band": nl["band"], "top_level": nl["top"]}
+    if nl["top"]:
+        return out, nl
+    out.update(next_level=nl["next_level"], next_band=nl["next_band"], next_level_starts_at=nl["target"],
+               points_to_next=nl["points_to_next"], reachable_on_expected_odds=nl["reachable"],
+               whole_plan={"fit_expected": nl["plan"]["fit_expected"], "fit_best_case": nl["plan"]["fit_best"],
+                           "level_reached_on": nl["plan"]["date"]})
+    if nl["reachable"]:
+        out["smallest_set"] = _found_json(nl["set"], by_id, "fit_expected")
+    else:
+        out["best_case_set"] = _found_json(nl.get("best_case"), by_id, "fit_if_all_work")
+        m = nl["missing"]
+        out["missing"] = {"points_short": m["points"], "ceiling_within_caps": m["ceiling"],
+                          "room_by_factor": [{"dimension": x["dimension"], "name": C.DIMENSION_NAMES[x["dimension"]],
+                                              "points": x["points"], "open_action_covers_it": x["covered"]} for x in m["room"]]}
+    return out, nl
+
+
+def levels_payload(data, page):
+    """Everything the level-up view shows, for the person's other agents (every open action switched on)."""
+    by_id = {a["id"]: a for a in data.plan.get("actions", [])}
+    roles = {r["id"]: r for r in page["roles"]}
+    if not page["roles"]:
+        return None
+    best, nl = _next_level_json(page, page["roles"][0], by_id)
+    per_org = {}
+    for g in page["orgOrder"]:
+        r = roles.get(page["orgs"][g]["best"])
+        if r and g != OTHER_KEY:
+            per_org[g] = _next_level_json(page, r, by_id)[0]
+    quests = []
+    for q in L.quests(page["roles"][0], page["actions"], page["caps"], page["weights"], nl):
+        a, raw = q["a"], by_id.get(q["a"]["id"], {})
+        quests.append({"id": a["id"], "title": raw.get("title", ""), "status": a["status"], "owner": raw.get("owner", "you"),
+                       "effort_hours": raw.get("effort_hours"), "target_date": raw.get("target_date"), "chance": a["p"],
+                       "done_when": raw.get("done_when", ""), "points_expected": q["exp"], "points_if_it_works": q["works"],
+                       "points_per_hour": round(q["rate"], 2), "on_path_to_next_level": q["crit"],
+                       "needed_for_best_case": bool(q["bc"]), "tell_your_agent": L.tell_agent(dict(a, title=raw.get("title", a["title"])))})
+    return {
+        "how": ("Levels are the rubric's fit bands (1 Very low, 2 Low from 40, 3 Moderate from 55, 4 Good from 70, 5 Strong from 85). "
+                "The smallest set is the fewest open actions whose expected effects (each weighted by its chance, within the "
+                "projection caps) reach the next level; the date assumes they land on their target dates. Quest points are fit "
+                "points on the best role, on top of the other open actions. Nothing here is made up: it all comes from the runs and the plan."),
+        "best_role": best, "per_org": per_org, "quests": quests,
+        "level_history": L.level_history(page["runs"]), "streak": page["streak"], "progress_days": page["progress"],
+    }
+
+
 def agent_payload(data, page):
     sensitive = bool(data.privacy.get("sensitive_mode", True))
     share_names = bool(data.privacy.get("share_contact_names_with_agents")) and not sensitive
@@ -667,6 +710,7 @@ def agent_payload(data, page):
         "gaps": cur.get("gaps", []),
         "verify_to_unlock": cur.get("verify_to_unlock", []),
         "actions_active": [dict(a, priority=priority(a)) for a in data.active],
+        "levels": levels_payload(data, page),
         "actions_done": [a for a in data.actions if a.get("status") == "done"],
         "north_star": data.plan.get("north_star", []),
         "metrics_history": data.metrics_history,
@@ -692,6 +736,69 @@ def agent_payload(data, page):
         clean_text = make_redactor(data, sensitive, hide_names=not share_names)
         payload = scrub(payload, clean_text) if sensitive else _scrub_text(payload, clean_text)
     return payload
+
+
+def _set_md(found):
+    acts = ", ".join("%s (%s, target %s)" % (a["id"], a["title"], a["target_date"] or "none") for a in found["actions"])
+    chance = "" if found["chance_it_happens"] is None else "; chance it really happens %d%%" % L.pct(found["chance_it_happens"])
+    return "%s; level reached %s%s" % (acts, found["level_reached_on"], chance)
+
+
+def _g(v):
+    return "%g" % v
+
+
+def _level_md(b):
+    head = "%s (%s), Level %d %s, fit %s." % (b["title"], b["org"], b["level"], b["band"], _g(b["fit"]))
+    if b["top_level"]:
+        return [head + " Top level."]
+    out = [head + " Level %d %s starts at %d: %s points to go." % (b["next_level"], b["next_band"], b["next_level_starts_at"],
+                                                                  _g(b["points_to_next"]))]
+    if b["reachable_on_expected_odds"]:
+        out.append("  Smallest set that gets there, counting each action's chance: " + _set_md(b["smallest_set"]) + ".")
+        return out
+    out.append("  No set of open actions gets there counting their chances: the whole plan is expected to reach %s, %s short." % (
+        _g(b["whole_plan"]["fit_expected"]), _g(b["missing"]["points_short"])))
+    if b.get("best_case_set"):
+        out.append("  Best case only (every action in it must work): " + _set_md(b["best_case_set"]) + ".")
+    room = ", ".join("%s +%s%s" % (x["name"], _g(x["points"]), "" if x["open_action_covers_it"] else " (no open action)")
+                     for x in b["missing"]["room_by_factor"])
+    out.append("  Room left within the caps: %s. Ceiling within the caps: %s." % (room or "none", _g(b["missing"]["ceiling_within_caps"])))
+    return out
+
+
+def levels_md(data, lv):
+    if not lv:
+        return []
+    lines = ["", "## Next level (fit bands of the rubric; nothing here is made up)", "- Best role: "]
+    first = _level_md(lv["best_role"])
+    lines[-1] += first[0]
+    lines += first[1:]
+    for oid, b in lv["per_org"].items():
+        rows = _level_md(b)
+        lines.append("- At %s: %s" % (data.org(oid), rows[0]))
+        lines += rows[1:]
+    lines += ["", "## Quests for the best role (most expected fit points per hour first)"]
+    for q in lv["quests"]:
+        tag = " [on the path to the next level]" if q["on_path_to_next_level"] else " [needed for the best case]" if q["needed_for_best_case"] else ""
+        pts = ("+%s expected, +%s if it works" % (_g(q["points_expected"]), _g(q["points_if_it_works"]))
+               if q["points_expected"] or q["points_if_it_works"] else "no fit points on this role")
+        lines.append("- %s %s%s: %s, %s, target %s, owner %s. Done when: %s" % (
+            q["id"], q["title"], tag, pts, hours(q["effort_hours"]) or "effort not set", q["target_date"] or "none",
+            q["owner"], q["done_when"]))
+    hist = ", ".join("%s Level %d %s (fit %s%s)" % (h["date"], h["level"], h["band"], _g(h["fit"]),
+                                                   ", level up" if h["change"] == "up" else ", level down" if h["change"] == "down" else "")
+                     for h in lv["level_history"])
+    lines += ["", "## Progress",
+              "- Streak: %s in a row with real progress (a fit that rose, newly checked evidence, or an action done with evidence)." % (
+                  "1 scored day" if lv["streak"] == 1 else "%d scored days" % lv["streak"]),
+              "- Level history, best role: %s" % hist,
+              "",
+              "## When the person says an action is done",
+              "- They may paste: Mark action A07 done (\"title\"). Evidence: <link, file or email>.",
+              "- The agent running the campaign sets status done, done_evidence and finished_on in campaign/plan.json. Done needs a",
+              "  link, a file or an email reference; without one, ask for it. Any other agent appends the message to campaign/inbox.md."]
+    return lines
 
 
 def summary_md(data, p):
@@ -733,6 +840,7 @@ def summary_md(data, p):
     for a in p["actions_active"]:
         lines.append("- [%s] %s %s (owner: %s; done when: %s)" % (a["status"], a["id"], a["title"], a.get("owner", "you"),
                                                                  a.get("done_when", "")))
+    lines += levels_md(data, p.get("levels"))
     lines += ["", "## Biggest gaps"]
     for g in p["gaps"]:
         lines.append("- %s: +%s fit points across %d roles. %s" % (g["title"], g["points_gain"], g["roles_affected"], g["why"]))
