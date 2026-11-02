@@ -27,7 +27,7 @@ from html.parser import HTMLParser
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 
-UA = "climb/0.1 (claims audit of the user's own pages; read only)"
+UA = "lvlme/0.3 (claims audit of the user's own pages; read only)"
 MAX_BYTES = 2_000_000
 CLAIM_RX = re.compile(
     r"\b(led|lead|leading|managed|managing|built|building|founded|co-?founded|launched|shipped|delivered|"
@@ -78,7 +78,7 @@ def read_source(src, workspace=None):
             body = resp.read(MAX_BYTES).decode("utf-8", errors="replace")
         return html_to_text(body) if "<" in body else body
     if re.match(r"^[a-z]+://", src, re.I):
-        raise SystemExit("climb: only http and https URLs are supported: %s" % src)
+        raise SystemExit("lvlme: only http and https URLs are supported: %s" % src)
     if workspace and not os.path.exists(src) and os.path.exists(os.path.join(workspace, src)):
         src = os.path.join(workspace, src)
     with open(src, encoding="utf-8", errors="replace") as fh:
@@ -129,7 +129,7 @@ def add_claims(audit, source, text, today):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Extract candidate claims from the person's own public pages.")
-    ap.add_argument("--workspace", help="workspace folder (default: $CLIMB_HOME)")
+    ap.add_argument("--workspace", help="workspace folder (default: $LVLME_HOME)")
     ap.add_argument("--today", help="date stamp for new claims (default: today)")
     ap.add_argument("sources", nargs="+", help="URLs (http or https) or .txt / .md / .html files")
     args = ap.parse_args(argv)

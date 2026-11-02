@@ -1,4 +1,4 @@
-"""Climb quick's result builder, offline, on the fictional demo (Alex Example and a made-up Globex Labs posting)."""
+"""LVLme quick's result builder, offline, on the fictional demo (Alex Example and a made-up Globex Labs posting)."""
 import io
 import json
 import os
@@ -22,7 +22,7 @@ BOARD = os.path.join(H.FIXTURES, "quick", "ashby-board.json")
 
 
 def tmpdir(test):
-    d = tempfile.mkdtemp(prefix="climb-quick-test-")
+    d = tempfile.mkdtemp(prefix="lvlme-quick-test-")
     test.addCleanup(shutil.rmtree, d, True)
     return d
 
@@ -116,11 +116,11 @@ class DemoTests(Base):
         page = open(os.path.join(self.folder, "index.html"), encoding="utf-8").read()
         self.assertNotRegex(page, r"<script|<link[^>]+href=|@import|url\(\s*['\"]?https?:|<img")
         self.assertIn("prefers-color-scheme:dark", page)
-        self.assertIn('Say "run Climb"', page)
+        self.assertIn('Say "run LVLme"', page)
         self.assertNotIn(os.path.expanduser("~"), page)
         self.assertIsNone(re.search("[–—]", re.sub(r"<[^>]+>", "", page)))
         message = open(os.path.join(self.folder, "message.md"), encoding="utf-8").read()
-        self.assertIn('Go deeper: say "run Climb"', message)
+        self.assertIn('Go deeper: say "run LVLme"', message)
         self.assertLess(len(message.split()), 150)
 
 
@@ -219,7 +219,7 @@ class NewFolderTests(unittest.TestCase):
         inside = os.path.join(H.ENGINE, "examples", "quick-demo", "not-fictional")
         code, _, err = run(["new", "--posting", LINK, "--saved-response", BOARD, "--folder", inside])
         self.assertEqual(code, 2)
-        self.assertIn("inside the Climb engine folder", err)
+        self.assertIn("inside the LVLme engine folder", err)
         self.assertFalse(os.path.exists(inside))
         repo = tmpdir(self)
         subprocess.run(["git", "init", "-q", repo], check=True)

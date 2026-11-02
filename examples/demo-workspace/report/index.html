@@ -14,7 +14,7 @@
   on". On a phone Do next follows the headline status, first-screen controls are 44
   points, the tab row scrolls with a visible hint, and the rail opens from a bottom
   toolbar that reserves its own space. Motion is quiet and never leaves content hidden.
-  Built by Climb scripts/build_dashboard.py.
+  Built by LVLme scripts/build_dashboard.py.
 -->
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -1351,9 +1351,10 @@ async function copyText(t){
     document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove(); return ok; } catch (e) { return false; }
 }
 // "Pending, tell your agent" ticks: this viewer's device only, never counted, never sent anywhere.
-const PEND_KEY = "climb-pending:" + D.meta.title;
+// Ticks saved under the old name (before Climb became LVLme) are still read.
+const PEND_KEY = "lvlme-pending:" + D.meta.title, PEND_OLD = "climb-pending:" + D.meta.title;
 let pending = new Set();
-try { const v = JSON.parse(localStorage.getItem(PEND_KEY) || "[]"); if (Array.isArray(v)) pending = new Set(v.filter(id => D.actions.some(a => a.id === id && live(a)))); } catch (e) {}
+try { const v = JSON.parse(localStorage.getItem(PEND_KEY) || localStorage.getItem(PEND_OLD) || "[]"); if (Array.isArray(v)) pending = new Set(v.filter(id => D.actions.some(a => a.id === id && live(a)))); } catch (e) {}
 function savePending(){ try { localStorage.setItem(PEND_KEY, JSON.stringify([...pending])); } catch (e) {} }
 function goLevel(){ state.view = "level"; renderViewSeg(); showView(); $(".views-nav").scrollIntoView({behavior: motionOK() ? "smooth" : "auto", block: "start"}); }
 
@@ -1668,12 +1669,12 @@ function refreshDetail(){ if (state.stack.length && (detail.classList.contains("
 function refreshNumbers(){ renderTopline(); renderTiles4(); showView(false); refreshDetail(); }
 function refresh(){ recompute(); renderTopline(); drawChart(); renderTiles4(); renderDoNext(); renderSwitches(); renderHistory(); showView(false); refreshDetail(); }
 let theme = "light";
-try { const t = localStorage.getItem("climb-theme"); if (t === "dark" || t === "light") theme = t; } catch (e) {}
+try { const t = localStorage.getItem("lvlme-theme") || localStorage.getItem("climb-theme"); if (t === "dark" || t === "light") theme = t; } catch (e) {}
 function applyTheme(){
   if (theme === "dark") document.documentElement.dataset.theme = "dark"; else delete document.documentElement.dataset.theme;
   $("#themeSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.t === theme)));
 }
-$("#themeSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { theme = b.dataset.t; try { localStorage.setItem("climb-theme", theme); } catch (e) {} applyTheme(); chartBuilt = false; lastVals = null; refresh(); }));
+$("#themeSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { theme = b.dataset.t; try { localStorage.setItem("lvlme-theme", theme); } catch (e) {} applyTheme(); chartBuilt = false; lastVals = null; refresh(); }));
 $("#allOn").addEventListener("click", () => { D.actions.forEach(a => { if (switchable(a)) enabled.add(a.id); }); refresh(); });
 $("#allOff").addEventListener("click", () => { enabled.clear(); refresh(); });
 $("#sampleTog").addEventListener("click", () => { state.sample = !state.sample; $("#sampleTog").setAttribute("aria-checked", String(state.sample)); renderTopline(); drawChart(); renderHistory(); });

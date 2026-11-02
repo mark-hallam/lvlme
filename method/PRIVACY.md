@@ -1,7 +1,7 @@
 # Privacy
 
-Climb handles some of the most personal data there is: your work
-history, your contacts, your pay, your plans. Climb's files stay on your
+LVLme handles some of the most personal data there is: your work
+history, your contacts, your pay, your plans. LVLme's files stay on your
 computer, and its scripts send none of it anywhere. Your AI agent is
 different: its provider receives whatever the agent reads (see "Your AI
 agent's provider" below).
@@ -12,8 +12,8 @@ agent's provider" below).
   the scripts, empty templates and a fictional demo. Nothing you enter goes
   into it.
 - **Your workspace is a separate, private folder** on your own computer. By
-  default it is `~/climb-workspaces/<goal>`, or wherever
-  `$CLIMB_HOME` points. `init.py` makes it readable by your user account
+  default it is `~/lvlme-workspaces/<goal>`, or wherever
+  `$LVLME_HOME` points. `init.py` makes it readable by your user account
   only.
 - **The scripts refuse an unsafe workspace.** Every script checks the
   workspace location and refuses one inside the engine repository (except
@@ -70,7 +70,7 @@ off.
 
 ## Your AI agent's provider
 
-Climb's files stay on your computer. Your AI agent's provider (for example
+LVLme's files stay on your computer. Your AI agent's provider (for example
 Anthropic for Claude Code, or OpenAI for Codex) receives whatever the agent
 reads, in order to process it. That is true even when the agent's program
 runs on your computer, because the model that does the reading runs on the
@@ -78,7 +78,7 @@ provider's servers. So when the agent reads your evidence, contacts, plans,
 documents or approved emails, that text goes to the provider and is handled
 under the provider's data terms: what it keeps, for how long, and whether it
 is used for training depend on those terms and your account settings, not on
-Climb. Read them on the provider's own site. Only a model that runs entirely
+LVLme. Read them on the provider's own site. Only a model that runs entirely
 on your computer keeps everything there.
 
 To limit what is sent:
@@ -92,7 +92,7 @@ To limit what is sent:
 Email, calendar and browser access are **opt in and read only**. The agent
 asks first, reads only what the run needs (for example, emails from the
 target organisations' domains or from job boards since the last run), and
-never sends, deletes, labels or changes anything. Climb never opens LinkedIn
+never sends, deletes, labels or changes anything. LVLme never opens LinkedIn
 itself, because automated access breaks LinkedIn's terms: it works from the
 official data export and what you paste.
 
@@ -110,12 +110,12 @@ sensitive, the agent does not record it.
 
 ## Network access and telemetry
 
-- No telemetry. Climb's scripts report nothing to anyone. (Your AI agent
+- No telemetry. LVLme's scripts report nothing to anyone. (Your AI agent
   still sends what it reads to its provider, as above.)
 - `fetch_roles.py` calls only the public job-board APIs (application
   programming interfaces) for the targets in your config.
 - `claims_audit.py` fetches only the addresses you pass it.
-- `quick_posting.py` (Climb quick) fetches only the one posting link you give
+- `quick_posting.py` (LVLme quick) fetches only the one posting link you give
   it: through the public job-board API for Greenhouse, Ashby and Lever links,
   otherwise the page itself, once. It never opens LinkedIn.
 - No other script uses the network.

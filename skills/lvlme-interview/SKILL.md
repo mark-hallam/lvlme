@@ -1,13 +1,13 @@
 ---
-name: climb-interview
-description: Run or update the Climb career interview. Reads the documents the person supplies first, then asks only what the documents cannot answer.
+name: lvlme-interview
+description: Run or update the LVLme career interview. Reads the documents the person supplies first, then asks only what the documents cannot answer.
 argument-hint: "[first | update]"
 disable-model-invocation: true
 ---
 
-# Climb: the interview
+# LVLme: the interview
 
-The Climb engine folder is `${CLAUDE_PLUGIN_ROOT}` (if that placeholder was not
+The LVLme engine folder is `${CLAUDE_PLUGIN_ROOT}` (if that placeholder was not
 filled in, it is the folder two levels above this file).
 
 1. Read the engine's `SKILL.md` and follow its hard rules and its "Find or
@@ -35,4 +35,4 @@ filled in, it is the folder two levels above this file).
    background for the sources they have approved (see
    `docs/ORCHESTRATION.md`).
 8. Finish with a short plain English summary: what you learnt, what still
-   needs an answer, and whether to run the full `/climb` next.
+   needs an answer, and whether to run the full `/lvlme` next.

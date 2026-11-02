@@ -1,13 +1,13 @@
 ---
-name: climb-quick
-description: Climb quick. Honest odds for one job in about five minutes, from one posting link (or pasted text) and a CV, with a blind second scorer, the campaign's own scoring maths, and the top 3 fixes. Never writes application answers.
+name: lvlme-quick
+description: LVLme quick. Honest odds for one job in about five minutes, from one posting link (or pasted text) and a CV, with a blind second scorer, the campaign's own scoring maths, and the top 3 fixes. Never writes application answers.
 argument-hint: "[posting link]"
 disable-model-invocation: true
 ---
 
-# Climb quick: honest odds for one job
+# LVLme quick: honest odds for one job
 
-The Climb engine folder is `${CLAUDE_PLUGIN_ROOT}` (if that placeholder was not
+The LVLme engine folder is `${CLAUDE_PLUGIN_ROOT}` (if that placeholder was not
 filled in, it is the folder two levels above this file). Run the commands from
 that folder.
 
@@ -30,7 +30,8 @@ would raise it most. Aim for about five minutes and at most two questions.
   and the next step; the person writes the words. Some employers publish
   guidance on how candidates may use AI when applying: point the person to it.
 - **Nothing personal in the engine folder.** The quick folder lives in
-  `~/climb-workspaces/quick/`; the script refuses anywhere unsafe.
+  `~/lvlme-workspaces/quick/` (or `~/climb-workspaces/quick/` while only the
+  folder's old name exists); the script refuses anywhere unsafe.
 
 ## Steps
 
@@ -84,7 +85,7 @@ would raise it most. Aim for about five minutes and at most two questions.
    ```
 
    If it lists items, start ONE fresh reviewer: in Claude Code the
-   `climb:reviewer` subagent, elsewhere a new session. Give it only the
+   `lvlme:reviewer` subagent, elsewhere a new session. Give it only the
    `reviewer_brief` the command prints (the rubric, the evidence file, the
    posting and the item list). Never give it a score, a note or this
    conversation. Save its reply, as it came, to `eval/review-reply.md`. If it
@@ -106,6 +107,6 @@ would raise it most. Aim for about five minutes and at most two questions.
    `result.json` and `message.md`. Fix any error it prints and run it again.
 9. **Tell the person**: paste `message.md` as it is. It holds the odds in
    plain English, the top fixes, the command to open the page, and the way to
-   go deeper: say "run Climb" for the full campaign. If they want to go deeper,
+   go deeper: say "run LVLme" for the full campaign. If they want to go deeper,
    start the full run (the engine's `SKILL.md`), and offer the CV they already
    gave as the first document for the interview.

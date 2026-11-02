@@ -1,4 +1,4 @@
-"""The Climb quick result page (index.html in a quick folder): one self-contained page.
+"""The LVLme quick result page (index.html in a quick folder): one self-contained page.
 
 Rendered once in Python from result.json. Inline CSS, no script, no external
 requests (no fonts, images or styles loaded from anywhere). Light by default,
@@ -176,9 +176,9 @@ def hero(result):
             '<h1>%s</h1><p class="sub small">%s%s</p>'
             '<div class="odds">%s%s</div>'
             '<p class="lead" id="oddsH"><b>%s.</b> %s</p>'
-            '<p class="sub small">Fit <b class="num">%s</b> out of 100 on the five factors Climb quick checks. '
+            '<p class="sub small">Fit <b class="num">%s</b> out of 100 on the five factors LVLme quick checks. '
             'The chances are judgement estimates, not statistics. Most applicants to competitive roles are turned '
-            'down, so Climb starts from "unlikely" and only evidence moves it.</p>%s</section>'
+            'down, so LVLme starts from "unlikely" and only evidence moves it.</p>%s</section>'
             % (esc(r["title"]), where, link, meter(result["interview_band"], "Interview chance"),
                meter(result["offer_band"], "Offer chance"), esc(headline(result)),
                esc(EXPLAIN[result["interview_band"]]), num(result["fit"]), banners))
@@ -231,7 +231,7 @@ def band_change(result, f):
 def fixes(result):
     if not result["fixes"]:
         return ('<section class="card"><p class="eyebrow">What would raise your odds</p><h2>No fix found</h2>'
-                '<p class="small sub">None of the fixes considered adds fit points. Say "run Climb" for the full '
+                '<p class="small sub">None of the fixes considered adds fit points. Say "run LVLme" for the full '
                 'campaign, which looks wider.</p></section>')
     items = []
     for f in result["fixes"]:
@@ -262,7 +262,7 @@ def brief(result):
     if back:
         parts.append('<h3 style="margin-top:12px">Have a source ready for</h3><ul class="ev">%s</ul>' % back)
     return ('<section class="card" aria-labelledby="briefH"><p class="eyebrow">Your brief</p>'
-            '<h2 id="briefH">Before you apply</h2>%s<p class="small sub" style="margin-top:12px">Climb gives fixes and a '
+            '<h2 id="briefH">Before you apply</h2>%s<p class="small sub" style="margin-top:12px">LVLme gives fixes and a '
             'brief, never application answers: you write those in your own words. Some employers publish guidance on '
             'how candidates may use AI; check theirs.</p></section>' % "".join(parts))
 
@@ -298,19 +298,19 @@ def deeper():
             '<h2 id="deepH">Want the whole climb?</h2><p class="small sub">The full campaign checks every open role at '
             'the organisations you choose, gathers evidence from the sources you approve, adds a recruiter screen and a '
             'consistency audit of your CV, LinkedIn and website, and re-scores as you act on the plan.</p></div>'
-            '<div class="say">Say "run Climb"</div></div></section>')
+            '<div class="say">Say "run LVLme"</div></div></section>')
 
 
 def render(result):
     r = result["role"]
     demo = " · fictional demo" if result.get("fictional") else ""
-    foot = ("Drafts only: Climb never applies, sends or posts for you. Your CV and this page stay on your computer. "
+    foot = ("Drafts only: LVLme never applies, sends or posts for you. Your CV and this page stay on your computer. "
             "Inputs fingerprint %s." % esc(result["inputs_digest"][:19]))
     body = "".join([hero(result), factors(result), fixes(result), brief(result), checked(result), deeper()])
     return ("<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">"
             "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
             "<meta name=\"color-scheme\" content=\"light dark\">"
-            "<title>Climb quick: %s</title><style>%s</style></head><body><div class=\"wrap\">"
-            "<header class=\"top\"><span class=\"mark\">%s</span><b>Climb quick</b>"
+            "<title>LVLme quick: %s</title><style>%s</style></head><body><div class=\"wrap\">"
+            "<header class=\"top\"><span class=\"mark\">%s</span><b>LVLme quick</b>"
             "<span class=\"sub\">%s%s</span></header><main>%s</main><footer>%s</footer></div></body></html>\n" % (
                 esc("%s at %s" % (r["title"], r["org_name"])), CSS, LOGO, esc(long_date(result["date"])), demo, body, foot))

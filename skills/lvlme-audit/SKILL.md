@@ -1,13 +1,13 @@
 ---
-name: climb-audit
-description: Run the Climb consistency audit and public claims audit. Compares the CV, LinkedIn, website and any official forms for mismatched dates, titles and claims, and checks public claims against evidence.
+name: lvlme-audit
+description: Run the LVLme consistency audit and public claims audit. Compares the CV, LinkedIn, website and any official forms for mismatched dates, titles and claims, and checks public claims against evidence.
 argument-hint: "[consistency | claims | both]"
 disable-model-invocation: true
 ---
 
-# Climb: the audits
+# LVLme: the audits
 
-The Climb engine folder is `${CLAUDE_PLUGIN_ROOT}` (if that placeholder was not
+The LVLme engine folder is `${CLAUDE_PLUGIN_ROOT}` (if that placeholder was not
 filled in, it is the folder two levels above this file).
 
 1. Read the engine's `SKILL.md` and follow its hard rules and its "Find or

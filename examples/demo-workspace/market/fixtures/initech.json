@@ -16,8 +16,8 @@
     "hostedUrl": "https://example.com/jobs/initech/i-0001",
     "applyUrl": "https://example.com/jobs/initech/i-0001/apply",
     "createdAt": 1760832000000,
-    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the Climb demo.</div><div>Plan and run robot fleet rollouts at customer warehouses.</div>",
-    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the Climb demo.</div><div>Plan and run robot fleet rollouts at customer warehouses.</div>",
+    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the LVLme demo.</div><div>Plan and run robot fleet rollouts at customer warehouses.</div>",
+    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the LVLme demo.</div><div>Plan and run robot fleet rollouts at customer warehouses.</div>",
     "lists": [
       {
         "text": "What you will do",
@@ -58,8 +58,8 @@
     "hostedUrl": "https://example.com/jobs/initech/i-0002",
     "applyUrl": "https://example.com/jobs/initech/i-0002/apply",
     "createdAt": 1759622400000,
-    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the Climb demo.</div><div>Shape how autonomous robots move goods through warehouses.</div>",
-    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the Climb demo.</div><div>Shape how autonomous robots move goods through warehouses.</div>",
+    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the LVLme demo.</div><div>Shape how autonomous robots move goods through warehouses.</div>",
+    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the LVLme demo.</div><div>Shape how autonomous robots move goods through warehouses.</div>",
     "lists": [
       {
         "text": "What you will do",
@@ -94,8 +94,8 @@
     "hostedUrl": "https://example.com/jobs/initech/i-0003",
     "applyUrl": "https://example.com/jobs/initech/i-0003/apply",
     "createdAt": 1759622400000,
-    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the Climb demo.</div><div>Represent Initech Robotics in safety standards work.</div>",
-    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the Climb demo.</div><div>Represent Initech Robotics in safety standards work.</div>",
+    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the LVLme demo.</div><div>Represent Initech Robotics in safety standards work.</div>",
+    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the LVLme demo.</div><div>Represent Initech Robotics in safety standards work.</div>",
     "lists": [
       {
         "text": "What you will do",
@@ -130,8 +130,8 @@
     "hostedUrl": "https://example.com/jobs/initech/i-0004",
     "applyUrl": "https://example.com/jobs/initech/i-0004/apply",
     "createdAt": 1761955200000,
-    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the Climb demo.</div><div>Keep fleet customers in New Zealand successful.</div>",
-    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the Climb demo.</div><div>Keep fleet customers in New Zealand successful.</div>",
+    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the LVLme demo.</div><div>Keep fleet customers in New Zealand successful.</div>",
+    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the LVLme demo.</div><div>Keep fleet customers in New Zealand successful.</div>",
     "lists": [
       {
         "text": "What you will do",
@@ -166,8 +166,8 @@
     "hostedUrl": "https://example.com/jobs/initech/i-0005",
     "applyUrl": "https://example.com/jobs/initech/i-0005/apply",
     "createdAt": 1759622400000,
-    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the Climb demo.</div>",
-    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the Climb demo.</div>",
+    "descriptionPlain": "<div>Initech Robotics builds warehouse robots. A fictional company for the LVLme demo.</div>",
+    "description": "<div>Initech Robotics builds warehouse robots. A fictional company for the LVLme demo.</div>",
     "lists": [
       {
         "text": "Requirements",

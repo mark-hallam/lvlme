@@ -1,6 +1,6 @@
 # For AI agents (Codex, Cursor and others)
 
-This repository is **Climb**: a method and small scripts that estimate,
+This repository is **LVLme**: a method and small scripts that estimate,
 honestly, how likely a person is to land a specific kind of role at specific
 organisations, and turn the gaps into a prioritised campaign.
 
@@ -22,7 +22,8 @@ version, and it runs the same procedure. Install notes for every agent:
 - **Never** ask about, infer or score protected attributes (age, gender,
   ethnicity, disability, religion, family status).
 - The person's data lives in a **private workspace** outside this repository
-  (`$CLIMB_HOME`, or a folder in `~/climb-workspaces/`). Never
+  (`$LVLME_HOME`, or a folder in `~/lvlme-workspaces/`; the old names
+  `$CLIMB_HOME` and `~/climb-workspaces/` still work). Never
   write personal data into this repository and never copy the workspace
   anywhere public. Be plain that what an agent reads goes to its provider to
   be processed, under that provider's data terms (`method/PRIVACY.md`).
@@ -106,7 +107,7 @@ cannot, run the same stages one after another; the gates do not change. See
 
 If the person asks for one part only, run only that part, with the hard rules:
 `quick` (honest odds for one posting from a link and a CV, in about five
-minutes: follow `skills/climb-quick/SKILL.md`), `interview` (stage 1), `audit`
+minutes: follow `skills/lvlme-quick/SKILL.md`), `interview` (stage 1), `audit`
 (the two audits), `screen` (the recruiter screen), `dashboard` (stage 9),
 `status` (stage 10 from the newest files, changing nothing), or `resume` (the
 first stage not yet done today).
@@ -116,12 +117,12 @@ first stage not yet done today).
 - Python 3.9 or newer, standard library only. No telemetry. Network calls only
   in `fetch_roles.py` (public job-board APIs, or application programming
   interfaces), `claims_audit.py` (addresses the person passes) and
-  `quick_posting.py` (the one posting link the person gives Climb quick).
+  `quick_posting.py` (the one posting link the person gives LVLme quick).
 - Tests run offline: `python3 -m unittest discover -s tests`.
   `tests/test_packaging.py` checks the plugin manifests, the skill and
   subagent files, and that every engine path the packaging docs name exists.
 - Packaging: `.claude-plugin/` (Claude Code plugin and marketplace), `skills/`
-  (the `/climb-*` commands), `agents/` (subagent briefs), `.cursor/rules/`
+  (the `/lvlme-*` commands), `agents/` (subagent briefs), `.cursor/rules/`
   (Cursor), this file (Codex and others).
 - The demo in `examples/demo-workspace/` is fictional. Rebuild it with
   `python3 examples/build_demo.py`.

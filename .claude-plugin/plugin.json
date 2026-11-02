@@ -1,7 +1,7 @@
 {
-  "name": "climb",
-  "displayName": "Climb",
-  "version": "0.2.0",
+  "name": "lvlme",
+  "displayName": "LVLme",
+  "version": "0.3.0",
   "description": "Honest, evidence-based odds of landing a kind of role at the organisations you choose, and a campaign that raises them. Runs in a private workspace on your own machine and never sends, posts, applies or changes an account on its own.",
   "author": {
     "name": "Mark Hallam",
@@ -18,6 +18,6 @@
   "skills": [
     "./"
   ],
-  "homepage": "https://github.com/mark-hallam/climb",
-  "repository": "https://github.com/mark-hallam/climb"
+  "homepage": "https://github.com/mark-hallam/lvlme",
+  "repository": "https://github.com/mark-hallam/lvlme"
 }

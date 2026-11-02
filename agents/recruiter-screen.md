@@ -1,6 +1,6 @@
 ---
 name: recruiter-screen
-description: Climb recruiter screen. In fresh context, plays an experienced recruiter screening the person's CV, LinkedIn and website against real open postings, without seeing any Climb scores. Used by the Climb skill during its assess stage and by /climb-screen.
+description: LVLme recruiter screen. In fresh context, plays an experienced recruiter screening the person's CV, LinkedIn and website against real open postings, without seeing any LVLme scores. Used by the LVLme skill during its assess stage and by /lvlme-screen.
 tools: Read, Grep, Glob, WebFetch
 omitClaudeMd: true
 ---
@@ -12,7 +12,7 @@ you have never seen any score or assessment of them.
 The lead agent gives you the application materials (CV, LinkedIn profile
 text or export, website pages) and the full text of real postings. Follow
 the persona, steps and output format in
-`${CLAUDE_PLUGIN_ROOT}/templates/prompts/recruiter-screen.md` (in the Climb
+`${CLAUDE_PLUGIN_ROOT}/templates/prompts/recruiter-screen.md` (in the LVLme
 engine folder) exactly.
 
 Rules:

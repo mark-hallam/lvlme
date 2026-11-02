@@ -1,6 +1,6 @@
-# Design: Climb, the career eval and campaign engine
+# Design: LVLme, the career eval and campaign engine
 
-Status: draft v0.1 (2026-11-01). Name: Climb (chosen 2026-11-02). Folder, skill and command name: `climb`.
+Status: draft v0.1 (2026-11-01). Name: LVLme, said "level me" (chosen 2026-11-03; called Climb from 2026-11-02 until then). Folder, skill and command name: `lvlme`.
 
 ## 1. What it is
 
@@ -41,7 +41,7 @@ targets, role families and weights are configuration.
 ## 3. Architecture
 
 ```
-climb/                        public engine (this repo, MIT)
+lvlme/                        public engine (this repo, MIT)
   SKILL.md  AGENTS.md  README.md  LICENSE
   method/   RUBRIC.md INTAKE.md SWOT.md CAMPAIGN.md REVIEW.md PRIVACY.md RUNBOOK.md
   schemas/  JSON schemas for every workspace file
@@ -68,7 +68,7 @@ climb/                        public engine (this repo, MIT)
   report/index.html  report/for-agents/SUMMARY.md  report/for-agents/dashboard.json
 ```
 
-Workspace location: `$CLIMB_HOME`, else `~/climb-workspaces/<goal-slug>`.
+Workspace location: `$LVLME_HOME`, else `~/lvlme-workspaces/<goal-slug>`. The names from before the rename (`$CLIMB_HOME`, `~/climb-workspaces/`) still work.
 `validate.py` refuses to run if the workspace is inside the engine repo or any
 git repo with a public remote.
 
@@ -219,7 +219,7 @@ the scorer's reasoning, and must justify every change).
 ## 11. Packaging
 
 - `SKILL.md` (Agent Skills format): Claude Code users drop the repo into
-  `~/.claude/skills/climb/` or install it as a plugin.
+  `~/.claude/skills/lvlme/` or install it as a plugin.
 - `AGENTS.md`: instructions for Codex, Cursor / Grok Bot and other agents.
 - Scripts: Python 3.9+, standard library only, no network calls except public
   job-board APIs and connectors the user approves. No telemetry.

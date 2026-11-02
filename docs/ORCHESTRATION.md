@@ -1,6 +1,6 @@
 # Orchestration: parallel agents with explicit gates
 
-Most of a Climb run is independent reading and judging: one email search
+Most of a LVLme run is independent reading and judging: one email search
 does not need to wait for one GitHub search, and one batch of roles does not
 need to wait for another. A capable agent should do that work at the same
 time, with several subagents, and then join the results. That keeps a full
@@ -36,8 +36,8 @@ is the reference. `SKILL.md` carries the short version.
   workspace.
 
 In Claude Code, the files in `agents/` load as subagents named
-`climb:evidence-scout`, `climb:market-scout`, `climb:role-judge`,
-`climb:reviewer` and `climb:recruiter-screen`. In any other agent, use the
+`lvlme:evidence-scout`, `lvlme:market-scout`, `lvlme:role-judge`,
+`lvlme:reviewer` and `lvlme:recruiter-screen`. In any other agent, use the
 body of the file as the subagent's task brief.
 
 ## The stage graph
@@ -150,7 +150,7 @@ evidence before it changes anything.
 Nothing is scored until the independent sceptical reviewer has challenged
 every score above 2.
 
-Climb runs the review **blind**, which is the strict form of
+LVLme runs the review **blind**, which is the strict form of
 `method/REVIEW.md`:
 
 1. List every item to review: each role dimension and each organisation
@@ -197,7 +197,7 @@ The reviewer and the recruiter screen must not be anchored by the campaign.
   `omitClaudeMd: true`, so personal instruction files do not reach them.
 - **Never the campaign's own scores.** No fit, band, level, outlook, run
   file, dashboard, plan, SWOT, or judgement notes. The reviewer gets item ids,
-  not numbers. The recruiter screen gets no Climb output at all.
+  not numbers. The recruiter screen gets no LVLme output at all.
 - **Self-check.** Both briefs tell the agent to stop and say so if its task
   message contains a score, band, level or plan.
 - **Packet, not access.** Pass the packet in the task message where it fits.
@@ -251,7 +251,7 @@ person sends or makes themselves.
 
 ## Resume
 
-If a run stops part way (the person leaves, a limit is hit), `/climb resume`
+If a run stops part way (the person leaves, a limit is hit), `/lvlme resume`
 starts at the first stage whose checkpoint is not met for today:
 
 | Stage done today when | Checkpoint |

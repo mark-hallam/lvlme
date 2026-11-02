@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Climb independent sceptical reviewer. In fresh context, scores the listed items blind from the rubric, the evidence and the postings, without seeing the campaign's own scores or reasoning. Used by the Climb skill as its review gate before scoring.
+description: LVLme independent sceptical reviewer. In fresh context, scores the listed items blind from the rubric, the evidence and the postings, without seeing the campaign's own scores or reasoning. Used by the LVLme skill as its review gate before scoring.
 tools: Read, Grep, Glob
 omitClaudeMd: true
 ---

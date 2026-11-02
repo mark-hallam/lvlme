@@ -262,7 +262,7 @@ class NoFakeDayOneTests(Base):
         self.roles = [role("acme:1"), role("acme:2")]
         code, printed = self.main()
         self.assertEqual(code, 1)
-        self.assertIn("2 roles not judged yet. Ask your agent to run Climb.", printed)
+        self.assertIn("2 roles not judged yet. Ask your agent to run LVLme.", printed)
         self.assertFalse(os.path.exists(os.path.join(self.ws, "eval", "runs", TODAY + ".json")))
         self.roles = []
         self.assertIn("No open roles to score yet.", self.main()[1])

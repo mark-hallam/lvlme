@@ -1,4 +1,4 @@
-Climb quick: Deployment Program Manager, AI Agents at Globex Labs.
+LVLme quick: Deployment Program Manager, AI Agents at Globex Labs.
 Odds today: Low chance of an interview, very low chance of an offer (fit 41 of 100).
 
 The fixes that would raise them most:
@@ -16,4 +16,4 @@ See why, factor by factor:
 open examples/quick-demo/2026-11-02-globex-labs-deployment-program-manager-ai-agents/index.html
 ```
 
-Go deeper: say "run Climb" for the full campaign.
+Go deeper: say "run LVLme" for the full campaign.

@@ -321,7 +321,7 @@ def cross_checks(ws, docs, errors, warnings):
     review_checks(docs, ev_ids, errors, warnings)
 
 
-# Evidence id prefixes Climb already uses for other ids, so an evidence id with one reads as something else.
+# Evidence id prefixes LVLme already uses for other ids, so an evidence id with one reads as something else.
 RESERVED_PREFIXES = {"D": "the factor codes D1 to D7", "A": "plan actions (A01)", "Q": "open questions (Q01)"}
 
 
@@ -334,7 +334,7 @@ def evidence_checks(cfg, ev, warnings):
         eid, kind = e.get("id") or "", e.get("kind") or "other"
         prefix = re.match(r"^[A-Z]*", eid).group(0)
         if prefix in RESERVED_PREFIXES:
-            warnings.append("profile/evidence.json: evidence id %s starts with %s, which Climb uses for %s; prefer E "
+            warnings.append("profile/evidence.json: evidence id %s starts with %s, which LVLme uses for %s; prefer E "
                             "(or another prefix) so it is not misread" % (eid, prefix, RESERVED_PREFIXES[prefix]))
         if e.get("level") == "partially_verified":
             mine = S.level_cap("partially_verified", kind, self_caps, partial)
@@ -453,21 +453,21 @@ def validate_workspace(ws):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Validate a Climb workspace.")
-    ap.add_argument("--workspace", help="workspace folder (default: $CLIMB_HOME)")
+    ap = argparse.ArgumentParser(description="Validate a LVLme workspace.")
+    ap.add_argument("--workspace", help="workspace folder (default: $LVLME_HOME)")
     ap.add_argument("--json", action="store_true", help="print the result as JSON")
     args = ap.parse_args(argv)
     try:
         ws = C.resolve_workspace(args.workspace)
     except C.WorkspaceError as exc:
-        print("climb: %s" % exc, file=sys.stderr)
+        print("lvlme: %s" % exc, file=sys.stderr)
         return 1
     problem = C.location_problem(ws)
     if problem:
         if args.json:
             print(json.dumps({"workspace": ws, "ok": False, "refused": problem}, indent=2))
         else:
-            print("climb: refused. " + problem, file=sys.stderr)
+            print("lvlme: refused. " + problem, file=sys.stderr)
         return 2
     errors, warnings, checked = validate_workspace(ws)
     if args.json:

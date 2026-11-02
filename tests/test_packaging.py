@@ -14,7 +14,7 @@ import unittest
 import helpers as H
 
 ROOT = H.ENGINE
-COMMANDS = {"climb", "climb-quick", "climb-interview", "climb-screen", "climb-audit", "climb-dashboard"}
+COMMANDS = {"lvlme", "lvlme-quick", "lvlme-interview", "lvlme-screen", "lvlme-audit", "lvlme-dashboard"}
 AGENTS = {"evidence-scout", "market-scout", "role-judge", "reviewer", "recruiter-screen"}
 INDEPENDENT = {"reviewer", "recruiter-screen"}
 AFTER_MERGE = {"method/INTERVIEW.md", "method/CONSISTENCY.md", "scripts/consistency_audit.py",
@@ -86,7 +86,7 @@ def slug(heading):
 class ManifestTests(unittest.TestCase):
     def test_plugin_manifest(self):
         plugin = H.load(os.path.join(ROOT, ".claude-plugin", "plugin.json"))
-        self.assertEqual(plugin["name"], "climb")
+        self.assertEqual((plugin["name"], plugin["displayName"]), ("lvlme", "LVLme"))
         self.assertTrue(NAME_RE.match(plugin["name"]))
         self.assertLessEqual(set(plugin), PLUGIN_KEYS)
         for key in ("version", "description", "license"):
@@ -115,18 +115,30 @@ class ManifestTests(unittest.TestCase):
         self.assertEqual(entry["source"], "./")
         self.assertTrue(os.path.isfile(os.path.join(ROOT, entry["source"], ".claude-plugin", "plugin.json")))
 
+    def test_old_plugin_name_is_renamed_not_dropped(self):
+        """Installs of the plugin under its old name, climb, migrate to lvlme instead of breaking."""
+        market = H.load(os.path.join(ROOT, ".claude-plugin", "marketplace.json"))
+        self.assertEqual(market["name"], "lvlme")
+        self.assertEqual(market.get("renames"), {"climb": "lvlme"})
+        names = {e["name"] for e in market["plugins"]}
+        for old, new in market["renames"].items():
+            self.assertNotIn(old, names, "a renamed name must not also be a live entry")
+            self.assertIn(new, names)
+
 
 class ComponentTests(unittest.TestCase):
     def test_root_skill_is_portable(self):
         data, body = frontmatter("SKILL.md")
         self.assertEqual(set(data), {"name", "description"}, "keep the root skill to the portable Agent Skills fields")
-        self.assertEqual(data["name"], "climb")
+        self.assertEqual(data["name"], "lvlme")
+        for phrase in ('"run LVLme"', '"run Climb"'):   # the old name still triggers the skill
+            self.assertIn(phrase, data["description"])
         self.assertLessEqual(len(data["description"]), 1024)
         self.assertLess(len(read("SKILL.md").splitlines()), 500)
         self.assertIn("docs/ORCHESTRATION.md", body)
 
     def test_command_skills(self):
-        names = {"climb"}
+        names = {"lvlme"}
         for path in glob.glob(os.path.join(ROOT, "skills", "*")):
             rel = os.path.relpath(os.path.join(path, "SKILL.md"), ROOT)
             data, body = frontmatter(rel)
@@ -175,7 +187,7 @@ class ComponentTests(unittest.TestCase):
             self.assertLess(len(read(rel).splitlines()), 500, rel)
             if data["alwaysApply"]:
                 always.append(rel)
-        self.assertEqual(always, [os.path.join(".cursor", "rules", "climb-hard-rules.mdc")])
+        self.assertEqual(always, [os.path.join(".cursor", "rules", "lvlme-hard-rules.mdc")])
 
     def test_agents_md_fits_codex_limit(self):
         self.assertLess(len(read("AGENTS.md").encode("utf-8")), 32 * 1024)
@@ -228,10 +240,12 @@ class DocTests(unittest.TestCase):
                 self.assertIn("/" + name, text, doc)
         orchestration = read("docs/ORCHESTRATION.md")
         for name in AGENTS:
-            self.assertIn("climb:" + name, orchestration)
+            self.assertIn("lvlme:" + name, orchestration)
         for rel in packaging_docs():
-            for ref in re.findall(r"`/?climb:([a-z-]+)`", read(rel)):
-                self.assertIn(ref, AGENTS | COMMANDS, "%s names unknown climb:%s" % (rel, ref))
+            text = read(rel)
+            for ref in re.findall(r"`/?lvlme:([a-z-]+)`", text):
+                self.assertIn(ref, AGENTS | COMMANDS, "%s names unknown lvlme:%s" % (rel, ref))
+            self.assertEqual(re.findall(r"\bclimb:[a-z]", text), [], "%s still uses the old climb: prefix" % rel)
 
     def test_install_doc_cites_the_formats_followed(self):
         text = read("docs/INSTALL.md")

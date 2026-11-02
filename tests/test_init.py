@@ -14,7 +14,7 @@ import validate as V
 
 class InitTests(unittest.TestCase):
     def tmp(self):
-        d = tempfile.mkdtemp(prefix="climb-init-")
+        d = tempfile.mkdtemp(prefix="lvlme-init-")
         self.addCleanup(shutil.rmtree, d, True)
         return d
 
@@ -34,8 +34,8 @@ class InitTests(unittest.TestCase):
         self.assertEqual((cfg["targets"], cfg["families"], cfg["exclude_title_keywords"]), ([], [], []))
         steps = [line for line in printed.splitlines() if line.startswith("Next step")]
         self.assertEqual(len(steps), 1)
-        self.assertIn('say to your agent "run the Climb interview"', steps[0])
-        self.assertIn(ws, steps[0])                    # outside ~/climb-workspaces, so it names the folder
+        self.assertIn('say to your agent "run the LVLme interview"', steps[0])
+        self.assertIn(ws, steps[0])                    # outside ~/lvlme-workspaces, so it names the folder
         self.assertNotIn("Next steps", printed)
         for rel in ("intake/answers.md", "profile/evidence.json", "eval/judgements.json", "campaign/plan.json",
                     "campaign/inbox.md", "market/roles/snapshots", "report/for-agents"):
@@ -57,16 +57,17 @@ class InitTests(unittest.TestCase):
     def test_next_step_is_just_the_interview_in_the_default_place(self):
         parent = self.tmp()
         with mock.patch.object(C, "DEFAULT_PARENT", parent), mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("LVLME_HOME", None)
             os.environ.pop("CLIMB_HOME", None)
             code, printed = self.run_init(["--goal", "Climate tech"])
         self.assertEqual(code, 0)
         self.assertTrue(os.path.exists(os.path.join(parent, "climate-tech", "config.json")))
-        self.assertEqual(printed.splitlines()[-1], 'Next step: say to your agent "run the Climb interview".')
+        self.assertEqual(printed.splitlines()[-1], 'Next step: say to your agent "run the LVLme interview".')
 
     def test_env_default_and_refusals(self):
         parent = self.tmp()
         target = os.path.join(parent, "from-env")
-        with mock.patch.dict(os.environ, {"CLIMB_HOME": target}), mock.patch("sys.stdout"):
+        with mock.patch.dict(os.environ, {"LVLME_HOME": target}), mock.patch("sys.stdout"):
             self.assertEqual(I.main(["--goal", "AI labs"]), 0)
         self.assertTrue(os.path.exists(os.path.join(target, "config.json")))
         with mock.patch("sys.stderr"):

@@ -1,6 +1,6 @@
 # Alex Example
 
-Brisbane, Australia. Australian citizen. Fictional person for the Climb demo.
+Brisbane, Australia. Australian citizen. Fictional person for the LVLme demo.
 
 ## Experience
 
