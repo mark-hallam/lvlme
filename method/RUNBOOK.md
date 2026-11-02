@@ -51,8 +51,9 @@ The commands below omit it. Run them from the engine folder.
    `manual`, and the board slug), role families and keywords, location
    classes, `candidate.timezone`, `candidate.eligibility_cleared`,
    `privacy.redact_terms` (their employers' names).
-3. Interview the person with the full question bank in `INTAKE.md`. Save the
-   answers in `intake/answers.md`.
+3. Interview the person with the full question bank in `INTAKE.md`,
+   document-led and in short rounds (`INTERVIEW.md`). Save the answers in
+   `intake/answers.md`.
 4. Ask for the LinkedIn data export and a résumé, saved in `intake/sources/`.
 5. Fill `eval/profile-dimensions.json` D6 rules for every location class, from
    the work-rights answers.
@@ -105,6 +106,19 @@ The commands below omit it. Run them from the engine folder.
 
    Judge every `pending` claim (see `INTAKE.md`). Every overstated or
    contradicted claim becomes a top-priority action.
+
+   Then, on the first run and whenever the CV, LinkedIn or website changes,
+   update `profile/role-records.json` and run the consistency audit
+   (`CONSISTENCY.md`):
+
+   ```bash
+   python3 scripts/consistency_audit.py
+   ```
+
+   Every high finding becomes a top-priority action. After the first fixes,
+   and about monthly, run an independent recruiter screen
+   (`RECRUITER_SCREEN.md`). Draft the resulting edits with
+   `PROFILE_FIXES.md`.
 
 6. **Judge.** Judgements live in files; the maths lives in a script.
    - `eval/judgements.json`: D1, D2 and D4 for every new role id, and any role

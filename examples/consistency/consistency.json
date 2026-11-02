@@ -1,0 +1,719 @@
+{
+  "schema_version": 1,
+  "generated_on": "2026-11-02",
+  "input": "role-records.json",
+  "settings": {
+    "date_tolerance_months": 1,
+    "gap_months": 3,
+    "truth_order": [
+      "confirmed",
+      "official_form",
+      "cv",
+      "linkedin",
+      "website"
+    ]
+  },
+  "sources": [
+    {
+      "id": "confirmed",
+      "label": "Confirmed by the person",
+      "complete": true,
+      "editable": false,
+      "records": 6,
+      "ref": "intake/answers.md#history"
+    },
+    {
+      "id": "official_form",
+      "label": "Official form (signed Aug 2019)",
+      "complete": true,
+      "editable": false,
+      "records": 2,
+      "ref": "intake/sources/history-form-photos/",
+      "covers": {
+        "from": "2009",
+        "to": "2019-08"
+      }
+    },
+    {
+      "id": "cv",
+      "label": "CV",
+      "complete": true,
+      "editable": true,
+      "records": 6,
+      "ref": "intake/sources/cv.pdf"
+    },
+    {
+      "id": "linkedin",
+      "label": "LinkedIn",
+      "complete": true,
+      "editable": true,
+      "records": 6,
+      "ref": "intake/sources/linkedin-profile.pdf"
+    },
+    {
+      "id": "website",
+      "label": "Website",
+      "complete": false,
+      "editable": true,
+      "records": 2,
+      "ref": "https://example.com/about"
+    }
+  ],
+  "counts": {
+    "high": 4,
+    "medium": 9,
+    "low": 1,
+    "by_type": {
+      "title_mismatch": 2,
+      "date_mismatch": 3,
+      "missing_role": 2,
+      "denied_claim": 1,
+      "claim_mismatch": 1,
+      "single_source_claim": 3,
+      "overlap": 1,
+      "gap": 1
+    }
+  },
+  "roles": [
+    {
+      "id": "R01",
+      "organisation": "Example University",
+      "kind": "education",
+      "concurrent": false,
+      "truth": {
+        "title": "Bachelor of Science",
+        "title_from": "confirmed",
+        "start": "2001",
+        "start_from": "confirmed",
+        "end": "2004",
+        "end_from": "confirmed",
+        "needs_confirmation": false
+      },
+      "seen_in": {
+        "confirmed": {
+          "title": "Bachelor of Science",
+          "start": "2001",
+          "end": "2004"
+        },
+        "cv": {
+          "title": "Bachelor of Science",
+          "start": "2001",
+          "end": "2004"
+        }
+      }
+    },
+    {
+      "id": "R02",
+      "organisation": "Fabrikam Air",
+      "kind": "role",
+      "concurrent": false,
+      "truth": {
+        "title": "Quality Officer",
+        "title_from": "confirmed",
+        "start": "2005-02",
+        "start_from": "confirmed",
+        "end": "2008-06",
+        "end_from": "confirmed",
+        "needs_confirmation": false
+      },
+      "seen_in": {
+        "confirmed": {
+          "title": "Quality Officer",
+          "start": "2005-02",
+          "end": "2008-06"
+        },
+        "cv": {
+          "title": "Quality Officer",
+          "start": "2005",
+          "end": "2008"
+        },
+        "linkedin": {
+          "title": "Quality Officer",
+          "start": "2005-02",
+          "end": "2008-06"
+        }
+      }
+    },
+    {
+      "id": "R03",
+      "organisation": "Fabrikam Air",
+      "kind": "role",
+      "concurrent": false,
+      "truth": {
+        "title": "Deputy Quality Manager",
+        "title_from": "confirmed",
+        "start": "2008-07",
+        "start_from": "confirmed",
+        "end": "2012-03",
+        "end_from": "confirmed",
+        "needs_confirmation": false
+      },
+      "seen_in": {
+        "confirmed": {
+          "title": "Deputy Quality Manager",
+          "start": "2008-07",
+          "end": "2012-03"
+        },
+        "official_form": {
+          "title": "Deputy Quality Manager",
+          "start": "2008-07",
+          "end": "2012-03"
+        },
+        "cv": {
+          "title": "Deputy Quality Manager",
+          "start": "2008-07",
+          "end": "2012-03"
+        },
+        "linkedin": {
+          "title": "Quality Manager",
+          "start": "2008-07",
+          "end": "2012-05"
+        }
+      }
+    },
+    {
+      "id": "R04",
+      "organisation": "Northwind Consulting",
+      "kind": "business",
+      "concurrent": false,
+      "truth": {
+        "title": "Founder",
+        "title_from": "confirmed",
+        "start": "2013-01",
+        "start_from": "confirmed",
+        "end": "2015-12",
+        "end_from": "confirmed",
+        "needs_confirmation": false
+      },
+      "seen_in": {
+        "confirmed": {
+          "title": "Founder",
+          "start": "2013-01",
+          "end": "2015-12"
+        },
+        "cv": {
+          "title": "Founder",
+          "start": "2013-01",
+          "end": "2015-12"
+        },
+        "linkedin": {
+          "title": "Founder",
+          "start": "2013-01",
+          "end": "2016-03"
+        }
+      }
+    },
+    {
+      "id": "R05",
+      "organisation": "Woodgrove Bank",
+      "kind": "role",
+      "concurrent": false,
+      "truth": {
+        "title": "Operations Analyst",
+        "title_from": "confirmed",
+        "start": "2016-01",
+        "start_from": "confirmed",
+        "end": "2019-08",
+        "end_from": "confirmed",
+        "needs_confirmation": false
+      },
+      "seen_in": {
+        "confirmed": {
+          "title": "Operations Analyst",
+          "start": "2016-01",
+          "end": "2019-08"
+        },
+        "official_form": {
+          "title": "Operations Analyst",
+          "start": "2016-01",
+          "end": "2019-08"
+        },
+        "cv": {
+          "title": "Operations Analyst",
+          "start": "2016-01",
+          "end": "2019-12"
+        },
+        "linkedin": {
+          "title": "Operations Analyst",
+          "start": "2016-01",
+          "end": "2019-08"
+        },
+        "website": {
+          "title": "Operations Lead",
+          "start": "2016",
+          "end": "2019"
+        }
+      }
+    },
+    {
+      "id": "R06",
+      "organisation": "Adventure Works",
+      "kind": "role",
+      "concurrent": false,
+      "truth": {
+        "title": "Advisory Board Member",
+        "title_from": "linkedin",
+        "start": "2018",
+        "start_from": "linkedin",
+        "end": "2019",
+        "end_from": "linkedin",
+        "needs_confirmation": true
+      },
+      "seen_in": {
+        "linkedin": {
+          "title": "Advisory Board Member",
+          "start": "2018",
+          "end": "2019"
+        }
+      }
+    },
+    {
+      "id": "R07",
+      "organisation": "Tailspin Robotics",
+      "kind": "role",
+      "concurrent": false,
+      "truth": {
+        "title": "Program Manager",
+        "title_from": "confirmed",
+        "start": "2019-09",
+        "start_from": "confirmed",
+        "end": "present",
+        "end_from": "confirmed",
+        "needs_confirmation": false
+      },
+      "seen_in": {
+        "confirmed": {
+          "title": "Program Manager",
+          "start": "2019-09",
+          "end": "present"
+        },
+        "cv": {
+          "title": "Program Manager",
+          "start": "2019-09",
+          "end": "present"
+        },
+        "linkedin": {
+          "title": "Program Manager",
+          "start": "2019-09",
+          "end": "present"
+        },
+        "website": {
+          "title": "Program Manager",
+          "start": "2019",
+          "end": "present"
+        }
+      }
+    }
+  ],
+  "findings": [
+    {
+      "id": "F01",
+      "type": "title_mismatch",
+      "severity": "high",
+      "roles": [
+        "R03"
+      ],
+      "sources": [
+        "confirmed",
+        "official_form",
+        "cv",
+        "linkedin"
+      ],
+      "summary": "Fabrikam Air: Confirmed by the person, Official form (signed Aug 2019) and CV say \"Deputy Quality Manager\"; LinkedIn says \"Quality Manager\".",
+      "likely_inflation": true,
+      "reason": "Likely inflation: \"Quality Manager\" leaves out \"Deputy\" (from \"Deputy Quality Manager\").",
+      "field": "title",
+      "values": {
+        "confirmed": "Deputy Quality Manager",
+        "official_form": "Deputy Quality Manager",
+        "cv": "Deputy Quality Manager",
+        "linkedin": "Quality Manager"
+      },
+      "inflated": [
+        "Quality Manager"
+      ]
+    },
+    {
+      "id": "F02",
+      "type": "denied_claim",
+      "severity": "high",
+      "roles": [
+        "R03"
+      ],
+      "sources": [
+        "linkedin"
+      ],
+      "summary": "Fabrikam Air, Deputy Quality Manager: LinkedIn says \"Ran the airline's external audit program\", but the person says this is not true.",
+      "claim": "Ran the airline's external audit program"
+    },
+    {
+      "id": "F03",
+      "type": "title_mismatch",
+      "severity": "high",
+      "roles": [
+        "R05"
+      ],
+      "sources": [
+        "confirmed",
+        "official_form",
+        "cv",
+        "linkedin",
+        "website"
+      ],
+      "summary": "Woodgrove Bank: Confirmed by the person, Official form (signed Aug 2019), CV and LinkedIn say \"Operations Analyst\"; Website says \"Operations Lead\".",
+      "likely_inflation": true,
+      "reason": "Likely inflation: \"Operations Lead\" is a seniority step above \"Operations Analyst\".",
+      "field": "title",
+      "values": {
+        "confirmed": "Operations Analyst",
+        "official_form": "Operations Analyst",
+        "cv": "Operations Analyst",
+        "linkedin": "Operations Analyst",
+        "website": "Operations Lead"
+      },
+      "inflated": [
+        "Operations Lead"
+      ]
+    },
+    {
+      "id": "F04",
+      "type": "missing_role",
+      "severity": "high",
+      "roles": [
+        "R06"
+      ],
+      "sources": [
+        "linkedin",
+        "confirmed",
+        "official_form",
+        "cv"
+      ],
+      "summary": "\"Advisory Board Member\" at Adventure Works (2018 to 2019) is in LinkedIn but not in Confirmed by the person, Official form (signed Aug 2019) and CV. Only the person's own pages list it.",
+      "present_in": [
+        "linkedin"
+      ],
+      "missing_from": [
+        "confirmed",
+        "official_form",
+        "cv"
+      ]
+    },
+    {
+      "id": "F05",
+      "type": "date_mismatch",
+      "severity": "medium",
+      "roles": [
+        "R03"
+      ],
+      "sources": [
+        "confirmed",
+        "official_form",
+        "cv",
+        "linkedin"
+      ],
+      "summary": "Fabrikam Air, Deputy Quality Manager: the end date differs (Confirmed by the person Mar 2012; Official form (signed Aug 2019) Mar 2012; CV Mar 2012; LinkedIn May 2012); they differ by up to 2 months.",
+      "field": "end",
+      "months": 2,
+      "values": {
+        "confirmed": "Mar 2012",
+        "official_form": "Mar 2012",
+        "cv": "Mar 2012",
+        "linkedin": "May 2012"
+      }
+    },
+    {
+      "id": "F06",
+      "type": "single_source_claim",
+      "severity": "medium",
+      "roles": [
+        "R03"
+      ],
+      "sources": [
+        "cv"
+      ],
+      "summary": "Fabrikam Air, Deputy Quality Manager: only CV says \"Prepared the quality team for three regulator audits\".",
+      "claim": "Prepared the quality team for three regulator audits",
+      "has_number": false
+    },
+    {
+      "id": "F07",
+      "type": "gap",
+      "severity": "medium",
+      "roles": [
+        "R03",
+        "R04"
+      ],
+      "sources": [],
+      "summary": "No role, study or explained break from Apr 2012 to Dec 2012 (9 months).",
+      "months": 9,
+      "gap": {
+        "start": "2012-04",
+        "end": "2012-12",
+        "current": false
+      }
+    },
+    {
+      "id": "F08",
+      "type": "date_mismatch",
+      "severity": "medium",
+      "roles": [
+        "R04"
+      ],
+      "sources": [
+        "confirmed",
+        "cv",
+        "linkedin"
+      ],
+      "summary": "Northwind Consulting, Founder: the end date differs (Confirmed by the person Dec 2015; CV Dec 2015; LinkedIn Mar 2016); they differ by up to 3 months.",
+      "field": "end",
+      "months": 3,
+      "values": {
+        "confirmed": "Dec 2015",
+        "cv": "Dec 2015",
+        "linkedin": "Mar 2016"
+      }
+    },
+    {
+      "id": "F09",
+      "type": "missing_role",
+      "severity": "medium",
+      "roles": [
+        "R04"
+      ],
+      "sources": [
+        "confirmed",
+        "cv",
+        "linkedin",
+        "official_form"
+      ],
+      "summary": "\"Founder\" at Northwind Consulting (Jan 2013 to Dec 2015) is in Confirmed by the person, CV and LinkedIn but not in Official form (signed Aug 2019).",
+      "present_in": [
+        "confirmed",
+        "cv",
+        "linkedin"
+      ],
+      "missing_from": [
+        "official_form"
+      ]
+    },
+    {
+      "id": "F10",
+      "type": "date_mismatch",
+      "severity": "medium",
+      "roles": [
+        "R05"
+      ],
+      "sources": [
+        "confirmed",
+        "official_form",
+        "cv",
+        "linkedin",
+        "website"
+      ],
+      "summary": "Woodgrove Bank, Operations Analyst: the end date differs (Confirmed by the person Aug 2019; Official form (signed Aug 2019) Aug 2019; CV Dec 2019; LinkedIn Aug 2019; Website 2019); they differ by up to 4 months.",
+      "field": "end",
+      "months": 4,
+      "values": {
+        "confirmed": "Aug 2019",
+        "official_form": "Aug 2019",
+        "cv": "Dec 2019",
+        "linkedin": "Aug 2019",
+        "website": "2019"
+      }
+    },
+    {
+      "id": "F11",
+      "type": "claim_mismatch",
+      "severity": "medium",
+      "roles": [
+        "R07"
+      ],
+      "sources": [
+        "confirmed",
+        "cv",
+        "linkedin"
+      ],
+      "summary": "Tailspin Robotics, Program Manager: the same claim has different numbers (Confirmed by the person \"Cut supplier defects by 30% in 2022\"; CV \"Cut supplier defects by 30% in 2022\"; LinkedIn \"Cut supplier defects by 40% in 2022\").",
+      "claim": "Cut supplier defects by 30% in 2022",
+      "values": {
+        "confirmed": "Cut supplier defects by 30% in 2022",
+        "cv": "Cut supplier defects by 30% in 2022",
+        "linkedin": "Cut supplier defects by 40% in 2022"
+      }
+    },
+    {
+      "id": "F12",
+      "type": "single_source_claim",
+      "severity": "medium",
+      "roles": [
+        "R07"
+      ],
+      "sources": [
+        "cv"
+      ],
+      "summary": "Tailspin Robotics, Program Manager: only CV says \"Ran a weekly risk review for 4 product teams\".",
+      "claim": "Ran a weekly risk review for 4 product teams",
+      "has_number": true
+    },
+    {
+      "id": "F13",
+      "type": "single_source_claim",
+      "severity": "medium",
+      "roles": [
+        "R07"
+      ],
+      "sources": [
+        "linkedin"
+      ],
+      "summary": "Tailspin Robotics, Program Manager: only LinkedIn says \"Managed a team of 12 engineers\".",
+      "claim": "Managed a team of 12 engineers",
+      "has_number": true
+    },
+    {
+      "id": "F14",
+      "type": "overlap",
+      "severity": "low",
+      "roles": [
+        "R05",
+        "R06"
+      ],
+      "sources": [],
+      "summary": "\"Operations Analyst\" at Woodgrove Bank and \"Advisory Board Member\" at Adventure Works overlap for 2 months (Dec 2018 to Jan 2019), and neither is marked concurrent.",
+      "months": 2
+    }
+  ],
+  "fixes": [
+    {
+      "finding": "F04",
+      "source": "confirmed",
+      "action": "confirm",
+      "text": "Ask the person whether they held \"Advisory Board Member\" at Adventure Works (2018 to 2019), and record the answer.",
+      "role": "R06"
+    },
+    {
+      "finding": "F09",
+      "source": "official_form",
+      "action": "explain",
+      "text": "Official form (signed Aug 2019) does not list \"Founder\" at Northwind Consulting and cannot be edited. Be ready to explain why.",
+      "role": "R04"
+    },
+    {
+      "finding": "F06",
+      "source": "cv",
+      "action": "prove_or_remove",
+      "text": "Keep \"Prepared the quality team for three regulator audits\" only if a second source backs it (a referee, a document, a press article); otherwise remove or soften it.",
+      "role": "R03",
+      "field": "claim",
+      "current": "Prepared the quality team for three regulator audits"
+    },
+    {
+      "finding": "F10",
+      "source": "cv",
+      "action": "change",
+      "text": "Change the end date from Dec 2019 to Aug 2019.",
+      "role": "R05",
+      "field": "end",
+      "current": "Dec 2019",
+      "suggested": "Aug 2019"
+    },
+    {
+      "finding": "F12",
+      "source": "cv",
+      "action": "prove_or_remove",
+      "text": "Keep \"Ran a weekly risk review for 4 product teams\" only if a second source backs it (a referee, a document, a press article); otherwise remove or soften it.",
+      "role": "R07",
+      "field": "claim",
+      "current": "Ran a weekly risk review for 4 product teams"
+    },
+    {
+      "finding": "F01",
+      "source": "linkedin",
+      "action": "change",
+      "text": "Change the title from \"Quality Manager\" to \"Deputy Quality Manager\".",
+      "role": "R03",
+      "field": "title",
+      "current": "Quality Manager",
+      "suggested": "Deputy Quality Manager"
+    },
+    {
+      "finding": "F02",
+      "source": "linkedin",
+      "action": "remove",
+      "text": "Remove \"Ran the airline's external audit program\": the person says it is not true.",
+      "role": "R03",
+      "field": "claim",
+      "current": "Ran the airline's external audit program"
+    },
+    {
+      "finding": "F04",
+      "source": "linkedin",
+      "action": "remove_or_prove",
+      "text": "Remove \"Advisory Board Member\" at Adventure Works unless the person confirms it and a document backs it.",
+      "role": "R06"
+    },
+    {
+      "finding": "F05",
+      "source": "linkedin",
+      "action": "change",
+      "text": "Change the end date from May 2012 to Mar 2012.",
+      "role": "R03",
+      "field": "end",
+      "current": "May 2012",
+      "suggested": "Mar 2012"
+    },
+    {
+      "finding": "F08",
+      "source": "linkedin",
+      "action": "change",
+      "text": "Change the end date from Mar 2016 to Dec 2015.",
+      "role": "R04",
+      "field": "end",
+      "current": "Mar 2016",
+      "suggested": "Dec 2015"
+    },
+    {
+      "finding": "F11",
+      "source": "linkedin",
+      "action": "change",
+      "text": "Change the claim from \"Cut supplier defects by 40% in 2022\" to \"Cut supplier defects by 30% in 2022\".",
+      "role": "R07",
+      "field": "claim",
+      "current": "Cut supplier defects by 40% in 2022",
+      "suggested": "Cut supplier defects by 30% in 2022"
+    },
+    {
+      "finding": "F13",
+      "source": "linkedin",
+      "action": "prove_or_remove",
+      "text": "Keep \"Managed a team of 12 engineers\" only if a second source backs it (a referee, a document, a press article); otherwise remove or soften it.",
+      "role": "R07",
+      "field": "claim",
+      "current": "Managed a team of 12 engineers"
+    },
+    {
+      "finding": "F03",
+      "source": "website",
+      "action": "change",
+      "text": "Change the title from \"Operations Lead\" to \"Operations Analyst\".",
+      "role": "R05",
+      "field": "title",
+      "current": "Operations Lead",
+      "suggested": "Operations Analyst"
+    },
+    {
+      "finding": "F07",
+      "source": "all",
+      "action": "explain",
+      "text": "Explain Apr 2012 to Dec 2012 in one line on the CV and LinkedIn (for example study, a business, travel or a career break), then add it to explained_gaps.",
+      "role": "R03"
+    },
+    {
+      "finding": "F14",
+      "source": "all",
+      "action": "mark_concurrent",
+      "text": "If R05 and R06 really ran at the same time, mark them concurrent in profile/role-records.json and make that clear on the CV; otherwise fix the dates.",
+      "role": "R05"
+    }
+  ],
+  "notes": []
+}

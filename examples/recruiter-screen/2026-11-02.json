@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "screened_on": "2026-11-02",
+  "reviewer": {"kind": "fresh_agent", "persona": "a recruiter and a hiring manager at an applied AI company"},
+  "independence": {"fresh_context": true, "saw_campaign_scores": false, "saw_campaign_plan": false, "searched_web": false,
+                   "note": "Fictional example. Every person, organisation and quote here is made up."},
+  "materials": [
+    {"id": "M1", "type": "website", "ref": "https://example.com/about", "captured_on": "2026-11-02"},
+    {"id": "M2", "type": "linkedin", "ref": "intake/sources/linkedin-profile.pdf", "captured_on": "2026-11-02"},
+    {"id": "M3", "type": "cv", "ref": "intake/sources/cv.pdf", "captured_on": "2026-11-02"}
+  ],
+  "postings": [
+    {"id": "P1", "org": "Initech Robotics", "title": "Fleet Deployment Program Manager", "ref": "https://example.com/jobs/1"},
+    {"id": "P2", "org": "Globex Labs", "title": "AI Success Manager", "ref": "https://example.com/jobs/2"},
+    {"id": "P3", "org": "Acme AI", "title": "Technical Program Manager, Safety", "ref": "https://example.com/jobs/3"}
+  ],
+  "six_second": {
+    "verdict": "skim",
+    "read_as": "An operations and quality program manager at a robotics company, not obviously an AI person.",
+    "why": "The headline says what the person does, but nothing on the first screen shows AI work.",
+    "noticed_first": ["Program Manager at Tailspin Robotics", "No link to any shipped work above the fold"]
+  },
+  "roles": [
+    {"posting": "P1", "advance": "yes", "biggest_reason": "Years running supplier and quality programs map straight onto fleet deployment.",
+     "strongest_match": "Cut supplier defects by 30% in 2022", "biggest_gap": "No robotics fleet experience named",
+     "quotes": ["Cut supplier defects by 30% in 2022"]},
+    {"posting": "P2", "advance": "maybe", "biggest_reason": "Customer facing work is implied, never shown.",
+     "biggest_gap": "No customer or account work described"},
+    {"posting": "P3", "advance": "no", "biggest_reason": "The posting asks for hands-on safety evaluation work; the profile shows none.",
+     "biggest_gap": "No evaluation or safety work a reviewer can check"}
+  ],
+  "stop_and_look": [
+    {"what": "A concrete, numbered result", "where": "M3", "quote": "Cut supplier defects by 30% in 2022"}
+  ],
+  "red_flags": [
+    {"kind": "inconsistency", "quote": "Cut supplier defects by 40% in 2022", "where": "M2",
+     "why": "The CV says 30%. A reader who sees both trusts neither.", "severity": "high",
+     "fix": "Use the number the person can prove, the same on every page."},
+    {"kind": "inconsistency", "quote": "Quality Manager", "where": "M2",
+     "why": "The CV gives the same role as Deputy Quality Manager. A background check will ask.", "severity": "high",
+     "fix": "Use the title from the offer letter everywhere."}
+  ],
+  "missing": [
+    {"what": "Any link to shipped work", "why_it_matters": "Proof a stranger can check is the strongest signal.",
+     "postings": ["P2", "P3"]}
+  ],
+  "top_changes": [
+    {"rank": 1, "change": "Make the title and dates on LinkedIn match the CV and the offer letter.", "where": "M2",
+     "impact": "high", "effort_hours": 0.5, "why": "Removes the most obvious honesty question.", "postings": ["P1", "P2", "P3"],
+     "needs_evidence": false},
+    {"rank": 2, "change": "Put one link to checkable work in the website headline area.", "where": "M1", "impact": "high",
+     "effort_hours": 1, "why": "The first screen shows no proof.", "postings": ["P2", "P3"], "needs_evidence": true}
+  ],
+  "remove": [
+    {"quote": "Ran the airline's external audit program", "where": "M2",
+     "why": "Not on the CV or anywhere else; reads as an overclaim."}
+  ],
+  "design_notes": [
+    {"note": "On a phone the contact link is below three screens of text.", "where": "M1", "device": "phone"}
+  ],
+  "summary": "Fictional example. Strong fit for operations heavy deployment roles; inconsistent titles and numbers between LinkedIn and the CV are the first thing to fix."
+}

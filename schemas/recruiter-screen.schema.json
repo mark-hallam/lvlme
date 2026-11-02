@@ -1,0 +1,171 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Recruiter screen (eval/recruiter-screens/<YYYY-MM-DD>.json)",
+  "description": "An independent, sceptical read of the person's public profile, done cold by a fresh agent (or a person) acting as a recruiter and hiring manager, against 3 to 5 real postings. It is an opinion about how the profile reads, not evidence about the person. See method/RECRUITER_SCREEN.md and templates/prompts/recruiter-screen.md.",
+  "type": "object",
+  "required": ["schema_version", "screened_on", "independence", "materials", "postings", "six_second", "roles", "stop_and_look", "red_flags", "missing", "top_changes", "remove", "design_notes"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "screened_on": {"$ref": "#/definitions/date"},
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"enum": ["fresh_agent", "person"]},
+        "model": {"type": "string"},
+        "persona": {"type": "string", "description": "For example 'recruiter and hiring manager at a frontier AI lab'."}
+      }
+    },
+    "independence": {
+      "type": "object",
+      "description": "The screen only counts if the reviewer started cold. These fields are fixed so a screen that saw the campaign fails validation.",
+      "required": ["fresh_context", "saw_campaign_scores", "saw_campaign_plan"],
+      "additionalProperties": false,
+      "properties": {
+        "fresh_context": {"const": true},
+        "saw_campaign_scores": {"const": false},
+        "saw_campaign_plan": {"const": false},
+        "searched_web": {"type": "boolean", "description": "True only if the person allowed a short web search, as a recruiter would do."},
+        "note": {"type": "string"}
+      }
+    },
+    "materials": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/material"}},
+    "postings": {"type": "array", "minItems": 1, "maxItems": 5, "items": {"$ref": "#/definitions/posting"}},
+    "six_second": {
+      "type": "object",
+      "required": ["verdict", "read_as", "why"],
+      "additionalProperties": false,
+      "properties": {
+        "verdict": {"enum": ["keep_reading", "skim", "move_on"]},
+        "read_as": {"type": "string", "minLength": 1, "description": "One line: who this person seems to be after six seconds."},
+        "why": {"type": "string", "minLength": 1},
+        "noticed_first": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "roles": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/role_verdict"}},
+    "stop_and_look": {"type": "array", "items": {"$ref": "#/definitions/highlight"}},
+    "red_flags": {"type": "array", "items": {"$ref": "#/definitions/red_flag"}},
+    "missing": {"type": "array", "items": {"$ref": "#/definitions/missing"}},
+    "top_changes": {"type": "array", "maxItems": 10, "items": {"$ref": "#/definitions/change"}},
+    "remove": {"type": "array", "items": {"$ref": "#/definitions/removal"}},
+    "design_notes": {"type": "array", "items": {"$ref": "#/definitions/design_note"}},
+    "summary": {"type": "string", "description": "Under 300 words, plain English."},
+    "quotes_checked_on": {"$ref": "#/definitions/date", "description": "Set by the campaign agent once every quote has been found, word for word, in the saved materials."},
+    "actions_created": {"type": "array", "items": {"$ref": "#/definitions/action_id"}, "description": "Plan actions the campaign agent created from this screen."}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "material_id": {"type": "string", "pattern": "^M[0-9]+$"},
+    "where": {"type": "string", "pattern": "^(M[0-9]+|all)$"},
+    "posting_id": {"type": "string", "pattern": "^P[0-9]+$"},
+    "action_id": {"type": "string", "pattern": "^A[0-9]{2,}$"},
+    "level": {"enum": ["high", "medium", "low"]},
+    "material": {
+      "type": "object",
+      "required": ["id", "type", "ref"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/definitions/material_id"},
+        "type": {"enum": ["website", "linkedin", "cv", "github", "portfolio", "other"]},
+        "ref": {"type": "string", "minLength": 1, "description": "The public address, or the workspace path of the saved copy the reviewer read."},
+        "captured_on": {"$ref": "#/definitions/date"},
+        "note": {"type": "string"}
+      }
+    },
+    "posting": {
+      "type": "object",
+      "required": ["id", "org", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/definitions/posting_id"},
+        "org": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "ref": {"type": "string", "description": "The posting's address."},
+        "role_id": {"type": "string", "description": "The id in market/roles/latest.json, if it is there."}
+      }
+    },
+    "role_verdict": {
+      "type": "object",
+      "required": ["posting", "advance", "biggest_reason"],
+      "additionalProperties": false,
+      "properties": {
+        "posting": {"$ref": "#/definitions/posting_id"},
+        "advance": {"enum": ["yes", "maybe", "no"], "description": "Advance to a phone screen?"},
+        "biggest_reason": {"type": "string", "minLength": 1},
+        "strongest_match": {"type": "string"},
+        "biggest_gap": {"type": "string"},
+        "quotes": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "highlight": {
+      "type": "object",
+      "required": ["what", "where"],
+      "additionalProperties": false,
+      "properties": {
+        "what": {"type": "string", "minLength": 1},
+        "where": {"$ref": "#/definitions/where"},
+        "quote": {"type": "string"}
+      }
+    },
+    "red_flag": {
+      "type": "object",
+      "required": ["kind", "quote", "where", "why", "severity"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"enum": ["overclaim", "inconsistency", "vague", "jargon", "unverifiable", "off_target", "other"]},
+        "quote": {"type": "string", "minLength": 1, "description": "Exact words from the material, copied, never paraphrased."},
+        "where": {"$ref": "#/definitions/where"},
+        "why": {"type": "string", "minLength": 1},
+        "severity": {"$ref": "#/definitions/level"},
+        "fix": {"type": "string"}
+      }
+    },
+    "missing": {
+      "type": "object",
+      "required": ["what", "why_it_matters"],
+      "additionalProperties": false,
+      "properties": {
+        "what": {"type": "string", "minLength": 1},
+        "why_it_matters": {"type": "string", "minLength": 1},
+        "postings": {"type": "array", "items": {"$ref": "#/definitions/posting_id"}}
+      }
+    },
+    "change": {
+      "type": "object",
+      "required": ["rank", "change", "where", "impact", "why"],
+      "additionalProperties": false,
+      "properties": {
+        "rank": {"type": "integer", "minimum": 1, "maximum": 10},
+        "change": {"type": "string", "minLength": 1},
+        "where": {"$ref": "#/definitions/where"},
+        "impact": {"$ref": "#/definitions/level"},
+        "effort_hours": {"type": "number", "minimum": 0},
+        "why": {"type": "string", "minLength": 1},
+        "postings": {"type": "array", "items": {"$ref": "#/definitions/posting_id"}},
+        "needs_evidence": {"type": "boolean", "description": "True if the change would add a claim; it can only be made once evidence exists."},
+        "action_id": {"$ref": "#/definitions/action_id"}
+      }
+    },
+    "removal": {
+      "type": "object",
+      "required": ["quote", "where", "why"],
+      "additionalProperties": false,
+      "properties": {
+        "quote": {"type": "string", "minLength": 1},
+        "where": {"$ref": "#/definitions/where"},
+        "why": {"type": "string", "minLength": 1}
+      }
+    },
+    "design_note": {
+      "type": "object",
+      "required": ["note", "where"],
+      "additionalProperties": false,
+      "properties": {
+        "note": {"type": "string", "minLength": 1},
+        "where": {"$ref": "#/definitions/where"},
+        "device": {"enum": ["desktop", "phone", "any"]}
+      }
+    }
+  }
+}

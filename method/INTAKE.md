@@ -3,7 +3,8 @@
 Intake is how evidence gets into the workspace. It has three parts:
 
 1. **The interview**: questions only the person can answer (the question bank
-   below). Answers go in `intake/answers.md`.
+   below). Answers go in `intake/answers.md`. Run it document-led, in short
+   rounds, as `INTERVIEW.md` describes.
 2. **Sources**: files and pages the person chooses to share, each opt in and
    read only.
 3. **Recording**: every fact becomes one item in `profile/evidence.json`, with
@@ -306,6 +307,10 @@ that is a fact as an evidence item with a source of type `interview` and a
 1. Save the answers in `intake/answers.md`.
 2. Add evidence items for each fact, with the right level.
 3. Add open questions for anything still unanswered.
-4. Update `config.json` if the goal, targets, families, locations or
+4. Copy the work history from each source (what the person confirmed, any
+   signed form, the CV, LinkedIn, the website) into
+   `profile/role-records.json`, and run the consistency audit
+   (`CONSISTENCY.md`).
+5. Update `config.json` if the goal, targets, families, locations or
    `candidate.eligibility_cleared` changed.
-5. Run `python3 scripts/validate.py`.
+6. Run `python3 scripts/validate.py`.

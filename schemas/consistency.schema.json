@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Consistency audit report (profile/consistency.json)",
+  "description": "Written by scripts/consistency_audit.py from profile/role-records.json: the roles matched across sources, the suggested single source of truth for each, the findings, and the exact fixes per source. Regenerated on every run; do not edit by hand. See method/CONSISTENCY.md.",
+  "type": "object",
+  "required": ["schema_version", "generated_on", "input", "settings", "sources", "counts", "roles", "findings", "fixes", "notes"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "generated_on": {"$ref": "#/definitions/date"},
+    "input": {"type": "string", "minLength": 1},
+    "settings": {
+      "type": "object",
+      "required": ["date_tolerance_months", "gap_months", "truth_order"],
+      "additionalProperties": false,
+      "properties": {
+        "date_tolerance_months": {"type": "integer", "minimum": 0},
+        "gap_months": {"type": "integer", "minimum": 0},
+        "truth_order": {"type": "array", "items": {"$ref": "#/definitions/source_id"}}
+      }
+    },
+    "sources": {"type": "array", "items": {"$ref": "#/definitions/source"}},
+    "counts": {
+      "type": "object",
+      "required": ["high", "medium", "low", "by_type"],
+      "additionalProperties": false,
+      "properties": {
+        "high": {"type": "integer", "minimum": 0},
+        "medium": {"type": "integer", "minimum": 0},
+        "low": {"type": "integer", "minimum": 0},
+        "by_type": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}}
+      }
+    },
+    "roles": {"type": "array", "items": {"$ref": "#/definitions/role"}},
+    "findings": {"type": "array", "items": {"$ref": "#/definitions/finding"}},
+    "fixes": {"type": "array", "items": {"$ref": "#/definitions/fix"}},
+    "notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "month": {"type": "string", "pattern": "^([0-9]{4}(-[0-9]{2})?|present)$"},
+    "source_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "role_id": {"type": "string", "pattern": "^R[0-9]{2,}$"},
+    "severity": {"enum": ["high", "medium", "low"]},
+    "source": {
+      "type": "object",
+      "required": ["id", "label", "complete", "editable", "records"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/definitions/source_id"},
+        "label": {"type": "string", "minLength": 1},
+        "ref": {"type": "string"},
+        "complete": {"type": "boolean"},
+        "editable": {"type": "boolean"},
+        "records": {"type": "integer", "minimum": 0},
+        "covers": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {"from": {"$ref": "#/definitions/month"}, "to": {"$ref": "#/definitions/month"}}
+        }
+      }
+    },
+    "seen": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": {"type": "string"},
+        "start": {"$ref": "#/definitions/month"},
+        "end": {"$ref": "#/definitions/month"}
+      }
+    },
+    "role": {
+      "type": "object",
+      "required": ["id", "organisation", "kind", "concurrent", "truth", "seen_in"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"$ref": "#/definitions/role_id"},
+        "organisation": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["role", "business", "volunteer", "education"]},
+        "concurrent": {"type": "boolean"},
+        "truth": {
+          "type": "object",
+          "description": "The suggested single source of truth. Each value names the source it was taken from.",
+          "required": ["needs_confirmation"],
+          "additionalProperties": false,
+          "properties": {
+            "title": {"type": "string"},
+            "title_from": {"$ref": "#/definitions/source_id"},
+            "start": {"$ref": "#/definitions/month"},
+            "start_from": {"$ref": "#/definitions/source_id"},
+            "end": {"$ref": "#/definitions/month"},
+            "end_from": {"$ref": "#/definitions/source_id"},
+            "needs_confirmation": {"type": "boolean"}
+          }
+        },
+        "seen_in": {"type": "object", "additionalProperties": {"$ref": "#/definitions/seen"}}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["id", "type", "severity", "roles", "sources", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^F[0-9]{2,}$"},
+        "type": {"enum": ["title_mismatch", "date_mismatch", "missing_role", "gap", "overlap", "single_source_claim", "claim_mismatch", "denied_claim"]},
+        "severity": {"$ref": "#/definitions/severity"},
+        "roles": {"type": "array", "items": {"$ref": "#/definitions/role_id"}},
+        "sources": {"type": "array", "items": {"$ref": "#/definitions/source_id"}},
+        "summary": {"type": "string", "minLength": 1},
+        "likely_inflation": {"type": "boolean"},
+        "reason": {"type": "string"},
+        "inflated": {"type": "array", "items": {"type": "string"}},
+        "field": {"enum": ["title", "start", "end"]},
+        "values": {"type": "object", "additionalProperties": {"type": "string"}},
+        "months": {"type": "integer", "minimum": 0},
+        "present_in": {"type": "array", "items": {"$ref": "#/definitions/source_id"}},
+        "missing_from": {"type": "array", "items": {"$ref": "#/definitions/source_id"}},
+        "claim": {"type": "string"},
+        "has_number": {"type": "boolean"},
+        "gap": {
+          "type": "object",
+          "required": ["start", "end", "current"],
+          "additionalProperties": false,
+          "properties": {
+            "start": {"$ref": "#/definitions/month"},
+            "end": {"$ref": "#/definitions/month"},
+            "current": {"type": "boolean"}
+          }
+        }
+      }
+    },
+    "fix": {
+      "type": "object",
+      "required": ["finding", "source", "action", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "finding": {"type": "string", "pattern": "^F[0-9]{2,}$"},
+        "source": {"anyOf": [{"$ref": "#/definitions/source_id"}, {"const": "all"}]},
+        "action": {"enum": ["change", "explain", "add", "remove", "remove_or_prove", "prove_or_remove", "confirm", "mark_concurrent"]},
+        "text": {"type": "string", "minLength": 1},
+        "role": {"$ref": "#/definitions/role_id"},
+        "field": {"enum": ["title", "start", "end", "claim"]},
+        "current": {"type": "string"},
+        "suggested": {"type": "string"}
+      }
+    }
+  }
+}
