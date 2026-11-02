@@ -106,10 +106,14 @@ class BadJson(Script):
         res = self.run_script("validate.py", "--workspace", ws)
         self.assertEqual(res.returncode, 1)
         self.assertIn("ERROR   config.json: not valid JSON (line 1, column 16: Expecting value)", res.stdout)
-        self.assertNotIn("WARNING", res.stdout)  # the cross-file checks need the config, so they wait for it
+        # the checks across files need the config, so they wait for it, and the one warning says so
+        warned = [line for line in res.stdout.splitlines() if line.startswith("WARNING")]
+        self.assertEqual(len(warned), 1, res.stdout)
+        self.assertIn("did not run, because they need config.json", warned[0])
         res = self.run_script("validate.py", "--workspace", ws, "--json")
-        self.assertEqual(json.loads(res.stdout)["errors"],
-                         ["config.json: not valid JSON (line 1, column 16: Expecting value)"])
+        report = json.loads(res.stdout)
+        self.assertEqual(report["errors"], ["config.json: not valid JSON (line 1, column 16: Expecting value)"])
+        self.assertEqual(len(report["warnings"]), 1)
 
     def test_a_broken_judgement_file_stops_scoring_plainly(self):
         ws = self.broken_workspace("eval/judgements.json", '{"roles": {,}}')
@@ -205,12 +209,11 @@ class Helpers(unittest.TestCase):
     def test_load_json_names_the_file_and_the_spot(self):
         path = os.path.join(tmpdir(self), "bad.json")
         with open(path, "w", encoding="utf-8") as fh:
-            fh.write('{\n  "a": 1,\n}')
+            fh.write('{\n  "a": 1,\n  "b": \n}')  # Python 3.13 words a trailing comma differently, so avoid one
         with self.assertRaises(C.FileProblem) as cm:
             C.load_json(path)
         self.assertIsInstance(cm.exception, ValueError)  # older callers that catch ValueError keep working
-        self.assertEqual(cm.exception.detail,
-                         "not valid JSON (line 3, column 1: Expecting property name enclosed in double quotes)")
+        self.assertEqual(cm.exception.detail, "not valid JSON (line 4, column 1: Expecting value)")
         self.assertTrue(str(cm.exception).startswith(C.show_path(path) + ": not valid JSON"))
         self.assertIsNone(C.load_json(path + ".missing"))  # a missing file is still the default
 

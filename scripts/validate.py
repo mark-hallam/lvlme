@@ -451,9 +451,17 @@ def validate_workspace(ws):
         errors.extend("%s: %s" % (rel, e) for e in check(data, schema))
         docs[rel] = data
         checked.append(rel)
-    if "config.json" in docs:  # every cross-file check compares against the config: without it they only add noise
+    # Most checks across files compare against the config, so without it they raise dozens of false alarms.
+    # Some do not (cited evidence, done actions), so say plainly that they wait rather than imply they passed.
+    if "config.json" in docs:
         cross_checks(ws, docs, errors, warnings)
+    else:
+        warnings.append(CROSS_CHECKS_WAIT)
     return errors, warnings, checked
+
+
+CROSS_CHECKS_WAIT = ("checks across files (cited evidence, the plan and the rest) did not run, because they need "
+                     "config.json. Fix config.json, then run this again.")
 
 
 def main(argv=None):
