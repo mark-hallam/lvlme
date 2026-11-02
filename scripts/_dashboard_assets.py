@@ -23,14 +23,14 @@ CSS = r"""
  --p0:#e6e6eb;--p0t:#2c2c2e;--p1:#d6e6fa;--p1t:#0d366b;--p2:#86b6ef;--p2t:#0b2447;--p3:#1b54a0;--p3t:#ffffff;--p4:#0b2a55;--p4t:#ffffff;
  --h0:#ececf0;--h1:#cde2fb;--h2:#86b6ef;--h3:#1b54a0;--h4:#133f7a;--h5:#0b2a55;--hlt:#0b2447;--hdt:#ffffff;
  --tv-bg:#dff3e4;--tv-t:#14501f;--tc-bg:#fde3e1;--tc-t:#7a1810;--tp-bg:#fcefd6;--tp-t:#6b3f00;
- --ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.25,.64,1)}
+ --link-soft:#084c9e;--ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.25,.64,1)}
 :root[data-theme=dark]{color-scheme:dark;
  --bg:#111113;--card:#1c1c1e;--card2:#26262a;--ink:#f5f5f7;--sub:#b8b8be;--line:#8e8e93;--rule:#38383c;
  --accent:#64b0ff;--on-accent:#0b1a2b;--accent-soft:#172c45;--ok:#4cd964;--warn:#ffb340;--warn-bg:#3a2e0b;
  --z0:#1f1f22;--z1:#252529;--grid:#323236;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.4);
  --p0:#3a3a3e;--p0t:#f2f2f7;--p1:#1b54a0;--p1t:#ffffff;--p2:#78aeee;--p2t:#0b1a2b;--p3:#9cc4f3;--p3t:#0b1a2b;--p4:#cfe2fa;--p4t:#0b1a2b;
  --h0:#2c2c30;--h1:#163f75;--h2:#1b54a0;--h3:#78aeee;--h4:#9cc4f3;--h5:#cfe2fa;--hlt:#ffffff;--hdt:#0b1a2b;
- --tv-bg:#1e3a24;--tv-t:#a6efb0;--tc-bg:#3d1714;--tc-t:#ffc2ba;--tp-bg:#3a2a10;--tp-t:#ffd99a}
+ --tv-bg:#1e3a24;--tv-t:#a6efb0;--tc-bg:#3d1714;--tc-t:#ffc2ba;--tp-bg:#3a2a10;--tp-t:#ffd99a;--link-soft:#8cc4ff}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
@@ -260,6 +260,82 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
 @container (max-width:560px){.p90-row{grid-template-columns:minmax(0,1fr)}.p90-axis-row{grid-template-columns:minmax(0,1fr)!important}.p90-axis-row > div:first-child{display:none}}
 @container (max-width:470px){.odds{grid-template-columns:minmax(0,1fr)}}
 
+/* level up: the next level, quests, level history and streak */
+.level .lv-line{margin-top:6px;color:var(--ink);line-height:1.4}
+.level .linkbtn{margin-top:6px;font-size:13px;color:var(--link-soft)}
+.lv-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.lv-head h3{margin:2px 0 4px}
+.lv-need{text-align:right;flex-shrink:0}
+.lv-need b{display:block;font-size:34px;letter-spacing:-.02em;line-height:1.05}
+.lv-track{position:relative;height:30px;margin:18px 0 0}
+.lv-zone{position:absolute;top:0;right:0;height:30px;border-radius:7px;background:var(--tv-bg)}
+.lv-base,.lv-fill,.lv-exp{position:absolute;top:12px;height:6px;border-radius:3px}
+.lv-base{left:0;right:0;background:var(--rule)}
+.lv-fill{left:0;background:var(--accent);transform-origin:left}
+.lv-exp{background:var(--accent);opacity:.38}
+.lv-bx{position:absolute;top:14px;height:0;border-top:2px dashed var(--accent)}
+.lv-goal{position:absolute;top:-3px;bottom:-3px;width:0;border-left:2px solid var(--ok)}
+.lv-mk{position:absolute;top:15px;width:12px;height:12px;margin:-6px 0 0 -6px;box-sizing:border-box}
+.lv-mk.now{width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--ink);border:2px solid var(--card)}
+.lv-mk.exp{background:var(--accent);border:2px solid var(--card);transform:rotate(45deg)}
+.lv-mk.best{background:var(--card);border:2px solid var(--accent);transform:rotate(45deg)}
+.lv-axis{position:relative;height:20px;font-size:12px;color:var(--sub);margin-top:2px}
+.lv-axis span{position:absolute;top:2px;transform:translateX(-50%);white-space:nowrap}
+.lv-axis .goal{color:var(--ok);font-weight:700}
+.lv-key{display:inline-block;width:10px;height:10px;transform:rotate(45deg);box-sizing:border-box}
+.lv-key.exp{background:var(--accent)}.lv-key.best{background:var(--card);border:2px solid var(--accent)}
+.lv-verdict{margin-top:14px;padding-top:14px;border-top:1px solid var(--rule)}
+.lv-v-h{font-weight:700;font-size:17px;margin-bottom:4px}
+.lv-verdict p{margin:4px 0}
+.lv-set{margin-top:8px}
+.lv-step{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--rule);cursor:pointer}
+.lv-step:first-child{border-top:none}
+.lv-step-t{flex:1;min-width:0;font-weight:600;font-size:15px;line-height:1.35}
+.lv-step:hover .lv-step-t,.lv-step:focus .lv-step-t{color:var(--accent)}
+.lv-step .tiny{white-space:nowrap}
+.lv-room{display:flex;align-items:baseline;gap:10px;padding:8px 0;border-top:1px solid var(--rule)}
+.lv-room:first-child{border-top:none}
+.lv-room > span:first-child{flex:1;min-width:0}
+.lv-room b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag.crit{background:var(--accent);color:var(--on-accent)}
+.tag.pend{background:var(--warn-bg);color:var(--warn)}
+.tag.up{background:var(--tv-bg);color:var(--tv-t)}.tag.down{background:var(--tc-bg);color:var(--tc-t)}
+.quests{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.quest{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.quest.crit{box-shadow:inset 0 0 0 2px var(--accent),var(--shadow)}
+.q-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.q-tags{display:flex;flex-wrap:wrap;gap:4px;min-width:0}
+.q-id{font-size:13px;color:var(--sub);white-space:nowrap}
+.q-title{font-weight:650;font-size:16px;line-height:1.35;cursor:pointer}
+.q-title:hover,.q-title:focus{color:var(--accent)}
+.q-pts{display:flex;flex-wrap:wrap;gap:2px 16px;align-items:baseline}
+.q-pts b{font-size:22px;letter-spacing:-.02em;color:var(--ok)}
+.q-pts b.q-alt{font-size:17px;color:var(--ink)}
+.q-meta{font-size:13px;color:var(--sub)}
+.q-foot{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-top:auto;padding-top:10px;border-top:1px solid var(--rule)}
+.q-msg{font-size:13px;color:var(--sub)}
+.q-msg:empty{display:none}
+.q-text{display:block;margin-top:4px;padding:8px 10px;border-radius:10px;background:var(--card2);border:1px solid var(--rule);color:var(--ink);font-size:13px;user-select:all;overflow-wrap:anywhere}
+.pend-box{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--sub);cursor:pointer}
+.pend-box input{width:18px;height:18px;margin:0;accent-color:var(--warn)}
+.streak{display:flex;gap:14px;align-items:center}
+.streak-n{font-size:44px;font-weight:750;letter-spacing:-.03em;line-height:1;color:var(--ok);min-width:44px;text-align:center}
+.streak-n.zero{color:var(--sub)}
+.streak-dots{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 2px}
+.sd{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);box-sizing:border-box}
+.sd.on{background:var(--ok);border-color:var(--ok)}
+.sd.start{border-style:dashed}
+.lh-row{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:2px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--rule)}
+.lh-row:first-child{border-top:none}
+.lh-date{white-space:nowrap;min-width:84px}
+.lv-badge{width:28px;height:28px;border-radius:8px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:750;font-size:14px}
+.run-chip .tag{margin-left:4px}
+.animate .enter .lvl-pop,.animate .lvl-pop.enter{animation:pop .6s var(--spring)}
+.animate .enter .lv-fill{animation:grow .8s var(--ease)}
+@container (max-width:620px){.quests{grid-template-columns:minmax(0,1fr)}.lv-need b{font-size:28px}}
+.lv-legend{margin-top:6px;row-gap:6px}
+@container (max-width:420px){.lh-row{grid-template-columns:auto minmax(0,1fr)}.lh-date{grid-column:1/-1;min-width:0}.lv-head{flex-direction:column;gap:6px}.lv-need{text-align:left}.lv-need b{display:inline;font-size:26px;margin-right:6px}.lv-step{flex-wrap:wrap}.lv-step .tiny{width:100%;padding-left:2px}}
+
 /* detail pane */
 .crumbs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:13px;margin-bottom:12px}
 .crumbs button{border:none;background:none;color:var(--accent);cursor:pointer;padding:2px 4px;border-radius:6px}
@@ -346,7 +422,7 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
 
 BODY = r"""
 <header class="top"><div class="top-in">
- <div class="brand"><b id="brandTitle"></b><span id="storyLine"></span></div>
+ <div class="brand"><b id="brandTitle">__TITLE__</b><span id="storyLine"></span></div>
  <div class="seg small" id="themeSeg" role="group" aria-label="Appearance"><button data-t="light" aria-pressed="true">Light</button><button data-t="dark" aria-pressed="false">Dark</button></div>
  <button class="btn primary" id="shareBtn">Share</button>
 </div></header>
@@ -379,11 +455,11 @@ BODY = r"""
    <div class="hero-row">
     <div>
      <div class="best-l" id="bestLabel">Your best chance today</div>
-     <div class="best-v num"><span id="bestNum">0</span> <small>/ 100</small></div>
+     <div class="best-v num"><span id="bestNum">__BESTFIT__</span> <small>/ 100</small></div>
      <div class="best-pills" id="bestPills"></div>
-     <div class="small sub" id="bestRole" style="margin-top:6px"></div>
+     <div class="small sub" id="bestRole" style="margin-top:6px">__BESTROLE__</div>
     </div>
-    <div class="level" id="level"></div>
+    <div class="level" id="level">__LEVELCARD__</div>
    </div>
    <div class="controls">
     <div class="seg" id="modeSeg" role="group" aria-label="Which numbers to show"></div>
@@ -406,6 +482,7 @@ BODY = r"""
   </div>
 
   <nav class="views-nav"><div class="seg" id="viewSeg" role="tablist" aria-label="Views"></div></nav>
+  <section class="view on" id="v-level" aria-label="Level up">__LEVELUP__</section>
   <section class="view" id="v-orgs"></section>
   <section class="view" id="v-top"></section>
   <section class="view" id="v-moves"></section>
@@ -472,13 +549,14 @@ const hardBlock = (r, k) => k === 5 && r.hard;              // a blocker the pla
 const live = a => a.status === "todo" || a.status === "doing";
 const enabled = new Set(D.actions.filter(live).map(a => a.id));
 const TODAY = D.meta.run_date;
-function project(r, mode, on){
-  on = on || enabled;
+// Apply a list of actions (in target-date order). sure: one action id treated as certain to work.
+// Mirrors walk() in scripts/_levels.py.
+function walkL(r, acts, mode, sure){
   const base = r.s.slice(), s = r.s.slice();
   const pts = [{d: TODAY, v: r.fit}];
-  D.actions.forEach(a => {                                   // already in target-date order
-    if (!on.has(a.id) || !live(a)) return;
-    const p = mode === "best" ? 1 : a.p;
+  acts.forEach(a => {
+    if (!live(a)) return;
+    const p = (mode === "best" || a.id === sure) ? 1 : a.p;
     a.effects.forEach(e => {
       if (!inScope(r, e.scope || {})) return;
       const k = DIMS.indexOf(e.dimension);
@@ -490,12 +568,17 @@ function project(r, mode, on){
     });
     pts.push({d: a.date < TODAY ? TODAY : a.date, v: fitOf(s)});
   });
-  pts.push({d: D.meta.end, v: fitOf(s)});
   return {pts, end: fitOf(s), scores: s};
+}
+function project(r, mode, on){
+  on = on || enabled;
+  const w = walkL(r, D.actions.filter(a => on.has(a.id)), mode);   // D.actions is already in target-date order
+  w.pts.push({d: D.meta.end, v: w.end});
+  return w;
 }
 
 // ---------- state + per-refresh cache ----------
-const state = {org: "best", mode: "today", sample: false, view: "orgs", stack: []};
+const state = {org: "best", mode: "today", sample: false, view: "level", stack: []};
 let P = {};                                                // role id -> {exp, best}
 function recompute(){ P = {}; D.roles.forEach(r => P[r.id] = {exp: project(r, "exp"), best: project(r, "best")}); }
 function fitM(r, mode){ mode = mode || state.mode; return mode === "today" ? r.fit : P[r.id][mode].end; }
@@ -564,15 +647,10 @@ function renderTopline(){
   countTo($("#bestNum"), fitM(focus));
   $("#bestPills").innerHTML = `Interview ${pill(ibM(focus))} Offer ${pill(obM(focus))}`;
   $("#bestRole").textContent = `${focus.on}: ${focus.title}`;
-  // level (today, actual)
-  const lv = bandIdx(r.fit), lo = THRESH[lv], hi = THRESH[lv + 1];
-  const pct = Math.max(0, Math.min(100, (r.fit - lo) / (hi - lo) * 100));
-  const toNext = lv < 4 ? r1(hi - r.fit) : 0;
-  const nd = lv < 4 ? crossDate(exp.pts, hi) : null;
-  $("#level").innerHTML = `<div class="level-top"><div class="level-badge">${lv + 1}</div><div><div class="level-name">Level ${lv + 1}, ${esc(BANDS[lv])}</div>
-    <div class="tiny sub">${lv < 4 ? `${toNext} ${toNext === 1 ? "point" : "points"} to Level ${lv + 2}, ${esc(BANDS[lv + 1])}` : "Top level"}</div></div></div>
-    <div class="prog"><span style="width:${pct}%"></span></div>
-    <div class="tiny sub">${lv < 4 ? (nd ? `Expected to reach Level ${lv + 2} on ${esc(fmtDate(nd))}` : `Level ${lv + 2} isn't reached on the current plan`) : ""}</div>`;
+  // level (today, actual): the next level and what gets you there
+  $("#level").innerHTML = levelCardHTML(nextLevel(r));
+  $("#level").querySelectorAll("[data-go-level]").forEach(b => b.addEventListener("click", goLevel));
+  enter($("#level .lvl-pop"), 900);
 }
 """
 
@@ -703,6 +781,12 @@ function drawChart(){
   const txt = (x, y, s, bold, fill, anchor) => { const n = svgEl("text", {x, y, "font-size": SMALL ? 11 : 12, "font-weight": bold ? 750 : 550, fill: fill || "var(--ink)", "text-anchor": anchor || "start"});
     n.setAttribute("stroke", "var(--card)"); n.setAttribute("stroke-width", 4); n.setAttribute("stroke-linejoin", "round"); n.setAttribute("paint-order", "stroke");
     n.textContent = s; lab.appendChild(n); };
+  hist.forEach((p, i) => {                                     // level-up moments (and honest level-downs)
+    if (!i) return; const a = bandIdx(hist[i - 1].v), b = bandIdx(p.v); if (a === b) return;
+    const x = xT(p.t), y = yOf(p.v), up = b > a;
+    act.appendChild(svgEl("path", {d: up ? `M${x},${y - 18} l5.5,7.5 h-11 Z` : `M${x},${y + 18} l5.5,-7.5 h-11 Z`, fill: up ? "var(--ok)" : "var(--line)"}));
+    if (up && !SMALL) txt(x - 9, y - 12, "Level " + (b + 1), true, "var(--ok)", "end");
+  });
   const d1 = hist.length ? hist[0].v : r.fit;
   txt(xT(hist.length ? hist[0].t : T0) + 10, Math.min(PT + IH - 6, yOf(d1) + 24), "Day 1: " + BANDS[bandIdx(d1)] + ", fit " + Math.round(d1), true);
   // end labels: outside the plot on wide screens, inside it (right aligned, above each line) on a phone
@@ -742,7 +826,8 @@ function onChartMove(e){
   if (t < TN && hist.length){
     const p = hist.reduce((a, b) => Math.abs(b.t - t) < Math.abs(a.t - t) ? b : a, hist[0]);
     cr.setAttribute("x1", xT(p.t)); cr.setAttribute("x2", xT(p.t)); cr.setAttribute("visibility", "visible");
-    showTip(e, [el("div", "tn", fmtT(p.t)), row(p.v, "measured", "var(--ink)")]);
+    const i = hist.indexOf(p), b = bandIdx(p.v), a = i > 0 ? bandIdx(hist[i - 1].v) : b;
+    showTip(e, [el("div", "tn", fmtT(p.t)), row(p.v, "measured", "var(--ink)"), el("div", "tn", "Level " + (b + 1) + ", " + BANDS[b] + (b > a ? ", level up from " + BANDS[a] : b < a ? ", down from " + BANDS[a] : ""))]);
     return;
   }
   const ts = SAMPLE_T[Math.max(0, Math.min(N - 1, Math.round((t - TN) / ((T1 - TN) / (N - 1)))))];
@@ -844,15 +929,15 @@ function renderMetrics(){
 
 JS_VIEWS = r"""
 // ---------- views ----------
-const VIEWS = [["orgs","Organisations"],["top","Path to the top band"],["moves","What moves you"],["roles","Roles"],["swot","SWOT and TOWS"],["plan","Plan"],["evidence","Evidence"],["market","Market"]]
+const VIEWS = [["level","Level up"],["orgs","Organisations"],["top","Path to the top band"],["moves","What moves you"],["roles","Roles"],["swot","SWOT and TOWS"],["plan","Plan"],["evidence","Evidence"],["market","Market"]]
   .filter(v => (v[0] !== "top" || D.ceil) && (v[0] !== "swot" || D.swot));
 function renderViewSeg(){
   $("#viewSeg").innerHTML = VIEWS.map(v => `<button role="tab" aria-pressed="${state.view === v[0]}" data-v="${v[0]}">${v[1]}</button>`).join("");
   $("#viewSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { state.view = b.dataset.v; renderViewSeg(); showView(); }));
 }
 function showView(animate){
-  ["orgs","top","moves","roles","swot","plan","evidence","market"].forEach(v => $("#v-" + v).classList.toggle("on", v === state.view));
-  ({orgs: renderOrgs, top: renderTop, moves: renderMoves, roles: renderRoles, swot: renderSwot, plan: renderPlan, evidence: renderEvidence, market: renderMarket})[state.view]();
+  ["level","orgs","top","moves","roles","swot","plan","evidence","market"].forEach(v => $("#v-" + v).classList.toggle("on", v === state.view));
+  ({level: renderLevel, orgs: renderOrgs, top: renderTop, moves: renderMoves, roles: renderRoles, swot: renderSwot, plan: renderPlan, evidence: renderEvidence, market: renderMarket})[state.view]();
   if (animate !== false) enter($("#v-" + state.view));
 }
 function ring(g, today, exp){
@@ -1071,6 +1156,229 @@ function renderMarket(){
 }
 """
 
+JS_LEVELS = r"""
+// ---------- level up: the next level, quests, level history and streak ----------
+// Mirrors scripts/_levels.py (same order of operations, same tie-breaks). Every number is
+// derived from the scored runs and the plan's effects: no experience points, nothing invented.
+const MAX_EXACT = 14;
+const fmtP = v => String(r1(v));
+const pctOf = p => Math.floor(p * 100 + 0.5);
+const andList = xs => xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
+const hoursOf = list => list.reduce((t, a) => t + (a.hours || 0), 0);
+const raisesL = (r, a) => walkL(r, [a], "best").scores.some((v, k) => v > r.s[k] + 1e-9);
+function keyLess(a, b){ for (let i = 0; i < a.length; i++){ if (a[i] < b[i]) return true; if (a[i] > b[i]) return false; } return false; }
+function combos(list, k, f){ const idx = []; (function rec(start){ if (idx.length === k){ f(idx.map(i => list[i])); return; }
+  for (let i = start; i < list.length; i++){ idx.push(i); rec(i + 1); idx.pop(); } })(0); }
+// The fewest actions whose projection reaches T. Ties: earliest date, least effort, higher fit, ids.
+function smallestSet(r, acts, T, mode){
+  if (walkL(r, acts, mode).end < T) return null;
+  if (acts.length > MAX_EXACT) return greedySet(r, acts, T, mode);
+  for (let k = 1; k <= acts.length; k++){
+    let best = null;
+    combos(acts, k, c => { const w = walkL(r, c, mode); if (w.end < T) return;
+      const key = [crossDate(w.pts, T), hoursOf(c), -w.end, c.map(a => a.id).join(",")];
+      if (!best || keyLess(key, best.key)) best = {key, c, w}; });
+    if (best) return {ids: best.c.map(a => a.id), acts: best.c, date: crossDate(best.w.pts, T), fit: best.w.end, exact: true};
+  }
+  return null;
+}
+function greedySet(r, acts, T, mode){
+  const fit = list => walkL(r, list, mode).end, inOrder = list => acts.filter(a => list.indexOf(a) >= 0);
+  let chosen = [];
+  while (fit(chosen) < T){
+    const cur = fit(chosen); let pick = null, rate = -1;
+    acts.forEach(a => { if (chosen.indexOf(a) >= 0) return; const g = fit(inOrder(chosen.concat([a]))) - cur, q = g / (a.hours || 1); if (g > 0 && q > rate){ pick = a; rate = q; } });
+    if (!pick) return null;
+    chosen = inOrder(chosen.concat([pick]));
+  }
+  for (let i = chosen.length - 1; i >= 0; i--){ const rest = chosen.filter((_, j) => j !== i); if (fit(rest) >= T) chosen = rest; }
+  const w = walkL(r, chosen, mode);
+  return {ids: chosen.map(a => a.id), acts: chosen, date: crossDate(w.pts, T), fit: w.end, exact: false};
+}
+// The chance these actions really get there, treating each action's chance as independent.
+function chanceOf(r, acts, T){
+  const n = acts.length; if (n > MAX_EXACT) return null;
+  let total = 0;
+  for (let m = 0; m < (1 << n); m++){
+    let pr = 1; const works = [];
+    acts.forEach((a, i) => { if ((m >> i) & 1){ pr *= a.p; works.push(a); } else pr *= 1 - a.p; });
+    if (pr > 0 && walkL(r, works, "best").end >= T) total += pr;
+  }
+  return total;
+}
+function nextLevel(r){
+  const acts = D.actions.filter(a => live(a) && enabled.has(a.id));
+  const idx = bandIdx(r.fit), o = {r, fit: r.fit, level: idx + 1, band: BANDS[idx], top: idx >= 4};
+  if (o.top) return o;
+  const T = THRESH[idx + 1], rel = acts.filter(a => raisesL(r, a)), every = walkL(r, acts, "exp");
+  Object.assign(o, {target: T, nextLevel: idx + 2, nextBand: BANDS[idx + 1], toNext: r1(T - r.fit),
+    plan: {exp: every.end, best: walkL(r, acts, "best").end, date: crossDate(every.pts, T)}});
+  const set = smallestSet(r, rel, T, "exp");
+  o.reachable = !!set;
+  if (set){ set.chance = chanceOf(r, set.acts, T); o.set = set; return o; }
+  const bc = smallestSet(r, rel, T, "best");
+  if (bc) bc.chance = chanceOf(r, bc.acts, T);
+  o.bestCase = bc;
+  const ceil = r.s.map((v, k) => hardBlock(r, k) ? v : Math.min(5, v + CAPS[k]));
+  const covered = DIMS.map((_, k) => rel.some(a => walkL(r, [a], "best").scores[k] > r.s[k] + 1e-9));
+  o.missing = {points: r1(T - every.end), ceiling: fitOf(ceil),
+    room: DIMS.map((d, k) => ({dim: d, k, points: r1((ceil[k] - every.scores[k]) * W[k] / 5 * 100 / TW), covered: covered[k]}))
+      .filter(x => x.points > 0).sort((a, b) => (b.points - a.points) || (a.k - b.k))};
+  return o;
+}
+function questsFor(r, nl){
+  const crit = new Set(nl.set ? nl.set.ids : []), bc = new Set(nl.bestCase ? nl.bestCase.ids : []), acts = D.actions.filter(live);
+  return acts.map(a => {
+    const w = acts.filter(x => enabled.has(x.id) || x.id === a.id), wo = acts.filter(x => enabled.has(x.id) && x.id !== a.id);
+    const base = walkL(r, wo, "exp").end, exp = r1(walkL(r, w, "exp").end - base), works = r1(walkL(r, w, "exp", a.id).end - base);
+    return {a, exp, works, rate: a.hours ? exp / a.hours : 0, crit: crit.has(a.id), bc: bc.has(a.id), on: enabled.has(a.id)};
+  }).sort((x, y) => (y.rate - x.rate) || (y.exp - x.exp) || (y.a.priority - x.a.priority) || (x.a.date < y.a.date ? -1 : x.a.date > y.a.date ? 1 : 0) || (x.a.id < y.a.id ? -1 : 1));
+}
+// Each scored day's level for the journey the organisation selector follows.
+function levelHist(){
+  let prev = null; const out = [];
+  D.runs.forEach(rn => { const v = state.org === "best" ? rn.top : rn.orgs[state.org]; if (v == null) return;
+    const lv = bandIdx(v); out.push({date: rn.date, fit: v, level: lv + 1, band: BANDS[lv], change: prev == null || lv === prev ? null : lv > prev ? "up" : "down", from: prev}); prev = lv; });
+  return out;
+}
+const lastChange = () => levelHist().filter(h => h.change).pop();
+function tellText(a){ return `Mark action ${a.id} done ("${a.title}"). Evidence: <paste a link, file path or email reference>. Done when: ${a.done_when || "see the plan"}`; }
+async function copyText(t){
+  try { if (navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(t); return true; } } catch (e) {}
+  try { const ta = document.createElement("textarea"); ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove(); return ok; } catch (e) { return false; }
+}
+// "Pending, tell your agent" ticks: this viewer's device only, never counted, never sent anywhere.
+const PEND_KEY = "climb-pending:" + D.meta.title;
+let pending = new Set();
+try { const v = JSON.parse(localStorage.getItem(PEND_KEY) || "[]"); if (Array.isArray(v)) pending = new Set(v.filter(id => D.actions.some(a => a.id === id && live(a)))); } catch (e) {}
+function savePending(){ try { localStorage.setItem(PEND_KEY, JSON.stringify([...pending])); } catch (e) {} }
+function goLevel(){ state.view = "level"; renderViewSeg(); showView(); $(".views-nav").scrollIntoView({behavior: motionOK() ? "smooth" : "auto", block: "start"}); }
+
+// ---------- level up: rendering ----------
+function nlLine(nl){
+  if (nl.top) return "Top level. Keep the evidence fresh so it stays there.";
+  if (nl.reachable){ const n = nl.set.ids.length;
+    return `Level ${nl.nextLevel} expected ${nl.set.date === TODAY ? "today" : "by " + shortDate(nl.set.date)} if ${n === 1 ? "1 action lands" : n + " actions land"} on time.`; }
+  return `Level ${nl.nextLevel} isn't reached on the current plan: ${fmtP(nl.missing.points)} points short, counting each action's chance.`;
+}
+function levelCardHTML(nl){
+  const lv = nl.level - 1, lo = THRESH[lv], hi = THRESH[lv + 1];
+  const pct = Math.max(0, Math.min(100, (nl.fit - lo) / (hi - lo) * 100)), ch = lastChange();
+  return `<div class="level-top"><div class="level-badge${ch && ch.change === "up" && ch.date === TODAY ? " lvl-pop" : ""}">${nl.level}</div><div><div class="level-name">Level ${nl.level}, ${esc(nl.band)}</div>
+    <div class="tiny sub">${nl.top ? "Top level" : `${fmtP(nl.toNext)} ${nl.toNext === 1 ? "point" : "points"} to Level ${nl.nextLevel}, ${esc(nl.nextBand)}`}</div></div></div>
+    <div class="prog"><span style="width:${pct}%"></span></div>
+    <div class="tiny lv-line">${esc(nlLine(nl))}</div>
+    ${ch ? `<div class="tiny sub" style="margin-top:2px">${ch.change === "up" ? "Levelled up" : "Dropped a level"} ${esc(fmtDate(ch.date))}, ${esc(BANDS[ch.from])} to ${esc(ch.band)}</div>` : ""}
+    <button class="linkbtn" data-go-level="1">See your quests ›</button>`;
+}
+const actOf = id => D.actions.find(a => a.id === id);
+function stepRows(acts){
+  return `<div class="lv-set">${acts.map(a => `<div class="lv-step" tabindex="0" data-act="${esc(a.id)}"><span class="tag crit">${esc(a.id)}</span><span class="lv-step-t">${esc(a.title)}</span><span class="tiny sub">${a.dated ? "by " + esc(shortDate(a.date)) : "no date yet"} · ${pctOf(a.p)}% chance</span></div>`).join("")}</div>`;
+}
+function lvTrack(nl){
+  const idx = nl.level - 1, lo = THRESH[idx], T = nl.target, hi = THRESH[idx + 2];
+  const at = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+  const now = at(nl.fit), ex = at(nl.plan.exp), be = at(nl.plan.best), g = at(T);
+  return `<div class="lv-track" role="img" aria-label="Today ${fmtP(nl.fit)}. Expected with the plan ${fmtP(nl.plan.exp)}. Best case ${fmtP(nl.plan.best)}. Level ${nl.nextLevel} starts at ${T}.">
+      <div class="lv-zone" style="left:${g}%"></div><div class="lv-base"></div><div class="lv-fill" style="width:${now}%"></div>
+      <div class="lv-exp" style="left:${now}%;width:${Math.max(0, ex - now)}%"></div><div class="lv-bx" style="left:${ex}%;width:${Math.max(0, be - ex)}%"></div>
+      <div class="lv-goal" style="left:${g}%"></div><span class="lv-mk best" style="left:${be}%"></span><span class="lv-mk exp" style="left:${ex}%"></span><span class="lv-mk now" style="left:${now}%"></span></div>
+    <div class="lv-axis"><span style="left:0;transform:none">${lo}</span><span class="goal" style="left:${g}%">Level ${nl.nextLevel} at ${T}</span><span style="left:100%;transform:translateX(-100%)">${hi}</span></div>
+    <div class="legend lv-legend"><span><i class="p90-key" style="background:var(--ink)"></i>Today ${fmtP(nl.fit)}</span><span><i class="lv-key exp"></i>Expected with the plan ${fmtP(nl.plan.exp)}</span><span><i class="lv-key best"></i>Best case ${fmtP(nl.plan.best)}</span></div>`;
+}
+function chanceLine(set, lead){
+  if (set.chance == null) return "";
+  const n = set.acts.length;
+  return `<p class="small sub">${lead}${pctOf(set.chance)}%${n > 1 ? ", treating each action's chance as independent" : ""}.</p>`;
+}
+function verdictHTML(nl){
+  if (nl.top) return `<div class="lv-verdict"><div class="lv-v-h">Top level</div><p class="small">Strong is the highest band. The work now is keeping the evidence fresh and the warm paths warm.</p></div>`;
+  const L = `Level ${nl.nextLevel} (${esc(nl.nextBand)})`;
+  if (nl.reachable){
+    const s = nl.set, n = s.acts.length, one = n === 1;
+    return `<div class="lv-verdict"><div class="lv-v-h">${one ? "One action" : n + " actions"} can get you there</div>
+      <p class="small">If ${one ? "it lands on its target date" : "they land on their target dates"}, you're expected to reach ${L} on <b>${esc(fmtDate(s.date))}</b>, at a fit of ${fmtP(s.fit)} counting each action's chance of working.</p>
+      ${chanceLine(s, "Chance it really happens: ")}
+      ${nl.plan.date && nl.plan.date < s.date ? `<p class="small sub">Doing everything switched on in the plan is expected to get there sooner, on ${esc(fmtDate(nl.plan.date))}.</p>` : ""}
+      ${s.exact ? "" : `<p class="small sub">The plan is long, so this set comes from a quick search; a smaller one may exist.</p>`}
+      ${stepRows(s.acts)}</div>`;
+  }
+  const m = nl.missing, bc = nl.bestCase;
+  const room = m.room.map(x => `<div class="lv-room"><span><b style="font-weight:600">${esc(D.dimNames[x.dim])}</b><div class="tiny sub">${x.covered ? "Open actions cover part of it" : "No open action raises it for this role"}</div></span><b class="num">+${fmtP(x.points)}</b></div>`).join("");
+  return `<div class="lv-verdict"><div class="lv-v-h">Not reachable on the current plan</div>
+    <p class="small">Counting each action's chance of working, no set of your switched-on actions reaches ${L}. All of them together are expected to take this role to ${fmtP(nl.plan.exp)}, which is <b>${fmtP(m.points)} points short</b>.</p>
+    ${bc ? `<p class="small"><b>Best case only:</b> ${esc(andList(bc.ids))} together reach ${fmtP(bc.fit)} by ${esc(fmtDate(bc.date))}, but only if ${bc.acts.length === 1 ? "it works" : bc.acts.length === 2 ? "both work" : "all of them work"}.</p>${chanceLine(bc, "Chance of that: ")}${stepRows(bc.acts)}`
+      : `<p class="small sub">Not even the best case gets there: if every action works, this role reaches ${fmtP(nl.plan.best)}.</p>`}
+    <div class="eyebrow" style="margin-top:16px">What is missing</div>
+    ${m.ceiling < nl.target ? `<p class="small">Even with every factor at the most the plan's caps allow, this role tops out at ${fmtP(m.ceiling)}. Reaching ${L} needs something the caps rule out within this plan, such as more years in a similar role, or a different role.</p>`
+      : `<p class="small sub">Room left on this role within the plan's caps, in fit points, if new actions fully work. The ${fmtP(m.points)} points have to come from here: add an action where none exists, or raise the odds of the ones you have.</p>`}
+    <div>${room || '<div class="small sub">No room left within the caps.</div>'}</div></div>`;
+}
+function questCard(q, nl){
+  const a = q.a, pend = pending.has(a.id);
+  const tags = [q.crit ? `<span class="tag crit">On the path to Level ${nl.nextLevel}</span>` : "", !nl.reachable && q.bc ? '<span class="tag">Needed for the best case</span>' : "",
+    pend ? '<span class="tag pend">Pending: tell your agent</span>' : "", q.on ? "" : '<span class="tag">Switched off in What if</span>',
+    a.derived ? '<span class="tag">Estimated effect</span>' : "", a.stale ? `<span class="tag pend">No movement in ${a.stale} runs</span>` : ""].join("");
+  const pts = !a.effects.length ? '<span class="small sub">Protects credibility, no score change</span>'
+    : q.exp <= 0 && q.works <= 0 ? '<span class="small sub">No points on this role</span>'
+    : `<span><b class="num">+${fmtP(q.exp)}</b> <span class="tiny sub">expected</span></span><span><b class="num q-alt">+${fmtP(q.works)}</b> <span class="tiny sub">if it works</span></span><span class="tiny sub num">${fmtP(q.rate)} per hour</span>`;
+  return `<div class="quest${q.crit ? " crit" : ""}">
+    <div class="q-top"><div class="q-tags">${tags}</div><span class="q-id">${esc(a.id)} · ${stName(a.status)}</span></div>
+    <div class="q-title" tabindex="0" data-act="${esc(a.id)}">${esc(a.title)}</div>
+    <div class="q-pts">${pts}</div>
+    <div class="q-meta">${esc(a.owner)}${a.effort ? " · " + esc(a.effort) : ""} · ${a.dated ? "due " + esc(fmtDate(a.date)) : "no due date yet"} · ${pctOf(a.p)}% chance</div>
+    <div class="small"><span class="sub">Done when:</span> ${esc(a.done_when)}</div>
+    <div class="q-foot"><button class="btn" data-tell="${esc(a.id)}">Done? Tell your agent</button>
+      <label class="pend-box"><input type="checkbox" data-pend="${esc(a.id)}"${pend ? " checked" : ""}> Pending on this device</label></div>
+    <div class="q-msg" role="status"></div></div>`;
+}
+function progressHTML(){
+  const days = D.progress || [], n = D.streak || 0, hist = levelHist().slice().reverse(), dayOf = {};
+  days.forEach(d => dayOf[d.date] = d);
+  const why = d => !d ? "" : d.start ? "Day 1, measured." : !d.progress ? "No real progress that day." :
+    cap1([d.roles_up ? `fit rose on ${plural(d.roles_up, "role")}` : "", d.evidence.length ? `newly checked evidence ${d.evidence.join(", ")}` : "",
+      d.actions.length ? `done with evidence: ${d.actions.join(", ")}` : ""].filter(Boolean).join(" · ")) + ".";
+  const who = state.org === "best" ? "your best role" : esc(D.orgs[state.org].name) + "'s best role";
+  return `<div class="eyebrow">Progress you can trust</div>
+    <div class="streak"><div class="streak-n num${n ? "" : " zero"}">${n}</div><div><div style="font-weight:650">${n === 1 ? "scored day" : "scored days"} in a row with real progress</div>
+      <div class="tiny sub">${days.length < 2 ? "Day 1 is measured. The streak starts with the next scored day that shows real progress." : !n ? "The latest scored day showed no real progress, so the streak starts again." : "Real progress means a score that rose, newly checked evidence, or an action done with evidence, on any role."}</div></div></div>
+    <div class="streak-dots" aria-hidden="true">${days.map(d => `<span class="sd${d.start ? " start" : d.progress ? " on" : ""}" title="${esc(fmtDate(d.date))}: ${esc(why(d))}"></span>`).join("")}</div>
+    <div class="eyebrow" style="margin-top:16px">Level history, ${who}</div>
+    <div class="tiny sub" style="margin-bottom:4px">One row per scored day, newest first, from the dated files in eval/runs.</div>
+    <div>${hist.map(h => `<div class="lh-row"><span class="tiny sub lh-date">${esc(fmtDate(h.date))}</span><span class="lv-badge">${h.level}</span>
+      <div><div class="small"><b>Level ${h.level}, ${esc(h.band)}</b> · fit ${Math.round(h.fit)}${h.change ? ` <span class="tag ${h.change}">${h.change === "up" ? "Level up" : "Level down"}</span>` : ""}</div>
+      <div class="tiny sub">${esc(why(dayOf[h.date]))}</div></div></div>`).join("")}</div>`;
+}
+function renderLevel(){
+  const r = headlineRole(), nl = nextLevel(r), qs = questsFor(r, nl);
+  const who = state.org === "best" ? "Your best role" : esc(D.orgs[state.org].name) + ", best role";
+  $("#v-level").innerHTML = `<div class="card lv-card"><div class="lv-head"><div><div class="eyebrow">Next level · ${who}</div>
+      <h3>Level ${nl.level}, ${esc(nl.band)}${nl.top ? "" : ` <span class="arrow">→</span> Level ${nl.nextLevel}, ${esc(nl.nextBand)}`}</h3><div class="small sub">${esc(r.on)}: ${esc(r.title)}</div></div>
+      ${nl.top ? "" : `<div class="lv-need"><b class="num">${fmtP(nl.toNext)}</b><span class="tiny sub">points to go</span></div>`}</div>
+      ${nl.top ? "" : lvTrack(nl)}${verdictHTML(nl)}</div>
+    <div class="eyebrow" style="margin:22px 4px 4px">Quests${nl.top ? "" : ` toward Level ${nl.nextLevel}`}</div>
+    <p class="small" style="margin:0 4px 12px">Your open actions, most points per hour first. Points are fit points on this role: expected counts each action's chance of working, if it works assumes it does. Ticks stay on this device and never change a number; your plan file is the record, so tell your agent.</p>
+    ${qs.length ? `<div class="quests">${qs.map(q => questCard(q, nl)).join("")}</div>` : '<div class="card small sub">No open actions. The next run adds some from the biggest gaps.</div>'}
+    <div class="card" style="margin-top:16px">${progressHTML()}</div>`;
+  bindLevel($("#v-level"));
+}
+function bindLevel(root){
+  root.querySelectorAll("[data-act]").forEach(n => onEnter(n, () => openDetail({type: "action", id: n.dataset.act}, true)));
+  root.querySelectorAll("[data-tell]").forEach(b => b.addEventListener("click", () => tellAgent(b)));
+  root.querySelectorAll("[data-pend]").forEach(c => c.addEventListener("change", () => {
+    const id = c.dataset.pend; if (c.checked) pending.add(id); else pending.delete(id); savePending();
+    renderLevel(); const again = $(`#v-level [data-pend="${id}"]`); if (again) again.focus();
+  }));
+}
+async function tellAgent(b){
+  const a = actOf(b.dataset.tell), text = tellText(a), msg = b.closest(".quest, .d-body").querySelector(".q-msg");
+  const ok = await copyText(text);
+  msg.innerHTML = ok ? "Copied. Paste it to your agent and add the evidence." : `Copy this to your agent:<span class="q-text">${esc(text)}</span>`;
+  if (ok){ b.textContent = "Copied"; setTimeout(() => { b.textContent = "Done? Tell your agent"; }, 2400); }
+}
+"""
+
 JS_DETAIL = r"""
 // ---------- detail pane ----------
 const detail = $("#detail"), scrim = $("#scrim");
@@ -1094,6 +1402,7 @@ function renderDetail(){
   card.querySelectorAll(".crumbs button[data-i]").forEach(b => b.addEventListener("click", () => { state.stack = state.stack.slice(0, +b.dataset.i + 1); renderDetail(); }));
   card.querySelectorAll("[data-factor]").forEach(f => f.addEventListener("click", () => { state.stack.push({type: "factor", id: f.dataset.role, k: +f.dataset.factor}); renderDetail(); }));
   card.querySelectorAll("[data-role-open]").forEach(n => n.addEventListener("click", () => { state.stack.push({type: "role", id: n.dataset.roleOpen}); renderDetail(); }));
+  card.querySelectorAll("[data-tell]").forEach(b => b.addEventListener("click", () => tellAgent(b)));
   bindChips(card); enter(card, 700); detail.scrollTop = 0;
 }
 function detailOrg(g){
@@ -1175,7 +1484,8 @@ function detailAction(id){
     <div class="eyebrow" style="margin-top:14px">Done when</div><div class="small">${esc(a.done_when)}</div>
     ${a.doneEvidence ? `<div class="eyebrow" style="margin-top:14px">Proof it's done</div><div class="small">${esc(a.doneEvidence)}</div>` : ""}
     ${a.draft ? `<div class="eyebrow" style="margin-top:14px">Draft ready for you</div><div class="small">${esc(a.draft)}, for you to read, edit and send yourself.</div>` : ""}
-    ${a.notes ? `<div class="eyebrow" style="margin-top:14px">Notes</div><div class="small">${esc(a.notes)}</div>` : ""}`;
+    ${a.notes ? `<div class="eyebrow" style="margin-top:14px">Notes</div><div class="small">${esc(a.notes)}</div>` : ""}
+    ${live(a) ? `<div style="margin-top:16px"><button class="btn" data-tell="${esc(a.id)}">Done? Tell your agent</button><div class="q-msg" role="status" style="margin-top:6px"></div><div class="tiny sub" style="margin-top:6px">Copies an instruction for your agent. The plan file is the record: nothing here changes until your agent marks it done there, with evidence.</div></div>` : ""}`;
 }
 
 // ---------- share card ----------
@@ -1212,10 +1522,14 @@ function renderSegs(){
   $("#modeSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { state.mode = b.dataset.m; renderSegs(); refreshNumbers(); }));
   const opts = [["best", "Best overall"]].concat(D.orgOrder.map(g => [g, D.orgs[g].name]));
   $("#orgSeg").innerHTML = opts.map(o => `<button aria-pressed="${state.org === o[0]}" data-org="${esc(o[0])}">${esc(o[1])}</button>`).join("");
-  $("#orgSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { state.org = b.dataset.org; renderSegs(); renderTopline(); drawChart(); renderHistory(); }));
+  $("#orgSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { state.org = b.dataset.org; renderSegs(); renderTopline(); drawChart(); renderHistory(); if (state.view === "level") renderLevel(); }));
 }
 function renderHistory(){
-  $("#history").innerHTML = D.runs.map(rn => `<div class="run-chip"><div class="tiny sub">${esc(fmtDate(rn.date))}${rn.date === D.runs[0].date ? " · Day 1" : ""}</div><b class="num">${Math.round(rn.top)}</b> <span class="tiny sub">best fit</span>${D.meta.git ? `<div class="tiny sub">${rn.commit ? `Saved in history: <span class="num" style="color:var(--ink);font-weight:600">${esc(rn.commit)}</span>` : "Not saved in history yet"}</div>` : ""}</div>`).join("") +
+  const lh = {}; levelHist().forEach(h => lh[h.date] = h);
+  const what = state.org === "best" ? "best fit" : "best at " + D.orgs[state.org].name;
+  $("#history").innerHTML = D.runs.map(rn => { const h = lh[rn.date];
+    return `<div class="run-chip"><div class="tiny sub">${esc(fmtDate(rn.date))}${rn.date === D.runs[0].date ? " · Day 1" : ""}</div>${h ? `<b class="num">${Math.round(h.fit)}</b> <span class="tiny sub">${esc(what)}</span>
+      <div class="tiny">Level ${h.level}, ${esc(h.band)}${h.change ? `<span class="tag ${h.change}">${h.change === "up" ? "Level up" : "Level down"}</span>` : ""}</div>` : '<span class="tiny sub">No open role that day</span>'}${D.meta.git ? `<div class="tiny sub">${rn.commit ? `Saved in history: <span class="num" style="color:var(--ink);font-weight:600">${esc(rn.commit)}</span>` : "Not saved in history yet"}</div>` : ""}</div>`; }).join("") +
     (state.sample ? sampleProgress(headlineRole()).map(p => `<div class="run-chip sample"><div class="tiny sub">${esc(new Date(p.t).toLocaleDateString("en-AU", {day: "numeric", month: "short"}))} · sample</div><b class="num">${Math.round(p.v)}</b></div>`).join("") : "");
   if (!state.sample){ const h = $("#history"); h.scrollLeft = h.scrollWidth; }
 }
@@ -1278,7 +1592,8 @@ HEADER = r"""<!doctype html>
   are flight levels, the measured Day 1 is the departure, plan actions are diamond
   waypoints, the offer zone is the destination) under a flight strip and a level
   badge. Left rail: the what-if switches with their own lift. Centre below the hero:
-  scoreboard tiles, then the views. Right pane: drill-down with breadcrumbs. On a
+  scoreboard tiles, then the views, led by Level up (the next level, quests, level
+  history and streak). Right pane: drill-down with breadcrumbs. On a
   phone the rail opens from a bottom toolbar that reserves its own space. Motion is
   quiet and never leaves content hidden. Built by Climb scripts/build_dashboard.py.
 -->
@@ -1290,4 +1605,4 @@ HEADER = r"""<!doctype html>
 
 TEMPLATE = (HEADER + CSS + "</style></head>\n<body>" + BODY
             + '\n<script type="application/json" id="data">__DATA__</script>\n<script>'
-            + JS_CORE + JS_CHART + JS_HOME + JS_VIEWS + JS_DETAIL + "</script>\n</body></html>\n")
+            + JS_CORE + JS_CHART + JS_HOME + JS_VIEWS + JS_LEVELS + JS_DETAIL + "</script>\n</body></html>\n")
