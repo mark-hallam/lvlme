@@ -269,7 +269,7 @@ class DocTests(unittest.TestCase):
     def test_github_addresses_use_the_repository_that_exists(self):
         """Every GitHub address names the plugin's own repository, and file links follow its default branch.
 
-        mark-hallam/lvlme is a different, private repository, and the public default branch is not main,
+        mark-hallam/lvlme is not a public repository, and the public default branch is not main,
         so /blob/HEAD/ is the only branch path that works before and after a rename to main.
         """
         with open(os.path.join(ROOT, ".claude-plugin", "plugin.json"), encoding="utf-8") as fh:

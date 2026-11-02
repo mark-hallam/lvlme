@@ -1680,7 +1680,7 @@ function shareHeadline(d1, now, day){
 function openShare(){
   const s = shareNumbers();
   $("#shareCard").innerHTML = `<div class="eyebrow">Dream job journey</div><h3 style="font-size:20px">${esc(s.head)}</h3>
-    <div class="small sub">Measured, dated and checkable. Day 1: ${esc(fmtDate(D.meta.baseline))}.</div>
+    <div class="small sub">Measured, dated and checkable. Day 1: <span style="white-space:nowrap">${esc(fmtDate(D.meta.baseline))}</span>.</div>
     <div class="share-row"><div><span class="tiny sub">Day 1</span><b class="num">${Math.round(s.d1)}</b>${pill(s.d1b)}</div><div><span class="tiny sub">Today</span><b class="num">${Math.round(s.r.fit)}</b>${pill(s.r.ib)}</div><div><span class="tiny sub">Projected</span><b class="num">${Math.round(s.exp)}</b>${pill(s.eb)}</div></div>
     <div class="tiny sub" style="margin-top:8px">Fit out of 100, interview chance under it. Projection assumes the plan is followed.</div>`;
   modal.classList.add("on"); scrim.classList.add("on");
