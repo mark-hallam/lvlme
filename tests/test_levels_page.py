@@ -1,4 +1,4 @@
-"""The page script's level maths (JS_LEVELS) agrees with _levels.py: the next level, the quests and the panel text.
+"""The page script's level maths (JS_LEVELS) agrees with _levels.py: the next level, the quests, their Do next order and the panel text.
 
 Runs the page's own maths and rendering functions in Node.js (a JavaScript runtime) on the same page data
 the Python side uses, for every journey (best overall and each organisation). Skipped when Node.js is not
@@ -44,6 +44,7 @@ const out = {dateOK, journeys: {}};
          missing: nl.missing ? {points: nl.missing.points, ceiling: nl.missing.ceiling, role: nl.missing.r.id,
                                 room: nl.missing.room.map(x => [x.dim, x.points, x.covered])} : null},
     quests: qs.map(q => [q.a.id, q.exp, q.works, Math.round(q.rate * 1e6) / 1e6, q.r.id, q.fitAfter, q.leadExp, q.leadWorks, q.crit, q.bc]),
+    up: upNext(qs, nl).map(q => q.a.id), rows: doNextRows(upNext(qs, nl), nl),
     verdict: verdictHTML(nl), via: qs.map(q => viaLine(q, nl))};
 });
 console.log(JSON.stringify(out));
@@ -84,6 +85,7 @@ def py_story(page):
                                      "room": [[x["dimension"], x["points"], x["covered"]] for x in m["room"]]}},
             "quests": [[q["a"]["id"], q["exp"], q["works"], round(q["rate"] * 1e6) / 1e6, q["role"]["id"], q["fit_after"],
                         q["lead_exp"], q["lead_works"], q["crit"], q["bc"]] for q in qs],
+            "up": [q["a"]["id"] for q in L.up_next(qs, nl)], "rows": LH.do_next_rows(nl, L.up_next(qs, nl)),
             "verdict": LH.verdict(page, nl, rs[0]), "via": [LH.via(q, rs[0]) for q in qs]}
     return out
 
@@ -98,6 +100,8 @@ class PageAgreesWithPython(unittest.TestCase):
             got = json.loads(json.dumps(js["journeys"][org]))
             self.assertEqual(got["nl"], json.loads(json.dumps(want["nl"])), org)
             self.assertEqual(got["quests"], json.loads(json.dumps(want["quests"])), org)
+            self.assertEqual(got["up"], want["up"], org)                     # one ranked list, the same in both
+            self.assertEqual(TL.plain(got["rows"]), TL.plain(want["rows"]), org)
             if js["dateOK"]:                                           # same words, once the markup is set aside
                 self.assertEqual(TL.plain(got["verdict"]), TL.plain(want["verdict"]), org)
                 self.assertEqual([TL.plain(v) for v in got["via"]], [TL.plain(v) for v in want["via"]], org)
@@ -108,6 +112,7 @@ class PageAgreesWithPython(unittest.TestCase):
         best = js["journeys"]["best"]
         self.assertEqual((best["nl"]["set"]["ids"], best["nl"]["set"]["role"]), (["A01"], "globex:7"))
         self.assertEqual(best["quests"][0][:3], ["A01", 5.2, 6])
+        self.assertEqual(best["up"], ["A01", "A02"])                       # the action that gets you there comes first
         if js["dateOK"]:
             self.assertIn("by lifting your fit for Solutions Lead (Globex Labs) from 37 to 44.2", TL.plain(best["verdict"]))
 
@@ -117,7 +122,9 @@ class PageAgreesWithPython(unittest.TestCase):
             self.assertEqual(B.main(["--workspace", ws]), 0)
         with open(os.path.join(ws, "report", "index.html"), encoding="utf-8") as fh:
             page = json.loads(fh.read().split('<script type="application/json" id="data">')[1].split("</script>")[0])
-        self.check(page)
+        js, _ = self.check(page)
+        self.assertEqual(js["journeys"]["best"]["up"][:2], ["A06", "A11"])    # the best-case set, in date order, first
+        self.assertEqual(js["journeys"]["globex"]["up"][0], "A02")             # the one action that gets Globex there
 
 
 if __name__ == "__main__":

@@ -201,10 +201,15 @@ the scorer's reasoning, and must justify every change).
 
 ## 10. Outputs
 
-- `report/index.html`: Overview, Trends, Roles, SWOT, Plan, Evidence. Self-contained,
-  no external requests, light and dark mode, readable on a phone. The key numbers,
-  the level card and the Level up view are also in the HTML itself, so they read
-  without JavaScript.
+- `report/index.html`: the "Mission control" dashboard (see `docs/LEVELS.md`).
+  Self-contained, no external requests, light and dark mode, readable on a phone.
+  The headline number reads "Best match 57 of 100": a fit score, not a probability.
+  One yardstick for actions: Do next, the quests, the badges and the plan list share
+  one order (the path to the next level first, then points per hour) and one points
+  number per action (expected points toward the next level, counting its chance);
+  only the What if rail shows what an action adds "with everything else on".
+  Internal ids stay in the drill-in detail. The key numbers, the level card and the
+  Level up view are also in the HTML itself, so they read without JavaScript.
 - `eval/reviews/<date>.json`: the reviewer disputes and the score that stood.
 - Every main workspace file accepts extension keys starting `x_` for data the
   engine never reads.

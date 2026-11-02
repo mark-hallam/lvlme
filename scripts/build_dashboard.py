@@ -17,13 +17,22 @@ if eval/ceilings.json exists), What moves you, Roles, SWOT and TOWS (only if
 eval/swot.json exists), Plan, Evidence, Market. A right-hand pane drills into
 any organisation, role, factor, action or piece of evidence.
 
+One yardstick for actions: Do next, the quests, the badges, the plan list and
+the action pane all use one ranked list (the actions on the path to the next
+level first, in target date order, then the most points per hour), and every
+action shows one points number there, its expected points toward the next level
+counting its chance. Only the What if rail shows another number, what an action
+adds "with everything else on", labelled that way.
+
 The page makes no external requests, is light by default with a readable dark
 switch, works on a phone, and its motion is optional: everything is drawn in
 its final state first, and reduced motion is respected. The key numbers (best
-chance, level, outlook, top actions by priority, best role per organisation), the
-level card and the Level up view are also rendered into the HTML here, so they
-read the same without JavaScript; the page script hides the static summary
-once it has drawn the live page.
+match, level, outlook, Do next, best role per organisation), the level card and
+the Level up view are also rendered into the HTML here, so they read the same
+without JavaScript; the page script hides the static summary once it has drawn
+the live page. Internal ids stay off the main surfaces (they stay in the action
+pane): action titles drop a bracketed id and name another action by its short
+title (people_title).
 
 Plan actions with status later are parked: off the active cap, and out of the
 projection, the next-level sets and the quests unless switched on in the
@@ -75,6 +84,7 @@ DIM_HELP = {
     "D7": "A résumé, portfolio and story tailored to this exact role.",
 }
 STATUS_ORDER = {"doing": 0, "todo": 1, "later": 2, "done": 3, "dropped": 4}
+STATUS_NAMES = {"doing": "in progress", "todo": "to do", "later": "parked for later", "done": "done", "dropped": "dropped"}
 OWNERS = {"you": "You", "agent": "Your agent", "both": "You and your agent"}
 DEFAULT_CAPS = {"D1": 0, "D2": 1, "D3": 2, "D4": 1, "D5": 1, "D6": 1, "D7": 3}
 DEFAULT_HARD_TYPES = ["us_person_export_control", "citizenship", "security_clearance"]
@@ -82,9 +92,10 @@ CLAIM_STATUSES = [("supported", "Supported"), ("overstated", "Overstated"), ("un
                   ("contradicted", "Contradicted"), ("pending", "Waiting to be checked")]
 TOWS = {"SO": "Use a strength to seize an opportunity", "ST": "Use a strength to blunt a threat",
         "WO": "Fix a weakness to unlock an opportunity", "WT": "Avoid the trap where a weakness meets a threat"}
+ID_RX = r"[A-Z]{1,3}[0-9]{2,}"  # action, evidence and question ids (schemas/plan, evidence)
 MAX_SLOTS = 8            # categorical colours; with more organisations the rest share "Other"
 OTHER_KEY = "+other"     # cannot clash with a target id (ids are [a-z0-9_])
-SAMPLE_UNTIL_RUNS = 7    # the made-up sample progress toggle shows only below this many runs
+SAMPLE_UNTIL_RUNS = 7    # the made-up sample progress toggle shows only below this many runs, and only with ?preview=1
 MONTHS = {"January", "February", "March", "April", "May", "June", "July", "August", "September",
           "October", "November", "December"}
 
@@ -108,6 +119,25 @@ def _factor_name(m):
     if m.group(3) and m.group(3).lower() == name.split()[-1].lower():
         return name
     return name + rest
+
+
+def people_title(title, short, known):
+    """An action title for people: a bracketed internal id such as "(Q01)" is dropped, and another
+    action's id ("once A04 is done") becomes that action's short title in quotes. short maps action
+    ids to short titles; known is every id in the workspace (actions, evidence, questions)."""
+    t = re.sub(r"\s*\((?:%s)(?:\s*,\s*(?:%s))*\)" % (ID_RX, ID_RX), lambda m: _drop_ids(m, known), clean(title))
+    return re.sub(r"\b(%s)\b" % ID_RX, lambda m: "\u201c%s\u201d" % short[m.group(1)] if m.group(1) in short else m.group(1), t)
+
+
+def _drop_ids(m, known):
+    ids = re.findall(ID_RX, m.group(0))
+    return "" if all(i in known for i in ids) else m.group(0)
+
+
+def short_title(title):
+    """The first clause of a title (up to a colon), at most six words."""
+    words = clean(title).split(":")[0].split()
+    return " ".join(words[:6]) + ("\u2026" if len(words) > 6 else "")
 
 
 def web_url(u):
@@ -325,12 +355,15 @@ def build_actions(data, end):
         if a.get("status") in ("done", "dropped"):
             return a.get("finished_on") or data.cur["run_date"]
         return end
+    short = {a["id"]: short_title(a["title"]) for a in acts}
+    known = set(short) | {e.get("id") for e in data.evidence.get("items", [])} | {
+        q.get("id") for q in data.evidence.get("open_questions") or []}
     out = []
     for a in sorted(acts, key=lambda a: (when(a), a["id"])):
         effects, derived = action_effects(a, data.weights)
         st = a.get("status", "todo")
         out.append({
-            "id": a["id"], "title": clean(a["title"]), "why": clean(a.get("why")),
+            "id": a["id"], "title": people_title(a["title"], short, known), "why": clean(a.get("why")),
             "owner": OWNERS.get(a.get("owner", "you"), "You"), "effort": hours(a.get("effort_hours")),
             "hours": _num(a.get("effort_hours")),
             "status": st, "date": when(a), "dated": bool(a.get("target_date")), "p": float(a.get("chance", 0)),
@@ -555,7 +588,7 @@ def render_page(data):
         page = _scrub_text(page, make_redactor(data, sensitive=False, hide_names=True, placeholder="a contact"))
     blob = json.dumps(page, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
     card, view = LH.render(page)          # first render, readable without JavaScript; the page script redraws it
-    static = ST.render(page, data.cur.get("per_org") or {}, [a["id"] for a in data.active])
+    static = ST.render(page, data.cur.get("per_org") or {})
     top = page["roles"][0] if page["roles"] else None
     out = A.TEMPLATE.replace("__TITLE__", html.escape(page["meta"]["title"]))
     out = out.replace("__BESTFIT__", str(int(top["fit"] + 0.5)) if top else "0")
@@ -694,34 +727,47 @@ def levels_payload(data, page):
         if r and g != OTHER_KEY:
             per_org[g] = _next_level_json(page, L.journey_roles(page["roles"], r, g), by_id)[0]
     lead, quests = every[0], []
-    for q in L.quests(every, page["actions"], page["caps"], page["weights"], nl):
+    qs = L.quests(every, page["actions"], page["caps"], page["weights"], nl)
+    path = set(L.path_ids(nl))
+    for rank, q in enumerate(L.up_next(qs, nl), 1):
         a, raw = q["a"], by_id.get(q["a"]["id"], {})
         other = q["role"]["id"] != lead["id"]
-        quests.append({"id": a["id"], "title": raw.get("title", ""), "status": a["status"], "owner": raw.get("owner", "you"),
-                       "effort_hours": raw.get("effort_hours"), "target_date": raw.get("target_date"), "chance": a["p"],
-                       "done_when": raw.get("done_when", ""), "points_expected": q["exp"], "points_if_it_works": q["works"],
-                       "points_per_hour": round(q["rate"], 2), "changes_a_score": bool(a["effects"]),
-                       "lifted_role": _role_json(q["role"], lead, q["fit_after"]),
-                       "on_best_role_today": {"points_expected": q["lead_exp"], "points_if_it_works": q["lead_works"]} if other else None,
-                       "on_path_to_next_level": q["crit"], "needed_for_best_case": bool(q["bc"]),
-                       "tell_your_agent": L.tell_agent(dict(a, title=raw.get("title", a["title"])))})
+        quests.append({"rank": rank, "id": a["id"], "title": raw.get("title", ""), "title_on_page": a["title"], "status": a["status"],
+                        "owner": raw.get("owner", "you"), "effort_hours": raw.get("effort_hours"), "target_date": raw.get("target_date"),
+                        "chance": a["p"], "done_when": raw.get("done_when", ""), "points_expected": q["exp"],
+                        "points_if_it_works": q["works"], "points_per_hour": round(q["rate"], 2), "changes_a_score": bool(a["effects"]),
+                        "lifted_role": _role_json(q["role"], lead, q["fit_after"]),
+                        "on_best_role_today": {"points_expected": q["lead_exp"], "points_if_it_works": q["lead_works"]} if other else None,
+                        "on_path": a["id"] in path, "on_path_to_next_level": q["crit"], "needed_for_best_case": bool(q["bc"]),
+                        "tell_your_agent": L.tell_agent(dict(a, title=raw.get("title", a["title"])))})
     return {
         "how": ("Levels are the rubric's fit bands (1 Very low, 2 Low from 40, 3 Moderate from 55, 4 Good from 70, 5 Strong from 85), "
-                "taken from the best fit across your roles, so any role can carry you to the next level. The smallest set is the fewest "
-                "open actions whose expected effects (each weighted by its chance, within the projection caps) take that best fit to the "
-                "next level; the date assumes they land on their target dates, and lifted_role is the role that then holds the best fit. "
-                "Quest points are points toward the next level: what each action alone adds to the best fit, chance weighted and within "
-                "the caps, counted on lifted_role, with on_best_role_today when that differs. Actions that raise the same factor overlap, "
-                "so quest points do not simply add up. Nothing here is made up: it all comes from the runs and the plan."),
+                "taken from the best fit across your roles (the page's best match), so any role can carry you to the next level. The "
+                "smallest set is the fewest open actions whose expected effects (each weighted by its chance, within the projection caps) "
+                "take that best fit to the next level; the date assumes they land on their target dates, and lifted_role is the role that "
+                "then holds the best fit. quests is the dashboard's one ranked list of actions (Do next, the quests, the badges and the "
+                "plan list all follow it): the actions on the path to the next level first (the smallest set, or when none reaches it on "
+                "expected odds, the best-case set), in target date order, then the rest by points per hour. Every action shows one "
+                "points number on the page, points_expected: what that action alone adds to the best fit toward the next level, chance "
+                "weighted and within the caps, counted on lifted_role, with on_best_role_today when that differs. Actions that raise the "
+                "same factor overlap, so quest points do not simply add up. Only the What if rail shows another number, what an action "
+                "adds with everything else switched on. Nothing here is made up: it all comes from the runs and the plan."),
         "best_role": best, "per_org": per_org, "quests": quests,
         "level_history": L.level_history(page["runs"]), "streak": page["streak"], "progress_days": page["progress"],
     }
+
+
+def up_next_order(actions, levels):
+    """Plan actions in the page's Do next order (the rest after it, as they were)."""
+    rank = {q["id"]: q["rank"] for q in (levels or {}).get("quests") or []}
+    return sorted(actions, key=lambda a: rank.get(a["id"], len(rank) + 1))
 
 
 def agent_payload(data, page):
     sensitive = bool(data.privacy.get("sensitive_mode", True))
     share_names = bool(data.privacy.get("share_contact_names_with_agents")) and not sensitive
     cur, goal = data.cur, data.config.get("goal") or {}
+    levels = levels_payload(data, page)
     counts = {}
     for e in data.evidence.get("items", []):
         counts[e.get("level")] = counts.get(e.get("level"), 0) + 1
@@ -739,9 +785,9 @@ def agent_payload(data, page):
         "projection": projection_summary(page),
         "gaps": cur.get("gaps", []),
         "verify_to_unlock": cur.get("verify_to_unlock", []),
-        "actions_active": [dict(a, priority=priority(a)) for a in data.active],
+        "actions_active": [dict(a, priority=priority(a)) for a in up_next_order(data.active, levels)],
         "actions_later": [dict(a, priority=priority(a)) for a in data.parked],
-        "levels": levels_payload(data, page),
+        "levels": levels,
         "actions_done": [a for a in data.actions if a.get("status") == "done"],
         "north_star": data.plan.get("north_star", []),
         "metrics_history": data.metrics_history,
@@ -813,14 +859,16 @@ def _quest_md(q):
     elif not (q["points_expected"] or q["points_if_it_works"]):
         pts = "no points toward the next level on its own"
     else:
-        pts = "+%s toward the next level expected, +%s if it works, %s per hour" % (
+        pts = "+%s toward the next level expected (the page's number; +%s if it works, %s per hour)" % (
             _g(q["points_expected"]), _g(q["points_if_it_works"]), _g(q["points_per_hour"]))
         if q["on_best_role_today"]:
             pts += ", by lifting %s; on the best role today +%s expected" % (
                 _lift_md(q["lifted_role"]), _g(q["on_best_role_today"]["points_expected"]))
-    tag = " [on the path to the next level]" if q["on_path_to_next_level"] else " [needed for the best case]" if q["needed_for_best_case"] else ""
-    return "- %s %s%s: %s; %s, target %s, owner %s. Done when: %s" % (
-        q["id"], q["title"], tag, pts, hours(q["effort_hours"]) or "effort not set", q["target_date"] or "none", q["owner"], q["done_when"])
+    tag = (" [on the path to the next level]" if q["on_path_to_next_level"]
+           else " [needed for the best case]" if q["needed_for_best_case"] else "")
+    return "%d. %s %s%s: %s; %s, %s, target %s, owner %s. Done when: %s" % (
+        q["rank"], q["id"], q["title"], tag, pts, STATUS_NAMES.get(q["status"], q["status"]), hours(q["effort_hours"]) or "effort not set",
+        q["target_date"] or "none", q["owner"], q["done_when"])
 
 
 def levels_md(data, lv):
@@ -834,9 +882,11 @@ def levels_md(data, lv):
         rows = _level_md(b)
         lines.append("- At %s: %s" % (data.org(oid), rows[0]))
         lines += rows[1:]
-    lines += ["", "## Quests (points toward the next level, each action on its own; most points per hour first)",
-              "- Points are what one action alone adds to the best fit across roles, chance weighted and within the caps. Actions that",
-              "  raise the same factor overlap, so the points do not simply add up; the smallest set above shows what they do together."]
+    lines += ["", "## Quests (the dashboard's Do next order and points: one ranked list, one number per action)",
+              "- Order: the actions on the path to the next level first, in target date order, then the most points per hour.",
+              "- Points are what one action alone adds to the best fit across roles toward the next level, chance weighted and within",
+              "  the caps. Actions that raise the same factor overlap, so the points do not simply add up; the smallest set above shows",
+              "  what they do together."]
     lines += [_quest_md(q) for q in lv["quests"]]
     hist = ", ".join("%s Level %d %s (fit %s%s)" % (h["date"], h["level"], h["band"], _g(h["fit"]),
                                                    ", level up" if h["change"] == "up" else ", level down" if h["change"] == "down" else "")
@@ -847,7 +897,8 @@ def levels_md(data, lv):
               "- Level history, best role: %s" % hist,
               "",
               "## When the person says an action is done",
-              "- They may paste: Mark action A07 done (\"title\"). Evidence: <link, file or email>.",
+              "- They may paste what the dashboard's \"Done? Tell your agent\" button copies:",
+              "  Mark action A07 done (\"title\"). Evidence: <link, file or email>.",
               "- The agent running the campaign sets status done, done_evidence and finished_on in campaign/plan.json. Done needs a",
               "  link, a file or an email reference; without one, ask for it. Any other agent appends the message to campaign/inbox.md."]
     return lines
@@ -874,6 +925,8 @@ def summary_md(data, p):
         "- Chance of reaching the goal within %s months if the campaign is followed: %s" % (
             p["goal"]["horizon_months"], p["outlook"]["band"]),
         "- %s" % p["outlook"]["text"],
+        "- Best match (the best fit across your open roles, a fit score, not a probability): %s of 100" % _g(
+            max([r["fit"] for r in p["roles"]] or [0])),
         "- Average fit of the 5 best open roles: %s / 100%s" % (
             p["top5_average_fit"],
             "" if p["top5_average_fit_previous"] is None else " (previous run %s)" % p["top5_average_fit_previous"]),
@@ -888,7 +941,7 @@ def summary_md(data, p):
     for r in pr["roles"]:
         lines.append("- %s: %s today, %s expected, %s if every action lands" % (
             r["title"], round(r["fit_today"]), round(r["fit_expected"]), round(r["fit_best_case"])))
-    lines += ["", "## Active actions (highest priority first)"]
+    lines += ["", "## Active actions (in the dashboard's Do next order; points under Quests below)"]
     for a in p["actions_active"]:
         lines.append("- [%s] %s %s (owner: %s; done when: %s)" % (a["status"], a["id"], a["title"], a.get("owner", "you"),
                                                                  a.get("done_when", "")))

@@ -1,4 +1,4 @@
-"""_levels.py: levels, the next-level set (reachable, cannot reach, caps, chance), quests, level history, streak."""
+"""_levels.py: levels, the next-level set (reachable, cannot reach, caps, chance), quests in Do next order, level history, streak."""
 import html
 import json
 import os
@@ -190,6 +190,67 @@ class Quests(unittest.TestCase):
         self.assertIn("Evidence: <paste a link, file path or email reference>", text)
 
 
+class UpNextOrder(unittest.TestCase):
+    """One yardstick: the actions on the path to the next level first, in date order, then points per hour."""
+    R = NextLevelSet.R
+
+    def acts(self):
+        return by_date([act("A01", [eff("D3", at_least=4)], p=1.0, hours=4, date="2026-11-10"),   # 3 an hour
+                        act("A02", [eff("D2", 1)], p=0.5, hours=1, date="2026-11-20"),            # 2 an hour
+                        act("A03", [eff("D7", 3)], p=1.0, hours=0.5, date="2026-11-05"),          # 6 an hour
+                        act("A04", [], hours=0.5, date="2026-11-06", priority=9),                 # credibility only
+                        act("A05", [eff("D5", 1)], p=1.0, hours=0.2, date="2026-11-30")])         # 10 an hour, not needed
+
+    def test_path_first_in_date_order_then_points_per_hour(self):
+        r, acts = role(self.R), self.acts()
+        nl = L.next_level([r], acts, CAPS, WEIGHTS, TODAY)
+        qs = L.quests([r], acts, CAPS, WEIGHTS, nl)
+        self.assertEqual(nl["set"]["ids"], ["A03", "A01"])
+        self.assertEqual([q["a"]["id"] for q in qs], ["A05", "A03", "A01", "A02", "A04"])     # quests: points per hour
+        up = L.up_next(qs, nl)
+        self.assertEqual([q["a"]["id"] for q in up], ["A03", "A01", "A05", "A02", "A04"])     # the set first, by date
+        self.assertEqual(L.path_ids(nl), ["A03", "A01"])
+        self.assertEqual({q["a"]["id"]: q["exp"] for q in up}, {q["a"]["id"]: q["exp"] for q in qs})   # same numbers, new order
+
+    def test_best_case_set_leads_when_no_set_reaches_it(self):
+        r = role(self.R)
+        acts = by_date([act("A01", [eff("D3", at_least=5)], p=0.5, hours=8, date="2026-11-10"),
+                        act("A02", [eff("D2", 3)], p=1.0, hours=8, date="2026-11-12"),
+                        act("A03", [eff("D5", 1)], p=1.0, hours=0.5, date="2026-11-30")])
+        nl = L.next_level([r], acts, CAPS, WEIGHTS, TODAY)
+        self.assertFalse(nl["reachable"])
+        self.assertEqual(nl["best_case"]["ids"], ["A01", "A02"])
+        qs = L.quests([r], acts, CAPS, WEIGHTS, nl)
+        self.assertEqual(qs[0]["a"]["id"], "A03")                        # the most points an hour
+        self.assertEqual([q["a"]["id"] for q in L.up_next(qs, nl)], ["A01", "A02", "A03"])   # but not on the path
+
+    def test_top_level_has_no_path(self):
+        r = role([5, 5, 5, 4, 4, 5, 5])
+        acts = by_date([act("A01", [eff("D4", 1)], hours=2), act("A02", [eff("D5", 1)], hours=1)])
+        nl = L.next_level([r], acts, CAPS, WEIGHTS, TODAY)
+        self.assertEqual(L.path_ids(nl), [])
+        qs = L.quests([r], acts, CAPS, WEIGHTS, nl)
+        self.assertEqual(L.up_next(qs, nl), qs)
+
+    def test_each_action_shows_one_points_number_the_same_in_its_row_and_card(self):
+        page = lifted_fixture()
+        rs = L.journey_roles(page["roles"])
+        nl = L.next_level(rs, page["actions"], CAPS, WEIGHTS, TODAY)
+        up = L.up_next(L.quests(rs, page["actions"], CAPS, WEIGHTS, nl), nl)
+        rows = LH.do_next_rows(nl, up).split('<div class="dn" ')[1:]
+        self.assertEqual(len(rows), 2)
+        for q, row in zip(up, rows):
+            want = ["+" + LH.fp(q["exp"])]
+            self.assertEqual(re.findall(r"\+\d+(?:\.\d+)?", plain(row)), want)                    # Do next: one points number
+            card = plain(LH.quest_card(q, nl, rs[0]))
+            self.assertEqual(re.findall(r"\+\d+(?:\.\d+)?", card), want)                          # its quest card: the same one
+            self.assertNotIn("if it works", card)
+            self.assertNotIn("per hour", card)
+            self.assertIn("To do", plain(row))                                                     # a word beside the dot
+        self.assertIn("On the path to Level 2", plain(rows[0]))
+        self.assertNotIn("On the path", plain(rows[1]))
+
+
 def lifted_fixture():
     """Page data where one action reaches the next level through a role other than today's best.
 
@@ -250,8 +311,7 @@ class LiftedRole(unittest.TestCase):
         self.assertEqual(self.qs[1]["exp"], 0.8)
         self.assertIs(self.qs[1]["role"], self.rs[0])
         via = plain(LH.via(a01, self.rs[0]))
-        self.assertEqual(via, "Lifts Solutions Lead (Globex Labs) from 37 to 44.2, which would then be your best role. "
-                              "On your best role today: no change.")
+        self.assertEqual(via, "Lifts Solutions Lead (Globex Labs) from 37 to 44.2, which would then be your best role.")   # +0 on today's best: the pane
         self.assertEqual(LH.via(self.qs[1], self.rs[0]), "")
 
     def test_best_case_and_missing_name_the_role_too(self):
@@ -261,7 +321,8 @@ class LiftedRole(unittest.TestCase):
         self.assertIs(nl["missing"]["role"], self.rs[0])                           # 39.2 beats 37.8: the plan's closest role
         self.assertIs(nl["best_case"]["role"], self.rs[0])                         # A02 alone reaches 41 first, on 8 Nov
         text = plain(LH.verdict(self.page, nl, self.rs[0]))
-        self.assertIn("Best case only: A02 reaches 41 by 8 Nov 2026", text)
+        self.assertIn("Best case only: the action below reaches 41 by 8 Nov 2026, but only if it works.", text)
+        self.assertNotIn("A02 reaches", text)                                      # the steps below name the actions by title
 
 
 class AgentFilesMirrorThePanel(unittest.TestCase):
@@ -285,11 +346,13 @@ class AgentFilesMirrorThePanel(unittest.TestCase):
         self.assertEqual(a01["lifted_role"]["fit_after"], 44.2)
         self.assertEqual(a01["on_best_role_today"], {"points_expected": 0, "points_if_it_works": 0})
         self.assertTrue(a01["on_path_to_next_level"])
+        self.assertEqual((a01["rank"], a01["on_path"], a02["rank"], a02["on_path"]), (1, True, 2, False))
         self.assertIsNone(a02["on_best_role_today"])                     # it counts on today's best role already
         md = "\n".join(B.levels_md(data, lv))
         self.assertIn("level reached 2026-11-12 by lifting Solutions Lead (globex) from 37 to 44.2, which would then be the best role", md)
-        self.assertIn("A01 Action A01 [on the path to the next level]: +5.2 toward the next level expected, +6 if it works, 2.6 per hour, "
-                      "by lifting Solutions Lead (globex) from 37 to 44.2; on the best role today +0 expected", md)
+        self.assertIn("## Quests (the dashboard's Do next order", md)
+        self.assertIn("1. A01 Action A01 [on the path to the next level]: +5.2 toward the next level expected (the page's number; +6 if it "
+                      "works, 2.6 per hour), by lifting Solutions Lead (globex) from 37 to 44.2; on the best role today +0 expected", md)
         self.assertIn("Level 2 Low starts at 40: 1 point to go.", md)
 
 
@@ -346,12 +409,20 @@ class DemoLevels(unittest.TestCase):
         globex = lv["per_org"]["globex"]
         self.assertEqual([a["id"] for a in globex["smallest_set"]["actions"]], ["A02"])
         self.assertEqual(globex["smallest_set"]["level_reached_on"], "2026-11-15")
-        self.assertEqual(lv["quests"][0]["id"], "A07")
-        self.assertTrue(lv["quests"][0]["tell_your_agent"].startswith("Mark action A07 done"))
+        up = lv["quests"]
+        self.assertEqual([q["id"] for q in up[:3]], ["A06", "A11", "A07"])     # the best-case set first, in date order
+        self.assertEqual([q["on_path"] for q in up[:3]], [True, True, False])
+        self.assertEqual([q["rank"] for q in up], list(range(1, len(up) + 1)))
+        self.assertTrue(up[0]["tell_your_agent"].startswith("Mark action A06 done"))
+        payload = H.load(os.path.join(self.ws, "report", "for-agents", "dashboard.json"))
+        self.assertEqual([a["id"] for a in payload["actions_active"]], [q["id"] for q in up])   # the same order
         self.assertEqual(lv["streak"], 4)
         self.assertEqual([h["change"] for h in lv["level_history"]], [None, None, None, "up", None])
         summary = self.read("report", "for-agents", "SUMMARY.md")
         self.assertIn("## Next level", summary)
+        self.assertIn("## Quests", summary)
+        self.assertIn("1. A06 ", summary)
+        self.assertNotIn("highest priority first", summary)                   # one ranking, not two
         self.assertIn("## When the person says an action is done", summary)
         self.assertNotIn("Jordan", summary)
 

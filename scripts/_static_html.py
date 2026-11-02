@@ -2,12 +2,11 @@
 
 build_dashboard.py puts it under the journey card. It shows what the latest run
 and the plan say, with every open action at its plan setting (the same default
-the live page and the agent briefing use): the best chance today with its bands,
-the level and the points to the next one, the outlook, the top actions (the
-plan's highest priority active actions, by expected points x roles affected x
-chance / effort hours, as method/CAMPAIGN.md ranks them; the live page's "Do
-next" card orders by what each adds to the best role instead) and the best role
-at each organisation.
+the live page and the agent briefing use): the best match today (a fit score out
+of 100, not a probability) with its bands, the level and the points to the next
+one, the outlook, Do next (the live page's one ranked list: the actions on the
+path to the next level first, then the most points per hour, each with its one
+points number) and the best role at each organisation.
 
 The page script hides it once it has drawn the live page, which shows the same
 numbers and lets the what-if switches change them, so with JavaScript on nobody
@@ -16,10 +15,9 @@ cells, so a screen reader or a text browser reads it in order.
 """
 import html
 
-import _levels as L
 import _levels_html as LH
 
-TOP_ACTIONS = 3
+TOP_ACTIONS = 4          # as many as the live page's Do next card
 
 
 def esc(s):
@@ -33,7 +31,7 @@ def whole(v):
 def _key_numbers(page, nl):
     r = page["roles"][0]
     o = page["meta"]["outlook"]
-    rows = [("Best chance today", "%s / 100 fit: %s, %s. Interview chance %s, offer chance %s." % (
+    rows = [("Best match", "%s of 100: %s, %s. Interview chance %s, offer chance %s." % (
         whole(r["fit"]), esc(r["on"]), esc(r["title"]), esc(r["ib"]), esc(r["ob"])))]
     if nl["top"]:
         rows.append(("Level", "Level %d, %s. Top level." % (nl["level"], esc(nl["band"]))))
@@ -44,19 +42,6 @@ def _key_numbers(page, nl):
     rows.append(("Outlook", "%s within %d months. %s" % (esc(o["band"]), page["meta"]["horizon"], esc(o["text"]))))
     body = "".join('<tr><th scope="row">%s</th><td>%s</td></tr>' % (k, v) for k, v in rows)
     return '<table aria-label="Key numbers"><tbody>%s</tbody></table>' % body
-
-
-def _actions(page, order):
-    by_id = {a["id"]: a for a in page["actions"]}
-    acts = [by_id[i] for i in order if i in by_id][:TOP_ACTIONS]
-    if not acts:
-        return '<p class="small sub">No open actions. The next run adds some from the biggest gaps.</p>'
-    items = "".join('<li><b>%s</b> <span class="sub">(%s)</span><div class="small sub">%s%s · %s · %d%% chance it works. '
-                    'Done when: %s</div></li>' % (
-                        esc(a["title"]), esc(a["id"]), esc(a["owner"]), " · " + esc(a["effort"]) if a.get("effort") else "",
-                        "target " + LH.long_date(a["date"]) if a.get("dated") else "no target date yet", L.pct(a["p"]),
-                        esc(a.get("done_when"))) for a in acts)
-    return "<ol>%s</ol>" % items
 
 
 def _per_org(page, per_org):
@@ -74,17 +59,17 @@ def _per_org(page, per_org):
             '<tbody>%s</tbody></table>') % "".join(rows)
 
 
-def render(page, per_org, action_order):
+def render(page, per_org):
     """The inner HTML of <section id="staticSummary">.
 
     page: the page data build_dashboard.py renders from (already scrubbed of contact names);
-    per_org: the latest run's per_org block; action_order: open action ids, highest priority first."""
+    per_org: the latest run's per_org block."""
     head = '<h2 id="staticSummaryH">Your numbers on %s</h2>' % LH.long_date(page["meta"]["run_date"])
     note = ('<p class="small sub">The key numbers as plain text, for reading without JavaScript. The interactive page '
             'shows the same numbers and adds the journey chart, the What if switches and the other views.</p>')
     if not page["roles"]:
         return head + note + '<p class="small">No open roles matched yet. Fetch roles and score a run, then build the dashboard again.</p>'
-    nl = L.next_level(L.journey_roles(page["roles"]), page["actions"], page["caps"], page["weights"], page["meta"]["run_date"])
+    _, nl, _, up = LH.compute(page)
     return (head + note + _key_numbers(page, nl)
-            + '<h3>Top actions, highest priority first</h3>' + _actions(page, action_order)
+            + '<h3>Do next</h3><div class="static-dn">%s</div>' % LH.do_next_rows(nl, up, TOP_ACTIONS)
             + '<h3 id="staticOrgsH">Best role at each organisation</h3>' + _per_org(page, per_org))

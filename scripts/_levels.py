@@ -25,7 +25,12 @@ The level follows the best fit across the roles a journey follows (every role,
 or one organisation's), as the level history does, so an action can reach the
 next level by lifting a role other than today's best. The next-level set, its
 date and chance, and each quest's points are all measured on that best fit; the
-role that then holds it is named wherever it is not today's best.
+role that then holds it is named wherever it is not today's best. The page calls
+that best fit the "best match".
+
+Up next is the one ranked list of actions the page shows (up_next): the actions
+on the path to the next level first, in target-date order, then the rest by
+points per hour. Each row shows one number, the quest's expected points.
 """
 import itertools
 import math
@@ -322,8 +327,30 @@ def quests(roles, actions, caps, weights, nl, enabled=None):
     return out
 
 
+def path_ids(nl):
+    """The actions on the path to the next level: the smallest set that gets there counting each action's
+    chance, or, when no set does, the best-case set (every action in it must work). Empty at the top level,
+    or when not even the best case gets there."""
+    if nl.get("top"):
+        return []
+    found = nl.get("set") if nl.get("reachable") else nl.get("best_case")
+    return list((found or {}).get("ids") or [])
+
+
+def up_next(qs, nl):
+    """The one ranked list of actions the dashboard shows as "Up next", everywhere outside the What if rail.
+
+    qs: quests() for the same journey. The actions on the path to the next level come first, in
+    target-date order (the order the Level up panel lists them), then the rest as quests() sorts them,
+    most points per hour first. Each keeps its quest numbers; the page shows one, exp. Mirrors upNext()
+    in the page script."""
+    path = set(path_ids(nl))
+    first = sorted((q for q in qs if q["a"]["id"] in path), key=lambda q: (q["a"]["date"], q["a"]["id"]))
+    return first + [q for q in qs if q["a"]["id"] not in path]
+
+
 def tell_agent(a):
-    """The instruction the dashboard copies for "Done? Tell your agent"."""
+    """The instruction the dashboard copies for "Mark done"."""
     return 'Mark action %s done ("%s"). Evidence: <paste a link, file path or email reference>. Done when: %s' % (
         a["id"], a["title"], a.get("done_when") or "see the plan")
 
