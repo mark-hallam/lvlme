@@ -171,6 +171,16 @@ class MainTests(unittest.TestCase):
         self.assertEqual(latest["summary"]["new_role_ids"], [])
         self.assertTrue(all(r["first_seen"] == "2026-11-01" for r in latest["roles"]))
 
+    def test_no_targets_stops_with_one_line(self):
+        cfg = H.load(os.path.join(self.ws, "config.json"))
+        cfg["targets"] = []
+        H.save(os.path.join(self.ws, "config.json"), cfg)
+        with mock.patch("sys.stdout"), mock.patch("sys.stderr") as err:
+            self.assertEqual(F.main(["--workspace", self.ws, "--fixtures", self.fx, "--date", "2026-11-01"]), 1)
+        printed = "".join(c.args[0] for c in err.write.call_args_list)
+        self.assertEqual(printed.strip(), "No target organisations yet. Say to your agent: run the Climb interview.")
+        self.assertFalse(os.path.exists(os.path.join(self.ws, "market", "roles", "latest.json")))
+
     def test_network_failure_keeps_previous_file(self):
         self.assertEqual(self.run_main("2026-11-01"), 0)
         before = H.load(os.path.join(self.ws, "market", "roles", "latest.json"))

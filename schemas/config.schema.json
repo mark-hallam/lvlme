@@ -37,8 +37,10 @@
         }
       }
     },
-    "targets": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/target"}},
-    "families": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/family"}},
+    "targets": {"type": "array", "items": {"$ref": "#/definitions/target"},
+                "description": "The organisations to target. Empty in a new workspace until the interview sets them; validate.py reports an empty list as an error and fetch_roles.py stops."},
+    "families": {"type": "array", "items": {"$ref": "#/definitions/family"},
+                 "description": "The role families to look for. Empty in a new workspace until the interview sets them; treated like empty targets."},
     "exclude_title_keywords": {"type": "array", "items": {"type": "string", "minLength": 1}},
     "locations": {
       "type": "object",

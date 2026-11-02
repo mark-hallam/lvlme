@@ -163,6 +163,8 @@ def _dups(ids):
 
 def cross_checks(ws, docs, errors, warnings):
     cfg = docs.get("config.json") or {}
+    if "config.json" in docs and C.setup_problem(cfg):
+        errors.append(C.setup_problem(cfg))
     ev = docs.get("profile/evidence.json") or {}
     ev_ids = {e.get("id") for e in ev.get("items", [])}
     targets = C.target_ids(cfg)

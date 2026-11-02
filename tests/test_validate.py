@@ -148,6 +148,18 @@ class WorkspaceTests(unittest.TestCase):
         self.assertNotIn("x_ok", text)
         self.assertIn("unexpected field 'x_not_here'", text)
 
+    def test_no_targets_or_families_is_one_plain_error(self):
+        cfg = H.template_config()
+        cfg["targets"], cfg["families"] = [], []
+        ws = H.new_workspace(self, cfg)
+        self.assertEqual(V.validate_workspace(ws)[0], [C.NO_TARGETS])
+        self.assertEqual(C.NO_TARGETS, "No target organisations yet. Say to your agent: run the Climb interview.")
+        cfg["targets"] = [{"id": "acme", "name": "Acme AI", "ats": "manual"}]
+        H.save(os.path.join(ws, "config.json"), cfg)
+        self.assertEqual(V.validate_workspace(ws)[0], [C.NO_FAMILIES])
+        with mock.patch("sys.stdout"):
+            self.assertEqual(V.main(["--workspace", ws]), 1)
+
     def test_main_exit_codes(self):
         with mock.patch("sys.stdout"):
             self.assertEqual(V.main(["--workspace", H.DEMO, "--json"]), 0)
