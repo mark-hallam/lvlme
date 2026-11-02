@@ -2,7 +2,8 @@
 """Create a private workspace for one goal from the templates/ skeleton.
 
 The workspace holds all personal data and lives outside the engine repo:
-  --workspace PATH, else $CLIMB_HOME, else ~/climb-workspaces/<goal-slug>
+  --workspace PATH, else $LVLME_HOME, else ~/lvlme-workspaces/<goal-slug>
+(the old names $CLIMB_HOME and ~/climb-workspaces still work: see _common.py)
 
 The new config.json holds your goal and no target organisations or role
 families: the interview sets those with you. --example starts from a config
@@ -28,7 +29,7 @@ import _common as C  # noqa: E402
 
 SKIP = {".gitkeep", ".DS_Store", "__pycache__"}
 EXAMPLE_DIR = os.path.join(C.ENGINE_ROOT, "examples", "configs")
-NEXT_STEP = 'Next step: say to your agent "run the Climb interview".'
+NEXT_STEP = 'Next step: say to your agent "run the LVLme interview".'
 
 
 def examples():
@@ -63,22 +64,23 @@ def copy_skeleton(dest):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Create a private Climb workspace.")
+    ap = argparse.ArgumentParser(description="Create a private LVLme workspace.")
     ap.add_argument("--goal", required=True, help='your goal in a few words, for example "Climate tech product roles"')
-    ap.add_argument("--workspace", help="where to create it (default: $CLIMB_HOME or "
-                                        "~/climb-workspaces/<goal-slug>)")
+    ap.add_argument("--workspace", help="where to create it (default: $LVLME_HOME or "
+                                        "~/lvlme-workspaces/<goal-slug>)")
     ap.add_argument("--example", choices=examples(),
                     help="start from this example config instead of an empty one")
     args = ap.parse_args(argv)
     slug = slugify(args.goal)
-    dest = args.workspace or os.environ.get("CLIMB_HOME") or os.path.join(C.DEFAULT_PARENT, slug)
+    env = C.home_env()
+    dest = args.workspace or env or os.path.join(C.default_parent(), slug)
     dest = os.path.abspath(os.path.expanduser(dest))
     if os.path.exists(dest) and (not os.path.isdir(dest) or os.listdir(dest)):
-        print("climb: %s already exists and is not empty. Choose another --workspace." % dest, file=sys.stderr)
+        print("lvlme: %s already exists and is not empty. Choose another --workspace." % dest, file=sys.stderr)
         return 1
     problem = C.location_problem(dest, {})
     if problem:
-        print("climb: refused. " + problem, file=sys.stderr)
+        print("lvlme: refused. " + problem, file=sys.stderr)
         return 2
     copy_skeleton(dest)
     for root, dirs, _ in os.walk(dest):
@@ -91,8 +93,8 @@ def main(argv=None):
     config.setdefault("candidate", {})["timezone"] = local_timezone()
     C.write_json(cfg_path, config)
     print("Created your private workspace: %s" % dest)
-    env = os.environ.get("CLIMB_HOME")
-    found = os.path.dirname(dest) == C.DEFAULT_PARENT or bool(env) and os.path.abspath(os.path.expanduser(env)) == dest
+    found = (os.path.dirname(dest) == C.default_parent(note=False)
+             or bool(env) and os.path.abspath(os.path.expanduser(env)) == dest)
     print(NEXT_STEP if found else NEXT_STEP[:-1] + " and tell it the workspace is %s." % dest)
     return 0
 

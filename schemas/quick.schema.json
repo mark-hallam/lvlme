@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Climb quick judgement (eval/quick.json in a quick folder)",
-  "description": "The agent's judgement of one posting for Climb quick: five factors with cited evidence ids, the warm path answer, the flags, the blind reviewer's flags and the candidate fixes. scripts/quick.py new writes the skeleton; scripts/quick.py build scores it with scripts/score.py's own functions. See skills/climb-quick/SKILL.md.",
+  "title": "LVLme quick judgement (eval/quick.json in a quick folder)",
+  "description": "The agent's judgement of one posting for LVLme quick: five factors with cited evidence ids, the warm path answer, the flags, the blind reviewer's flags and the candidate fixes. scripts/quick.py new writes the skeleton; scripts/quick.py build scores it with scripts/score.py's own functions. See skills/lvlme-quick/SKILL.md.",
   "type": "object",
   "required": ["quick_version", "role_id", "judged_on", "factors"],
   "additionalProperties": false,

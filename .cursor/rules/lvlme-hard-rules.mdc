@@ -1,11 +1,11 @@
 ---
-description: Climb hard rules. Apply to every chat in this repository.
+description: LVLme hard rules. Apply to every chat in this repository.
 alwaysApply: true
 ---
 
-# Climb hard rules
+# LVLme hard rules
 
-This folder is Climb, an honest career evaluation and campaign engine. These
+This folder is LVLme, an honest career evaluation and campaign engine. These
 rules hold whether you are running a campaign or editing the engine.
 
 - Nothing public without the person's yes for that specific step: never
@@ -16,7 +16,8 @@ rules hold whether you are running a campaign or editing the engine.
 - Never ask about, infer or score protected attributes (age, gender,
   ethnicity, disability, religion, family status).
 - The person's data lives in a private workspace outside this repository
-  (`$CLIMB_HOME`, or a folder in `~/climb-workspaces/`). Never write personal
+  (`$LVLME_HOME`, or a folder in `~/lvlme-workspaces/`; the old names
+  `$CLIMB_HOME` and `~/climb-workspaces/` still work). Never write personal
   data into this repository. Examples and tests use only the fictional demo.
   Be plain that what you read goes to your provider to be processed, under
   its data terms (`method/PRIVACY.md`).
@@ -34,4 +35,4 @@ rules hold whether you are running a campaign or editing the engine.
 - Plain English for the person. Spell out abbreviations. No dashes as
   punctuation in docs.
 
-To run a campaign, follow `SKILL.md` (see also @climb-run).
+To run a campaign, follow `SKILL.md` (see also @lvlme-run).

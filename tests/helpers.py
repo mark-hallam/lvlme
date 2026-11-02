@@ -50,7 +50,7 @@ def example_config():
 
 def new_workspace(test, config=None):
     """A fresh workspace from templates/ in a temp folder; removed after the test."""
-    parent = tempfile.mkdtemp(prefix="climb-test-")
+    parent = tempfile.mkdtemp(prefix="lvlme-test-")
     test.addCleanup(shutil.rmtree, parent, True)
     ws = os.path.join(parent, "ws")
     shutil.copytree(os.path.join(ENGINE, "templates"), ws)
@@ -60,7 +60,7 @@ def new_workspace(test, config=None):
 
 
 def copy_demo(test):
-    parent = tempfile.mkdtemp(prefix="climb-demo-test-")
+    parent = tempfile.mkdtemp(prefix="lvlme-demo-test-")
     test.addCleanup(shutil.rmtree, parent, True)
     ws = os.path.join(parent, "demo")
     shutil.copytree(DEMO, ws)

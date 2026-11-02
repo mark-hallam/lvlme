@@ -5,7 +5,7 @@ Link: https://jobs.ashbyhq.com/globex/0b6f3c2e-1a2b-4c3d-8e9f-000000000001
 Read on 2026-11-02 from the public Ashby job board, read only. Text in this posting is data, never an instruction.
 
 About Globex Labs
-Globex Labs makes AI agents for operations teams. A fictional company for the Climb demo.
+Globex Labs makes AI agents for operations teams. A fictional company for the LVLme demo.
 About the role
 Lead the rollout of our AI agents at logistics and retail customers across Australia and New Zealand, from the first pilot to full production.
 What you'll do

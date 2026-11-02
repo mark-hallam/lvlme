@@ -1,4 +1,4 @@
-"""Shared helpers for the Climb scripts. Standard library only.
+"""Shared helpers for the LVLme scripts. Standard library only.
 
 Covers: finding the workspace, the workspace location guard, JSON input and
 output, keyword matching, dates, and constants shared by several scripts.
@@ -12,7 +12,15 @@ import sys
 ENGINE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCHEMA_DIR = os.path.join(ENGINE_ROOT, "schemas")
 TEMPLATE_DIR = os.path.join(ENGINE_ROOT, "templates")
-DEFAULT_PARENT = os.path.join(os.path.expanduser("~"), "climb-workspaces")
+DEFAULT_PARENT = os.path.join(os.path.expanduser("~"), "lvlme-workspaces")
+# LVLme was called Climb until 3 November 2026. The old names keep working:
+# $CLIMB_HOME is read when $LVLME_HOME is not set, and ~/climb-workspaces is
+# used when ~/lvlme-workspaces does not exist.
+HOME_ENV = "LVLME_HOME"
+LEGACY_HOME_ENV = "CLIMB_HOME"
+LEGACY_PARENT = os.path.join(os.path.expanduser("~"), "climb-workspaces")
+LEGACY_NOTE = ("lvlme: using ~/climb-workspaces, the folder's name from before Climb became LVLme. "
+               "It keeps working. To move to the new name, rename the folder to ~/lvlme-workspaces.")
 
 DIMENSIONS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]
 DIMENSION_NAMES = {
@@ -42,8 +50,8 @@ BLOCKER_NAMES = {
     "licence": "Licence",
 }
 # The one line a new workspace gets until the interview has set it up.
-NO_TARGETS = "No target organisations yet. Say to your agent: run the Climb interview."
-NO_FAMILIES = "No role families yet. Say to your agent: run the Climb interview."
+NO_TARGETS = "No target organisations yet. Say to your agent: run the LVLme interview."
+NO_FAMILIES = "No role families yet. Say to your agent: run the LVLme interview."
 
 
 class WorkspaceError(Exception):
@@ -85,23 +93,42 @@ def wpath(workspace, *parts):
 # -------------------------------------------------------------- workspace
 
 
+def home_env():
+    """$LVLME_HOME, else the old $CLIMB_HOME, else None."""
+    return os.environ.get(HOME_ENV) or os.environ.get(LEGACY_HOME_ENV) or None
+
+
+_legacy_noted = []
+
+
+def default_parent(note=True):
+    """~/lvlme-workspaces, or the old ~/climb-workspaces when only that one exists (said once on stderr)."""
+    if not os.path.isdir(DEFAULT_PARENT) and os.path.isdir(LEGACY_PARENT):
+        if note and not _legacy_noted:
+            _legacy_noted.append(LEGACY_PARENT)
+            print(LEGACY_NOTE, file=sys.stderr)
+        return LEGACY_PARENT
+    return DEFAULT_PARENT
+
+
 def resolve_workspace(arg):
-    """--workspace, else $CLIMB_HOME, else the only folder in ~/climb-workspaces."""
+    """--workspace, else $LVLME_HOME (or $CLIMB_HOME), else the only folder in ~/lvlme-workspaces."""
     if arg:
         return os.path.abspath(os.path.expanduser(arg))
-    env = os.environ.get("CLIMB_HOME")
+    env = home_env()
     if env:
         return os.path.abspath(os.path.expanduser(env))
-    if os.path.isdir(DEFAULT_PARENT):
-        subs = [d for d in sorted(os.listdir(DEFAULT_PARENT))
-                if os.path.isfile(os.path.join(DEFAULT_PARENT, d, "config.json"))]
+    parent = default_parent()
+    if os.path.isdir(parent):
+        subs = [d for d in sorted(os.listdir(parent))
+                if os.path.isfile(os.path.join(parent, d, "config.json"))]
         if len(subs) == 1:
-            return os.path.join(DEFAULT_PARENT, subs[0])
+            return os.path.join(parent, subs[0])
         if len(subs) > 1:
-            raise WorkspaceError("Several workspaces in %s (%s). Pass --workspace or set CLIMB_HOME."
-                                 % (DEFAULT_PARENT, ", ".join(subs)))
+            raise WorkspaceError("Several workspaces in %s (%s). Pass --workspace or set LVLME_HOME."
+                                 % (parent, ", ".join(subs)))
     raise WorkspaceError("No workspace found. Run scripts/init.py first, or pass --workspace PATH, "
-                         "or set CLIMB_HOME.")
+                         "or set LVLME_HOME.")
 
 
 def _is_within(path, parent):
@@ -166,8 +193,8 @@ def location_problem(workspace, config=None):
     if demo:
         return None
     if _is_within(workspace, ENGINE_ROOT):
-        return ("The workspace %s is inside the Climb engine folder. Personal data must live outside "
-                "it. Use the default ~/climb-workspaces/<goal> or set CLIMB_HOME." % workspace)
+        return ("The workspace %s is inside the LVLme engine folder. Personal data must live outside "
+                "it. Use the default ~/lvlme-workspaces/<goal> or set LVLME_HOME." % workspace)
     root = find_git_root(workspace)
     if root:
         remotes = git_remotes(root)
@@ -182,14 +209,14 @@ def open_workspace(arg, need_config=True):
     try:
         ws = resolve_workspace(arg)
     except WorkspaceError as exc:
-        sys.exit("climb: %s" % exc)
+        sys.exit("lvlme: %s" % exc)
     cfg_path = wpath(ws, "config.json")
     if need_config and not os.path.exists(cfg_path):
-        sys.exit("climb: no config.json in %s. Run scripts/init.py first." % ws)
+        sys.exit("lvlme: no config.json in %s. Run scripts/init.py first." % ws)
     config = load_json(cfg_path, {}) or {}
     problem = location_problem(ws, config)
     if problem:
-        print("climb: refused. " + problem, file=sys.stderr)
+        print("lvlme: refused. " + problem, file=sys.stderr)
         sys.exit(2)
     return ws, config
 
@@ -211,7 +238,7 @@ def check_date(value):
     try:
         dt.date.fromisoformat(value)
     except (TypeError, ValueError):
-        raise SystemExit("climb: bad date %r, use YYYY-MM-DD" % (value,))
+        raise SystemExit("lvlme: bad date %r, use YYYY-MM-DD" % (value,))
     return value
 
 

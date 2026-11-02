@@ -5,8 +5,10 @@ rubric, updates the plan based on what worked, rebuilds the report, and tells
 the person what to do next.
 
 Every script takes `--workspace PATH`. Without it, scripts use
-`$CLIMB_HOME`, or the only folder inside `~/climb-workspaces/`.
-The commands below omit it. Run them from the engine folder.
+`$LVLME_HOME`, or the only folder inside `~/lvlme-workspaces/`. The names from
+before Climb became LVLme still work: `$CLIMB_HOME`, and `~/climb-workspaces/`
+when `~/lvlme-workspaces/` does not exist. The commands below omit
+`--workspace`. Run them from the engine folder.
 
 ## Run modes
 
@@ -89,7 +91,7 @@ The commands below omit it. Run them from the engine folder.
    - email, read only, since the last run date: messages from target
      organisations' domains and from job boards (Greenhouse, Ashby, Lever),
      and words such as interview, referral, introduction, recruiter;
-   - a fresh LinkedIn data export, if the person has downloaded one (Climb
+   - a fresh LinkedIn data export, if the person has downloaded one (LVLme
      never opens LinkedIn itself: automated access breaks LinkedIn's terms);
    - `campaign/plan.json`: actions the person marked done, and their notes.
 

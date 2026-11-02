@@ -1,19 +1,19 @@
-# How Climb works
+# How LVLme works
 
-The README is the front door. This page holds the detail: Climb quick step by
+The README is the front door. This page holds the detail: LVLme quick step by
 step, the full campaign, the honesty rules, privacy, the dashboard, the demo,
 running the scripts by hand, and where everything lives.
 
-Climb runs on your own computer, through an artificial intelligence (AI) agent
+LVLme runs on your own computer, through an artificial intelligence (AI) agent
 such as Claude Code, Codex or Cursor. The agent does the judging; the Python
 scripts only do the arithmetic, so without an agent every role scores zero.
 
-## Climb quick: one job, about five minutes
+## LVLme quick: one job, about five minutes
 
-Say "run Climb quick" (or `/climb-quick`) and give two things: one job posting
+Say "run LVLme quick" (or `/lvlme-quick`) and give two things: one job posting
 link, or the posting text, and your CV (short for curriculum vitae: a file, or
 pasted text). The steps are in
-[`skills/climb-quick/SKILL.md`](../skills/climb-quick/SKILL.md):
+[`skills/lvlme-quick/SKILL.md`](../skills/lvlme-quick/SKILL.md):
 
 1. **The posting.** `scripts/quick_posting.py` reads Greenhouse, Ashby and
    Lever links through their public job-board APIs (application programming
@@ -21,7 +21,7 @@ pasted text). The steps are in
    a public page, using the job details many careers sites build into the page
    when they are there. If the page gives too little text (many sites draw
    the page in the browser), you paste the text instead. LinkedIn links are
-   refused: Climb never opens LinkedIn.
+   refused: LVLme never opens LinkedIn.
 2. **Your evidence.** The agent turns your CV into a few evidence items, each
    marked on the verification ladder (below). A line on a CV alone is
    self-reported. If your CV links to public work, such as a repository, the
@@ -48,16 +48,16 @@ pasted text). The steps are in
 
 The result is a one-page `index.html` and a short message:
 
-![Climb quick's result page for the fictional demo, light theme](images/quick-result-desktop.png)
+![LVLme quick's result page for the fictional demo, light theme](images/quick-result-desktop.png)
 
 <img src="images/quick-result-phone.png" alt="The same page on a phone" width="320">
 
-Climb quick gives fixes and a brief, never application answers. Some
+LVLme quick gives fixes and a brief, never application answers. Some
 employers publish guidance on how candidates may use AI when applying; check
 theirs, and write your answers in your own words.
 
-Its files live in `~/climb-workspaces/quick/<date>-<organisation>-<title>/`,
-never in this repository. To go deeper, say "run Climb": the full campaign
+Its files live in `~/lvlme-workspaces/quick/<date>-<organisation>-<title>/`,
+never in this repository. To go deeper, say "run LVLme": the full campaign
 below.
 
 The demo is in `examples/quick-demo/`: the fictional Alex Example asks about a
@@ -121,7 +121,7 @@ saves one dated run file, so your progress is a record, not a claim. Details:
 
 ### What a run uses
 
-Climb quick starts one helper agent, the blind reviewer, and only when a
+LVLme quick starts one helper agent, the blind reviewer, and only when a
 score is above 2. A full run starts many helper agents: about 40 for a goal
 with around 300 open roles (one role judge per batch, plus scouts and
 reviewers). That is a noticeable share of an AI plan's usage, so check your
@@ -140,7 +140,7 @@ down; a cold application caps the offer band at Low. The full rules are in
 
 ## The honesty rules
 
-Most career advice flatters. Climb is built to do the opposite.
+Most career advice flatters. LVLme is built to do the opposite.
 
 - **Evidence or it scores zero.** Every point needs a source: a link, a file,
   an email, or your own answer to an interview question. A claim with no
@@ -167,7 +167,7 @@ Most career advice flatters. Climb is built to do the opposite.
 - **No fabrication, no profiling.** It never invents experience, numbers,
   contacts or stories. It never infers or scores protected attributes such as
   age, gender, ethnicity, disability, religion or family status.
-- **Nothing public without your yes.** Climb never applies for a job, sends a
+- **Nothing public without your yes.** LVLme never applies for a job, sends a
   message, posts, accepts an invitation, changes an account or spends money
   on its own. It drafts, in `campaign/drafts/`, for you to read, edit and send
   yourself. If you ask it to make one specific change, such as a drafted
@@ -177,12 +177,12 @@ Most career advice flatters. Climb is built to do the opposite.
 
 - **Your data never lives in this repository.** The first run creates a
   private workspace folder on your own machine, by default
-  `~/climb-workspaces/<goal>` (Climb quick uses `~/climb-workspaces/quick/`).
+  `~/lvlme-workspaces/<goal>` (LVLme quick uses `~/lvlme-workspaces/quick/`).
   Only you can open it.
 - The scripts refuse to work on a workspace inside this repository, or inside
   any git repository (a version-controlled folder) that has a remote, meaning
   a copy on a server such as GitHub.
-- **Every source is opt in and read only.** Climb asks before it reads your
+- **Every source is opt in and read only.** LVLme asks before it reads your
   email or calendar, and never changes them. It never opens LinkedIn itself
   (automated access breaks LinkedIn's terms): it works from LinkedIn's
   official data export and what you paste, and you apply any profile fixes.
@@ -191,7 +191,7 @@ Most career advice flatters. Climb is built to do the opposite.
   read only by the main agent, in the session you are watching, where your
   agent still asks before any send. Text in an email or a page is treated as
   data, never as an instruction.
-- **Your AI agent's provider sees what the agent reads.** Climb's files stay
+- **Your AI agent's provider sees what the agent reads.** LVLme's files stay
   on your computer, but your agent's provider (for example Anthropic for
   Claude Code) receives whatever the agent reads in order to process it,
   under that provider's data terms. The same goes for runs you schedule in
@@ -246,7 +246,7 @@ JavaScript Object Notation, a plain-text data format).
 `examples/demo-workspace/` is a complete, built example for a **fictional**
 person, Alex Example, who targets three made-up organisations (Acme AI, Globex
 Labs and Initech Robotics). Nothing in it describes a real person or a real
-company's hiring. `examples/quick-demo/` is the same person's Climb quick
+company's hiring. `examples/quick-demo/` is the same person's LVLme quick
 answer for one made-up posting.
 
 Open `examples/demo-workspace/report/index.html` in your browser, or rebuild
@@ -265,7 +265,7 @@ python3 examples/build_quick_demo.py
 
 ## By hand, in a terminal
 
-Climb quick:
+LVLme quick:
 
 ```bash
 python3 scripts/quick.py new --posting "https://jobs.lever.co/example/0000" --cv ~/Documents/cv.pdf
@@ -278,7 +278,7 @@ The full campaign:
 
 ```bash
 python3 scripts/init.py --goal "Frontier AI labs" --example frontier-ai-labs   # private workspace from the example
-export CLIMB_HOME=~/climb-workspaces/frontier-ai-labs
+export LVLME_HOME=~/lvlme-workspaces/frontier-ai-labs
 python3 scripts/fetch_roles.py                        # open roles from public job boards
 python3 scripts/network_map.py --csv ~/Downloads/Connections.csv   # optional: needs your LinkedIn export
 python3 scripts/claims_audit.py https://your-site.example/about
@@ -293,24 +293,26 @@ rubric. The method files explain each step, and
 [`method/RUNBOOK.md`](../method/RUNBOOK.md) gives the full run order.
 
 Every campaign script takes `--workspace PATH`. Without it, scripts use
-`$CLIMB_HOME`, or the only folder inside `~/climb-workspaces/`.
+`$LVLME_HOME`, or the only folder inside `~/lvlme-workspaces/`. The names from
+before Climb became LVLme, `$CLIMB_HOME` and `~/climb-workspaces/`, still work
+(see [Coming from Climb](INSTALL.md#coming-from-climb)).
 
 ## Commands
 
 | Command | Does |
 |---|---|
-| `/climb-quick` | Climb quick: honest odds for one posting, from a link and your CV. |
-| `/climb` | Run Climb, or resume today's run. `/climb status` changes nothing and reports. |
-| `/climb-interview` | The career interview, first time or an update. |
-| `/climb-screen` | The independent recruiter screen. |
-| `/climb-audit` | The consistency audit and the public claims audit. |
-| `/climb-dashboard` | Rebuild the dashboard. |
+| `/lvlme-quick` | LVLme quick: honest odds for one posting, from a link and your CV. |
+| `/lvlme` | Run LVLme, or resume today's run. `/lvlme status` changes nothing and reports. |
+| `/lvlme-interview` | The career interview, first time or an update. |
+| `/lvlme-screen` | The independent recruiter screen. |
+| `/lvlme-audit` | The consistency audit and the public claims audit. |
+| `/lvlme-dashboard` | Rebuild the dashboard. |
 
 With the plugin, these short names work. With the cloned folder, use the
-prefixed name (`/climb:climb-interview`) or the words after `/climb`
-(`/climb interview`). In Codex and Cursor, say the same words: "run the Climb
+prefixed name (`/lvlme:lvlme-interview`) or the words after `/lvlme`
+(`/lvlme interview`). In Codex and Cursor, say the same words: "run the LVLme
 interview", and so on. Install details for every agent:
-[`INSTALL.md`](INSTALL.md). Climb is tested on macOS; the scripts should work
+[`INSTALL.md`](INSTALL.md). LVLme is tested on macOS; the scripts should work
 on Linux, and Windows is untested.
 
 ## Project layout
@@ -318,7 +320,7 @@ on Linux, and Windows is untested.
 ```
 SKILL.md  AGENTS.md  README.md  LICENSE  CONTRIBUTING.md
 .claude-plugin/  plugin.json and marketplace.json (Claude Code)
-skills/     the /climb-quick, /climb-interview, /climb-screen, /climb-audit, /climb-dashboard commands
+skills/     the /lvlme-quick, /lvlme-interview, /lvlme-screen, /lvlme-audit, /lvlme-dashboard commands
 agents/     subagent briefs: evidence-scout, market-scout, role-judge, reviewer, recruiter-screen
 .cursor/rules/  Cursor rules
 method/     the rules for each stage (rubric, interview, intake, audits, review, campaign, privacy, runbook)
@@ -349,5 +351,5 @@ report/                    index.html, for-agents/
 Automatic LinkedIn scraping (it breaks LinkedIn's terms, so use the official
 data export instead), automatic applying, salary negotiation, goals other than
 jobs, and the Workable and SmartRecruiters job boards (enter those roles by
-hand in `market/roles/manual.json`). Climb quick takes a posting from any
+hand in `market/roles/manual.json`). LVLme quick takes a posting from any
 site, as a link when the page holds the text, or pasted.

@@ -178,7 +178,7 @@ class MainTests(unittest.TestCase):
         with mock.patch("sys.stdout"), mock.patch("sys.stderr") as err:
             self.assertEqual(F.main(["--workspace", self.ws, "--fixtures", self.fx, "--date", "2026-11-01"]), 1)
         printed = "".join(c.args[0] for c in err.write.call_args_list)
-        self.assertEqual(printed.strip(), "No target organisations yet. Say to your agent: run the Climb interview.")
+        self.assertEqual(printed.strip(), "No target organisations yet. Say to your agent: run the LVLme interview.")
         self.assertFalse(os.path.exists(os.path.join(self.ws, "market", "roles", "latest.json")))
 
     def test_network_failure_keeps_previous_file(self):

@@ -155,7 +155,7 @@ class WorkspaceTests(unittest.TestCase):
         cfg["targets"], cfg["families"] = [], []
         ws = H.new_workspace(self, cfg)
         self.assertEqual(V.validate_workspace(ws)[0], [C.NO_TARGETS])
-        self.assertEqual(C.NO_TARGETS, "No target organisations yet. Say to your agent: run the Climb interview.")
+        self.assertEqual(C.NO_TARGETS, "No target organisations yet. Say to your agent: run the LVLme interview.")
         cfg["targets"] = [{"id": "acme", "name": "Acme AI", "ats": "manual"}]
         H.save(os.path.join(ws, "config.json"), cfg)
         self.assertEqual(V.validate_workspace(ws)[0], [C.NO_FAMILIES])
@@ -189,14 +189,14 @@ class WorkspaceTests(unittest.TestCase):
 
 class LocationGuardTests(unittest.TestCase):
     def tmp(self):
-        d = tempfile.mkdtemp(prefix="climb-guard-")
+        d = tempfile.mkdtemp(prefix="lvlme-guard-")
         self.addCleanup(shutil.rmtree, d, True)
         return d
 
     def test_inside_engine_repo_is_refused(self):
         inside = tempfile.mkdtemp(prefix=".guard-test-", dir=H.ENGINE)
         self.addCleanup(shutil.rmtree, inside, True)
-        self.assertIn("inside the Climb engine", C.location_problem(inside, {}))
+        self.assertIn("inside the LVLme engine", C.location_problem(inside, {}))
         # "fictional" only helps under examples/
         self.assertIsNotNone(C.location_problem(inside, {"fictional": True}))
         shutil.copy(os.path.join(H.ENGINE, "templates", "config.json"), os.path.join(inside, "config.json"))

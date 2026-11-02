@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch one job posting for Climb quick, read only.
+"""Fetch one job posting for LVLme quick, read only.
 
 Give it a posting link. Greenhouse, Ashby and Lever links are read through
 their public job-board APIs (application programming interfaces, the feeds the
@@ -7,7 +7,7 @@ boards publish). Any other link is fetched once as a public web page: a
 JobPosting block in the page (structured data many careers sites embed) is
 used when there is one, otherwise the page text. Pasted text works too.
 
-LinkedIn links are refused: Climb never opens LinkedIn. Ask the person for the
+LinkedIn links are refused: LVLme never opens LinkedIn. Ask the person for the
 employer's own posting link, or to paste the posting text.
 
 The posting comes back as one role in the shape of market/roles/latest.json
@@ -37,7 +37,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 import fetch_roles as FR  # noqa: E402
 
-UA = "climb/0.1 (Climb quick: one job posting the person asked about; read only)"
+UA = "lvlme/0.3 (LVLme quick: one job posting the person asked about; read only)"
 MAX_BYTES = 3_000_000
 MIN_TEXT = 400  # fewer characters than this and the page did not give a usable posting
 GREENHOUSE_HOSTS = {"boards.greenhouse.io", "job-boards.greenhouse.io",
@@ -64,7 +64,7 @@ def parse_link(url):
     if host.startswith("www."):
         host = host[4:]
     if LINKEDIN.search(host):
-        raise PostingError("Climb never opens LinkedIn (automated access breaks LinkedIn's terms). "
+        raise PostingError("LVLme never opens LinkedIn (automated access breaks LinkedIn's terms). "
                            "Paste the posting text, or give the employer's own posting link.")
     segs = [s for s in parts.path.split("/") if s]
     query = urllib.parse.parse_qs(parts.query)
@@ -321,7 +321,7 @@ def from_text(text, title=None, org_name=None, url=None):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Fetch one job posting for Climb quick (read only).")
+    ap = argparse.ArgumentParser(description="Fetch one job posting for LVLme quick (read only).")
     ap.add_argument("url", nargs="?", help="the posting link")
     ap.add_argument("--text", help="a file holding the posting text the person pasted ('-' reads standard input)")
     ap.add_argument("--title", help="the role title, for pasted text")
@@ -337,7 +337,7 @@ def main(argv=None):
         else:
             ap.error("give a posting link or --text FILE")
     except PostingError as exc:
-        print("climb: %s" % exc, file=sys.stderr)
+        print("lvlme: %s" % exc, file=sys.stderr)
         return 3
     print(json.dumps({"source": source, "role": role}, indent=2, ensure_ascii=False))
     return 0

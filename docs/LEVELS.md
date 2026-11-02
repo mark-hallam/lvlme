@@ -170,8 +170,8 @@ claims an action is done.
   pastes it to their agent. If the browser blocks copying, the text appears on the card to
   copy by hand. Without JavaScript the instruction is printed on each card.
 - **Pending on this device** is an optional tick kept in the browser's local storage
-  (`climb-pending:<report title>`). It only adds a "Pending: tell your agent" tag. It never
-  changes a number, is never sent anywhere, and disappears once the action is no longer open.
+  (`lvlme-pending:<report title>`; ticks saved under the old key, `climb-pending:`, are
+  still read). It only adds a "Pending: tell your agent" tag. It never changes a number, is never sent anywhere, and disappears once the action is no longer open.
 - The agent running the campaign then sets `status`, `done_evidence` and `finished_on` in
   `campaign/plan.json` (done needs a link, a file or an email reference, as
   `method/CAMPAIGN.md` says). Any other agent appends the message to `campaign/inbox.md`.

@@ -345,7 +345,7 @@ def digest(*parts):
 def build_run(ws, config, run_date):
     roles_doc = C.load_json(C.wpath(ws, "market", "roles", "latest.json"))
     if roles_doc is None:
-        raise SystemExit("climb: no market/roles/latest.json. Run scripts/fetch_roles.py first.")
+        raise SystemExit("lvlme: no market/roles/latest.json. Run scripts/fetch_roles.py first.")
     judgements_doc = C.load_json(C.wpath(ws, "eval", "judgements.json"), {"roles": {}}) or {"roles": {}}
     profile = C.load_json(C.wpath(ws, "eval", "profile-dimensions.json"), {}) or {}
     templates = (C.load_json(C.wpath(ws, "eval", "gap-templates.json"), {}) or {}).get("gaps", [])
@@ -409,7 +409,7 @@ def build_run(ws, config, run_date):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Score every open role from the judgement files.")
-    ap.add_argument("--workspace", help="workspace folder (default: $CLIMB_HOME)")
+    ap.add_argument("--workspace", help="workspace folder (default: $LVLME_HOME)")
     ap.add_argument("--date", help="run date YYYY-MM-DD (default: today in the candidate's time zone)")
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)
@@ -417,8 +417,8 @@ def main(argv=None):
     run = build_run(ws, config, run_date)
     n = run["counts"]
     if not n["judged"]:  # nothing judged is not a measurement: saving it would make a false Day 1
-        print(("%d role%s not judged yet. Ask your agent to run Climb." % (n["roles"], "" if n["roles"] == 1 else "s"))
-              if n["roles"] else "No open roles to score yet. Ask your agent to run Climb.", file=sys.stderr)
+        print(("%d role%s not judged yet. Ask your agent to run LVLme." % (n["roles"], "" if n["roles"] == 1 else "s"))
+              if n["roles"] else "No open roles to score yet. Ask your agent to run LVLme.", file=sys.stderr)
         print("No run saved: with nothing judged it would not be a measurement.", file=sys.stderr)
         return 1
     out = C.wpath(ws, "eval", "runs", "%s.json" % run_date)

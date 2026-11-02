@@ -1,9 +1,9 @@
 ---
-name: climb
-description: Honest, evidence-based estimate of how likely a person is to land a specific kind of role at specific organisations, with every point traced to a source, an independent sceptical review, deterministic scoring, and a prioritised campaign of actions that raise the odds. Includes a document-led career interview, a CV, LinkedIn and website consistency audit, an independent recruiter screen against real postings, and a level-up dashboard. Use when someone asks how likely they are to get a kind of job at particular organisations (for example "could I get hired at an AI lab?"), wants an evidence-based job-search plan, wants their CV, LinkedIn or website checked against evidence, or wants to run or resume their career campaign ("run Climb", "resume my campaign", "update my job campaign"). Works in a private workspace on the person's own machine and drafts everything, so it never sends, posts, applies or changes an account on its own.
+name: lvlme
+description: Honest, evidence-based estimate of how likely a person is to land a specific kind of role at specific organisations, with every point traced to a source, an independent sceptical review, deterministic scoring, and a prioritised campaign of actions that raise the odds. Includes a document-led career interview, a CV, LinkedIn and website consistency audit, an independent recruiter screen against real postings, and a level-up dashboard. Use when someone asks how likely they are to get a kind of job at particular organisations (for example "could I get hired at an AI lab?"), wants an evidence-based job-search plan, wants their CV, LinkedIn or website checked against evidence, or wants to run or resume their career campaign ("run LVLme", or "run Climb", its old name; "resume my campaign", "update my job campaign"). Works in a private workspace on the person's own machine and drafts everything, so it never sends, posts, applies or changes an account on its own.
 ---
 
-# Climb: the procedure
+# LVLme: the procedure
 
 You are running an honest career evaluation and campaign for one person. The
 method lives in `method/`. The maths lives in `scripts/score.py`. Your job is
@@ -68,24 +68,26 @@ workspace.
 
 ## Entry points
 
-If the person named an entry point (for example `/climb interview`, or one
-of the `/climb-*` commands), run only that part, with the hard rules.
+If the person named an entry point (for example `/lvlme interview`, or one
+of the `/lvlme-*` commands), run only that part, with the hard rules.
 
 | Asked for | Do |
 |---|---|
-| `/climb`, `/climb run`, "run Climb" | A full run, stages 1 to 10. If today's run stopped part way, resume it. |
-| `/climb quick`, `/climb-quick`, "run Climb quick", or one job link with a CV | Climb quick: honest odds for that one posting in about five minutes. Follow `skills/climb-quick/SKILL.md`. Its folder, `~/climb-workspaces/quick/`, is not a campaign workspace. |
-| `/climb resume` | Resume today's run at the first stage not yet done (see "Resume" in `docs/ORCHESTRATION.md`). |
-| `/climb interview`, `/climb-interview` | Stage 1 only. |
-| `/climb audit`, `/climb-audit` | The claims and consistency audits from stage 4. |
-| `/climb screen`, `/climb-screen` | The recruiter screen from stage 4. |
-| `/climb dashboard`, `/climb-dashboard` | Stage 9 only, then a short message. |
-| `/climb status` | Change nothing. Read the newest run and the plan, then do stage 10. |
+| `/lvlme`, `/lvlme run`, "run LVLme" (or the old name, "run Climb") | A full run, stages 1 to 10. If today's run stopped part way, resume it. |
+| `/lvlme quick`, `/lvlme-quick`, "run LVLme quick" (or "run Climb quick"), or one job link with a CV | LVLme quick: honest odds for that one posting in about five minutes. Follow `skills/lvlme-quick/SKILL.md`. Its folder, `~/lvlme-workspaces/quick/` (or `~/climb-workspaces/quick/` while only the old folder exists), is not a campaign workspace. |
+| `/lvlme resume` | Resume today's run at the first stage not yet done (see "Resume" in `docs/ORCHESTRATION.md`). |
+| `/lvlme interview`, `/lvlme-interview` | Stage 1 only. |
+| `/lvlme audit`, `/lvlme-audit` | The claims and consistency audits from stage 4. |
+| `/lvlme screen`, `/lvlme-screen` | The recruiter screen from stage 4. |
+| `/lvlme dashboard`, `/lvlme-dashboard` | Stage 9 only, then a short message. |
+| `/lvlme status` | Change nothing. Read the newest run and the plan, then do stage 10. |
 
 ## Find or create the workspace
 
-- If `$CLIMB_HOME` is set, that is the workspace.
-- Otherwise look in `~/climb-workspaces/`. One folder there: use it.
+- If `$LVLME_HOME` is set, that is the workspace. If not, `$CLIMB_HOME` (the
+  setting's name before Climb became LVLme) still counts.
+- Otherwise look in `~/lvlme-workspaces/`, or in `~/climb-workspaces/` if only
+  that older folder exists. One folder there: use it.
   Several: ask which goal.
 - None: ask the person for their goal in one sentence, then run
   `python3 scripts/init.py --goal "<goal>"`. Edit `config.json` with them:
@@ -118,9 +120,9 @@ Full detail, the stage graph and the subagent briefs:
   context and none of the campaign's scores. G3: nothing is scored until the
   reviewer has challenged every score above 2. G4: nothing public happens
   without the person's yes for that specific step.
-- **Briefs.** In Claude Code the briefs are subagents: `climb:evidence-scout`,
-  `climb:market-scout`, `climb:role-judge`, `climb:reviewer` and
-  `climb:recruiter-screen` (files in `agents/`). Elsewhere, give the same
+- **Briefs.** In Claude Code the briefs are subagents: `lvlme:evidence-scout`,
+  `lvlme:market-scout`, `lvlme:role-judge`, `lvlme:reviewer` and
+  `lvlme:recruiter-screen` (files in `agents/`). Elsewhere, give the same
   brief as the subagent's task.
 - **No subagents?** Run the same stages one after another. For the review
   and the recruiter screen, start a new session and give it only the packet.

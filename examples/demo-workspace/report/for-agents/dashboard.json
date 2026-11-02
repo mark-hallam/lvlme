@@ -1,6 +1,6 @@
 {
   "about": "Private career campaign data. Read only. See SUMMARY.md in this folder for the rules.",
-  "generated_by": "climb scripts/build_dashboard.py",
+  "generated_by": "lvlme scripts/build_dashboard.py",
   "sensitive_mode": true,
   "run_date": "2026-11-01",
   "rubric_version": "1.0",

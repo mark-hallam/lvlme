@@ -1,4 +1,4 @@
-"""Climb quick's posting fetcher, offline: saved Greenhouse, Ashby and Lever API responses and a saved page."""
+"""LVLme quick's posting fetcher, offline: saved Greenhouse, Ashby and Lever API responses and a saved page."""
 import io
 import os
 import unittest
@@ -138,7 +138,7 @@ class FetchTests(unittest.TestCase):
     def tmp(self):
         import shutil
         import tempfile
-        d = tempfile.mkdtemp(prefix="climb-quick-posting-")
+        d = tempfile.mkdtemp(prefix="lvlme-quick-posting-")
         self.addCleanup(shutil.rmtree, d, True)
         return d
 

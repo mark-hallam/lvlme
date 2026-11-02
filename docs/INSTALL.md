@@ -1,6 +1,6 @@
-# Install Climb
+# Install LVLme
 
-Climb is one folder: a skill (`SKILL.md`), method files, small Python scripts
+LVLme is one folder: a skill (`SKILL.md`), method files, small Python scripts
 and a demo. The same folder installs as a Claude Code plugin, as a Claude
 Code skill, as a Codex skill, and as Cursor rules. Pick the one that matches
 the agent you use.
@@ -8,8 +8,8 @@ the agent you use.
 You need Python 3.9 or newer (the scripts use only its standard library) and
 git (a tool that copies and updates the folder). Nothing else.
 
-In the commands below, `mark-hallam/climb` is the repository on GitHub, and
-`https://github.com/mark-hallam/climb` is its full address. You can also use a
+In the commands below, `mark-hallam/lvlme` is the repository on GitHub, and
+`https://github.com/mark-hallam/lvlme` is its full address. You can also use a
 local copy of the folder.
 
 ## Claude Code
@@ -19,88 +19,88 @@ local copy of the folder.
 In a Claude Code session (version 2.1.275 or later):
 
 ```text
-/plugin install climb --marketplace mark-hallam/climb
+/plugin install lvlme --marketplace mark-hallam/lvlme
 ```
 
-Claude Code adds the Climb marketplace (a catalogue of plugins, here just
+Claude Code adds the LVLme marketplace (a catalogue of plugins, here just
 one), shows you what the plugin adds, and asks where to install it. Choose
 "Install for you" so it works in every project.
 
 The same thing from your terminal (version 2.1.292 or later):
 
 ```bash
-claude plugin install climb --marketplace mark-hallam/climb
+claude plugin install lvlme --marketplace mark-hallam/lvlme
 ```
 
 Or in two steps, on any recent version:
 
 ```text
-/plugin marketplace add mark-hallam/climb
-/plugin install climb@climb
+/plugin marketplace add mark-hallam/lvlme
+/plugin install lvlme@lvlme
 ```
 
 ### Option B: clone into your skills folder (the simple fallback)
 
 ```bash
-git clone https://github.com/mark-hallam/climb ~/.claude/skills/climb
+git clone https://github.com/mark-hallam/lvlme ~/.claude/skills/lvlme
 ```
 
 Start a new Claude Code session. Because the folder holds
 `.claude-plugin/plugin.json`, Claude Code loads it as a skills folder plugin
-named `climb@skills-dir`: `/climb` is the main skill and the other commands
-carry the plugin prefix (for example `/climb:climb-interview`). If your
+named `lvlme@skills-dir`: `/lvlme` is the main skill and the other commands
+carry the plugin prefix (for example `/lvlme:lvlme-interview`). If your
 organisation's settings block skills folder plugins, `SKILL.md` still loads
-as a plain skill, so `/climb` works and the other entry points work as words
-after it (for example `/climb interview`).
+as a plain skill, so `/lvlme` works and the other entry points work as words
+after it (for example `/lvlme interview`).
 
-To update: `git -C ~/.claude/skills/climb pull`.
+To update: `git -C ~/.claude/skills/lvlme pull`.
 
 ### Option C: try it for one session
 
 ```bash
-claude --plugin-dir /path/to/climb
+claude --plugin-dir /path/to/lvlme
 ```
 
 ### What you get
 
 | Command | Does |
 |---|---|
-| `/climb` | Run Climb, or resume today's run. Also `/climb status`. |
-| `/climb-quick` | Climb quick: honest odds for one posting, from a link and your CV, in about five minutes. |
-| `/climb-interview` | The document-led career interview, first time or an update. |
-| `/climb-screen` | The independent recruiter screen against real postings. |
-| `/climb-audit` | The consistency audit (CV, LinkedIn, website, forms) and the public claims audit. |
-| `/climb-dashboard` | Rebuild the dashboard and print the command to open it. |
+| `/lvlme` | Run LVLme, or resume today's run. Also `/lvlme status`. |
+| `/lvlme-quick` | LVLme quick: honest odds for one posting, from a link and your CV, in about five minutes. |
+| `/lvlme-interview` | The document-led career interview, first time or an update. |
+| `/lvlme-screen` | The independent recruiter screen against real postings. |
+| `/lvlme-audit` | The consistency audit (CV, LinkedIn, website, forms) and the public claims audit. |
+| `/lvlme-dashboard` | Rebuild the dashboard and print the command to open it. |
 
 Plugin commands also have a full name with the plugin prefix:
-`/climb:climb`, `/climb:climb-interview` and so on. The short name works
+`/lvlme:lvlme`, `/lvlme:lvlme-interview` and so on. The short name works
 unless another command already uses it.
 
 The plugin also adds five subagents (helper agents with their own fresh
-context) that `/climb` starts for the parallel run: `climb:evidence-scout`,
-`climb:market-scout`, `climb:role-judge`, `climb:reviewer` and
-`climb:recruiter-screen`. See [`ORCHESTRATION.md`](ORCHESTRATION.md).
+context) that `/lvlme` starts for the parallel run: `lvlme:evidence-scout`,
+`lvlme:market-scout`, `lvlme:role-judge`, `lvlme:reviewer` and
+`lvlme:recruiter-screen`. See [`ORCHESTRATION.md`](ORCHESTRATION.md).
 
-You can also just say "run Climb" or "how likely am I to get a job at X?",
+You can also just say "run LVLme" or "how likely am I to get a job at X?",
 and Claude loads the skill.
 
 ### Check it loaded
 
 ```bash
-claude plugin details climb@climb
+claude plugin details lvlme@lvlme
 ```
 
-Use `climb@skills-dir` for option B. In a session, `/plugin` lists it on the
+Use `lvlme@skills-dir` for option B. In a session, `/plugin` lists it on the
 **Installed** tab, and the **Errors** tab says why if it did not load.
 
 ### Updates
 
 Plugins from marketplaces other than Anthropic's own do not update on their
-own by default. Turn on auto-update for the Climb marketplace in `/plugin`
+own by default. Turn on auto-update for the LVLme marketplace in `/plugin`
 (**Marketplaces** tab), or update by hand:
 
 ```bash
-claude plugin update climb@climb
+claude plugin update lvlme@lvlme
 ```
 
 ## Codex
@@ -108,13 +108,13 @@ claude plugin update climb@climb
 Codex reads personal skills from `~/.agents/skills/`, and `AGENTS.md` from the
 folder you work in.
 
-- **As a skill:** `git clone https://github.com/mark-hallam/climb ~/.agents/skills/climb`,
-  then in Codex type `$climb` (or pick it from `/skills`) and say "run
-  Climb quick" with a job link, or "run Climb".
+- **As a skill:** `git clone https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme`,
+  then in Codex type `$lvlme` (or pick it from `/skills`) and say "run
+  LVLme quick" with a job link, or "run LVLme".
 - **In the engine folder:** open Codex in the cloned folder. It reads
   `AGENTS.md`, which runs the same procedure.
 
-If your Codex cannot start subagents, Climb runs the same stages one after
+If your Codex cannot start subagents, LVLme runs the same stages one after
 another (see "Fallback" in [`ORCHESTRATION.md`](ORCHESTRATION.md)). For the
 independent review and the recruiter screen, start a new Codex session and
 give it only the packet the lead prepares.
@@ -124,17 +124,46 @@ give it only the packet the lead prepares.
 Open the cloned folder in Cursor. The rules in `.cursor/rules/` load
 automatically:
 
-- `climb-hard-rules.mdc` applies to every chat in the folder.
-- `climb-run.mdc` applies when you ask to run Climb, or when you mention it
-  with `@climb-run`.
+- `lvlme-hard-rules.mdc` applies to every chat in the folder.
+- `lvlme-run.mdc` applies when you ask to run LVLme, or when you mention it
+  with `@lvlme-run`.
 
-Cursor also reads `AGENTS.md`. Say "run Climb quick" with a job link, or
-"run Climb".
+Cursor also reads `AGENTS.md`. Say "run LVLme quick" with a job link, or
+"run LVLme".
+
+## Coming from Climb
+
+LVLme was called Climb until 3 November 2026. What changed, and what still
+works:
+
+- **The plugin.** The marketplace now lists the plugin as `lvlme` and records
+  that `climb` was renamed to it. On your machine the marketplace keeps the
+  name you added it under, `climb`. Update it, then install the new name once:
+
+  ```text
+  /plugin marketplace update climb
+  /plugin install lvlme@climb
+  ```
+
+  A new install by the old plugin name finds nothing: use `lvlme`, as in the
+  commands at the top of this page.
+- **The commands.** `/climb`, `/climb-quick` and the rest are now `/lvlme`,
+  `/lvlme-quick` and so on, and the helper agents are `lvlme:reviewer` and so
+  on. Saying "run Climb" or "run Climb quick" still starts the same thing.
+- **A cloned folder.** GitHub forwards the old address, so
+  `git -C ~/.claude/skills/climb pull` keeps updating it. The skill inside is
+  now called `lvlme`. In Codex, type `$lvlme`.
+- **Your workspace.** Nothing to do. When `LVLME_HOME` is not set, the scripts
+  read `CLIMB_HOME`. When `~/lvlme-workspaces/` does not exist, they use
+  `~/climb-workspaces/` and say so once. To move to the new names, rename the
+  folder and change the setting at the same time.
+- **The dashboard.** The theme and the "Pending" ticks your browser saved
+  under the old name still load.
 
 ## By hand, in a terminal
 
 See "By hand, in a terminal" in
-[How Climb works](HOW-IT-WORKS.md#by-hand-in-a-terminal). Every script takes
+[How LVLme works](HOW-IT-WORKS.md#by-hand-in-a-terminal). Every script takes
 `--workspace PATH`.
 
 ## Where your data goes
@@ -142,7 +171,7 @@ See "By hand, in a terminal" in
 - Installing copies only the engine (no personal data). A plugin install
   keeps its copy under `~/.claude/plugins/`.
 - Your data lives in your private workspace, by default
-  `~/climb-workspaces/<goal>`, created on the first run. The scripts refuse a
+  `~/lvlme-workspaces/<goal>`, created on the first run. The scripts refuse a
   workspace inside the engine folder, or inside any git repository that has a
   remote.
 - An agent that runs in the cloud sees whatever it reads. Decide that on

@@ -175,11 +175,11 @@ class Data:
         runs = [(os.path.basename(f), C.load_json(f)) for f in files]
         for name, run in runs:
             if not (run.get("counts") or {}).get("judged", 1):  # saved before score.py refused these
-                print("climb: ignoring eval/runs/%s: nothing was judged, so it is not a measurement "
+                print("lvlme: ignoring eval/runs/%s: nothing was judged, so it is not a measurement "
                       "(it can be deleted)." % name, file=sys.stderr)
         runs = [(name, run) for name, run in runs if (run.get("counts") or {}).get("judged", 1)]
         if not runs:
-            raise SystemExit("climb: no scored runs in eval/runs/ yet. Ask your agent to run Climb.")
+            raise SystemExit("lvlme: no scored runs in eval/runs/ yet. Ask your agent to run LVLme.")
         self.run_files = [name for name, _ in runs]
         self.runs = [run for _, run in runs]
         self.cur = self.runs[-1]
@@ -779,7 +779,7 @@ def agent_payload(data, page):
         counts[e.get("level")] = counts.get(e.get("level"), 0) + 1
     payload = {
         "about": "Private career campaign data. Read only. See SUMMARY.md in this folder for the rules.",
-        "generated_by": "climb scripts/build_dashboard.py",
+        "generated_by": "lvlme scripts/build_dashboard.py",
         "sensitive_mode": sensitive,
         "run_date": cur["run_date"], "rubric_version": cur["rubric_version"],
         "goal": {"title": goal.get("title", ""), "description": goal.get("description", ""),
@@ -975,7 +975,7 @@ def summary_md(data, p):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Build the dashboard and the agent briefing.")
-    ap.add_argument("--workspace", help="workspace folder (default: $CLIMB_HOME)")
+    ap.add_argument("--workspace", help="workspace folder (default: $LVLME_HOME)")
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)
     data = Data(ws, config)

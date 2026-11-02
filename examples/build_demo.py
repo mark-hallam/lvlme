@@ -175,14 +175,14 @@ def clean_outputs(root):
 def run(fn, argv):
     code = fn(argv)
     if code:
-        raise SystemExit("Climb demo: %s %s failed with code %s" % (fn.__module__, argv, code))
+        raise SystemExit("LVLme demo: %s %s failed with code %s" % (fn.__module__, argv, code))
 
 
 def main():
     cur = {"evidence": load("profile/evidence.json"), "judgements": load("eval/judgements.json"),
            "profile": load("eval/profile-dimensions.json"), "plan": load("campaign/plan.json"),
            "outlook": load("eval/outlook.json")}
-    tmp = tempfile.mkdtemp(prefix="climb-demo-")
+    tmp = tempfile.mkdtemp(prefix="lvlme-demo-")
     try:
         work = os.path.join(tmp, "demo")
         shutil.copytree(DEMO, work)

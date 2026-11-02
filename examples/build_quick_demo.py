@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild the Climb quick demo: one fictional posting, one fictional CV.
+"""Rebuild the LVLme quick demo: one fictional posting, one fictional CV.
 
 Alex Example (the fictional person of examples/demo-workspace/) asks about one
 made-up posting at Globex Labs. This runs the real steps, offline:
@@ -14,7 +14,7 @@ made-up posting at Globex Labs. This runs the real steps, offline:
 
 The quick folder's config.json sets "fictional": true, which is what lets it
 live inside the engine's repository. A real quick folder lives in
-~/climb-workspaces/quick/.
+~/lvlme-workspaces/quick/.
 
 Usage: python3 examples/build_quick_demo.py
 """

@@ -813,7 +813,7 @@ def to_markdown(report):
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Check that a work history agrees across the CV, LinkedIn, the "
                                              "website and official forms.")
-    ap.add_argument("--workspace", help="workspace folder (default: $CLIMB_HOME)")
+    ap.add_argument("--workspace", help="workspace folder (default: $LVLME_HOME)")
     ap.add_argument("--input", help="role records file (default: profile/role-records.json in the workspace). "
                                     "Without --workspace the report is printed and nothing is written.")
     ap.add_argument("--json", action="store_true", help="with --input only: print the JSON report, not Markdown")
@@ -833,7 +833,7 @@ def main(argv=None):
     if ws and not os.path.exists(path) and os.path.exists(C.wpath(ws, path)):
         path = C.wpath(ws, path)
     if not os.path.exists(path):
-        print("climb: no role records at %s. Copy each source into it first (see method/CONSISTENCY.md)." % path,
+        print("lvlme: no role records at %s. Copy each source into it first (see method/CONSISTENCY.md)." % path,
               file=sys.stderr)
         return 1
     label = os.path.relpath(path, ws) if ws and C._is_within(path, ws) else os.path.basename(path)
@@ -844,11 +844,11 @@ def main(argv=None):
         doc = C.load_json(path)
         report = run_audit(doc, args.tolerance_months, args.gap_months, today, label, evidence_ids)
     except ValueError as exc:
-        print("climb: %s is not valid JSON (%s)" % (path, exc), file=sys.stderr)
+        print("lvlme: %s is not valid JSON (%s)" % (path, exc), file=sys.stderr)
         return 1
     except InputError as exc:
         for msg in exc.args[0]:
-            print("climb: %s: %s" % (label, msg), file=sys.stderr)
+            print("lvlme: %s: %s" % (label, msg), file=sys.stderr)
         return 1
     if standalone:
         print(C.dump_json(report) if args.json else to_markdown(report), end="")

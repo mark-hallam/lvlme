@@ -111,7 +111,7 @@ One fact per item in `profile/evidence.json` under `items`:
 
 | Field | What to put |
 |---|---|
-| `id` | `E01`, `E02` and so on. Never reuse or renumber an id. An id is 1 to 3 capital letters and then digits, so items imported from a source with its own numbering can keep it (for example `G01` for email findings). Avoid `D`, `A` and `Q`, which Climb uses for factors, actions and questions. |
+| `id` | `E01`, `E02` and so on. Never reuse or renumber an id. An id is 1 to 3 capital letters and then digits, so items imported from a source with its own numbering can keep it (for example `G01` for email findings). Avoid `D`, `A` and `Q`, which LVLme uses for factors, actions and questions. |
 | `claim` | The fact in one plain sentence. |
 | `kind` | One of `job_history`, `education`, `credential`, `artefact`, `achievement`, `network`, `public_signal`, `eligibility`, `preference`, `other`. |
 | `level` | One of the five ladder levels. |

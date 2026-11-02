@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Climb quick: honest odds for one job posting, in about five minutes.
+"""LVLme quick: honest odds for one job posting, in about five minutes.
 
-Three steps, with the agent's judgement in between (skills/climb-quick/SKILL.md):
+Three steps, with the agent's judgement in between (skills/lvlme-quick/SKILL.md):
 
   new           make the quick folder, read the posting (scripts/quick_posting.py), copy the CV
   review-items  list the factors the blind reviewer must score, with no scores shown
   build         score with scripts/score.py's own functions and write the one-page result
 
-The quick folder (default ~/climb-workspaces/quick/<date>-<organisation>-<title>/,
+The quick folder (default ~/lvlme-workspaces/quick/<date>-<organisation>-<title>/,
 never inside this repository) uses the campaign's file names, so the reviewer
 brief (agents/reviewer.md) and the scoring code work on it unchanged:
 
@@ -54,8 +54,7 @@ import validate as V  # noqa: E402
 
 QUICK_DIMS = ["D1", "D2", "D3", "D4", "D6"]   # judged in the quick answer, in rubric order
 NOT_CHECKED = ["D5", "D7"]                    # need the full campaign; count 0 here
-NOT_CHECKED_NOTE = "Not checked in Climb quick. The full campaign checks it."
-DEFAULT_PARENT = os.path.join(C.DEFAULT_PARENT, "quick")
+NOT_CHECKED_NOTE = "Not checked in LVLme quick. The full campaign checks it."
 CLASS = "quick"
 WHATIF = "WHATIF"
 TOP_FIXES = 3
@@ -68,6 +67,11 @@ class QuickError(Exception):
 
 
 # ------------------------------------------------------------------ files
+
+
+def default_parent():
+    """~/lvlme-workspaces/quick, or ~/climb-workspaces/quick while only the old folder exists."""
+    return os.path.join(C.default_parent(), "quick")
 
 
 def rel_folder(folder):
@@ -95,7 +99,7 @@ def unique(path):
 
 def answers_md(date, org_name, role):
     where = ", ".join(role.get("locations") or []) or "where this role is based"
-    return ("# Climb quick: answers\n\nDate: %s\n\n"
+    return ("# LVLme quick: answers\n\nDate: %s\n\n"
             "## Warm path\n\nDo you know someone at %s who has seen your work and would vouch for you? (yes or no)\n\n"
             "Answer:\n\n"
             "## Work rights (ask only if the CV and the posting do not settle it)\n\n"
@@ -133,21 +137,21 @@ def new(args):
         else:
             raise QP.PostingError("Give a posting link (--posting) or the pasted text (--posting-text).")
     except QP.PostingError as exc:
-        print("climb: %s" % exc, file=sys.stderr)
+        print("lvlme: %s" % exc, file=sys.stderr)
         return 3
     org_name = args.org or source.get("org_name") or role["org"]
     folder = rel_folder(args.folder) if args.folder else unique(
-        os.path.join(rel_folder(args.parent or DEFAULT_PARENT), folder_name(date, org_name, role["title"])))
+        os.path.join(rel_folder(args.parent or default_parent()), folder_name(date, org_name, role["title"])))
     config = {"quick": True, "fictional": bool(args.fictional),
-              "goal": {"title": "Climb quick: %s at %s" % (role["title"], org_name)},
+              "goal": {"title": "LVLme quick: %s at %s" % (role["title"], org_name)},
               "targets": [{"id": role["org"], "name": org_name, "ats": source["kind"]}],
               "candidate": {}}
     problem = C.location_problem(folder, config)
     if problem:
-        print("climb: refused. " + problem, file=sys.stderr)
+        print("lvlme: refused. " + problem, file=sys.stderr)
         return 2
     if os.path.exists(os.path.join(folder, "config.json")) and not args.folder:
-        print("climb: %s already exists." % folder, file=sys.stderr)
+        print("lvlme: %s already exists." % folder, file=sys.stderr)
         return 1
     C.write_json(os.path.join(folder, "config.json"), config)
     C.write_json(os.path.join(folder, "market", "roles", "latest.json"), {
@@ -161,7 +165,7 @@ def new(args):
     cv = None
     if args.cv:
         if not os.path.isfile(args.cv):
-            print("climb: no CV file at %s" % args.cv, file=sys.stderr)
+            print("lvlme: no CV file at %s" % args.cv, file=sys.stderr)
             return 1
         cv = os.path.join(folder, "intake", "sources", os.path.basename(args.cv))
         os.makedirs(os.path.dirname(cv), exist_ok=True)
@@ -187,7 +191,7 @@ def load(folder):
     folder = rel_folder(folder)
     config = C.load_json(os.path.join(folder, "config.json"))
     if not config or not config.get("quick"):
-        raise QuickError("%s is not a Climb quick folder (no config.json with \"quick\": true)." % folder)
+        raise QuickError("%s is not a LVLme quick folder (no config.json with \"quick\": true)." % folder)
     problem = C.location_problem(folder, config)
     if problem:
         raise QuickError("refused. " + problem)
@@ -504,7 +508,7 @@ def review_sentence(result):
 
 def message(result, folder):
     r = result["role"]
-    lines = ["Climb quick: %s at %s." % (r["title"], r["org_name"]),
+    lines = ["LVLme quick: %s at %s." % (r["title"], r["org_name"]),
              "Odds today: %s (fit %s of 100)." % (QH.headline(result), QH.num(result["fit"])), ""]
     if result["fixes"]:
         lines.append("The fixes that would raise them most:")
@@ -516,7 +520,7 @@ def message(result, folder):
     lines.append(review_sentence(result))
     lines += ["", "See why, factor by factor:", "", "```bash", "open %s" % display_path(os.path.join(folder, "index.html")),
               "```", "",
-              "Go deeper: say \"run Climb\" for the full campaign."]
+              "Go deeper: say \"run LVLme\" for the full campaign."]
     return "\n".join(lines) + "\n"
 
 
@@ -535,7 +539,7 @@ def build(folder):
 
 
 def reviewer_brief(docs, items):
-    lines = ["You are the blind reviewer for one Climb quick answer. Score each item below yourself, from the",
+    lines = ["You are the blind reviewer for one LVLme quick answer. Score each item below yourself, from the",
              "rubric, the evidence and the posting only. Today is %s." % docs["quick"]["judged_on"], "",
              "Read only these files:",
              "- %s" % os.path.join(C.ENGINE_ROOT, "method", "RUBRIC.md"),
@@ -549,7 +553,7 @@ def reviewer_brief(docs, items):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Climb quick: honest odds for one job posting.")
+    ap = argparse.ArgumentParser(description="LVLme quick: honest odds for one job posting.")
     sub = ap.add_subparsers(dest="cmd", required=True)
     n = sub.add_parser("new", help="make the quick folder, read the posting, copy the CV")
     n.add_argument("--posting", help="the posting link (Greenhouse, Ashby, Lever or any public page)")
@@ -559,7 +563,7 @@ def main(argv=None):
     n.add_argument("--cv", help="the CV file, copied into the quick folder")
     n.add_argument("--cv-text", help="a file holding pasted CV text ('-' reads standard input)")
     n.add_argument("--date", help="the date, YYYY-MM-DD (default: today)")
-    n.add_argument("--parent", help="where quick folders go (default: ~/climb-workspaces/quick)")
+    n.add_argument("--parent", help="where quick folders go (default: ~/lvlme-workspaces/quick)")
     n.add_argument("--folder", help="use exactly this folder")
     n.add_argument("--saved-response", help="offline: read a saved job-board API response instead of the network")
     n.add_argument("--fictional", action="store_true", help="mark the folder as fictional (the demo only)")
@@ -580,7 +584,7 @@ def main(argv=None):
             return 0
         result, text = build(args.folder)
     except QuickError as exc:
-        print("climb: %s" % exc, file=sys.stderr)
+        print("lvlme: %s" % exc, file=sys.stderr)
         return 1
     print(text, end="")
     for w in result["warnings"]:
