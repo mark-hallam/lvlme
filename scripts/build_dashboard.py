@@ -640,8 +640,12 @@ def make_redactor(data, sensitive, hide_names, placeholder="[contact]"):
     own = set(((data.config.get("candidate") or {}).get("display_name") or "").split())
     firsts = {n.split()[0] for n in names if len(n.split()) > 1}
     firsts = {f for f in firsts if len(f) >= 3 and f not in own and f not in MONTHS}
+    # A one-word name ("Will", "Mark") matches with its capital only, like a first name, so the
+    # words "will" and "mark" stay; and never the person's own name.
+    names = {n for n in names if len(n.split()) > 1 or n.strip() not in own}
     rules = [(re.compile(r"(?<!\w)%s(?!\w)" % re.escape(t), re.I), "[redacted]") for t in sorted(terms, key=len, reverse=True)]
-    rules += [(re.compile(r"(?<!\w)%s(?!\w)" % re.escape(n), re.I), placeholder) for n in sorted(names, key=len, reverse=True)]
+    rules += [(re.compile(r"(?<!\w)%s(?!\w)" % re.escape(n), re.I if len(n.split()) > 1 else 0), placeholder)
+              for n in sorted(names, key=len, reverse=True)]
     rules += [(re.compile(r"(?<!\w)%s(?!\w)" % re.escape(f)), placeholder) for f in sorted(firsts, key=len, reverse=True)]
 
     def sub_for(word):

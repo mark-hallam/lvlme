@@ -187,6 +187,20 @@ class DashboardTests(unittest.TestCase):
         self.assertIn("  - Jordan Sample (Program Manager): Connected", summary)
         self.assertIn("Harper Mock", {c["who"] for c in d["warm"]["contacts"]})
 
+    def test_one_word_name_is_hidden_without_eating_ordinary_words(self):
+        path = os.path.join(self.ws, "campaign", "warm-paths.json")
+        doc = H.load(path)
+        doc["contacts"][3]["person"] = "Will"           # a one-word name that is also an ordinary word
+        doc["contacts"][3]["next_step"] = "Will said this will help"
+        doc["contacts"][2]["person"] = "Alex"           # the same as the person's own first name
+        H.save(path, doc)
+        page, d, _, _ = self.build()
+        whos = {c["who"] for c in d["warm"]["contacts"]}
+        self.assertNotIn("Will", whos)
+        nexts = [c["next"] for c in d["warm"]["contacts"]]
+        self.assertIn("A contact said this will help", nexts)
+        self.assertIn("Alex Example", page)               # the person's own name is never hidden
+
     def test_static_summary_lists_the_warm_paths(self):
         page, _, _, _ = self.build()
         body = page.split('<script type="application/json"')[0]

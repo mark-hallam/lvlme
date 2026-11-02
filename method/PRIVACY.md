@@ -49,7 +49,9 @@ Contacts, referees and email senders did not sign up for this. So:
   `profile/network.json` and in the warm-path tracker,
   `campaign/warm-paths.json`. Keep other people's names (referees, email
   senders) out of evidence and plan text, or add them to
-  `privacy.redact_terms`.
+  `privacy.redact_terms`. A contact recorded by one word only ("Will") is
+  hidden where that word starts with a capital, so the ordinary word "will"
+  stays; a full name is safer.
 - `network_map.py` prints counts only, never names, and does not keep email
   addresses.
 
