@@ -38,6 +38,39 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 - [todo] A06 Apply to the Initech Robotics fleet deployments role once A04 is done (owner: you; done when: Application submitted (confirmation email))
 - [doing] A10 Build a small route-eval demo for Acme AI's quarterly evaluation challenge (owner: you; done when: Demo submitted to the challenge (link))
 
+## Next level (fit bands of the rubric; nothing here is made up)
+- Best role: Program Manager, Robot Fleet Deployments (initech), Level 3 Moderate, fit 57. Level 4 Good starts at 70: 13 points to go.
+  No set of open actions gets there counting their chances: the whole plan is expected to reach 62.8, 7.2 short.
+  Best case only (every action in it must work): A06 (Apply to the Initech Robotics fleet deployments role once A04 is done, target 2026-11-08), A11 (Go to the Initech warehouse operators meetup in Melbourne, target 2026-12-10); level reached 2026-12-10; chance it really happens 16%.
+  Room left within the caps: Warm path +7, Proof of work +4 (no open action), Org-specific edge +2 (no open action), Public signal +2 (no open action), Application readiness +1.2. Ceiling within the caps: 79.
+- At Acme AI: Technical Program Manager, Model Launches (acme), Level 2 Low, fit 46. Level 3 Moderate starts at 55: 9 points to go.
+  No set of open actions gets there counting their chances: the whole plan is expected to reach 47, 8 short.
+  Room left within the caps: Warm path +12 (no open action), Proof of work +4 (no open action), Public signal +2 (no open action), Application readiness +2 (no open action), Org-specific edge +1. Ceiling within the caps: 68.
+- At Globex Labs: AI Success Manager, Asia (globex), Level 1 Very low, fit 39. Level 2 Low starts at 40: 1 points to go.
+  Smallest set that gets there, counting each action's chance: A02 (Ask [contact] for the introduction to the Globex AI Success lead, and send route-eval first, target 2026-11-15); level reached 2026-11-15; chance it really happens 50%.
+- At Initech Robotics: Program Manager, Robot Fleet Deployments (initech), Level 3 Moderate, fit 57. Level 4 Good starts at 70: 13 points to go.
+  No set of open actions gets there counting their chances: the whole plan is expected to reach 62.8, 7.2 short.
+  Best case only (every action in it must work): A06 (Apply to the Initech Robotics fleet deployments role once A04 is done, target 2026-11-08), A11 (Go to the Initech warehouse operators meetup in Melbourne, target 2026-12-10); level reached 2026-12-10; chance it really happens 16%.
+  Room left within the caps: Warm path +7, Proof of work +4 (no open action), Org-specific edge +2 (no open action), Public signal +2 (no open action), Application readiness +1.2. Ceiling within the caps: 79.
+
+## Quests for the best role (most expected fit points per hour first)
+- A07 Ask your three closest logistics contacts whether they know anyone at Initech Robotics: +2.6 expected, +6.4 if it works, 2 hours, target 2026-11-22, owner you. Done when: Someone has agreed to introduce you to a person at Initech (email or message)
+- A06 Apply to the Initech Robotics fleet deployments role once A04 is done [needed for the best case]: +0.8 expected, +1 if it works, 1 hour, target 2026-11-08, owner you. Done when: Application submitted (confirmation email)
+- A11 Go to the Initech warehouse operators meetup in Melbourne [needed for the best case]: +1.8 expected, +8.8 if it works, 4 hours, target 2026-12-10, owner you. Done when: Met at least one Initech employee who has seen your work (follow-up email)
+- A04 Fix the LinkedIn headline: 'led a team of 40' should say 'led a team of 8': no fit points on this role, 30 minutes, target 2026-11-05, owner you. Done when: Headline changed (screenshot or link), claim C001 re-checked as supported
+- A08 Answer the notice period and non-compete question (Q01): no fit points on this role, 30 minutes, target 2026-11-04, owner you. Done when: Answer recorded in intake/answers.md and evidence.json
+- A02 Ask [contact] for the introduction to the Globex AI Success lead, and send route-eval first: no fit points on this role, 2 hours, target 2026-11-15, owner you. Done when: The AI Success lead has replied and seen route-eval (email)
+- A10 Build a small route-eval demo for Acme AI's quarterly evaluation challenge: no fit points on this role, 6 hours, target 2026-11-29, owner you. Done when: Demo submitted to the challenge (link)
+
+## Progress
+- Streak: 4 scored days in a row with real progress (a fit that rose, newly checked evidence, or an action done with evidence).
+- Level history, best role: 2026-10-04 Level 2 Low (fit 40), 2026-10-11 Level 2 Low (fit 44), 2026-10-18 Level 2 Low (fit 46), 2026-10-25 Level 3 Moderate (fit 55, level up), 2026-11-01 Level 3 Moderate (fit 57)
+
+## When the person says an action is done
+- They may paste: Mark action A07 done ("title"). Evidence: <link, file or email>.
+- The agent running the campaign sets status done, done_evidence and finished_on in campaign/plan.json. Done needs a
+  link, a file or an email reference; without one, ask for it. Any other agent appends the message to campaign/inbox.md.
+
 ## Biggest gaps
 - Turn a warm contact into a referral: +144.0 fit points across 12 roles. An agreed referral (D3 = 4) also moves the interview band up one step.
 - Get a warm introduction at each target organisation: +96.0 fit points across 12 roles. A named insider who knows your work (D3 = 3) is the strongest single lift for a non-traditional candidate.
