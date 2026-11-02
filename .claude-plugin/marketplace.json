@@ -1,7 +1,7 @@
 {
   "name": "climb",
   "owner": {
-    "name": "Climb contributors"
+    "name": "Mark Hallam"
   },
   "description": "Climb: honest career odds from evidence, and a campaign that raises them, one verified step at a time.",
   "plugins": [
@@ -10,7 +10,12 @@
       "source": "./",
       "description": "Honest, evidence-based odds of landing a kind of role, with a sceptical independent review, deterministic scoring, a recruiter screen, a consistency audit and a level-up dashboard. Drafts only.",
       "category": "productivity",
-      "tags": ["career", "job-search", "evidence", "campaign"]
+      "tags": [
+        "career",
+        "job-search",
+        "evidence",
+        "campaign"
+      ]
     }
   ]
 }

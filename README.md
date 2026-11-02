@@ -55,18 +55,17 @@ You need Python 3.9 or newer (Climb uses only its standard library) and git.
 Full details for every agent, and the documentation they follow, are in
 [`docs/INSTALL.md`](docs/INSTALL.md).
 
-**Claude Code, one step** (version 2.1.275 or later), once the repository is
-published (replace `<github-user>` with its owner):
+**Claude Code, one step** (version 2.1.275 or later):
 
 ```text
-/plugin install climb --marketplace <github-user>/climb
+/plugin install climb --marketplace mark-hallam/climb
 ```
 
 **Claude Code, the simple fallback:** clone the folder into your skills
 folder, then start a new session.
 
 ```bash
-git clone <repository address> ~/.claude/skills/climb
+git clone https://github.com/mark-hallam/climb ~/.claude/skills/climb
 ```
 
 **Codex:** clone it into `~/.agents/skills/climb` and type `$climb`, or open

@@ -8,9 +8,9 @@ the agent you use.
 You need Python 3.9 or newer (the scripts use only its standard library) and
 git (a tool that copies and updates the folder). Nothing else.
 
-In the commands below, `<github-user>/climb` is the repository once it is
-published on GitHub, and `<repository address>` is its full address. Until
-then, use a local copy of the folder.
+In the commands below, `mark-hallam/climb` is the repository on GitHub, and
+`https://github.com/mark-hallam/climb` is its full address. You can also use a
+local copy of the folder.
 
 ## Claude Code
 
@@ -19,7 +19,7 @@ then, use a local copy of the folder.
 In a Claude Code session (version 2.1.275 or later):
 
 ```text
-/plugin install climb --marketplace <github-user>/climb
+/plugin install climb --marketplace mark-hallam/climb
 ```
 
 Claude Code adds the Climb marketplace (a catalogue of plugins, here just
@@ -29,20 +29,20 @@ one), shows you what the plugin adds, and asks where to install it. Choose
 The same thing from your terminal (version 2.1.292 or later):
 
 ```bash
-claude plugin install climb --marketplace <github-user>/climb
+claude plugin install climb --marketplace mark-hallam/climb
 ```
 
 Or in two steps, on any recent version:
 
 ```text
-/plugin marketplace add <github-user>/climb
+/plugin marketplace add mark-hallam/climb
 /plugin install climb@climb
 ```
 
 ### Option B: clone into your skills folder (the simple fallback)
 
 ```bash
-git clone <repository address> ~/.claude/skills/climb
+git clone https://github.com/mark-hallam/climb ~/.claude/skills/climb
 ```
 
 Start a new Claude Code session. Because the folder holds
@@ -107,7 +107,7 @@ claude plugin update climb@climb
 Codex reads personal skills from `~/.agents/skills/`, and `AGENTS.md` from the
 folder you work in.
 
-- **As a skill:** `git clone <repository address> ~/.agents/skills/climb`,
+- **As a skill:** `git clone https://github.com/mark-hallam/climb ~/.agents/skills/climb`,
   then in Codex type `$climb` (or pick it from `/skills`) and say "run
   Climb".
 - **In the engine folder:** open Codex in the cloned folder. It reads
@@ -167,8 +167,6 @@ See "By hand, in a terminal" in the
   `tests/test_packaging.py` checks offline that both manifests parse, that
   every skill and subagent file has valid frontmatter, and that every engine
   path the packaging docs name exists.
-- **Before publishing:** replace `<github-user>` and `<repository address>`
-  in the docs, and add `homepage` and `repository` to `plugin.json`.
 
 ## Documentation this follows
 

@@ -4,9 +4,20 @@
   "version": "0.1.0",
   "description": "Honest, evidence-based odds of landing a kind of role at the organisations you choose, and a campaign that raises them. Runs in a private workspace on your own machine and never sends, posts, applies or changes an account on its own.",
   "author": {
-    "name": "Climb contributors"
+    "name": "Mark Hallam",
+    "url": "https://github.com/mark-hallam"
   },
   "license": "MIT",
-  "keywords": ["career", "job-search", "evidence", "campaign", "honest-odds"],
-  "skills": ["./"]
+  "keywords": [
+    "career",
+    "job-search",
+    "evidence",
+    "campaign",
+    "honest-odds"
+  ],
+  "skills": [
+    "./"
+  ],
+  "homepage": "https://github.com/mark-hallam/climb",
+  "repository": "https://github.com/mark-hallam/climb"
 }
