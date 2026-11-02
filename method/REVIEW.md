@@ -62,7 +62,7 @@ Do **not** give it:
 
 The scoring agent applies the agreed changes to the judgement files:
 
-- Change the `score` where the reviewer lowered (or, rarely, raised) it.
+- Set the `score` to the one that stands (agreed, or the middle of three).
 - Set `reviewed_on` to today and write a one-line `reviewer_note`:
   - in `eval/judgements.json`, on the role judgement (covers D1, D2 and D4)
     or on a single dimension entry;
