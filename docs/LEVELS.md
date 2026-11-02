@@ -1,8 +1,12 @@
 # Levels: what gets you to the next one
 
-Status: added 2026-11-02. Code: `scripts/_levels.py` (the maths), `scripts/_levels_html.py`
-(the first render of the view) and the `JS_LEVELS` block in `scripts/_dashboard_assets.py`
-(the same maths in the page, so the switches can change it). Tests: `tests/test_levels.py`.
+Status: added 2026-11-02. The same day, the next level and the quest points moved onto one
+yardstick, the best fit across your roles (see "One yardstick" below). Code:
+`scripts/_levels.py` (the maths), `scripts/_levels_html.py` (the first render of the view)
+and the `JS_LEVELS` block in `scripts/_dashboard_assets.py` (the same maths in the page, so
+the switches can change it). Tests: `tests/test_levels.py`, and `tests/test_levels_page.py`,
+which runs the page script's level maths in Node.js (a JavaScript runtime; the test is
+skipped when it is not installed) and checks it agrees with Python.
 
 The dashboard always answers one question: **what, exactly, gets me to the next level?**
 It also shows the progress already made, in a way anyone can check. Nothing on it is a
@@ -46,59 +50,85 @@ chance bands shown elsewhere on the page still include those adjustments.
 
 ## The next level, worked out
 
-For the role the journey follows (your best role, or the best role at the organisation
-picked in the selector):
+Your level is the band of your **best fit** among the roles the journey follows: every
+open role, or the roles at the organisation picked in the selector. That is the same
+number the level history uses. So the next level arrives as soon as **any** of those roles
+crosses the line, not only the role that is your best today. The panel's heading still
+names today's best role; when an action gets you there through a different role, the
+panel names that role too.
 
 1. **Which actions can help.** Only open actions (to do, or in progress) that are switched
-   on in the What if rail, and only those that raise at least one of this role's factors if
-   they work. Done actions are already in today's score; dropped ones never count. Parked
-   actions (status `later`) start switched off and count only once switched on in the rail.
+   on in the What if rail, and only those that raise at least one of these roles' factors
+   if they work. Done actions are already in today's score; dropped ones never count.
+   Parked actions (status `later`) start switched off and count only once switched on in
+   the rail.
 2. **The smallest set.** Every combination is tried, smallest first, using the same
-   projection as the journey chart: actions apply in target date order, each effect is
-   weighted by the action's chance of working, no factor rises more than the plan's
-   `projection_caps` over today or above 5, and a role whose eligibility blocker cannot be
-   cleared never gains eligibility. The first size at which some set reaches the next
-   level wins. Ties go to the set that gets there first, then the one with the fewest
-   hours, then the higher fit. Plans with more than 14 helpful actions use a quick search
-   instead (the most fit per hour first, then anything it can do without is dropped), and
-   the page says so.
-3. **The date.** The day the level is reached if those actions land on their target dates.
+   projection as the journey chart, run on every one of these roles: actions apply in
+   target date order, each effect is weighted by the action's chance of working, no factor
+   rises more than the plan's `projection_caps` over today or above 5, and a role whose
+   eligibility blocker cannot be cleared never gains eligibility. A set reaches the next
+   level when the best fit among the roles does. The first size at which some set gets
+   there wins. Ties go to the set that gets there first, then the one with the fewest
+   hours, then the higher fit. To keep this quick, only roles that could reach the line if
+   every helpful action worked are tried. Plans with more than 14 such actions use a quick
+   search instead (the most fit per hour first, then anything it can do without is
+   dropped), and the page says so.
+3. **The role it lifts.** The role that holds your best fit once the set lands. When it is
+   not today's best role, the page says so and gives its fit before and after, for example
+   "by lifting your fit for Solutions Lead (Globex Labs) from 37 to 44.2". That role would
+   then be your best.
+4. **The date.** The day the level is reached if those actions land on their target dates.
    Actions with no target date count at the end of the plan. If doing everything switched
    on gets there sooner, the page says that too.
-4. **The chance it really happens.** The expected path is an average, so the page also
+5. **The chance it really happens.** The expected path is an average, so the page also
    gives the chance the set actually crosses the line: every works or fails outcome of the
-   set is projected, and the chances of those that reach the level are added up, treating
-   each action's chance as independent.
+   set is projected, and the chances of those that take any of the roles to the level are
+   added up, treating each action's chance as independent.
 
 **When no set gets there,** the page says so plainly ("Not reachable on the current
 plan") and shows:
 
-- how far the whole plan falls short, counting each action's chance;
+- how far the whole plan falls short of the line, on your best fit, counting each
+  action's chance;
 - the best case, if there is one: the smallest set that would reach it if every action in
-  it works, its date and the chance of that;
-- **what is missing**: for each factor, the room left on this role within the caps after
-  the plan, in fit points, and whether any open action covers it. A factor with room and
-  no action is where a new action should go;
+  it works, the role it lifts, its date and the chance of that;
+- **what is missing**: for each factor, the room left within the caps after the plan on
+  the role the plan takes closest (named when it is not today's best), in fit points, and
+  whether any open action covers it. A factor with room and no action is where a new
+  action should go;
 - if even the caps cannot reach the level (for example years in a similar role, which the
-  default caps hold still), it says the role tops out below it.
+  default caps hold still), it says that role tops out below it.
 
 ## Quests
 
 Each open action is a card with: its id and status, tags, the title, **points toward the
 next level**, owner, effort, due date, chance, and what proves it done.
 
-- **Expected**: what it adds to this role's fit, weighted by its chance of working, on top
-  of the other switched-on actions. This is the same number as the What if rail.
-- **If it works**: what it adds when it does work (its best case).
+- **Expected**: points toward the next level. That is what the action, on its own, adds
+  to your best fit among the journey's roles, weighted by its chance of working and within
+  the caps: your best fit after that action alone, minus your best fit today. It is
+  counted on the role that would then hold your best fit. When that is not today's best
+  role, the card names it with its fit before and after, then shows what the action adds
+  to today's best role, second.
+- **If it works**: the same, when it does work (its best case).
 - **Per hour**: expected points divided by effort hours. Cards are sorted by it, highest
   first.
+- Points are counted one action at a time. Two actions that raise the same factor overlap
+  (a factor stops at its cap), so their points do not simply add up; the Next level panel
+  shows what a set does together. A one-action set and its card always agree: today's
+  best fit plus the card's expected points is the fit the panel shows.
+- The What if rail and the Do next card answer a different question: what an action adds
+  to your best role on top of every other switched-on action. That is why a card can show
+  more points than the rail does for the same action.
 - Tags: **On the path to Level N** (in the smallest set, also outlined in the accent
   colour), **Needed for the best case** (when no set gets there on expected odds),
   **Estimated effect** (the plan gave no effects, so they were estimated from
   `expected_points`), **No movement in N runs** (a stalled experiment), and **Switched off
   in What if**.
-- An action that changes no score says "Protects credibility, no score change"; one that
-  helps other roles but not this one says "No points on this role".
+- An action that changes no score says "Protects credibility, no score change". One that
+  adds nothing to your best fit on its own says "No points toward Level N on its own",
+  and, if it is in the set, that it counts together with the others in the set (two
+  actions can lift a role past your best only together).
 
 ## Progress you can trust
 
@@ -135,8 +165,8 @@ claims an action is done.
 
 | Field | What it holds |
 |---|---|
-| `best_role`, `per_org.<org>` | `level`, `band`, `points_to_next`, `next_level_starts_at`, `reachable_on_expected_odds`, `whole_plan` (expected and best case fit, and the date the level is reached), then either `smallest_set` (actions, `level_reached_on`, `fit_expected`, `chance_it_happens`, `exact_search`) or `best_case_set` and `missing` (`points_short`, `ceiling_within_caps`, `room_by_factor`). |
-| `quests` | Every open action for the best role, sorted as on the page, with `points_expected`, `points_if_it_works`, `points_per_hour`, `on_path_to_next_level`, `needed_for_best_case` and the `tell_your_agent` text. |
+| `best_role`, `per_org.<org>` | Today's best role and its `level`, `band`, `points_to_next`, `next_level_starts_at`, `reachable_on_expected_odds`, `whole_plan` (expected and best case best fit, and the date the level is reached), then either `smallest_set` (actions, `level_reached_on`, `fit_expected`, `lifted_role`, `chance_it_happens`, `exact_search`) or `best_case_set` (the same, with `fit_if_all_work`) and `missing` (`points_short`, `ceiling_within_caps`, `closest_role`, `room_by_factor`). `lifted_role` and `closest_role` give `role_id`, `org`, `title`, `fit_before` and the fit after, and `is_best_role_today`. |
+| `quests` | Every open action, sorted as on the page, with `points_expected`, `points_if_it_works` and `points_per_hour` (points toward the next level, each action on its own), `lifted_role` (the role that then holds the best fit, before and after), `on_best_role_today` (what it adds to today's best role, when `lifted_role` is another role), `changes_a_score`, `on_path_to_next_level`, `needed_for_best_case` and the `tell_your_agent` text. |
 | `level_history`, `streak`, `progress_days` | The history and streak described above. |
 
 These use every open action switched on (the page's default). Sensitive mode scrubs them like
@@ -148,6 +178,8 @@ the rest of the file.
    scored runs or the plan.
 2. "Gets you there" means on expected odds (each action weighted by its chance), within the
    projection caps. The best case is always labelled as needing every action in it to work.
+   The level, the set and the quest points all use one yardstick, the best fit across the
+   journey's roles, and the role that carries it is named.
 3. The page says plainly when the next level is not reachable, and shows what is missing.
 4. Level downs and days without progress are shown, not hidden.
 5. A tick on the page is never treated as done. Only the plan file, with evidence, is.
@@ -155,6 +187,17 @@ the rest of the file.
    level, outlook, top actions by priority, best role at each organisation) are rendered into the
    HTML file, so they read the same with JavaScript off. The page script hides the static
    summary once it has drawn the live page.
+
+## One yardstick
+
+The first version of this view measured the next level on today's best role alone and
+counted each quest on top of every other open action. The two could disagree badly: the
+panel could say one action gets you to the next level while that action's card showed a
+fraction of a point, because other actions raising the same capped factors had already
+taken the credit. Now the panel and the cards both measure your best fit across the
+journey's roles, and a card counts its action alone, so a one-action set and its card
+always tell the same story. `tests/test_levels.py` and `tests/test_levels_page.py` check
+this in Python and in the page script.
 
 ## Known limits
 
@@ -164,5 +207,7 @@ the rest of the file.
 - An evidence item's check date is the latest `checked_on` among its sources, so
   re-checking an old source counts as newly checked evidence on that day.
 - The streak counts progress on any role; the level history follows the selected one.
+- Quest points are counted one action at a time, so they do not add up when actions overlap
+  (see Quests). The panel's set is the place to read what several actions do together.
 - Without JavaScript the page shows the static summary, the level card and the Level up
   view. The journey chart, the What if switches and the other views still need JavaScript.

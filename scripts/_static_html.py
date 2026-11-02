@@ -84,8 +84,7 @@ def render(page, per_org, action_order):
             'shows the same numbers and adds the journey chart, the What if switches and the other views.</p>')
     if not page["roles"]:
         return head + note + '<p class="small">No open roles matched yet. Fetch roles and score a run, then build the dashboard again.</p>'
-    r = page["roles"][0]
-    nl = L.next_level(r, page["actions"], page["caps"], page["weights"], page["meta"]["run_date"])
+    nl = L.next_level(L.journey_roles(page["roles"]), page["actions"], page["caps"], page["weights"], page["meta"]["run_date"])
     return (head + note + _key_numbers(page, nl)
             + '<h3>Top actions, highest priority first</h3>' + _actions(page, action_order)
             + '<h3 id="staticOrgsH">Best role at each organisation</h3>' + _per_org(page, per_org))

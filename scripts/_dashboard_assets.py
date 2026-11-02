@@ -585,6 +585,18 @@ function project(r, mode, on){
   w.pts.push({d: D.meta.end, v: w.end});
   return w;
 }
+// The best fit across roles after the same actions (the level follows it, so any role can carry it).
+// Ties go to the role listed first, so today's best wins a tie. pts: the best fit at each step.
+// Mirrors best_of() in scripts/_levels.py.
+function bestOf(rs, acts, mode, sure){
+  if (!rs.length) return null;
+  let best = null, pts = null;
+  rs.forEach(r => { const w = walkL(r, acts, mode, sure);
+    if (!best || w.end > best.end) best = {end: w.end, r, scores: w.scores};
+    pts = pts ? pts.map((p, i) => ({d: p.d, v: Math.max(p.v, w.pts[i].v)})) : w.pts; });
+  best.pts = pts;
+  return best;
+}
 
 // ---------- state + per-refresh cache ----------
 const state = {org: "best", mode: "today", sample: false, view: "level", stack: []};
@@ -599,6 +611,11 @@ const modeName = () => ({today:"today", exp:"if you follow the plan, by " + shor
 function headlineRole(){
   if (state.org === "best") return D.roles[0];
   return roleById[D.orgs[state.org].best] || D.roles.find(r => r.g === state.org);
+}
+// The roles the journey follows, today's best first: every role, or the selected organisation's.
+function journeyRoles(){
+  const h = headlineRole();
+  return state.org === "best" ? D.roles : [h].concat(D.roles.filter(r => r.g === state.org && r !== h));
 }
 function crossDate(pts, threshold){
   for (let i = 0; i < pts.length; i++) if (pts[i].v >= threshold) return pts[i].d;   // an action lands on its target date
@@ -657,7 +674,7 @@ function renderTopline(){
   $("#bestPills").innerHTML = `Interview ${pill(ibM(focus))} Offer ${pill(obM(focus))}`;
   $("#bestRole").textContent = `${focus.on}: ${focus.title}`;
   // level (today, actual): the next level and what gets you there
-  $("#level").innerHTML = levelCardHTML(nextLevel(r));
+  $("#level").innerHTML = levelCardHTML(nextLevel(journeyRoles()));
   $("#level").querySelectorAll("[data-go-level]").forEach(b => b.addEventListener("click", goLevel));
   enter($("#level .lvl-pop"), 900);
 }
@@ -882,7 +899,7 @@ function renderDoNext(){
 }
 function renderHome(){
   const card = $("#detailCard");
-  card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h3 style="margin:0">Do next</h3><div class="tiny sub" style="margin-bottom:4px">What each adds to your best role, if it works.</div><div>${doNextHTML()}</div>
+  card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h3 style="margin:0">Do next</h3><div class="tiny sub" style="margin-bottom:4px">What each adds to your best role on top of the rest of your plan, counting its chance.</div><div>${doNextHTML()}</div>
     <h3 style="margin:18px 0 0">Biggest unlocks</h3><div class="tiny sub" style="margin-bottom:4px">Fit points gained, added up across your top roles.</div><div>${unlocksHTML()}</div>
     <div class="tiny sub" style="margin-top:18px;padding-top:12px;border-top:1px solid var(--rule)">Tap any organisation, role, factor, action or piece of evidence to drill in here.</div></div>`;
   bindHome(card);
@@ -1178,21 +1195,21 @@ const raisesL = (r, a) => walkL(r, [a], "best").scores.some((v, k) => v > r.s[k]
 function keyLess(a, b){ for (let i = 0; i < a.length; i++){ if (a[i] < b[i]) return true; if (a[i] > b[i]) return false; } return false; }
 function combos(list, k, f){ const idx = []; (function rec(start){ if (idx.length === k){ f(idx.map(i => list[i])); return; }
   for (let i = start; i < list.length; i++){ idx.push(i); rec(i + 1); idx.pop(); } })(0); }
-// The fewest actions whose projection reaches T. Ties: earliest date, least effort, higher fit, ids.
-function smallestSet(r, acts, T, mode){
-  if (walkL(r, acts, mode).end < T) return null;
-  if (acts.length > MAX_EXACT) return greedySet(r, acts, T, mode);
+// The fewest actions that take the best fit across rs to T. Ties: earliest date, least effort, higher fit, ids.
+function smallestSet(rs, acts, T, mode){
+  if (!rs.length || bestOf(rs, acts, mode).end < T) return null;
+  if (acts.length > MAX_EXACT) return greedySet(rs, acts, T, mode);
   for (let k = 1; k <= acts.length; k++){
     let best = null;
-    combos(acts, k, c => { const w = walkL(r, c, mode); if (w.end < T) return;
+    combos(acts, k, c => { const w = bestOf(rs, c, mode); if (w.end < T) return;
       const key = [crossDate(w.pts, T), hoursOf(c), -w.end, c.map(a => a.id).join(",")];
       if (!best || keyLess(key, best.key)) best = {key, c, w}; });
-    if (best) return {ids: best.c.map(a => a.id), acts: best.c, date: crossDate(best.w.pts, T), fit: best.w.end, exact: true};
+    if (best) return {ids: best.c.map(a => a.id), acts: best.c, date: crossDate(best.w.pts, T), fit: best.w.end, exact: true, role: best.w.r};
   }
   return null;
 }
-function greedySet(r, acts, T, mode){
-  const fit = list => walkL(r, list, mode).end, inOrder = list => acts.filter(a => list.indexOf(a) >= 0);
+function greedySet(rs, acts, T, mode){
+  const fit = list => bestOf(rs, list, mode).end, inOrder = list => acts.filter(a => list.indexOf(a) >= 0);
   let chosen = [];
   while (fit(chosen) < T){
     const cur = fit(chosen); let pick = null, rate = -1;
@@ -1201,47 +1218,54 @@ function greedySet(r, acts, T, mode){
     chosen = inOrder(chosen.concat([pick]));
   }
   for (let i = chosen.length - 1; i >= 0; i--){ const rest = chosen.filter((_, j) => j !== i); if (fit(rest) >= T) chosen = rest; }
-  const w = walkL(r, chosen, mode);
-  return {ids: chosen.map(a => a.id), acts: chosen, date: crossDate(w.pts, T), fit: w.end, exact: false};
+  const w = bestOf(rs, chosen, mode);
+  return {ids: chosen.map(a => a.id), acts: chosen, date: crossDate(w.pts, T), fit: w.end, exact: false, role: w.r};
 }
-// The chance these actions really get there, treating each action's chance as independent.
-function chanceOf(r, acts, T){
+// The chance these actions really get any of rs there, treating each action's chance as independent.
+function chanceOf(rs, acts, T){
   const n = acts.length; if (n > MAX_EXACT) return null;
   let total = 0;
   for (let m = 0; m < (1 << n); m++){
     let pr = 1; const works = [];
     acts.forEach((a, i) => { if ((m >> i) & 1){ pr *= a.p; works.push(a); } else pr *= 1 - a.p; });
-    if (pr > 0 && walkL(r, works, "best").end >= T) total += pr;
+    if (pr > 0 && rs.some(r => walkL(r, works, "best").end >= T)) total += pr;
   }
   return total;
 }
-function nextLevel(r){
-  const acts = D.actions.filter(a => switchable(a) && enabled.has(a.id));
+// The next level on the best fit across rs (today's best first): any of them can carry it.
+function nextLevel(rs){
+  const r = rs[0], acts = D.actions.filter(a => switchable(a) && enabled.has(a.id));
   const idx = bandIdx(r.fit), o = {r, fit: r.fit, level: idx + 1, band: BANDS[idx], top: idx >= 4};
   if (o.top) return o;
-  const T = THRESH[idx + 1], rel = acts.filter(a => raisesL(r, a)), every = walkL(r, acts, "exp");
+  const T = THRESH[idx + 1], rel = acts.filter(a => rs.some(x => raisesL(x, a))), every = bestOf(rs, acts, "exp");
   Object.assign(o, {target: T, nextLevel: idx + 2, nextBand: BANDS[idx + 1], toNext: r1(T - r.fit),
-    plan: {exp: every.end, best: walkL(r, acts, "best").end, date: crossDate(every.pts, T)}});
-  const set = smallestSet(r, rel, T, "exp");
+    plan: {exp: every.end, best: bestOf(rs, acts, "best").end, date: crossDate(every.pts, T)}});
+  // Only roles that could reach the line if every helpful action worked can carry the level there.
+  const cands = rs.filter(x => walkL(x, rel, "best").end >= T), use = rel.filter(a => cands.some(x => raisesL(x, a)));
+  const set = smallestSet(cands, use, T, "exp");
   o.reachable = !!set;
-  if (set){ set.chance = chanceOf(r, set.acts, T); o.set = set; return o; }
-  const bc = smallestSet(r, rel, T, "best");
-  if (bc) bc.chance = chanceOf(r, bc.acts, T);
+  if (set){ set.chance = chanceOf(cands, set.acts, T); o.set = set; return o; }
+  const bc = smallestSet(cands, use, T, "best");
+  if (bc) bc.chance = chanceOf(cands, bc.acts, T);
   o.bestCase = bc;
-  const ceil = r.s.map((v, k) => hardBlock(r, k) ? v : Math.min(5, v + CAPS[k]));
-  const covered = DIMS.map((_, k) => rel.some(a => walkL(r, [a], "best").scores[k] > r.s[k] + 1e-9));
-  o.missing = {points: r1(T - every.end), ceiling: fitOf(ceil),
+  // What is missing: room under the caps on the role the whole plan takes closest.
+  const m = every.r, ceil = m.s.map((v, k) => hardBlock(m, k) ? v : Math.min(5, v + CAPS[k]));
+  const covered = DIMS.map((_, k) => rel.some(a => walkL(m, [a], "best").scores[k] > m.s[k] + 1e-9));
+  o.missing = {points: r1(T - every.end), ceiling: fitOf(ceil), r: m,
     room: DIMS.map((d, k) => ({dim: d, k, points: r1((ceil[k] - every.scores[k]) * W[k] / 5 * 100 / TW), covered: covered[k]}))
       .filter(x => x.points > 0).sort((a, b) => (b.points - a.points) || (a.k - b.k))};
   return o;
 }
-function questsFor(r, nl){
-  const crit = new Set(nl.set ? nl.set.ids : []), bc = new Set(nl.bestCase ? nl.bestCase.ids : []);
+// Each action on its own, as points toward the next level: the best fit across rs after it alone, minus the
+// best fit today, on the role that then holds the best fit (q.r), with today's best role second (leadExp).
+function questsFor(rs, nl){
+  const lead = rs[0], crit = new Set(nl.set ? nl.set.ids : []), bc = new Set(nl.bestCase ? nl.bestCase.ids : []);
   const acts = D.actions.filter(a => live(a) || (a.status === "later" && enabled.has(a.id)));   // parked: only while switched on
   return acts.map(a => {
-    const w = acts.filter(x => enabled.has(x.id) || x.id === a.id), wo = acts.filter(x => enabled.has(x.id) && x.id !== a.id);
-    const base = walkL(r, wo, "exp").end, exp = r1(walkL(r, w, "exp").end - base), works = r1(walkL(r, w, "exp", a.id).end - base);
-    return {a, exp, works, rate: a.hours ? exp / a.hours : 0, crit: crit.has(a.id), bc: bc.has(a.id), on: enabled.has(a.id)};
+    const w = bestOf(rs, [a], "exp"), ok = bestOf(rs, [a], "exp", a.id);
+    const exp = r1(w.end - lead.fit), works = r1(ok.end - lead.fit);
+    return {a, exp, works, rate: a.hours ? exp / a.hours : 0, crit: crit.has(a.id), bc: bc.has(a.id), on: enabled.has(a.id),
+      r: w.r, fitAfter: w.end, leadExp: r1(walkL(lead, [a], "exp").end - lead.fit), leadWorks: r1(walkL(lead, [a], "best").end - lead.fit)};
   }).sort((x, y) => (y.rate - x.rate) || (y.exp - x.exp) || (y.a.priority - x.a.priority) || (x.a.date < y.a.date ? -1 : x.a.date > y.a.date ? 1 : 0) || (x.a.id < y.a.id ? -1 : 1));
 }
 // Each scored day's level for the journey the organisation selector follows.
@@ -1302,28 +1326,44 @@ function chanceLine(set, lead){
   const n = set.acts.length;
   return `<p class="small sub">${lead}${pctOf(set.chance)}%${n > 1 ? ", treating each action's chance as independent" : ""}.</p>`;
 }
+const roleName = r => `<b>${esc(r.title)}</b> (${esc(r.on)})`;
 function verdictHTML(nl){
   if (nl.top) return `<div class="lv-verdict"><div class="lv-v-h">Top level</div><p class="small">Strong is the highest band. The work now is keeping the evidence fresh and the warm paths warm.</p></div>`;
   const L = `Level ${nl.nextLevel} (${esc(nl.nextBand)})`;
   if (nl.reachable){
     const s = nl.set, n = s.acts.length, one = n === 1;
+    const how = s.role === nl.r ? `, at a fit of ${fmtP(s.fit)} counting each action's chance of working.`
+      : ` by lifting your fit for ${roleName(s.role)} from ${fmtP(s.role.fit)} to ${fmtP(s.fit)}, counting each action's chance of working. That role would then be your best.`;
     return `<div class="lv-verdict"><div class="lv-v-h">${one ? "One action" : n + " actions"} can get you there</div>
-      <p class="small">If ${one ? "it lands on its target date" : "they land on their target dates"}, you're expected to reach ${L} on <b>${esc(fmtDate(s.date))}</b>, at a fit of ${fmtP(s.fit)} counting each action's chance of working.</p>
+      <p class="small">If ${one ? "it lands on its target date" : "they land on their target dates"}, you're expected to reach ${L} on <b>${esc(fmtDate(s.date))}</b>${how}</p>
       ${chanceLine(s, "Chance it really happens: ")}
       ${nl.plan.date && nl.plan.date < s.date ? `<p class="small sub">Doing everything switched on in the plan is expected to get there sooner, on ${esc(fmtDate(nl.plan.date))}.</p>` : ""}
       ${s.exact ? "" : `<p class="small sub">The plan is long, so this set comes from a quick search; a smaller one may exist.</p>`}
       ${stepRows(s.acts)}</div>`;
   }
-  const m = nl.missing, bc = nl.bestCase;
+  const m = nl.missing, bc = nl.bestCase, same = m.r === nl.r, who = same ? "this role" : roleName(m.r);
   const room = m.room.map(x => `<div class="lv-room"><span><b style="font-weight:600">${esc(D.dimNames[x.dim])}</b><div class="tiny sub">${x.covered ? "Open actions cover part of it" : "No open action raises it for this role"}</div></span><b class="num">+${fmtP(x.points)}</b></div>`).join("");
   return `<div class="lv-verdict"><div class="lv-v-h">Not reachable on the current plan</div>
-    <p class="small">Counting each action's chance of working, no set of your switched-on actions reaches ${L}. All of them together are expected to take this role to ${fmtP(nl.plan.exp)}, which is <b>${fmtP(m.points)} points short</b>.</p>
-    ${bc ? `<p class="small"><b>Best case only:</b> ${esc(andList(bc.ids))} together reach ${fmtP(bc.fit)} by ${esc(fmtDate(bc.date))}, but only if ${bc.acts.length === 1 ? "it works" : bc.acts.length === 2 ? "both work" : "all of them work"}.</p>${chanceLine(bc, "Chance of that: ")}${stepRows(bc.acts)}`
-      : `<p class="small sub">Not even the best case gets there: if every action works, this role reaches ${fmtP(nl.plan.best)}.</p>`}
+    <p class="small">Counting each action's chance of working, no set of your switched-on actions reaches ${L}. All of them together are expected to take ${same ? "this role" : `your best fit, on ${roleName(m.r)},`} to ${fmtP(nl.plan.exp)}, which is <b>${fmtP(m.points)} points short</b>.</p>
+    ${bc ? `<p class="small"><b>Best case only:</b> ${esc(andList(bc.ids))}${bc.acts.length === 1 ? "" : " together"} ${bc.role === nl.r ? `reach${bc.acts.length === 1 ? "es" : ""} ${fmtP(bc.fit)}` : `lift${bc.acts.length === 1 ? "s" : ""} ${roleName(bc.role)} from ${fmtP(bc.role.fit)} to ${fmtP(bc.fit)}`} by ${esc(fmtDate(bc.date))}, but only if ${bc.acts.length === 1 ? "it works" : bc.acts.length === 2 ? "both work" : "all of them work"}.</p>${chanceLine(bc, "Chance of that: ")}${stepRows(bc.acts)}`
+      : `<p class="small sub">Not even the best case gets there: if every action works, your best fit reaches ${fmtP(nl.plan.best)}.</p>`}
     <div class="eyebrow" style="margin-top:16px">What is missing</div>
-    ${m.ceiling < nl.target ? `<p class="small">Even with every factor at the most the plan's caps allow, this role tops out at ${fmtP(m.ceiling)}. Reaching ${L} needs something the caps rule out within this plan, such as more years in a similar role, or a different role.</p>`
-      : `<p class="small sub">Room left on this role within the plan's caps, in fit points, if new actions fully work. The ${fmtP(m.points)} points have to come from here: add an action where none exists, or raise the odds of the ones you have.</p>`}
+    ${m.ceiling < nl.target ? `<p class="small">Even with every factor at the most the plan's caps allow, ${who} tops out at ${fmtP(m.ceiling)}. Reaching ${L} needs something the caps rule out within this plan, such as more years in a similar role, or a different role.</p>`
+      : `<p class="small sub">Room left on ${same ? who : who + ", the role the plan takes closest,"} within the plan's caps, in fit points, if new actions fully work. The ${fmtP(m.points)} points have to come from here: add an action where none exists, or raise the odds of the ones you have.</p>`}
     <div>${room || '<div class="small sub">No room left within the caps.</div>'}</div></div>`;
+}
+// What a quest card says when the action alone adds nothing to the best fit.
+function noPoints(q, nl){
+  const toward = nl.top ? "to your best fit" : `toward Level ${nl.nextLevel}`;
+  return q.crit || (q.bc && !nl.reachable) ? `No points ${toward} on its own; it counts together with the others in the set` : `No points ${toward} on its own`;
+}
+// The second line of a quest card when the action carries the level through a role other than today's best.
+function viaLine(q, nl){
+  if (q.r === nl.r || q.exp <= 0) return "";
+  return `<div class="tiny sub q-via">Lifts ${roleName(q.r)} from ${fmtP(q.r.fit)} to ${fmtP(q.fitAfter)}, which would then be your best role. On your best role today: ${q.leadExp > 0 ? "+" + fmtP(q.leadExp) + " expected" : "no change"}.</div>`;
+}
+function questIntro(nl){
+  return `Your open actions, most points per hour first. Points are what each action on its own adds to your best fit${nl.top ? "" : `, counted toward Level ${nl.nextLevel}`}: expected counts its chance of working, if it works assumes it does. Actions that raise the same factor overlap, so their points don't simply add up; the panel above shows what they do together.`;
 }
 function questCard(q, nl){
   const a = q.a, pend = pending.has(a.id);
@@ -1331,12 +1371,12 @@ function questCard(q, nl){
     pend ? '<span class="tag pend">Pending: tell your agent</span>' : "", q.on ? "" : '<span class="tag">Switched off in What if</span>',
     a.derived ? '<span class="tag">Estimated effect</span>' : "", a.stale ? `<span class="tag pend">No movement in ${a.stale} runs</span>` : ""].join("");
   const pts = !a.effects.length ? '<span class="small sub">Protects credibility, no score change</span>'
-    : q.exp <= 0 && q.works <= 0 ? '<span class="small sub">No points on this role</span>'
+    : q.exp <= 0 && q.works <= 0 ? `<span class="small sub">${noPoints(q, nl)}</span>`
     : `<span><b class="num">+${fmtP(q.exp)}</b> <span class="tiny sub">expected</span></span><span><b class="num q-alt">+${fmtP(q.works)}</b> <span class="tiny sub">if it works</span></span><span class="tiny sub num">${fmtP(q.rate)} per hour</span>`;
   return `<div class="quest${q.crit ? " crit" : ""}">
     <div class="q-top"><div class="q-tags">${tags}</div><span class="q-id">${esc(a.id)} · ${stName(a.status)}</span></div>
     <div class="q-title" tabindex="0" data-act="${esc(a.id)}">${esc(a.title)}</div>
-    <div class="q-pts">${pts}</div>
+    <div class="q-pts">${pts}</div>${viaLine(q, nl)}
     <div class="q-meta">${esc(a.owner)}${a.effort ? " · " + esc(a.effort) : ""} · ${a.dated ? "due " + esc(fmtDate(a.date)) : "no due date yet"} · ${pctOf(a.p)}% chance</div>
     <div class="small"><span class="sub">Done when:</span> ${esc(a.done_when)}</div>
     <div class="q-foot"><button class="btn" data-tell="${esc(a.id)}">Done? Tell your agent</button>
@@ -1361,14 +1401,14 @@ function progressHTML(){
       <div class="tiny sub">${esc(why(dayOf[h.date]))}</div></div></div>`).join("")}</div>`;
 }
 function renderLevel(){
-  const r = headlineRole(), nl = nextLevel(r), qs = questsFor(r, nl);
+  const rs = journeyRoles(), r = rs[0], nl = nextLevel(rs), qs = questsFor(rs, nl);
   const who = state.org === "best" ? "Your best role" : esc(D.orgs[state.org].name) + ", best role";
   $("#v-level").innerHTML = `<div class="card lv-card"><div class="lv-head"><div><div class="eyebrow">Next level · ${who}</div>
       <h3>Level ${nl.level}, ${esc(nl.band)}${nl.top ? "" : ` <span class="arrow">→</span> Level ${nl.nextLevel}, ${esc(nl.nextBand)}`}</h3><div class="small sub">${esc(r.on)}: ${esc(r.title)}</div></div>
       ${nl.top ? "" : `<div class="lv-need"><b class="num">${fmtP(nl.toNext)}</b><span class="tiny sub">points to go</span></div>`}</div>
       ${nl.top ? "" : lvTrack(nl)}${verdictHTML(nl)}</div>
     <div class="eyebrow" style="margin:22px 4px 4px">Quests${nl.top ? "" : ` toward Level ${nl.nextLevel}`}</div>
-    <p class="small" style="margin:0 4px 12px">Your open actions, most points per hour first. Points are fit points on this role: expected counts each action's chance of working, if it works assumes it does. Ticks stay on this device and never change a number; your plan file is the record, so tell your agent.</p>
+    <p class="small" style="margin:0 4px 12px">${esc(questIntro(nl))} Ticks stay on this device and never change a number; your plan file is the record, so tell your agent.</p>
     ${qs.length ? `<div class="quests">${qs.map(q => questCard(q, nl)).join("")}</div>` : '<div class="card small sub">No open actions. The next run adds some from the biggest gaps.</div>'}
     <div class="card" style="margin-top:16px">${progressHTML()}</div>`;
   bindLevel($("#v-level"));
