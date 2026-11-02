@@ -8,6 +8,11 @@ also what the agent briefing reports. The next level and the quest points are
 measured on the best fit across every role, so a role other than today's best
 can carry the level; it is named wherever it does. Keep the markup in step with JS_LEVELS in
 _dashboard_assets.py.
+
+One yardstick: Do next and the quests are one ranked list (_levels.up_next: the
+actions on the path to the next level first, then the most points per hour), and
+every action shows one points number wherever it appears, its expected points
+toward the next level. Internal ids (A04, E02) stay in the drill-in detail.
 """
 import datetime as dt
 import html
@@ -40,19 +45,20 @@ def plural(n, one, many=None):
     return "%d %s" % (n, one if n == 1 else (many or one + "s"))
 
 
-def and_list(xs):
-    return "".join(xs) if len(xs) < 2 else ", ".join(xs[:-1]) + " and " + xs[-1]
-
-
 def cap1(s):
     return s[:1].upper() + s[1:] if s else ""
 
 
+def status_name(st):
+    return STATUS.get(st, "To do")
+
+
 def compute(page):
-    """The next level and the quests on the best fit across every role, every open action on."""
+    """The next level, the quests and their Do next order, on the best fit across every role, every open action on."""
     rs, acts, today = L.journey_roles(page["roles"]), page["actions"], page["meta"]["run_date"]
     nl = L.next_level(rs, acts, page["caps"], page["weights"], today)
-    return rs[0], nl, L.quests(rs, acts, page["caps"], page["weights"], nl)
+    qs = L.quests(rs, acts, page["caps"], page["weights"], nl)
+    return rs[0], nl, qs, L.up_next(qs, nl)
 
 
 def role_name(r):
@@ -89,7 +95,7 @@ def level_card(page, nl):
 
 
 def _steps(acts):
-    rows = "".join('<div class="lv-step"><span class="tag crit">%s</span><span class="lv-step-t">%s</span>'
+    rows = "".join('<div class="lv-step" tabindex="0" data-act="%s"><span class="lv-step-t">%s</span>'
                    '<span class="tiny sub">%s · %d%% chance</span></div>' % (
                        esc(a["id"]), esc(a["title"]), "by " + short(a["date"]) if a.get("dated") else "no date yet", L.pct(a["p"]))
                    for a in acts)
@@ -157,8 +163,8 @@ def verdict(page, nl, lead):
         k = len(bc["acts"])
         reach = ("reach%s %s" % ("es" if k == 1 else "", fp(bc["fit"])) if bc["role"] is lead
                  else "lift%s %s from %s to %s" % ("s" if k == 1 else "", role_name(bc["role"]), fp(bc["role"]["fit"]), fp(bc["fit"])))
-        out.append('<p class="small"><b>Best case only:</b> %s%s %s by %s, but only if %s.</p>' % (
-            esc(and_list(bc["ids"])), "" if k == 1 else " together", reach, long_date(bc["date"]),
+        out.append('<p class="small"><b>Best case only:</b> %s %s by %s, but only if %s.</p>' % (
+            "the action below" if k == 1 else "the %d actions below together" % k, reach, long_date(bc["date"]),
             "it works" if k == 1 else "both work" if k == 2 else "all of them work"))
         out.append(_chance(bc, "Chance of that: ") + _steps(bc["acts"]))
     else:
@@ -190,19 +196,49 @@ def no_points(q, nl):
 
 
 def via(q, lead):
-    """The second line of a quest card when the action carries the level through a role other than today's best."""
+    """The second line of a quest card when the action carries the level through a role other than today's best.
+    The fits are the role's, not more points for the action: what it adds to today's best role is in the action pane."""
     if q["role"] is lead or q["exp"] <= 0:
         return ""
-    on_lead = "+%s expected" % fp(q["lead_exp"]) if q["lead_exp"] > 0 else "no change"
-    return ('<div class="tiny sub q-via">Lifts %s from %s to %s, which would then be your best role. On your best role today: %s.</div>' % (
-        role_name(q["role"]), fp(q["role"]["fit"]), fp(q["fit_after"]), on_lead))
+    return ('<div class="tiny sub q-via">Lifts %s from %s to %s, which would then be your best role.</div>' % (
+        role_name(q["role"]), fp(q["role"]["fit"]), fp(q["fit_after"])))
+
+
+def path_tag(q, nl):
+    """The tag an action on the path to the next level carries in Do next and on its quest card, or None."""
+    if q["crit"]:
+        return "On the path to Level %d" % nl["next_level"]
+    if q["bc"] and not nl.get("reachable"):
+        return "Needed for the best case"
+    return None
+
+
+def points(q):
+    """The one points number an action shows everywhere outside the What if rail: its expected points
+    toward the next level, on its own, counting its chance. None when it changes no score."""
+    return "+" + fp(max(0.0, q["exp"])) if q["a"]["effects"] else None
+
+
+def do_next_rows(nl, ordered, limit=None):
+    """The Do next rows: status (a word beside the dot), title, owner and date, and the one points number."""
+    if not ordered:
+        return '<div class="small sub">No open actions. The next run adds some from the biggest gaps.</div>'
+    rows = []
+    for q in ordered[:limit] if limit else ordered:
+        a, tag = q["a"], path_tag(q, nl)
+        rows.append('<div class="dn" tabindex="0" data-act="%s"><span class="status-dot %s"></span><div style="flex:1;min-width:0">'
+                    '<div class="dn-t">%s</div><div class="tiny sub">%s%s · %s · %s%s</div></div><div class="dn-p">%s</div></div>' % (
+                        esc(a["id"]), esc(a["status"]), esc(a["title"]), status_name(a["status"]),
+                        "" if q["on"] else ", switched off", esc(a["owner"]), "by " + short(a["date"]) if a.get("dated") else "no target date yet",
+                        ' · <span class="dn-tag">%s</span>' % tag if tag else "", points(q) or "credibility"))
+    return "".join(rows)
 
 
 def quest_card(q, nl, lead):
     a = q["a"]
+    tag = path_tag(q, nl)
     tags = "".join([
-        '<span class="tag crit">On the path to Level %d</span>' % nl["next_level"] if q["crit"] else "",
-        '<span class="tag">Needed for the best case</span>' if not nl.get("reachable") and q["bc"] else "",
+        '<span class="tag%s">%s</span>' % (" crit" if q["crit"] else "", tag) if tag else "",
         '<span class="tag">Estimated effect</span>' if a.get("derived") else "",
         '<span class="tag pend">No movement in %d runs</span>' % a["stale"] if a.get("stale") else ""])
     if not a["effects"]:
@@ -210,13 +246,12 @@ def quest_card(q, nl, lead):
     elif q["exp"] <= 0 and q["works"] <= 0:
         pts = '<span class="small sub">%s</span>' % no_points(q, nl)
     else:
-        pts = ('<span><b class="num">+%s</b> <span class="tiny sub">expected</span></span><span><b class="num q-alt">+%s</b> '
-               '<span class="tiny sub">if it works</span></span><span class="tiny sub num">%s per hour</span>') % (fp(q["exp"]), fp(q["works"]), fp(q["rate"]))
-    return ('<div class="quest%s"><div class="q-top"><div class="q-tags">%s</div><span class="q-id">%s · %s</span></div>'
+        pts = '<span><b class="num">%s</b> <span class="tiny sub">expected</span></span>' % points(q)
+    return ('<div class="quest%s"><div class="q-top"><div class="q-tags">%s</div><span class="q-id"><span class="status-dot %s"></span>%s</span></div>'
             '<div class="q-title">%s</div><div class="q-pts">%s</div>%s<div class="q-meta">%s%s · %s · %d%% chance</div>'
             '<div class="small"><span class="sub">Done when:</span> %s</div>'
             '<div class="q-foot small"><span><span class="sub">Done? Tell your agent:</span><span class="q-text">%s</span></span></div></div>') % (
-        " crit" if q["crit"] else "", tags, esc(a["id"]), STATUS.get(a["status"], "To do"), esc(a["title"]), pts, via(q, lead), esc(a["owner"]),
+        " crit" if q["crit"] else "", tags, esc(a["status"]), status_name(a["status"]), esc(a["title"]), pts, via(q, lead), esc(a["owner"]),
         " · " + esc(a["effort"]) if a.get("effort") else "", "due " + long_date(a["date"]) if a.get("dated") else "no due date yet",
         L.pct(a["p"]), esc(a.get("done_when")), esc(L.tell_agent(a)))
 
@@ -229,8 +264,8 @@ def _why(d):
     if not d["progress"]:
         return "No real progress that day."
     parts = ["fit rose on %s" % plural(d["roles_up"], "role") if d["roles_up"] else "",
-             "newly checked evidence %s" % ", ".join(d["evidence"]) if d["evidence"] else "",
-             "done with evidence: %s" % ", ".join(d["actions"]) if d["actions"] else ""]
+             "newly checked evidence (%s)" % plural(len(d["evidence"]), "item") if d["evidence"] else "",
+             "%s done with evidence" % plural(len(d["actions"]), "action") if d["actions"] else ""]
     return cap1(" · ".join(p for p in parts if p)) + "."
 
 
@@ -248,34 +283,37 @@ def progress(page):
                        long_date(h["date"]), h["level"], h["level"], esc(h["band"]), int(h["fit"] + 0.5),
                        ' <span class="tag %s">%s</span>' % (h["change"], "Level up" if h["change"] == "up" else "Level down") if h["change"] else "",
                        esc(_why(by_date.get(h["date"])))) for h in hist)
-    return ('<div class="eyebrow">Progress you can trust</div><div class="streak"><div class="streak-n num%s">%d</div><div>'
+    return ('<h2 class="eyebrow">Progress you can trust</h2><div class="streak"><div class="streak-n num%s">%d</div><div>'
             '<div style="font-weight:650">%s in a row with real progress</div><div class="tiny sub">%s</div></div></div>'
-            '<div class="streak-dots" aria-hidden="true">%s</div><div class="eyebrow" style="margin-top:16px">Level history, your best role</div>'
+            '<div class="streak-dots" aria-hidden="true">%s</div><h3 class="eyebrow" style="margin-top:16px">Level history, your best role</h3>'
             '<div class="tiny sub" style="margin-bottom:4px">One row per scored day, newest first, from the dated files in eval/runs.</div>'
             '<div>%s</div>') % ("" if n else " zero", n, "scored day" if n == 1 else "scored days", note, dots, rows)
 
 
 def quests_intro(nl):
-    """How quest points are counted, in plain words."""
-    toward = "" if nl["top"] else ", counted toward Level %d" % nl["next_level"]
-    return ("Your open actions, most points per hour first. Points are what each action on its own adds to your best fit%s: expected "
-            "counts its chance of working, if it works assumes it does. Actions that raise the same factor overlap, so their points "
-            "don't simply add up; the panel above shows what they do together." % toward)
+    """How the quests are ordered and their points counted, in plain words."""
+    if nl["top"]:
+        return ("Your open actions, in the same order as Do next, most points per hour first. Points are what each action on its own "
+                "adds to your best fit, counting its chance of working.")
+    return ("Your open actions, in the same order as Do next: the ones on the path to Level %d first, then the most points per hour. "
+            "Points are what each action on its own adds to your best fit toward Level %d, counting its chance of working. Actions "
+            "that raise the same factor overlap, so their points don't simply add up; the panel above shows what they do together."
+            % (nl["next_level"], nl["next_level"]))
 
 
 def render(page):
     """(level card HTML, level-up view HTML) for the static first render."""
     if not page["roles"]:
         return "", ""
-    r, nl, qs = compute(page)
-    head = ('<div class="lv-head"><div><div class="eyebrow">Next level · Your best role</div><h3>Level %d, %s%s</h3>'
+    r, nl, _, qs = compute(page)
+    head = ('<div class="lv-head"><div><h2 class="eyebrow">Next level · Your best role</h2><h3>Level %d, %s%s</h3>'
             '<div class="small sub">%s: %s</div></div>%s</div>') % (
         nl["level"], esc(nl["band"]), "" if nl["top"] else ' <span class="arrow">→</span> Level %d, %s' % (nl["next_level"], esc(nl["next_band"])),
         esc(r["on"]), esc(r["title"]),
         "" if nl["top"] else '<div class="lv-need"><b class="num">%s</b><span class="tiny sub">points to go</span></div>' % fp(nl["points_to_next"]))
     quests = ('<div class="quests">%s</div>' % "".join(quest_card(q, nl, r) for q in qs) if qs
               else '<div class="card small sub">No open actions. The next run adds some from the biggest gaps.</div>')
-    view = ('<div class="card lv-card">%s%s%s</div><div class="eyebrow" style="margin:22px 4px 4px">Quests%s</div>'
+    view = ('<div class="card lv-card">%s%s%s</div><h2 class="eyebrow" style="margin:22px 4px 4px">Quests%s</h2>'
             '<p class="small" style="margin:0 4px 12px">%s Your plan file is the record, so when one is done, tell your agent.</p>'
             '%s<div class="card" style="margin-top:16px">%s</div>') % (
         head, "" if nl["top"] else _track(nl), verdict(page, nl, r), "" if nl["top"] else " toward Level %d" % nl["next_level"],

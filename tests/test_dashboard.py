@@ -1,4 +1,4 @@
-"""build_dashboard.py: projection rules, colour slots, optional views, the verifiable record, copy rules."""
+"""build_dashboard.py: projection rules, colour slots, optional views, the history, copy rules, one yardstick."""
 import html
 import json
 import os
@@ -9,6 +9,7 @@ import unittest
 from unittest import mock
 
 import helpers as H
+import _dashboard_assets as A
 import build_dashboard as B
 
 WEIGHTS = [25, 20, 20, 10, 10, 10, 5]
@@ -222,24 +223,83 @@ class ParkedAndStaticTests(unittest.TestCase):
         run = H.load(os.path.join(self.ws, "eval", "runs", "2026-11-01.json"))
         best = run["roles"][0]
         self.assertIn("Your numbers on 1 Nov 2026", text)
-        self.assertIn("%d / 100 fit" % int(best["fit"] + 0.5), text)
+        self.assertIn("Best match %d of 100" % int(best["fit"] + 0.5), text)
         self.assertIn("Interview chance %s, offer chance %s" % (best["interview_band"], best["offer_band"]), text)
         self.assertIn("Level 3, Moderate", text)
         for org, b in run["per_org"].items():
             title = next(r["title"] for r in d["roles"] if r["id"] == b["role_id"])
             self.assertIn("%s %s %d %s %s" % (d["orgNames"][org], title, int(b["fit"] + 0.5), b["interview_band"],
                                               b["offer_band"]), text)
-        plan = H.load(os.path.join(self.ws, "campaign", "plan.json"))
-        top3 = sorted([a for a in plan["actions"] if a["status"] in ("todo", "doing")],
-                      key=lambda a: (-B.priority(a), B.STATUS_ORDER[a["status"]], a["id"]))[:3]
-        self.assertIn("Top actions, highest priority first", text)
-        for a in top3:
-            self.assertIn(B.clean(a["title"]), text)
+        # Do next: the live page's one ranked list, in the agent files' order, with one points number per action
+        up = self.payload()["levels"]["quests"]
+        rows = section.split('<div class="dn" tabindex="0" data-act="')[1:]
+        self.assertEqual([r.split('"')[0] for r in rows], [q["id"] for q in up][:4])
+        self.assertEqual(rows[0].split('"')[0], "A06")                            # the panel's best-case set leads, not last
+        for row, q in zip(rows, up):
+            cell = re.search(r'<div class="dn-p">(.*?)</div>', row).group(1)
+            self.assertEqual(cell, "+%g" % q["points_expected"] if q["changes_a_score"] else "credibility", q["id"])
+            self.assertEqual(len(re.findall(r"\+\d", re.sub(r"<[^>]+>", " ", row))), 1 if q["changes_a_score"] else 0)
+            self.assertRegex(row, r'<div class="tiny sub">(To do|In progress)')  # a word beside the dot, not colour alone
+        self.assertIn("Do next", text)
+        self.assertNotIn("highest priority", text)
         self.assertIn('<th scope="col">Organisation</th>', section)
         self.assertIn('$("#staticSummary").hidden = true;', page)                 # hidden once the live page runs
         self.assertNotIn("__STATIC__", page)
         self.assertNotIn("Jordan", section)
         self.assertNotRegex(text, "[\u2013\u2014]| - ")
+
+    def test_one_yardstick_keeps_the_mission_control_character(self):
+        page, d = self.build()
+        body, script = page.split('<script type="application/json"')
+        # The owner keeps the flight, game and analyst vocabulary; only the misleading "best chance" label goes.
+        for kept in ("Departed", "Altitude", "Flight level", "Offer zone", "Quests", "Badges", "Do next", "Start here",
+                     "Biggest unlocks", "Verifiable record", "Progress you can trust", "Best role fit", "Done? Tell your agent",
+                     "Expected by", "Do nothing", "What moves you", "Pending on this device"):
+            self.assertIn(kept, page)
+        self.assertNotIn("Your best chance", page)
+        self.assertIn('Best match today</div>\n     <div class="best-v num"><span id="bestNum">57</span> <small>of 100</small>', body)
+        # The marginal number appears only in the What if rail, labelled "with everything else on".
+        blocks = [A.JS_CORE, A.JS_CHART, A.JS_HOME, A.JS_VIEWS, A.JS_LEVELS, A.JS_DETAIL]
+        rail = A.JS_HOME[A.JS_HOME.index("function renderSwitches"):A.JS_HOME.index("function renderBottomBar")]
+        self.assertGreater(rail.count("with everything else on"), 0)
+        self.assertEqual(sum(b.count("with everything else on") for b in blocks), rail.count("with everything else on"))
+        self.assertNotIn("actionLift", script)                    # the old "on top of the rest of the plan" number is gone
+        # Phone: Do next comes straight after the headline status (strip, best match, level), before the chart.
+        self.assertLess(body.index('id="level"'), body.index('id="nextIn"'))
+        self.assertLess(body.index('id="nextIn"'), body.index('id="chartWrap"'))
+        self.assertIn(".btn,.seg button,select{min-height:44px}", page)
+        # One h1; tabs with aria-selected and aria-controls; every view keeps its tab, in a row that scrolls with a hint.
+        self.assertEqual(len(re.findall(r"<h1[\s>]", page)), 1)
+        self.assertIn('role="tab" id="tab-${v[0]}" aria-selected="${on}" aria-controls="v-${v[0]}"', script)
+        self.assertNotIn('role="tab" aria-pressed', script)
+        self.assertIn('<div class="hscroll"><div class="seg" id="viewSeg" role="tablist"', body)
+        self.assertIn("scrollHint($(\"#viewSeg\"))", script)
+        for v in ("Level up", "Organisations", "Path to the top band", "What moves you", "Roles", "SWOT and TOWS", "Plan", "Evidence", "Market"):
+            self.assertIn('"%s"]' % v, script)
+        # The made-up sample progress is a design preview, reachable only with ?preview=1.
+        self.assertIn("$(\"#sampleRow\").hidden = !(D.meta.sample_allowed && PREVIEW);", script)
+        # Internal ids stay off the main surfaces (the action pane keeps them): titles name another action by its short title.
+        titles = {a["id"]: a["title"] for a in d["actions"]}
+        self.assertEqual(titles["A08"], "Answer the notice period and non-compete question")
+        self.assertIn("once \u201cFix the LinkedIn headline\u201d is done", titles["A06"])
+        view = re.search(r'<section class="view on" id="v-level".*?</section>', body, re.S).group(0)
+        view = re.sub(r'<span class="q-text">.*?</span>|data-act="[^"]*"', "", view)   # the note for the agent keeps the id
+        self.assertNotRegex(view, r"\b[AEQ][0-9]{2}\b")
+
+    def test_do_nothing_line_has_three_to_one_contrast(self):
+        def lum(hexc):
+            rgb = [int(hexc[i:i + 2], 16) / 255.0 for i in (1, 3, 5)]
+            lin = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in rgb]
+            return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
+
+        def ratio(a, b):
+            hi, lo = sorted((lum(a), lum(b)), reverse=True)
+            return (hi + 0.05) / (lo + 0.05)
+        light, dark = A.CSS.split(":root[data-theme=dark]")[0], A.CSS.split(":root[data-theme=dark]")[1].split("}")[0]
+        for theme in (light, dark):
+            tok = dict(re.findall(r"--(stop|z0|z1|card):(#[0-9a-f]{6})", theme))
+            for bg in ("z0", "z1", "card"):
+                self.assertGreaterEqual(ratio(tok["stop"], tok[bg]), 3.0, (tok, bg))
 
     def test_extension_fields_pass_through(self):
         for rel, fn in (("profile/evidence.json", lambda d: d["items"][0].update(x_original_id="G01")),

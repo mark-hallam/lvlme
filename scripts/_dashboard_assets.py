@@ -23,14 +23,14 @@ CSS = r"""
  --p0:#e6e6eb;--p0t:#2c2c2e;--p1:#d6e6fa;--p1t:#0d366b;--p2:#86b6ef;--p2t:#0b2447;--p3:#1b54a0;--p3t:#ffffff;--p4:#0b2a55;--p4t:#ffffff;
  --h0:#ececf0;--h1:#cde2fb;--h2:#86b6ef;--h3:#1b54a0;--h4:#133f7a;--h5:#0b2a55;--hlt:#0b2447;--hdt:#ffffff;
  --tv-bg:#dff3e4;--tv-t:#14501f;--tc-bg:#fde3e1;--tc-t:#7a1810;--tp-bg:#fcefd6;--tp-t:#6b3f00;
- --link-soft:#084c9e;--ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.25,.64,1)}
+ --stop:#6e6e73;--link-soft:#084c9e;--ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.25,.64,1)}
 :root[data-theme=dark]{color-scheme:dark;
  --bg:#111113;--card:#1c1c1e;--card2:#26262a;--ink:#f5f5f7;--sub:#b8b8be;--line:#8e8e93;--rule:#38383c;
  --accent:#64b0ff;--on-accent:#0b1a2b;--accent-soft:#172c45;--ok:#4cd964;--warn:#ffb340;--warn-bg:#3a2e0b;
  --z0:#1f1f22;--z1:#252529;--grid:#323236;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.4);
  --p0:#3a3a3e;--p0t:#f2f2f7;--p1:#1b54a0;--p1t:#ffffff;--p2:#78aeee;--p2t:#0b1a2b;--p3:#9cc4f3;--p3t:#0b1a2b;--p4:#cfe2fa;--p4t:#0b1a2b;
  --h0:#2c2c30;--h1:#163f75;--h2:#1b54a0;--h3:#78aeee;--h4:#9cc4f3;--h5:#cfe2fa;--hlt:#ffffff;--hdt:#0b1a2b;
- --tv-bg:#1e3a24;--tv-t:#a6efb0;--tc-bg:#3d1714;--tc-t:#ffc2ba;--tp-bg:#3a2a10;--tp-t:#ffd99a;--link-soft:#8cc4ff}
+ --tv-bg:#1e3a24;--tv-t:#a6efb0;--tc-bg:#3d1714;--tc-t:#ffc2ba;--tp-bg:#3a2a10;--tp-t:#ffd99a;--link-soft:#8cc4ff;--stop:#9a9aa0}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
@@ -38,13 +38,14 @@ body{font:16px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Ne
 button{font:inherit;color:inherit}
 a{color:var(--accent)}
 .sub{color:var(--sub)}.small{font-size:14px}.tiny{font-size:13px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .num{font-variant-numeric:tabular-nums}
 
 /* header */
 .top{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--rule)}
 .top-in{max-width:1520px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:12px}
 .brand{display:flex;flex-direction:column;min-width:0;flex:1}
-.brand b{font-size:17px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand h1{font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.3;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brand span{font-size:13px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .btn{border:1px solid var(--rule);background:var(--card);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:14px;font-weight:500}
 .btn:hover{background:var(--card2)}
@@ -56,13 +57,22 @@ a{color:var(--accent)}
 .seg{display:inline-flex;background:var(--card2);border:1px solid var(--rule);border-radius:11px;padding:3px;gap:2px;overflow-x:auto;max-width:100%;scrollbar-width:none}
 .seg::-webkit-scrollbar{display:none}
 .seg button{border:none;background:none;padding:6px 12px;border-radius:8px;font-size:14px;font-weight:500;color:var(--sub);cursor:pointer;white-space:nowrap}
-.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.seg button[aria-pressed=true],.seg button[aria-selected=true]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .seg.small button{padding:4px 10px;font-size:13px}
+/* a row that scrolls sideways shows a fade and a chevron while there is more to see */
+.hscroll{position:relative;display:inline-flex;max-width:100%;vertical-align:top}
+.hscroll::before,.hscroll::after{position:absolute;top:1px;bottom:1px;pointer-events:none;opacity:0;transition:opacity .2s}
+.hscroll::after{content:"\203A";right:1px;width:52px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-size:24px;font-weight:600;color:var(--accent);background:linear-gradient(to right,rgba(246,246,248,0),var(--card2) 60%);border-radius:0 11px 11px 0}
+.hscroll::before{content:"";left:1px;width:28px;background:linear-gradient(to left,rgba(246,246,248,0),var(--card2));border-radius:11px 0 0 11px}
+:root[data-theme=dark] .hscroll::after{background:linear-gradient(to right,rgba(38,38,42,0),var(--card2) 60%)}
+:root[data-theme=dark] .hscroll::before{background:linear-gradient(to left,rgba(38,38,42,0),var(--card2))}
+.hscroll.more-right::after,.hscroll.more-left::before{opacity:1}
 
 /* layout */
 .app{max-width:1520px;margin:0 auto;padding:20px;display:grid;grid-template-columns:272px minmax(0,1fr) 340px;gap:20px;align-items:start}
 .centre{container-type:inline-size;min-width:0}
-@media (min-width:1280px){.centre .pair{display:none}}
+@media (min-width:1280px){.centre .pair,.hero .next-in{display:none}}
+.next-in{margin:16px 0 0;padding:14px 0 8px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
 @media (min-width:1500px){.app{grid-template-columns:300px minmax(0,1fr) 380px}}
 .rail,.detail{position:sticky;top:76px;max-height:calc(100vh - 96px);overflow:auto;scrollbar-width:thin}
 .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:18px 20px}
@@ -70,6 +80,7 @@ a{color:var(--accent)}
 .eyebrow{font-size:13px;font-weight:650;color:var(--sub);letter-spacing:.03em;margin-bottom:8px;text-transform:uppercase}
 h2{font-size:22px;letter-spacing:-.015em;margin:0 0 6px}
 h3{font-size:17px;margin:0 0 6px}
+.rail-h,.pane-h{font-size:17px;letter-spacing:0;margin:0 0 6px}
 
 /* rail */
 .sw{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--rule)}
@@ -82,6 +93,7 @@ h3{font-size:17px;margin:0 0 6px}
 .sw-meta{font-size:13px;color:var(--sub);margin-top:2px}
 .stale{color:var(--warn);font-weight:600}
 .tog{position:relative;width:44px;height:26px;flex-shrink:0;border-radius:999px;background:var(--rule);border:none;cursor:pointer;margin-top:2px}
+.tog::before{content:"";position:absolute;inset:-9px 0}
 .tog::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .tog[aria-checked=true]{background:var(--ok)}
 .tog[aria-checked=true]::after{transform:translateX(18px)}
@@ -91,6 +103,8 @@ h3{font-size:17px;margin:0 0 6px}
 .metric b{font-size:18px}
 .metric > .num{white-space:nowrap}
 .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;background:var(--line)}
+.dn-tag{color:var(--accent);font-weight:600}
+.dn .status-dot{margin-right:0;flex-shrink:0}
 .status-dot.doing{background:var(--accent)}.status-dot.done{background:var(--ok)}
 .grp-h{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:650;color:var(--sub);letter-spacing:.03em;text-transform:uppercase;margin:12px 0 0}
 .grp{border-top:1px solid var(--rule);margin-top:6px}
@@ -418,7 +432,21 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
  .brand span{display:none}
  .share-row b{font-size:22px}
 }
-@media (max-width:420px){.top-in{padding:10px 16px;gap:10px}.brand b{font-size:16px}.seg.small button{padding:4px 8px}.top .btn{padding:6px 12px}.card{padding:16px}.tiles4{gap:10px}.tile .v{font-size:24px}}
+@media (max-width:759px){
+ .btn,.seg button,select{min-height:44px}
+ .seg.small button{min-width:44px}
+ .linkbtn{min-height:44px;display:inline-flex;align-items:center}
+ .close{width:44px;height:44px}
+ #modeSeg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}
+ #modeSeg button{white-space:normal;line-height:1.2;padding:4px 6px}
+ .hscroll,.hscroll > .seg{width:100%}
+ .banner div{font-size:13px;padding:8px 12px}
+ .strip{padding-bottom:10px;margin-bottom:12px}
+ .hero-row{gap:12px}
+ .level{padding:10px 12px}
+ .level .linkbtn{margin-top:0}
+}
+@media (max-width:420px){.top-in{padding:10px 16px;gap:10px}.brand h1{font-size:16px}.seg.small button{padding:4px 8px}.top .btn{padding:6px 12px}.card{padding:16px}.tiles4{gap:10px}.tile .v{font-size:24px}}
 @media (max-width:360px){.seg button{padding:6px 8px;font-size:13px}}
 .sheet-grip{display:none;width:40px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 4px}
 .sheet-done{display:none}
@@ -428,7 +456,7 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
 
 BODY = r"""
 <header class="top"><div class="top-in">
- <div class="brand"><b id="brandTitle">__TITLE__</b><span id="storyLine"></span></div>
+ <div class="brand"><h1 id="brandTitle">__TITLE__</h1><span id="storyLine"></span></div>
  <div class="seg small" id="themeSeg" role="group" aria-label="Appearance"><button data-t="light" aria-pressed="true">Light</button><button data-t="dark" aria-pressed="false">Dark</button></div>
  <button class="btn primary" id="shareBtn">Share</button>
 </div></header>
@@ -440,36 +468,38 @@ BODY = r"""
   <button class="btn sheet-done" id="railDone">Done</button>
   <div class="card">
    <div class="eyebrow">What if</div>
-   <h3>Switch plan actions on and off</h3>
-   <p class="small sub" style="margin:2px 0 6px">Every number on the page updates. Each switch shows what that action adds to your best role and how many roles it lifts.</p>
+   <h2 class="rail-h">Switch plan actions on and off</h2>
+   <p class="small sub" style="margin:2px 0 6px">Every number on the page updates. Each switch shows what that action adds to your best role with everything else on, and how many roles it lifts.</p>
    <div class="rail-actions"><button class="btn" id="allOn">All on</button><button class="btn" id="allOff">All off</button></div>
    <div class="grp-h"><span>Now</span><span class="tiny" id="nowCount"></span></div>
-   <div class="grp-note">The open actions, highest priority first. Work these first.</div>
+   <div class="grp-note">The open actions, in the same order as Do next. Work these first.</div>
    <div id="switchesNow"></div>
    <details class="grp" id="laterBox"><summary><span id="laterLabel">Later</span><span class="chev">›</span></summary><div class="grp-note">Over the active cap, or parked for later. Parked actions start switched off; any action here counts in the projection only while switched on.</div><div id="switchesLater"></div></details>
    <details class="grp" id="doneBox" hidden><summary><span id="doneLabel">Done</span><span class="chev">›</span></summary><div class="grp-note">Already in today's scores.</div><div id="switchesDone"></div></details>
   </div>
   <div class="card">
-   <div class="eyebrow">Campaign progress</div>
+   <h2 class="eyebrow">Campaign progress</h2>
    <div id="metrics"></div>
   </div>
  </aside>
 
  <main class="centre" id="centre">
-  <section class="card hero enter" id="hero" aria-label="Journey">
+  <section class="card hero enter" id="hero" aria-labelledby="heroH">
+   <h2 class="sr-only" id="heroH">Journey</h2>
    <div class="strip" id="strip"></div>
    <div class="hero-row">
     <div>
-     <div class="best-l" id="bestLabel">Your best chance today</div>
-     <div class="best-v num"><span id="bestNum">__BESTFIT__</span> <small>/ 100</small></div>
+     <div class="best-l" id="bestLabel">Best match today</div>
+     <div class="best-v num"><span id="bestNum">__BESTFIT__</span> <small>of 100</small></div>
      <div class="best-pills" id="bestPills"></div>
      <div class="small sub" id="bestRole" style="margin-top:6px">__BESTROLE__</div>
     </div>
     <div class="level" id="level">__LEVELCARD__</div>
    </div>
+   <div class="next-in" id="nextIn" hidden><div class="eyebrow">Start here</div><h2 class="pane-h">Do next</h2><div id="doNext"></div></div>
    <div class="controls">
     <div class="seg" id="modeSeg" role="group" aria-label="Which numbers to show"></div>
-    <div class="seg" id="orgSeg" role="group" aria-label="Which organisation the journey follows"></div>
+    <div class="hscroll"><div class="seg" id="orgSeg" role="group" aria-label="Which organisation the journey follows"></div></div>
    </div>
    <div class="chart-wrap" id="chartWrap"></div>
    <div class="legend" id="legend"></div>
@@ -483,21 +513,18 @@ BODY = r"""
 
   <section class="card static-sum" id="staticSummary" aria-labelledby="staticSummaryH">__STATIC__</section>
   <div class="tiles4" id="tiles4"></div>
-  <div class="grid2 pair">
-   <div class="card"><div class="eyebrow">Do next</div><div id="doNext"></div></div>
-   <div class="card"><div class="eyebrow">Biggest unlocks</div><div id="unlocks"></div></div>
-  </div>
+  <div class="card pair" id="unlocksCard"><div class="eyebrow">Biggest unlocks</div><div id="unlocks"></div></div>
 
-  <nav class="views-nav"><div class="seg" id="viewSeg" role="tablist" aria-label="Views"></div></nav>
-  <section class="view on" id="v-level" aria-label="Level up">__LEVELUP__</section>
-  <section class="view" id="v-orgs"></section>
-  <section class="view" id="v-top"></section>
-  <section class="view" id="v-moves"></section>
-  <section class="view" id="v-roles"></section>
-  <section class="view" id="v-swot"></section>
-  <section class="view" id="v-plan"></section>
-  <section class="view" id="v-evidence"></section>
-  <section class="view" id="v-market"></section>
+  <nav class="views-nav" aria-label="Views"><div class="hscroll"><div class="seg" id="viewSeg" role="tablist" aria-label="Views"></div></div></nav>
+  <section class="view on" id="v-level" role="tabpanel" aria-labelledby="tab-level">__LEVELUP__</section>
+  <section class="view" id="v-orgs" role="tabpanel"></section>
+  <section class="view" id="v-top" role="tabpanel"></section>
+  <section class="view" id="v-moves" role="tabpanel"></section>
+  <section class="view" id="v-roles" role="tabpanel"></section>
+  <section class="view" id="v-swot" role="tabpanel"></section>
+  <section class="view" id="v-plan" role="tabpanel"></section>
+  <section class="view" id="v-evidence" role="tabpanel"></section>
+  <section class="view" id="v-market" role="tabpanel"></section>
   <p class="tiny sub" style="margin:28px 4px 0">How scores work: seven factors, each 0 to 5 from cited evidence, weighted into a fit score out of 100, then turned into chance bands. A separate sceptical reviewer must agree with every score above 2. The projection applies each action on its target date, weighted by its chance of working, with caps so it can't overpromise; a role with an eligibility blocker you can't clear never gains eligibility. Bands are judgement, not statistics. Drafts only: the engine never applies, sends, posts or changes accounts. Last scored <span id="builtAt"></span>.</p>
  </main>
 
@@ -536,6 +563,10 @@ const isDark = () => document.documentElement.dataset.theme === "dark";
 const orgColour = g => D.orgs[g] ? (isDark() ? D.orgs[g].cd : D.orgs[g].c) : "var(--line)";
 const motionOK = () => !reduce && document.visibilityState === "visible";
 const plural = (n, one, many) => n + " " + (n === 1 ? one : (many || one + "s"));
+const stName = s => s === "doing" ? "In progress" : s === "later" ? "Parked for later" : s === "done" ? "Done" : s === "dropped" ? "Dropped" : "To do";
+const cap1 = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
+// The made-up sample progress is a design preview: reachable only with ?preview=1 in the address.
+const PREVIEW = typeof location !== "undefined" && /[?&]preview=1(&|$)/.test(location.search);
 
 // Mark an element as entering so its CSS animation runs, then always clear it,
 // so a paused or skipped animation can never leave content hidden.
@@ -601,7 +632,8 @@ function bestOf(rs, acts, mode, sure){
 // ---------- state + per-refresh cache ----------
 const state = {org: "best", mode: "today", sample: false, view: "level", stack: []};
 let P = {};                                                // role id -> {exp, best}
-function recompute(){ P = {}; D.roles.forEach(r => P[r.id] = {exp: project(r, "exp"), best: project(r, "best")}); }
+let LV = null;                                             // the journey's next level, quests and Do next order (see lv())
+function recompute(){ P = {}; LV = null; D.roles.forEach(r => P[r.id] = {exp: project(r, "exp"), best: project(r, "best")}); }
 function fitM(r, mode){ mode = mode || state.mode; return mode === "today" ? r.fit : P[r.id][mode].end; }
 function scoresM(r, mode){ mode = mode || state.mode; return mode === "today" ? r.s : P[r.id][mode].scores; }
 function ibM(r, mode){ mode = mode || state.mode; return mode === "today" ? r.ib : interviewBand(fitM(r, mode), scoresM(r, mode), r.hrl); }
@@ -623,13 +655,6 @@ function crossDate(pts, threshold){
 }
 
 // ---------- helpers ----------
-// How an action's lift on the best role reads: short for badges, long for sentences.
-function liftText(a, lift, long){
-  if (a.status === "done") return long ? "Already in today's scores" : "done";
-  if (lift > 0) return "+" + lift.toFixed(1);
-  if (!a.effects.length) return long ? "Protects credibility, no score change" : "credibility";
-  return long ? "Little extra on your best role, other actions cover the same factors" : "covered";
-}
 function pill(band){ return `<span class="pill pb${BANDS.indexOf(band)}">${esc(band)}</span>`; }
 function countTo(node, to, dur){
   const from = parseFloat(node.dataset.v || "0"); node.dataset.v = to;
@@ -669,12 +694,12 @@ function renderTopline(){
   // best chance (mode aware)
   const best = D.roles.reduce((a, b) => fitM(b) > fitM(a) ? b : a, D.roles[0]);
   const focus = state.org === "best" ? best : r;
-  $("#bestLabel").textContent = (state.org === "best" ? "Your best chance " : D.orgs[focus.g].name + ", best role ") + modeName();
+  $("#bestLabel").textContent = (state.org === "best" ? "Best match " : D.orgs[focus.g].name + ", best match ") + modeName();
   countTo($("#bestNum"), fitM(focus));
   $("#bestPills").innerHTML = `Interview ${pill(ibM(focus))} Offer ${pill(obM(focus))}`;
   $("#bestRole").textContent = `${focus.on}: ${focus.title}`;
   // level (today, actual): the next level and what gets you there
-  $("#level").innerHTML = levelCardHTML(nextLevel(journeyRoles()));
+  $("#level").innerHTML = levelCardHTML(lv().nl);
   $("#level").querySelectorAll("[data-go-level]").forEach(b => b.addEventListener("click", goLevel));
   enter($("#level .lvl-pop"), 900);
 }
@@ -745,7 +770,7 @@ function buildChartFrame(){
     <line x1="${PL}" x2="${PL + IW}" y1="${yOf(70)}" y2="${yOf(70)}" stroke="var(--ok)" stroke-width="1.5" stroke-dasharray="5 4"/>
     ${SMALL ? `<text x="${PL + 6}" y="${yOf(70) - 6}" font-size="11" font-weight="750" fill="var(--ok)" ${HALO}>Offer zone, fit 70 and up</text>` : ""}
     <g clip-path="url(#clipReveal)">
-      <path id="pNone" class="series" stroke="var(--line)" stroke-dasharray="2 5"/>
+      <path id="pNone" class="series" stroke="var(--stop)" stroke-dasharray="2 4"/>
       <path id="pBest" class="series" stroke-dasharray="7 5"/>
       <path id="pExp" class="series"/>
       <path id="pSample" class="series" stroke="var(--ink)" stroke-dasharray="4 3" visibility="hidden"/>
@@ -832,7 +857,7 @@ function drawChart(){
   $("#legend").innerHTML = `<span style="color:var(--ink)"><i class="lk"></i><span class="sub">Measured, one dot per scored day${state.sample ? ", sample shown dashed" : ""}</span></span>
     <span style="color:${c}"><i class="lk"></i><span class="sub">Expected if you follow the plan</span></span>
     <span style="color:${c}"><i class="lk" style="border-top-style:dashed"></i><span class="sub">Best case, every action lands</span></span>
-    <span style="color:var(--line)"><i class="lk" style="border-top-style:dotted"></i><span class="sub">Do nothing</span></span>
+    <span style="color:var(--stop)"><i class="lk" style="border-top-style:dotted"></i><span class="sub">Do nothing</span></span>
     <span><svg width="12" height="12" viewBox="-6 -6 12 12" aria-hidden="true"><path d="M0,-5 L5,0 L0,5 L-5,0 Z" fill="var(--card)" stroke="${c}" stroke-width="1.6"/></svg><span class="sub">Plan action</span></span>`;
   const rows = hist.slice(0, -1).map(p => `<tr><td>${fmtT(p.t)}</td><td class="num">${Math.round(p.v)}</td><td></td><td></td><td></td></tr>`).join("") +
     exp.pts.map((p, i) => `<tr><td>${fmtDate(p.d)}${i === 0 ? " (today)" : ""}</td><td class="num">${i === 0 ? Math.round(r.fit) : ""}</td><td class="num">${Math.round(p.v)}</td><td class="num">${Math.round(best.pts[i].v)}</td><td class="num">${Math.round(r.fit)}</td></tr>`).join("");
@@ -858,7 +883,7 @@ function onChartMove(e){
   }
   const ts = SAMPLE_T[Math.max(0, Math.min(N - 1, Math.round((t - TN) / ((T1 - TN) / (N - 1)))))];
   cr.setAttribute("x1", xT(ts)); cr.setAttribute("x2", xT(ts)); cr.setAttribute("visibility", "visible");
-  showTip(e, [el("div", "tn", fmtT(ts)), row(valueAt(exp.pts, ts), "expected", c), row(valueAt(best.pts, ts), "best case", c, "dashed"), row(r.fit, "do nothing", "var(--line)", "dotted")]);
+  showTip(e, [el("div", "tn", fmtT(ts)), row(valueAt(exp.pts, ts), "expected", c), row(valueAt(best.pts, ts), "best case", c, "dashed"), row(r.fit, "do nothing", "var(--stop)", "dotted")]);
 }
 """
 
@@ -873,17 +898,12 @@ function renderTiles4(){
   $("#tiles4").innerHTML = tiles.map(t => `<div class="tile"><div class="v num" data-to="${t[1]}">${Math.round(t[1])}</div><div class="l">${esc(t[0])}</div></div>`).join("");
   $("#tiles4").querySelectorAll("[data-to]").forEach(n => countTo(n, +n.dataset.to));
 }
-function actionLift(a, r){ if (!switchable(a)) return 0; const w = new Set(enabled); w.add(a.id); const wo = new Set(enabled); wo.delete(a.id); return r1(project(r, "exp", w).end - project(r, "exp", wo).end); }
 const byWhen = a => a.dated ? "by " + shortDate(a.date) : "no target date yet";
-// Do next and Biggest unlocks live in the right pane on wide screens (its home state)
-// and in the centre column on narrower screens, so they are rendered as strings.
-function doNextHTML(){
-  const r = D.roles[0];
-  const next = D.actions.filter(a => a.group === "now").map(a => ({a, lift: actionLift(a, r)}))
-    .sort((x, y) => (y.lift - x.lift) || (y.a.priority - x.a.priority)).slice(0, 4);
-  if (!next.length) return '<div class="small sub">No open actions. The next run adds some from the biggest gaps.</div>';
-  return next.map(({a, lift}) => `<div class="dn" tabindex="0" data-act="${esc(a.id)}"><span class="status-dot ${esc(a.status)}"></span><div style="flex:1;min-width:0"><div class="dn-t">${esc(a.title)}</div><div class="tiny sub">${esc(a.owner)} · ${esc(byWhen(a))}</div></div><div class="dn-p">${liftText(a, lift)}</div></div>`).join("");
-}
+// Do next and Biggest unlocks live in the right pane on wide screens (its home state), and on narrower
+// screens Do next sits in the journey card under the headline status, so they are rendered as strings.
+// Do next is the top of the one ranked list (the quests in the same order): one points number per action.
+const DO_NEXT = 4;
+function doNextHTML(){ const L = lv(); return doNextRows(L.up, L.nl, DO_NEXT); }
 function unlocksHTML(){
   return D.gaps.slice(0, 4).map(x => `<div class="dn" tabindex="0" data-moves="1"><div style="flex:1;min-width:0"><div class="dn-t">${esc(x.title)}</div><div class="tiny sub">${plural(x.roles, "role")}</div></div><div class="dn-p">+${x.points}</div></div>`).join("") +
     `<button class="linkbtn" data-see-moves="1" style="margin-top:8px">See everything that moves you ›</button>`;
@@ -894,25 +914,29 @@ function bindHome(root){
   root.querySelectorAll("[data-moves],[data-see-moves]").forEach(n => onEnter(n, goMoves));
 }
 function renderDoNext(){
-  $("#doNext").innerHTML = doNextHTML(); $("#unlocks").innerHTML = unlocksHTML(); bindHome($(".pair"));
+  $("#doNext").innerHTML = `<div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div>${doNextHTML()}`; $("#nextIn").hidden = false;
+  $("#unlocks").innerHTML = unlocksHTML(); bindHome($("#nextIn")); bindHome($(".pair"));
   if (!narrow() && !state.stack.length) renderHome();
 }
 function renderHome(){
   const card = $("#detailCard");
-  card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h3 style="margin:0">Do next</h3><div class="tiny sub" style="margin-bottom:4px">What each adds to your best role on top of the rest of your plan, counting its chance.</div><div>${doNextHTML()}</div>
-    <h3 style="margin:18px 0 0">Biggest unlocks</h3><div class="tiny sub" style="margin-bottom:4px">Fit points gained, added up across your top roles.</div><div>${unlocksHTML()}</div>
+  card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h2 class="pane-h" style="margin:0">Do next</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div><div>${doNextHTML()}</div>
+    <h2 class="pane-h" style="margin:18px 0 0">Biggest unlocks</h2><div class="tiny sub" style="margin-bottom:4px">Fit points gained, added up across your top roles.</div><div>${unlocksHTML()}</div>
     <div class="tiny sub" style="margin-top:18px;padding-top:12px;border-top:1px solid var(--rule)">Tap any organisation, role, factor, action or piece of evidence to drill in here.</div></div>`;
   bindHome(card);
 }
 
 // ---------- rail ----------
+// The rail keeps the Do next order the page opened with, so its rows never jump while you switch.
+let RANK = {};
 function renderSwitches(){
   const best = D.roles[0], box = {now: $("#switchesNow"), later: $("#switchesLater"), done: $("#switchesDone")};
   Object.values(box).forEach(b => b.innerHTML = "");
   const groups = {now: [], later: [], done: []};
   D.actions.forEach(a => { if (groups[a.group]) groups[a.group].push(a); });
-  groups.now.sort((x, y) => (y.priority - x.priority) || (tOf(x.date) - tOf(y.date)));
-  groups.later.sort((x, y) => (y.priority - x.priority) || (tOf(x.date) - tOf(y.date)));
+  const rank = a => a.id in RANK ? RANK[a.id] : 1e3;
+  const byRank = (x, y) => (rank(x) - rank(y)) || (y.priority - x.priority) || (tOf(x.date) - tOf(y.date));
+  groups.now.sort(byRank); groups.later.sort(byRank);
   groups.done.sort((x, y) => tOf(y.date) - tOf(x.date));
   const onIn = list => list.filter(a => enabled.has(a.id)).length;
   $("#nowCount").textContent = `${onIn(groups.now)} of ${groups.now.length} on`;
@@ -927,11 +951,12 @@ function renderSwitches(){
       row.innerHTML = `<div class="sw-main"><div class="sw-title">${esc(a.title)}</div><div class="sw-meta">Done ${esc(shortDate(a.date))}</div></div><span class="done-tick" aria-label="Done">✓</span>`;
     } else {
       const on = enabled.has(a.id);
+      // The only place the marginal number appears: what this action adds to your best role with everything else switched on.
       const w = new Set(enabled); w.add(a.id); const wo = new Set(enabled); wo.delete(a.id);
       const lift = r1(project(best, "exp", w).end - project(best, "exp", wo).end);
       let lifted = 0; D.roles.forEach(r => { if (project(r, "exp", w).end - project(r, "exp", wo).end > 0.05) lifted++; });
       row.innerHTML = `<div class="sw-main"><div class="sw-title">${esc(a.title)}</div>
-        <div class="sw-lift">${lift > 0 ? `<b>+${lift.toFixed(1)}</b> on your best role${lifted ? `, lifts <b>${lifted}</b> ${lifted === 1 ? "role" : "roles"}` : ""}` : !a.effects.length ? "Protects credibility, no score change" : `Little extra on your best role${lifted ? `, but lifts <b>${lifted}</b> ${lifted === 1 ? "role" : "roles"}` : ""}`}</div>
+        <div class="sw-lift">${lift > 0 ? `<b>+${lift.toFixed(1)}</b> with everything else on${lifted ? `, lifts <b>${lifted}</b> ${lifted === 1 ? "role" : "roles"}` : ""}` : !a.effects.length ? "Protects credibility, no score change" : `Little extra with everything else on${lifted ? `, but lifts <b>${lifted}</b> ${lifted === 1 ? "role" : "roles"}` : ""}`}</div>
         <div class="sw-meta"><span class="status-dot ${esc(a.status)}"></span>${a.status === "doing" ? "In progress" : a.status === "later" ? "Parked for later" : "To do"} · ${esc(byWhen(a))}${a.stale ? ` · <span class="stale">No movement in ${a.stale} runs</span>` : ""}</div></div>
         <button class="tog" role="switch" aria-checked="${on}" aria-label="${esc(a.title)}"></button>`;
       row.querySelector(".tog").addEventListener("click", () => { if (enabled.has(a.id)) enabled.delete(a.id); else enabled.add(a.id); refresh(); });
@@ -957,13 +982,32 @@ JS_VIEWS = r"""
 // ---------- views ----------
 const VIEWS = [["level","Level up"],["orgs","Organisations"],["top","Path to the top band"],["moves","What moves you"],["roles","Roles"],["swot","SWOT and TOWS"],["plan","Plan"],["evidence","Evidence"],["market","Market"]]
   .filter(v => (v[0] !== "top" || D.ceil) && (v[0] !== "swot" || D.swot));
-function renderViewSeg(){
-  $("#viewSeg").innerHTML = VIEWS.map(v => `<button role="tab" aria-pressed="${state.view === v[0]}" data-v="${v[0]}">${v[1]}</button>`).join("");
-  $("#viewSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { state.view = b.dataset.v; renderViewSeg(); showView(); }));
+// Tabs: aria-selected and aria-controls, arrow keys move between them, and on a phone the row
+// scrolls sideways with a visible hint (a fade and a chevron) while there are more tabs to see.
+function renderViewSeg(focus){
+  $("#viewSeg").innerHTML = VIEWS.map(v => { const on = state.view === v[0];
+    return `<button role="tab" id="tab-${v[0]}" aria-selected="${on}" aria-controls="v-${v[0]}" tabindex="${on ? 0 : -1}" data-v="${v[0]}">${v[1]}</button>`; }).join("");
+  const tabs = [...$("#viewSeg").querySelectorAll("[role=tab]")];
+  tabs.forEach((b, i) => { b.addEventListener("click", () => { state.view = b.dataset.v; renderViewSeg(); showView(); });
+    b.addEventListener("keydown", e => { const k = {ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1}[e.key];
+      if (k == null) return; e.preventDefault(); state.view = tabs[(k + tabs.length) % tabs.length].dataset.v; renderViewSeg(true); showView(); }); });
+  VIEWS.forEach(v => $("#v-" + v[0]).setAttribute("aria-labelledby", "tab-" + v[0]));
+  const sel = $("#viewSeg [aria-selected=true]"), seg = $("#viewSeg");
+  if (sel && seg.scrollWidth > seg.clientWidth) seg.scrollLeft = Math.max(0, sel.offsetLeft - (seg.clientWidth - sel.offsetWidth) / 2);
+  if (sel && focus) sel.focus();
+  scrollHint(seg);
+}
+function scrollHint(row){
+  const wrap = row.parentElement;
+  if (!wrap || !wrap.classList.contains("hscroll")) return;
+  const upd = () => { wrap.classList.toggle("more-right", row.scrollLeft + row.clientWidth < row.scrollWidth - 2); wrap.classList.toggle("more-left", row.scrollLeft > 2); };
+  if (!row.dataset.hint){ row.dataset.hint = "1"; row.addEventListener("scroll", upd, {passive: true}); }
+  upd();
 }
 function showView(animate){
   ["level","orgs","top","moves","roles","swot","plan","evidence","market"].forEach(v => $("#v-" + v).classList.toggle("on", v === state.view));
   ({level: renderLevel, orgs: renderOrgs, top: renderTop, moves: renderMoves, roles: renderRoles, swot: renderSwot, plan: renderPlan, evidence: renderEvidence, market: renderMarket})[state.view]();
+  if (state.view !== "level") $("#v-" + state.view).insertAdjacentHTML("afterbegin", `<h2 class="sr-only">${esc(VIEWS.find(v => v[0] === state.view)[1])}</h2>`);
   if (animate !== false) enter($("#v-" + state.view));
 }
 function ring(g, today, exp){
@@ -983,7 +1027,7 @@ function trail(g, r){
   const hist = D.runs.map(rn => ({t: tOf(rn.date), v: rn.date === TODAY ? r.fit : rn.orgs[g]})).filter(p => p.v != null);
   return `<svg viewBox="0 0 ${W2} ${H2}" style="width:100%;height:auto;margin-top:8px" role="img" aria-label="Trail for ${esc(D.orgs[g].name)}">
     <line x1="6" x2="${W2 - 6}" y1="${yy(70)}" y2="${yy(70)}" stroke="var(--ok)" stroke-dasharray="4 3"/>
-    <path d="M${xx(TN)},${yy(r.fit)} L${W2 - 6},${yy(r.fit)}" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="2 4"/>
+    <path d="M${xx(TN)},${yy(r.fit)} L${W2 - 6},${yy(r.fit)}" fill="none" stroke="var(--stop)" stroke-width="2" stroke-dasharray="2 4"/>
     <path d="${path(best.pts)}" fill="none" stroke="${c}" stroke-width="2" stroke-dasharray="6 4"/>
     <path d="${path(exp.pts)}" fill="none" stroke="${c}" stroke-width="2"/>
     ${hist.length > 1 ? `<path d="${hist.map((p, i) => (i ? "L" : "M") + xx(p.t).toFixed(1) + "," + yy(p.v).toFixed(1)).join(" ")}" fill="none" stroke="var(--ink)" stroke-width="2"/>` : ""}
@@ -1007,7 +1051,6 @@ function renderOrgs(){
   $("#v-orgs").querySelectorAll(".org-card").forEach(c => onEnter(c, () => openDetail({type: "org", id: c.dataset.org}, true)));
 }
 // ---------- Path to the top band (from eval/ceilings.json; today's numbers from the latest run) ----------
-const cap1 = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
 const an = n => /^(8|11|18)/.test(String(n)) ? "an" : "a";      // "an 85", "a 90"
 const li = list => `<ul class="small">${list.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
 function renderTop(){
@@ -1118,9 +1161,14 @@ function renderSwot(){
     ${rest.length ? `<div class="grids">${rest.map(G => `<details><summary>${esc(G.name)}: its own grid</summary>${swotGrid(G)}</details>`).join("")}</div>` : ""}`;
   bindChips($("#v-swot"));
 }
-const stName = s => s === "doing" ? "In progress" : s === "later" ? "Parked for later" : s === "done" ? "Done" : s === "dropped" ? "Dropped" : "To do";
+// Badges and the action list follow the one ranked list too: done first for the badges, then Do next order.
+const STATUS_RANK = {doing: 0, todo: 1, later: 2, done: 3, dropped: 4};
 function renderPlan(){
-  const r = D.roles[0], acts = D.actions.filter(a => a.status !== "dropped");
+  const L = lv(), Q = {}, acts = D.actions.filter(a => a.status !== "dropped");
+  L.qs.forEach(q => Q[q.a.id] = q);
+  const rest = D.actions.filter(a => !Q[a.id]).sort((x, y) => (STATUS_RANK[x.status] - STATUS_RANK[y.status]) || (x.status === "done" ? tOf(y.date) - tOf(x.date) : tOf(x.date) - tOf(y.date)));
+  const order = L.up.map(q => q.a).concat(rest), badges = rest.filter(a => a.status === "done").concat(order.filter(a => a.status !== "done" && a.status !== "dropped"));
+  let step = 0;
   const PW = Math.max(300, ($("#hero").clientWidth || 760) - 40), PH = 40 + acts.length * 34;
   const col = Math.min(170, Math.round(PW * 0.42)), maxCh = Math.floor(col / 6.6);
   const xa = iso => col + (Math.max(T0, Math.min(T1, tOf(iso))) - T0) / (T1 - T0) * (PW - col - 46), todayX = xa(TODAY);
@@ -1134,13 +1182,13 @@ function renderPlan(){
   svg += "</svg>";
   $("#v-plan").innerHTML = `${D.meta.principle ? `<div class="card"><div class="eyebrow">The principle</div><div class="small">${esc(D.meta.principle)}</div></div>` : ""}
     <div class="card"><div class="eyebrow">Badges</div><div class="small sub" style="margin:-2px 0 12px">A badge unlocks when an action is done, with evidence.</div>
-    <div class="badges">${acts.map((a, i) => `<div class="badge ${esc(a.status)}" data-act="${esc(a.id)}"><div class="bi">${a.status === "done" ? "✓" : i + 1}</div><div class="bt">${esc(a.title)}</div><div class="bs">${stName(a.status)}</div></div>`).join("") || '<div class="small sub">No actions yet.</div>'}</div></div>
+    <div class="badges">${badges.map(a => `<div class="badge ${esc(a.status)}" data-act="${esc(a.id)}"><div class="bi">${a.status === "done" ? "✓" : ++step}</div><div class="bt">${esc(a.title)}</div><div class="bs">${stName(a.status)}</div></div>`).join("") || '<div class="small sub">No actions yet.</div>'}</div></div>
     ${acts.length ? `<div class="card"><div class="eyebrow">Plan timeline</div>${svg}</div>` : ""}
-    <div class="list" style="margin-top:16px">${D.actions.map(a => { const lift = actionLift(a, r);
+    <div class="list" style="margin-top:16px">${order.map(a => { const q = Q[a.id];
       return `<div class="row" tabindex="0" data-act="${esc(a.id)}"><span class="status-dot ${esc(a.status)}"></span><div class="row-main"><div class="row-title">${esc(a.title)}</div>
       <div class="row-sub">${a.group === "now" ? "Now · " : a.group === "later" && a.status !== "later" ? "Later · " : ""}${stName(a.status)} · ${esc(a.owner)}${a.effort ? " · " + esc(a.effort) : ""} · ${a.status === "done" ? "done " + esc(fmtDate(a.date)) : a.dated ? "target " + esc(fmtDate(a.date)) : "no target date"} · ${Math.round(a.p * 100)}% chance</div>
       ${a.stale ? `<div class="tiny stale">No score or metric movement in ${a.stale} runs: rework it or drop it.</div>` : ""}</div>
-      <div class="row-side"><span class="dn-p">${liftText(a, lift)}</span></div><span class="chev">›</span></div>`; }).join("")}</div>
+      <div class="row-side"><span class="dn-p">${q ? points(q) || "credibility" : a.status === "done" ? "done" : ""}</span></div><span class="chev">›</span></div>`; }).join("")}</div>
     <div class="grid2" style="margin-top:16px">
       <div class="card"><div class="eyebrow">What was tried</div>${D.experiments.length ? D.experiments.map((x, i) => `<div style="padding:9px 0;${i ? "border-top:1px solid var(--rule)" : ""}"><div class="small" style="font-weight:600">${esc(x.action)} <span class="tag">${esc(cap1(x.decision))}</span></div><div class="small">${esc(x.result)}</div><div class="tiny sub">${esc(fmtDate(x.date))}${x.why ? ". " + esc(x.why) : ""}</div></div>`).join("") : '<div class="small sub">Nothing logged yet.</div>'}</div>
       <div class="card"><div class="eyebrow">Backlog</div>${D.backlog.length ? li(D.backlog) : '<div class="small sub">Empty.</div>'}</div></div>`;
@@ -1189,7 +1237,6 @@ JS_LEVELS = r"""
 const MAX_EXACT = 14;
 const fmtP = v => String(r1(v));
 const pctOf = p => Math.floor(p * 100 + 0.5);
-const andList = xs => xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
 const hoursOf = list => list.reduce((t, a) => t + (a.hours || 0), 0);
 const raisesL = (r, a) => walkL(r, [a], "best").scores.some((v, k) => v > r.s[k] + 1e-9);
 function keyLess(a, b){ for (let i = 0; i < a.length; i++){ if (a[i] < b[i]) return true; if (a[i] > b[i]) return false; } return false; }
@@ -1268,6 +1315,31 @@ function questsFor(rs, nl){
       r: w.r, fitAfter: w.end, leadExp: r1(walkL(lead, [a], "exp").end - lead.fit), leadWorks: r1(walkL(lead, [a], "best").end - lead.fit)};
   }).sort((x, y) => (y.rate - x.rate) || (y.exp - x.exp) || (y.a.priority - x.a.priority) || (x.a.date < y.a.date ? -1 : x.a.date > y.a.date ? 1 : 0) || (x.a.id < y.a.id ? -1 : 1));
 }
+// ---------- one yardstick: the ranked list every action list follows ----------
+// The actions on the path to the next level: the smallest set, or, when none gets there, the best-case set.
+// Mirrors path_ids() in scripts/_levels.py.
+function pathIds(nl){ if (nl.top) return []; const f = nl.reachable ? nl.set : nl.bestCase; return f ? f.ids.slice() : []; }
+// The path first, in target-date order, then the rest as questsFor() sorts them. Mirrors up_next() in scripts/_levels.py.
+function upNext(qs, nl){
+  const path = new Set(pathIds(nl));
+  const first = qs.filter(q => path.has(q.a.id)).sort((x, y) => (x.a.date < y.a.date ? -1 : x.a.date > y.a.date ? 1 : 0) || (x.a.id < y.a.id ? -1 : 1));
+  return first.concat(qs.filter(q => !path.has(q.a.id)));
+}
+// The journey's next level, quests and Do next order, worked out once per refresh (recompute() and the organisation selector clear it).
+function lv(){ if (!LV){ const rs = journeyRoles(), nl = nextLevel(rs), qs = questsFor(rs, nl); LV = {rs, nl, qs, up: upNext(qs, nl)}; } return LV; }
+// The tag an action on the path carries in Do next and on its quest card. Mirrors path_tag() in _levels_html.py.
+const pathTag = (q, nl) => q.crit ? `On the path to Level ${nl.nextLevel}` : q.bc && !nl.reachable ? "Needed for the best case" : null;
+// The one points number an action shows everywhere outside the What if rail: expected points toward the next level, on its own.
+const points = q => q.a.effects.length ? "+" + fmtP(Math.max(0, q.exp)) : null;
+// Mirrors do_next_rows() in _levels_html.py: status as a word beside the dot, title, owner and date, one points number.
+function doNextRows(list, nl, limit){
+  if (!list.length) return '<div class="small sub">No open actions. The next run adds some from the biggest gaps.</div>';
+  return (limit ? list.slice(0, limit) : list).map(q => { const a = q.a, tag = pathTag(q, nl);
+    return `<div class="dn" tabindex="0" data-act="${esc(a.id)}"><span class="status-dot ${esc(a.status)}"></span><div style="flex:1;min-width:0"><div class="dn-t">${esc(a.title)}</div><div class="tiny sub">${stName(a.status)}${q.on ? "" : ", switched off"} · ${esc(a.owner)} · ${a.dated ? "by " + esc(shortDate(a.date)) : "no target date yet"}${tag ? ` · <span class="dn-tag">${esc(tag)}</span>` : ""}</div></div><div class="dn-p">${points(q) || "credibility"}</div></div>`; }).join("");
+}
+const doNextSub = nl => nl.top ? "Expected points each action adds to your best fit on its own, counting its chance."
+  : `Expected points toward Level ${nl.nextLevel}, each action on its own. The path to Level ${nl.nextLevel} comes first.`;
+
 // Each scored day's level for the journey the organisation selector follows.
 function levelHist(){
   let prev = null; const out = [];
@@ -1308,7 +1380,7 @@ function levelCardHTML(nl){
 }
 const actOf = id => D.actions.find(a => a.id === id);
 function stepRows(acts){
-  return `<div class="lv-set">${acts.map(a => `<div class="lv-step" tabindex="0" data-act="${esc(a.id)}"><span class="tag crit">${esc(a.id)}</span><span class="lv-step-t">${esc(a.title)}</span><span class="tiny sub">${a.dated ? "by " + esc(shortDate(a.date)) : "no date yet"} · ${pctOf(a.p)}% chance</span></div>`).join("")}</div>`;
+  return `<div class="lv-set">${acts.map(a => `<div class="lv-step" tabindex="0" data-act="${esc(a.id)}"><span class="lv-step-t">${esc(a.title)}</span><span class="tiny sub">${a.dated ? "by " + esc(shortDate(a.date)) : "no date yet"} · ${pctOf(a.p)}% chance</span></div>`).join("")}</div>`;
 }
 function lvTrack(nl){
   const idx = nl.level - 1, lo = THRESH[idx], T = nl.target, hi = THRESH[idx + 2];
@@ -1345,7 +1417,7 @@ function verdictHTML(nl){
   const room = m.room.map(x => `<div class="lv-room"><span><b style="font-weight:600">${esc(D.dimNames[x.dim])}</b><div class="tiny sub">${x.covered ? "Open actions cover part of it" : "No open action raises it for this role"}</div></span><b class="num">+${fmtP(x.points)}</b></div>`).join("");
   return `<div class="lv-verdict"><div class="lv-v-h">Not reachable on the current plan</div>
     <p class="small">Counting each action's chance of working, no set of your switched-on actions reaches ${L}. All of them together are expected to take ${same ? "this role" : `your best fit, on ${roleName(m.r)},`} to ${fmtP(nl.plan.exp)}, which is <b>${fmtP(m.points)} points short</b>.</p>
-    ${bc ? `<p class="small"><b>Best case only:</b> ${esc(andList(bc.ids))}${bc.acts.length === 1 ? "" : " together"} ${bc.role === nl.r ? `reach${bc.acts.length === 1 ? "es" : ""} ${fmtP(bc.fit)}` : `lift${bc.acts.length === 1 ? "s" : ""} ${roleName(bc.role)} from ${fmtP(bc.role.fit)} to ${fmtP(bc.fit)}`} by ${esc(fmtDate(bc.date))}, but only if ${bc.acts.length === 1 ? "it works" : bc.acts.length === 2 ? "both work" : "all of them work"}.</p>${chanceLine(bc, "Chance of that: ")}${stepRows(bc.acts)}`
+    ${bc ? `<p class="small"><b>Best case only:</b> ${bc.acts.length === 1 ? "the action below" : `the ${bc.acts.length} actions below together`} ${bc.role === nl.r ? `reach${bc.acts.length === 1 ? "es" : ""} ${fmtP(bc.fit)}` : `lift${bc.acts.length === 1 ? "s" : ""} ${roleName(bc.role)} from ${fmtP(bc.role.fit)} to ${fmtP(bc.fit)}`} by ${esc(fmtDate(bc.date))}, but only if ${bc.acts.length === 1 ? "it works" : bc.acts.length === 2 ? "both work" : "all of them work"}.</p>${chanceLine(bc, "Chance of that: ")}${stepRows(bc.acts)}`
       : `<p class="small sub">Not even the best case gets there: if every action works, your best fit reaches ${fmtP(nl.plan.best)}.</p>`}
     <div class="eyebrow" style="margin-top:16px">What is missing</div>
     ${m.ceiling < nl.target ? `<p class="small">Even with every factor at the most the plan's caps allow, ${who} tops out at ${fmtP(m.ceiling)}. Reaching ${L} needs something the caps rule out within this plan, such as more years in a similar role, or a different role.</p>`
@@ -1360,21 +1432,22 @@ function noPoints(q, nl){
 // The second line of a quest card when the action carries the level through a role other than today's best.
 function viaLine(q, nl){
   if (q.r === nl.r || q.exp <= 0) return "";
-  return `<div class="tiny sub q-via">Lifts ${roleName(q.r)} from ${fmtP(q.r.fit)} to ${fmtP(q.fitAfter)}, which would then be your best role. On your best role today: ${q.leadExp > 0 ? "+" + fmtP(q.leadExp) + " expected" : "no change"}.</div>`;
+  return `<div class="tiny sub q-via">Lifts ${roleName(q.r)} from ${fmtP(q.r.fit)} to ${fmtP(q.fitAfter)}, which would then be your best role.</div>`;
 }
 function questIntro(nl){
-  return `Your open actions, most points per hour first. Points are what each action on its own adds to your best fit${nl.top ? "" : `, counted toward Level ${nl.nextLevel}`}: expected counts its chance of working, if it works assumes it does. Actions that raise the same factor overlap, so their points don't simply add up; the panel above shows what they do together.`;
+  if (nl.top) return "Your open actions, in the same order as Do next, most points per hour first. Points are what each action on its own adds to your best fit, counting its chance of working.";
+  return `Your open actions, in the same order as Do next: the ones on the path to Level ${nl.nextLevel} first, then the most points per hour. Points are what each action on its own adds to your best fit toward Level ${nl.nextLevel}, counting its chance of working. Actions that raise the same factor overlap, so their points don't simply add up; the panel above shows what they do together.`;
 }
 function questCard(q, nl){
-  const a = q.a, pend = pending.has(a.id);
-  const tags = [q.crit ? `<span class="tag crit">On the path to Level ${nl.nextLevel}</span>` : "", !nl.reachable && q.bc ? '<span class="tag">Needed for the best case</span>' : "",
+  const a = q.a, pend = pending.has(a.id), tag = pathTag(q, nl);
+  const tags = [tag ? `<span class="tag${q.crit ? " crit" : ""}">${esc(tag)}</span>` : "",
     pend ? '<span class="tag pend">Pending: tell your agent</span>' : "", q.on ? "" : '<span class="tag">Switched off in What if</span>',
     a.derived ? '<span class="tag">Estimated effect</span>' : "", a.stale ? `<span class="tag pend">No movement in ${a.stale} runs</span>` : ""].join("");
   const pts = !a.effects.length ? '<span class="small sub">Protects credibility, no score change</span>'
     : q.exp <= 0 && q.works <= 0 ? `<span class="small sub">${noPoints(q, nl)}</span>`
-    : `<span><b class="num">+${fmtP(q.exp)}</b> <span class="tiny sub">expected</span></span><span><b class="num q-alt">+${fmtP(q.works)}</b> <span class="tiny sub">if it works</span></span><span class="tiny sub num">${fmtP(q.rate)} per hour</span>`;
+    : `<span><b class="num">${points(q)}</b> <span class="tiny sub">expected</span></span>`;
   return `<div class="quest${q.crit ? " crit" : ""}">
-    <div class="q-top"><div class="q-tags">${tags}</div><span class="q-id">${esc(a.id)} · ${stName(a.status)}</span></div>
+    <div class="q-top"><div class="q-tags">${tags}</div><span class="q-id"><span class="status-dot ${esc(a.status)}"></span>${stName(a.status)}</span></div>
     <div class="q-title" tabindex="0" data-act="${esc(a.id)}">${esc(a.title)}</div>
     <div class="q-pts">${pts}</div>${viaLine(q, nl)}
     <div class="q-meta">${esc(a.owner)}${a.effort ? " · " + esc(a.effort) : ""} · ${a.dated ? "due " + esc(fmtDate(a.date)) : "no due date yet"} · ${pctOf(a.p)}% chance</div>
@@ -1387,27 +1460,27 @@ function progressHTML(){
   const days = D.progress || [], n = D.streak || 0, hist = levelHist().slice().reverse(), dayOf = {};
   days.forEach(d => dayOf[d.date] = d);
   const why = d => !d ? "" : d.start ? "Day 1, measured." : !d.progress ? "No real progress that day." :
-    cap1([d.roles_up ? `fit rose on ${plural(d.roles_up, "role")}` : "", d.evidence.length ? `newly checked evidence ${d.evidence.join(", ")}` : "",
-      d.actions.length ? `done with evidence: ${d.actions.join(", ")}` : ""].filter(Boolean).join(" · ")) + ".";
+    cap1([d.roles_up ? `fit rose on ${plural(d.roles_up, "role")}` : "", d.evidence.length ? `newly checked evidence (${plural(d.evidence.length, "item")})` : "",
+      d.actions.length ? `${plural(d.actions.length, "action")} done with evidence` : ""].filter(Boolean).join(" · ")) + ".";
   const who = state.org === "best" ? "your best role" : esc(D.orgs[state.org].name) + "'s best role";
-  return `<div class="eyebrow">Progress you can trust</div>
+  return `<h2 class="eyebrow">Progress you can trust</h2>
     <div class="streak"><div class="streak-n num${n ? "" : " zero"}">${n}</div><div><div style="font-weight:650">${n === 1 ? "scored day" : "scored days"} in a row with real progress</div>
       <div class="tiny sub">${days.length < 2 ? "Day 1 is measured. The streak starts with the next scored day that shows real progress." : !n ? "The latest scored day showed no real progress, so the streak starts again." : "Real progress means a score that rose, newly checked evidence, or an action done with evidence, on any role."}</div></div></div>
     <div class="streak-dots" aria-hidden="true">${days.map(d => `<span class="sd${d.start ? " start" : d.progress ? " on" : ""}" title="${esc(fmtDate(d.date))}: ${esc(why(d))}"></span>`).join("")}</div>
-    <div class="eyebrow" style="margin-top:16px">Level history, ${who}</div>
+    <h3 class="eyebrow" style="margin-top:16px">Level history, ${who}</h3>
     <div class="tiny sub" style="margin-bottom:4px">One row per scored day, newest first, from the dated files in eval/runs.</div>
     <div>${hist.map(h => `<div class="lh-row"><span class="tiny sub lh-date">${esc(fmtDate(h.date))}</span><span class="lv-badge">${h.level}</span>
       <div><div class="small"><b>Level ${h.level}, ${esc(h.band)}</b> · fit ${Math.round(h.fit)}${h.change ? ` <span class="tag ${h.change}">${h.change === "up" ? "Level up" : "Level down"}</span>` : ""}</div>
       <div class="tiny sub">${esc(why(dayOf[h.date]))}</div></div></div>`).join("")}</div>`;
 }
 function renderLevel(){
-  const rs = journeyRoles(), r = rs[0], nl = nextLevel(rs), qs = questsFor(rs, nl);
+  const {rs, nl, up} = lv(), r = rs[0], qs = up;           // the quests in the Do next order
   const who = state.org === "best" ? "Your best role" : esc(D.orgs[state.org].name) + ", best role";
-  $("#v-level").innerHTML = `<div class="card lv-card"><div class="lv-head"><div><div class="eyebrow">Next level · ${who}</div>
+  $("#v-level").innerHTML = `<div class="card lv-card"><div class="lv-head"><div><h2 class="eyebrow">Next level · ${who}</h2>
       <h3>Level ${nl.level}, ${esc(nl.band)}${nl.top ? "" : ` <span class="arrow">→</span> Level ${nl.nextLevel}, ${esc(nl.nextBand)}`}</h3><div class="small sub">${esc(r.on)}: ${esc(r.title)}</div></div>
       ${nl.top ? "" : `<div class="lv-need"><b class="num">${fmtP(nl.toNext)}</b><span class="tiny sub">points to go</span></div>`}</div>
       ${nl.top ? "" : lvTrack(nl)}${verdictHTML(nl)}</div>
-    <div class="eyebrow" style="margin:22px 4px 4px">Quests${nl.top ? "" : ` toward Level ${nl.nextLevel}`}</div>
+    <h2 class="eyebrow" style="margin:22px 4px 4px">Quests${nl.top ? "" : ` toward Level ${nl.nextLevel}`}</h2>
     <p class="small" style="margin:0 4px 12px">${esc(questIntro(nl))} Ticks stay on this device and never change a number; your plan file is the record, so tell your agent.</p>
     ${qs.length ? `<div class="quests">${qs.map(q => questCard(q, nl)).join("")}</div>` : '<div class="card small sub">No open actions. The next run adds some from the biggest gaps.</div>'}
     <div class="card" style="margin-top:16px">${progressHTML()}</div>`;
@@ -1520,14 +1593,25 @@ function effectText(e){
   const by = ("delta" in e) ? "+" + r1(e.delta) : "to at least " + e.set_at_least;
   return `${D.dimNames[e.dimension] || e.dimension} ${by}${where.length ? " for " + where.join(", ") : " for every role"}`;
 }
+// The action pane: the same points number as the action's Do next row and quest card, then the detail behind it.
+function actionPoints(a){
+  const L = lv(), nl = L.nl, q = L.qs.find(x => x.a.id === a.id), lbl = nl.top ? "Adds to your best fit" : `Toward Level ${nl.nextLevel}, expected`;
+  if (a.status === "done") return `<div class="kv"><span>${lbl}</span><b class="num">Already in today's scores</b></div>`;
+  if (!q) return a.status === "later" ? `<div class="kv"><span>${lbl}</span><span>Switch it on in What if to count it</span></div>` : "";
+  if (!a.effects.length) return `<div class="kv"><span>${lbl}</span><span>Protects credibility, no score change</span></div>`;
+  return `<div class="kv"><span>${lbl}</span><b class="num" style="color:var(--ok)">${points(q)}</b></div>
+    <div class="kv"><span>If it works</span><b class="num">+${fmtP(Math.max(0, q.works))}</b></div>
+    ${a.hours ? `<div class="kv"><span>Per hour of effort</span><b class="num">${fmtP(q.rate)}</b></div>` : ""}
+    ${q.r !== nl.r && q.exp > 0 ? `<div class="small sub" style="margin:4px 0">Lifts ${roleName(q.r)} from ${fmtP(q.r.fit)} to ${fmtP(q.fitAfter)}, which would then be your best role. On your best role today: ${q.leadExp > 0 ? "+" + fmtP(q.leadExp) + " expected" : "no change"}.</div>` : ""}`;
+}
 function detailAction(id){
-  const a = D.actions.find(x => x.id === id), r = D.roles[0], lift = actionLift(a, r);
+  const a = D.actions.find(x => x.id === id);
   const affected = D.roles.filter(x => a.effects.some(e => inScope(x, e.scope || {}))).length;
   return `<div class="tiny sub">${esc(a.id)} · ${stName(a.status)}</div><h2>${esc(a.title)}</h2>${a.why ? `<p class="small">${esc(a.why)}</p>` : ""}
     ${a.stale ? `<div class="small warnline">No score or metric movement in ${a.stale} runs: rework it or drop it.</div>` : ""}
     <div class="kv"><span>Owner</span><span>${esc(a.owner)}</span></div>${a.effort ? `<div class="kv"><span>Effort</span><span>${esc(a.effort)}</span></div>` : ""}
     <div class="kv"><span>${a.status === "done" ? "Done on" : "Target date"}</span><span>${a.dated || a.status === "done" ? esc(fmtDate(a.date)) : "Not set, counted at the end"}</span></div><div class="kv"><span>Chance it works</span><b class="num">${Math.round(a.p * 100)}%</b></div>
-    <div class="kv"><span>Adds to your best role</span><b class="num" style="color:${lift > 0 ? "var(--ok)" : "var(--ink)"}">${liftText(a, lift, true)}</b></div>
+    ${actionPoints(a)}
     <div class="kv"><span>Roles it touches</span><b class="num">${affected}</b></div>
     ${a.metric ? `<div class="kv"><span>Moves the metric</span><span>${esc(a.metric)}</span></div>` : ""}
     <div class="eyebrow" style="margin-top:14px">What it changes</div>${a.effects.length ? `<ul class="small">${a.effects.map(e => `<li>${esc(effectText(e))}</li>`).join("")}</ul>${a.derived ? '<div class="tiny sub">Estimated from its expected points; the plan lists no effects for it.</div>' : ""}` : '<div class="small sub">Protects credibility. No direct score change.</div>'}
@@ -1572,7 +1656,10 @@ function renderSegs(){
   $("#modeSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { state.mode = b.dataset.m; renderSegs(); refreshNumbers(); }));
   const opts = [["best", "Best overall"]].concat(D.orgOrder.map(g => [g, D.orgs[g].name]));
   $("#orgSeg").innerHTML = opts.map(o => `<button aria-pressed="${state.org === o[0]}" data-org="${esc(o[0])}">${esc(o[1])}</button>`).join("");
-  $("#orgSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { state.org = b.dataset.org; renderSegs(); renderTopline(); drawChart(); renderHistory(); if (state.view === "level") renderLevel(); }));
+  // The level, Do next, the quests and the plan list all follow the selected journey.
+  $("#orgSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { state.org = b.dataset.org; LV = null; renderSegs(); renderTopline(); drawChart(); renderHistory(); renderDoNext();
+    if (state.view === "level" || state.view === "plan") showView(false); refreshDetail(); }));
+  scrollHint($("#orgSeg"));
 }
 function renderHistory(){
   const lh = {}; levelHist().forEach(h => lh[h.date] = h);
@@ -1609,6 +1696,7 @@ addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setT
   const w = Math.max(260, Math.round($("#chartWrap").clientWidth));
   if (w !== CW){ chartBuilt = false; lastVals = null; drawChart(); if (state.view === "plan") renderPlan(); }
   if (!narrow() && !state.stack.length) renderHome();
+  scrollHint($("#viewSeg")); scrollHint($("#orgSeg"));
 }, 150); });
 document.addEventListener("keydown", e => { if (e.key === "Escape"){ closeShare(); closeDetail(); $("#rail").classList.remove("open"); scrim.classList.remove("on"); } });
 
@@ -1628,8 +1716,9 @@ if (!D.roles.length){
 }
 if (motionOK()) document.body.classList.add("animate");
 document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "visible") document.body.classList.remove("animate"); else if (!reduce) document.body.classList.add("animate"); });
-$("#sampleRow").hidden = !D.meta.sample_allowed;
-recompute(); renderSegs(); renderViewSeg(); renderMetrics(); renderSwitches(); renderTopline(); drawChart(); renderTiles4(); renderDoNext(); renderHistory(); showView();
+$("#sampleRow").hidden = !(D.meta.sample_allowed && PREVIEW);     // a design preview, only with ?preview=1
+recompute(); lv().up.forEach((q, i) => RANK[q.a.id] = i);
+renderSegs(); renderViewSeg(); renderMetrics(); renderSwitches(); renderTopline(); drawChart(); renderTiles4(); renderDoNext(); renderHistory(); showView();
 $("#staticSummary").hidden = true;   // the live page has rendered the same numbers; the static copy is for readers without JavaScript
 enter($("#hero"), 1500);
 })();
@@ -1644,9 +1733,14 @@ HEADER = r"""<!doctype html>
   waypoints, the offer zone is the destination) under a flight strip and a level
   badge. Left rail: the what-if switches with their own lift. Centre below the hero:
   scoreboard tiles, then the views, led by Level up (the next level, quests, level
-  history and streak). Right pane: drill-down with breadcrumbs. On a
-  phone the rail opens from a bottom toolbar that reserves its own space. Motion is
-  quiet and never leaves content hidden. Built by Climb scripts/build_dashboard.py.
+  history and streak). Right pane: Start here (Do next, Biggest unlocks), then
+  drill-down with breadcrumbs. One yardstick: Do next, the quests, the badges and the
+  plan list share one order (the path to the next level first, then points per hour)
+  and one points number per action; only the What if rail shows "with everything else
+  on". On a phone Do next follows the headline status, first-screen controls are 44
+  points, the tab row scrolls with a visible hint, and the rail opens from a bottom
+  toolbar that reserves its own space. Motion is quiet and never leaves content hidden.
+  Built by Climb scripts/build_dashboard.py.
 -->
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

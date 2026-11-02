@@ -200,114 +200,41 @@
   ],
   "actions_active": [
     {
-      "id": "A04",
-      "title": "Fix the LinkedIn headline: 'led a team of 40' should say 'led a team of 8'",
-      "why": "Overclaims hurt credibility more than gaps. Fix before any application goes out.",
+      "id": "A06",
+      "title": "Apply to the Initech Robotics fleet deployments role once A04 is done",
+      "why": "Best fit of all open roles. Apply after the headline fix so the profiles match.",
       "status": "todo",
       "owner": "you",
-      "dimension": "D5",
-      "effort_hours": 0.5,
-      "expected_points": 2,
-      "roles_affected": 12,
-      "chance": 0.9,
-      "target_date": "2026-11-05",
-      "effects": [],
-      "done_when": "Headline changed (screenshot or link), claim C001 re-checked as supported",
-      "strategy_ids": [
-        "WT1"
-      ],
-      "added_on": "2026-10-25",
-      "priority": 43.2
-    },
-    {
-      "id": "A08",
-      "title": "Answer the notice period and non-compete question (Q01)",
-      "why": "Confirms the earliest start date and that no role is off limits.",
-      "status": "todo",
-      "owner": "you",
-      "dimension": "D6",
-      "effort_hours": 0.5,
+      "dimension": "D7",
+      "effort_hours": 1,
       "expected_points": 1,
-      "roles_affected": 12,
-      "chance": 0.9,
-      "target_date": "2026-11-04",
-      "done_when": "Answer recorded in intake/answers.md and evidence.json",
-      "added_on": "2026-10-25",
-      "priority": 21.6
-    },
-    {
-      "id": "A07",
-      "title": "Ask your three closest logistics contacts whether they know anyone at Initech Robotics",
-      "why": "Initech has four matching roles and no warm path (D3 0). An agreed second-degree path is D3 2.",
-      "status": "todo",
-      "owner": "you",
-      "dimension": "D3",
-      "effort_hours": 2,
-      "expected_points": 8,
-      "roles_affected": 4,
-      "chance": 0.4,
-      "target_date": "2026-11-22",
+      "roles_affected": 1,
+      "chance": 0.8,
+      "target_date": "2026-11-08",
       "effects": [
         {
-          "dimension": "D3",
-          "set_at_least": 2,
+          "dimension": "D7",
+          "delta": 1,
           "scope": {
-            "orgs": [
-              "initech"
+            "role_ids": [
+              "initech:i-0001"
             ]
           },
-          "note": "An agreed second-degree path."
+          "note": "Submitted, tailored application."
         }
       ],
-      "done_when": "Someone has agreed to introduce you to a person at Initech (email or message)",
+      "done_when": "Application submitted (confirmation email)",
       "strategy_ids": [
-        "WO1"
+        "SO1",
+        "ST1"
       ],
-      "gap_id": "initech-path",
-      "metric": "warm_intros",
+      "metric": "applications",
       "orgs": [
         "initech"
       ],
-      "added_on": "2026-10-25",
-      "priority": 6.4
-    },
-    {
-      "id": "A02",
-      "title": "Ask [contact] for the introduction to the Globex AI Success lead, and send route-eval first",
-      "why": "Turns an agreed path (D3 2) into a named insider who knows your work (D3 3).",
-      "status": "doing",
-      "owner": "you",
-      "dimension": "D3",
-      "effort_hours": 2,
-      "expected_points": 4,
-      "roles_affected": 4,
-      "chance": 0.5,
-      "target_date": "2026-11-15",
-      "effects": [
-        {
-          "dimension": "D3",
-          "set_at_least": 3,
-          "scope": {
-            "orgs": [
-              "globex"
-            ]
-          },
-          "note": "A named insider who has seen route-eval."
-        }
-      ],
-      "done_when": "The AI Success lead has replied and seen route-eval (email)",
-      "strategy_ids": [
-        "SO2"
-      ],
-      "gap_id": "warm-intro",
-      "metric": "warm_intros",
-      "orgs": [
-        "globex"
-      ],
-      "added_on": "2026-10-18",
-      "started_on": "2026-10-25",
-      "draft": "campaign/drafts/intro-request-jordan.md",
-      "priority": 4.0
+      "added_on": "2026-11-01",
+      "draft": "campaign/drafts/initech-fleet-application.md",
+      "priority": 0.8
     },
     {
       "id": "A11",
@@ -346,41 +273,114 @@
       "priority": 1.6
     },
     {
-      "id": "A06",
-      "title": "Apply to the Initech Robotics fleet deployments role once A04 is done",
-      "why": "Best fit of all open roles. Apply after the headline fix so the profiles match.",
+      "id": "A07",
+      "title": "Ask your three closest logistics contacts whether they know anyone at Initech Robotics",
+      "why": "Initech has four matching roles and no warm path (D3 0). An agreed second-degree path is D3 2.",
       "status": "todo",
       "owner": "you",
-      "dimension": "D7",
-      "effort_hours": 1,
-      "expected_points": 1,
-      "roles_affected": 1,
-      "chance": 0.8,
-      "target_date": "2026-11-08",
+      "dimension": "D3",
+      "effort_hours": 2,
+      "expected_points": 8,
+      "roles_affected": 4,
+      "chance": 0.4,
+      "target_date": "2026-11-22",
       "effects": [
         {
-          "dimension": "D7",
-          "delta": 1,
+          "dimension": "D3",
+          "set_at_least": 2,
           "scope": {
-            "role_ids": [
-              "initech:i-0001"
+            "orgs": [
+              "initech"
             ]
           },
-          "note": "Submitted, tailored application."
+          "note": "An agreed second-degree path."
         }
       ],
-      "done_when": "Application submitted (confirmation email)",
+      "done_when": "Someone has agreed to introduce you to a person at Initech (email or message)",
       "strategy_ids": [
-        "SO1",
-        "ST1"
+        "WO1"
       ],
-      "metric": "applications",
+      "gap_id": "initech-path",
+      "metric": "warm_intros",
       "orgs": [
         "initech"
       ],
-      "added_on": "2026-11-01",
-      "draft": "campaign/drafts/initech-fleet-application.md",
-      "priority": 0.8
+      "added_on": "2026-10-25",
+      "priority": 6.4
+    },
+    {
+      "id": "A04",
+      "title": "Fix the LinkedIn headline: 'led a team of 40' should say 'led a team of 8'",
+      "why": "Overclaims hurt credibility more than gaps. Fix before any application goes out.",
+      "status": "todo",
+      "owner": "you",
+      "dimension": "D5",
+      "effort_hours": 0.5,
+      "expected_points": 2,
+      "roles_affected": 12,
+      "chance": 0.9,
+      "target_date": "2026-11-05",
+      "effects": [],
+      "done_when": "Headline changed (screenshot or link), claim C001 re-checked as supported",
+      "strategy_ids": [
+        "WT1"
+      ],
+      "added_on": "2026-10-25",
+      "priority": 43.2
+    },
+    {
+      "id": "A08",
+      "title": "Answer the notice period and non-compete question (Q01)",
+      "why": "Confirms the earliest start date and that no role is off limits.",
+      "status": "todo",
+      "owner": "you",
+      "dimension": "D6",
+      "effort_hours": 0.5,
+      "expected_points": 1,
+      "roles_affected": 12,
+      "chance": 0.9,
+      "target_date": "2026-11-04",
+      "done_when": "Answer recorded in intake/answers.md and evidence.json",
+      "added_on": "2026-10-25",
+      "priority": 21.6
+    },
+    {
+      "id": "A02",
+      "title": "Ask [contact] for the introduction to the Globex AI Success lead, and send route-eval first",
+      "why": "Turns an agreed path (D3 2) into a named insider who knows your work (D3 3).",
+      "status": "doing",
+      "owner": "you",
+      "dimension": "D3",
+      "effort_hours": 2,
+      "expected_points": 4,
+      "roles_affected": 4,
+      "chance": 0.5,
+      "target_date": "2026-11-15",
+      "effects": [
+        {
+          "dimension": "D3",
+          "set_at_least": 3,
+          "scope": {
+            "orgs": [
+              "globex"
+            ]
+          },
+          "note": "A named insider who has seen route-eval."
+        }
+      ],
+      "done_when": "The AI Success lead has replied and seen route-eval (email)",
+      "strategy_ids": [
+        "SO2"
+      ],
+      "gap_id": "warm-intro",
+      "metric": "warm_intros",
+      "orgs": [
+        "globex"
+      ],
+      "added_on": "2026-10-18",
+      "started_on": "2026-10-25",
+      "draft": "campaign/drafts/intro-request-jordan.md",
+      "priority": 4.0
     },
     {
       "id": "A10",
@@ -453,7 +453,7 @@
     }
   ],
   "levels": {
-    "how": "Levels are the rubric's fit bands (1 Very low, 2 Low from 40, 3 Moderate from 55, 4 Good from 70, 5 Strong from 85), taken from the best fit across your roles, so any role can carry you to the next level. The smallest set is the fewest open actions whose expected effects (each weighted by its chance, within the projection caps) take that best fit to the next level; the date assumes they land on their target dates, and lifted_role is the role that then holds the best fit. Quest points are points toward the next level: what each action alone adds to the best fit, chance weighted and within the caps, counted on lifted_role, with on_best_role_today when that differs. Actions that raise the same factor overlap, so quest points do not simply add up. Nothing here is made up: it all comes from the runs and the plan.",
+    "how": "Levels are the rubric's fit bands (1 Very low, 2 Low from 40, 3 Moderate from 55, 4 Good from 70, 5 Strong from 85), taken from the best fit across your roles (the page's best match), so any role can carry you to the next level. The smallest set is the fewest open actions whose expected effects (each weighted by its chance, within the projection caps) take that best fit to the next level; the date assumes they land on their target dates, and lifted_role is the role that then holds the best fit. quests is the dashboard's one ranked list of actions (Do next, the quests, the badges and the plan list all follow it): the actions on the path to the next level first (the smallest set, or when none reaches it on expected odds, the best-case set), in target date order, then the rest by points per hour. Every action shows one points number on the page, points_expected: what that action alone adds to the best fit toward the next level, chance weighted and within the caps, counted on lifted_role, with on_best_role_today when that differs. Actions that raise the same factor overlap, so quest points do not simply add up. Only the What if rail shows another number, what an action adds with everything else switched on. Nothing here is made up: it all comes from the runs and the plan.",
     "best_role": {
       "role_id": "initech:i-0001",
       "org": "initech",
@@ -740,34 +740,10 @@
     },
     "quests": [
       {
-        "id": "A07",
-        "title": "Ask your three closest logistics contacts whether they know anyone at Initech Robotics",
-        "status": "todo",
-        "owner": "you",
-        "effort_hours": 2,
-        "target_date": "2026-11-22",
-        "chance": 0.4,
-        "done_when": "Someone has agreed to introduce you to a person at Initech (email or message)",
-        "points_expected": 3.2,
-        "points_if_it_works": 8.0,
-        "points_per_hour": 1.6,
-        "changes_a_score": true,
-        "lifted_role": {
-          "role_id": "initech:i-0001",
-          "org": "initech",
-          "title": "Program Manager, Robot Fleet Deployments",
-          "fit_before": 57.0,
-          "fit_after": 60.2,
-          "is_best_role_today": true
-        },
-        "on_best_role_today": null,
-        "on_path_to_next_level": false,
-        "needed_for_best_case": false,
-        "tell_your_agent": "Mark action A07 done (\"Ask your three closest logistics contacts whether they know anyone at Initech Robotics\"). Evidence: <paste a link, file path or email reference>. Done when: Someone has agreed to introduce you to a person at Initech (email or message)"
-      },
-      {
+        "rank": 1,
         "id": "A06",
         "title": "Apply to the Initech Robotics fleet deployments role once A04 is done",
+        "title_on_page": "Apply to the Initech Robotics fleet deployments role once “Fix the LinkedIn headline” is done",
         "status": "todo",
         "owner": "you",
         "effort_hours": 1,
@@ -787,13 +763,16 @@
           "is_best_role_today": true
         },
         "on_best_role_today": null,
+        "on_path": true,
         "on_path_to_next_level": false,
         "needed_for_best_case": true,
         "tell_your_agent": "Mark action A06 done (\"Apply to the Initech Robotics fleet deployments role once A04 is done\"). Evidence: <paste a link, file path or email reference>. Done when: Application submitted (confirmation email)"
       },
       {
+        "rank": 2,
         "id": "A11",
         "title": "Go to the Initech warehouse operators meetup in Melbourne",
+        "title_on_page": "Go to the Initech warehouse operators meetup in Melbourne",
         "status": "todo",
         "owner": "you",
         "effort_hours": 4,
@@ -813,13 +792,45 @@
           "is_best_role_today": true
         },
         "on_best_role_today": null,
+        "on_path": true,
         "on_path_to_next_level": false,
         "needed_for_best_case": true,
         "tell_your_agent": "Mark action A11 done (\"Go to the Initech warehouse operators meetup in Melbourne\"). Evidence: <paste a link, file path or email reference>. Done when: Met at least one Initech employee who has seen your work (follow-up email)"
       },
       {
+        "rank": 3,
+        "id": "A07",
+        "title": "Ask your three closest logistics contacts whether they know anyone at Initech Robotics",
+        "title_on_page": "Ask your three closest logistics contacts whether they know anyone at Initech Robotics",
+        "status": "todo",
+        "owner": "you",
+        "effort_hours": 2,
+        "target_date": "2026-11-22",
+        "chance": 0.4,
+        "done_when": "Someone has agreed to introduce you to a person at Initech (email or message)",
+        "points_expected": 3.2,
+        "points_if_it_works": 8.0,
+        "points_per_hour": 1.6,
+        "changes_a_score": true,
+        "lifted_role": {
+          "role_id": "initech:i-0001",
+          "org": "initech",
+          "title": "Program Manager, Robot Fleet Deployments",
+          "fit_before": 57.0,
+          "fit_after": 60.2,
+          "is_best_role_today": true
+        },
+        "on_best_role_today": null,
+        "on_path": false,
+        "on_path_to_next_level": false,
+        "needed_for_best_case": false,
+        "tell_your_agent": "Mark action A07 done (\"Ask your three closest logistics contacts whether they know anyone at Initech Robotics\"). Evidence: <paste a link, file path or email reference>. Done when: Someone has agreed to introduce you to a person at Initech (email or message)"
+      },
+      {
+        "rank": 4,
         "id": "A04",
         "title": "Fix the LinkedIn headline: 'led a team of 40' should say 'led a team of 8'",
+        "title_on_page": "Fix the LinkedIn headline: 'led a team of 40' should say 'led a team of 8'",
         "status": "todo",
         "owner": "you",
         "effort_hours": 0.5,
@@ -839,13 +850,16 @@
           "is_best_role_today": true
         },
         "on_best_role_today": null,
+        "on_path": false,
         "on_path_to_next_level": false,
         "needed_for_best_case": false,
         "tell_your_agent": "Mark action A04 done (\"Fix the LinkedIn headline: 'led a team of 40' should say 'led a team of 8'\"). Evidence: <paste a link, file path or email reference>. Done when: Headline changed (screenshot or link), claim C001 re-checked as supported"
       },
       {
+        "rank": 5,
         "id": "A08",
         "title": "Answer the notice period and non-compete question (Q01)",
+        "title_on_page": "Answer the notice period and non-compete question",
         "status": "todo",
         "owner": "you",
         "effort_hours": 0.5,
@@ -865,13 +879,16 @@
           "is_best_role_today": true
         },
         "on_best_role_today": null,
+        "on_path": false,
         "on_path_to_next_level": false,
         "needed_for_best_case": false,
         "tell_your_agent": "Mark action A08 done (\"Answer the notice period and non-compete question (Q01)\"). Evidence: <paste a link, file path or email reference>. Done when: Answer recorded in intake/answers.md and evidence.json"
       },
       {
+        "rank": 6,
         "id": "A02",
         "title": "Ask [contact] for the introduction to the Globex AI Success lead, and send route-eval first",
+        "title_on_page": "Ask a contact for the introduction to the Globex AI Success lead, and send route-eval first",
         "status": "doing",
         "owner": "you",
         "effort_hours": 2,
@@ -891,13 +908,16 @@
           "is_best_role_today": true
         },
         "on_best_role_today": null,
+        "on_path": false,
         "on_path_to_next_level": false,
         "needed_for_best_case": false,
         "tell_your_agent": "Mark action A02 done (\"Ask [contact] for the introduction to the Globex AI Success lead, and send route-eval first\"). Evidence: <paste a link, file path or email reference>. Done when: The AI Success lead has replied and seen route-eval (email)"
       },
       {
+        "rank": 7,
         "id": "A10",
         "title": "Build a small route-eval demo for Acme AI's quarterly evaluation challenge",
+        "title_on_page": "Build a small route-eval demo for Acme AI's quarterly evaluation challenge",
         "status": "doing",
         "owner": "you",
         "effort_hours": 6,
@@ -917,6 +937,7 @@
           "is_best_role_today": true
         },
         "on_best_role_today": null,
+        "on_path": false,
         "on_path_to_next_level": false,
         "needed_for_best_case": false,
         "tell_your_agent": "Mark action A10 done (\"Build a small route-eval demo for Acme AI's quarterly evaluation challenge\"). Evidence: <paste a link, file path or email reference>. Done when: Demo submitted to the challenge (link)"

@@ -22,15 +22,21 @@ game score: every number is a fit point from the rubric or an effect from the pl
 - **The Level up view**, the first view under the journey (it opens by default):
   1. *Next level*: a track from your current level to the next, with today, the expected
      result of the plan and the best case marked, then the verdict (below).
-  2. *Quests*: every open plan action as a card.
+  2. *Quests*: every open plan action as a card, in the same order as Do next.
   3. *Progress you can trust*: the streak and the level history.
+- **Do next** (the Start here pane on a wide screen; on a phone or tablet it sits right
+  under the best match and the level card, before the chart): the top four quests, in the
+  same order and with the same points. The badges and the action list in the Plan view
+  follow that order too. See "One number per action" below.
 - **The verifiable record** chips under the chart show each scored day's level, with a
   "Level up" or "Level down" tag when it changed, and the chart marks those days with a
   small triangle.
-- **The action pane** (tap any action) has the same "Done? Tell your agent" button.
+- **The action pane** (tap any action) has the same "Done? Tell your agent" button, the
+  same points number first, and the detail behind it: if it works, points per hour, the
+  role it lifts, and the action's id.
 - **The agent files**: `report/for-agents/dashboard.json` has a `levels` block and
-  `SUMMARY.md` has "Next level", "Quests", "Progress" and "When the person says an action
-  is done" sections.
+  `SUMMARY.md` has "Next level", "Quests" (in the Do next order), "Progress" and "When the
+  person says an action is done" sections.
 
 ## What a level is
 
@@ -101,25 +107,33 @@ plan") and shows:
 
 ## Quests
 
-Each open action is a card with: its id and status, tags, the title, **points toward the
-next level**, owner, effort, due date, chance, and what proves it done.
+Each open action is a card with: its status (a word beside the dot), tags, the title,
+**points toward the next level**, owner, effort, due date, chance, and what proves it
+done. Internal ids (A04, Q01, E02) stay off the cards: a title that names another action
+by its id shows that action's short title instead ("once “Fix the LinkedIn headline”
+is done"), and a bracketed id is dropped. The ids stay in the action pane and in the note
+the "Done? Tell your agent" button copies, because the agent needs them.
 
 - **Expected**: points toward the next level. That is what the action, on its own, adds
   to your best fit among the journey's roles, weighted by its chance of working and within
   the caps: your best fit after that action alone, minus your best fit today. It is
   counted on the role that would then hold your best fit. When that is not today's best
-  role, the card names it with its fit before and after, then shows what the action adds
-  to today's best role, second.
-- **If it works**: the same, when it does work (its best case).
-- **Per hour**: expected points divided by effort hours. Cards are sorted by it, highest
-  first.
+  role, the card names it with its fit before and after; the action pane adds what the
+  action brings to today's best role.
+- **Order**: the actions on the path to the next level come first, in target date order
+  (the smallest set, or, when no set gets there on expected odds, the best-case set: the
+  actions the panel lists). Then the rest, most expected points per hour first. So the
+  action the panel says gets you to the next level is never ranked last.
+- **If it works** and **per hour** are in the action pane, labelled, not on the card: a
+  card shows one points number.
 - Points are counted one action at a time. Two actions that raise the same factor overlap
   (a factor stops at its cap), so their points do not simply add up; the Next level panel
   shows what a set does together. A one-action set and its card always agree: today's
   best fit plus the card's expected points is the fit the panel shows.
-- The What if rail and the Do next card answer a different question: what an action adds
-  to your best role on top of every other switched-on action. That is why a card can show
-  more points than the rail does for the same action.
+- The What if rail is the one place with a different number: what an action adds to your
+  best role on top of every other switched-on action, labelled "with everything else on".
+  It can be smaller than the card's number for the same action, because other actions
+  raising the same capped factors take some of the credit.
 - Tags: **On the path to Level N** (in the smallest set, also outlined in the accent
   colour), **Needed for the best case** (when no set gets there on expected odds),
   **Estimated effect** (the plan gave no effects, so they were estimated from
@@ -167,7 +181,7 @@ claims an action is done.
 | Field | What it holds |
 |---|---|
 | `best_role`, `per_org.<org>` | Today's best role and its `level`, `band`, `points_to_next`, `next_level_starts_at`, `reachable_on_expected_odds`, `whole_plan` (expected and best case best fit, and the date the level is reached), then either `smallest_set` (actions, `level_reached_on`, `fit_expected`, `lifted_role`, `chance_it_happens`, `exact_search`) or `best_case_set` (the same, with `fit_if_all_work`) and `missing` (`points_short`, `ceiling_within_caps`, `closest_role`, `room_by_factor`). `lifted_role` and `closest_role` give `role_id`, `org`, `title`, `fit_before` and the fit after, and `is_best_role_today`. |
-| `quests` | Every open action, sorted as on the page, with `points_expected`, `points_if_it_works` and `points_per_hour` (points toward the next level, each action on its own), `lifted_role` (the role that then holds the best fit, before and after), `on_best_role_today` (what it adds to today's best role, when `lifted_role` is another role), `changes_a_score`, `on_path_to_next_level`, `needed_for_best_case` and the `tell_your_agent` text. |
+| `quests` | Every open action, in the page's Do next order (`rank` 1 first; `on_path` marks the actions on the path to the next level), with `title_on_page` (the title as the page shows it, without internal ids), `points_expected` (the one number the page shows), `points_if_it_works` and `points_per_hour` (points toward the next level, each action on its own), `lifted_role` (the role that then holds the best fit, before and after), `on_best_role_today` (what it adds to today's best role, when `lifted_role` is another role), `changes_a_score`, `on_path_to_next_level`, `needed_for_best_case` and the `tell_your_agent` text. |
 | `level_history`, `streak`, `progress_days` | The history and streak described above. |
 
 These use every open action switched on (the page's default). Sensitive mode scrubs them like
@@ -184,10 +198,12 @@ the rest of the file.
 3. The page says plainly when the next level is not reachable, and shows what is missing.
 4. Level downs and days without progress are shown, not hidden.
 5. A tick on the page is never treated as done. Only the plan file, with evidence, is.
-6. The level view, the level card and a static summary of the key numbers (best chance,
-   level, outlook, top actions by priority, best role at each organisation) are rendered into the
-   HTML file, so they read the same with JavaScript off. The page script hides the static
-   summary once it has drawn the live page.
+6. The level view, the level card and a static summary of the key numbers (best match,
+   level, outlook, Do next, best role at each organisation) are rendered into the HTML file,
+   so they read the same with JavaScript off. The page script hides the static summary once
+   it has drawn the live page.
+7. "Best match 57 of 100" is a fit score out of 100, not a probability; the chance bands
+   beside it are the chances.
 
 ## One yardstick
 
@@ -199,6 +215,24 @@ taken the credit. Now the panel and the cards both measure your best fit across 
 journey's roles, and a card counts its action alone, so a one-action set and its card
 always tell the same story. `tests/test_levels.py` and `tests/test_levels_page.py` check
 this in Python and in the page script.
+
+### One number per action
+
+A design review then found the same action showing different numbers in different places
+(for example +0.1 in Do next and +5.4 on its quest card) and three "do this first" lists
+with different first items (the What if rail by priority, Do next by what each adds on top
+of the rest of the plan, the quests by points per hour). Now:
+
+- Do next, the quests, the badges, the Plan view's action list, the static summary and the
+  agent files share one ranked list (`up_next` in `scripts/_levels.py`, mirrored by
+  `upNext` in the page script): the path to the next level first, then points per hour.
+  The What if rail keeps the order the page opened with, so its rows never jump while you
+  switch.
+- Every action shows one points number outside the What if rail: its expected points
+  toward the next level, on its own, counting its chance. The rail's "with everything else
+  on" number appears nowhere else.
+- `tests/test_levels.py`, `tests/test_levels_page.py` and `tests/test_dashboard.py` pin the
+  order, the single number, and that the panel's set is never ranked last.
 
 ## Known limits
 

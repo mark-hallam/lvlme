@@ -214,7 +214,7 @@ requests), light by default with a readable dark mode, that works on a phone.
 
 <img src="images/dashboard-phone.png" alt="The demo dashboard on a phone, light theme" width="320">
 
-- **The journey**: your best chance today, your level, and a flight-path
+- **The journey**: your best match today, your level, and a flight-path
   chart. The black line is what was measured, one dot per scored day. From
   today it splits into three paths to the end date: *expected* if you follow
   the plan (each action weighted by its chance of working), *best case* if
