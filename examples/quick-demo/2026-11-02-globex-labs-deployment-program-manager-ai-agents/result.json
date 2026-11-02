@@ -3,16 +3,16 @@
   "date": "2026-11-02",
   "fictional": true,
   "role": {
-    "id": "globex:0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
+    "id": "globex_labs_example:0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
     "title": "Deployment Program Manager, AI Agents",
-    "org": "globex",
+    "org": "globex_labs_example",
     "org_name": "Globex Labs",
     "locations": [
       "Sydney, Australia",
       "Remote (Australia)"
     ],
     "remote": true,
-    "url": "https://jobs.ashbyhq.com/globex/0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
+    "url": "https://jobs.ashbyhq.com/globex-labs-example/0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
     "eligibility_blockers": [],
     "requires_heavy_coding": false
   },
@@ -220,7 +220,7 @@
     ],
     "disputes": [
       {
-        "item_id": "globex:0b6f3c2e-1a2b-4c3d-8e9f-000000000001/D2",
+        "item_id": "globex_labs_example:0b6f3c2e-1a2b-4c3d-8e9f-000000000001/D2",
         "dimension": "D2",
         "scorer": {
           "score": 3,
@@ -312,6 +312,6 @@
       }
     ]
   },
-  "inputs_digest": "sha256:dc2869e485de3979359020514d351acaf0f971a71455110fc2959564cc030a8c",
+  "inputs_digest": "sha256:6689ba5866e2bbfc85b72e4e31308e4ba554ccab2885a9ca6f62f6d04b8ba0b4",
   "warnings": []
 }

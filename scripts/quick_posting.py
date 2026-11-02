@@ -50,7 +50,8 @@ import _common as C  # noqa: E402
 import fetch_roles as FR  # noqa: E402
 
 UA = "lvlme/0.3 (LVLme quick: one job posting the person asked about; read only)"
-MAX_BYTES = 3_000_000
+MAX_BYTES = 3_000_000  # a web page
+API_MAX_BYTES = 60_000_000  # a job board API answer: Ashby sends the employer's whole board, about 3 MB for a big employer
 MIN_TEXT = 400  # fewer characters than this and the page did not give a usable posting
 GREENHOUSE_HOSTS = {"boards.greenhouse.io", "job-boards.greenhouse.io",
                     "boards.eu.greenhouse.io", "job-boards.eu.greenhouse.io"}
@@ -517,11 +518,29 @@ def check_text(role):
 
 
 def http_get(url, accept):
+    """The response body as text. A job board API answer (JSON) may be far larger than a page.
+
+    Raises ValueError when the answer is larger than the cap, rather than return a cut off body.
+    """
+    cap = API_MAX_BYTES if accept == "application/json" else MAX_BYTES
     req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": accept})
     with urllib.request.urlopen(req, timeout=45) as resp:
-        body = resp.read(MAX_BYTES)
+        body = resp.read(cap + 1)
         charset = resp.headers.get_content_charset() or "utf-8"
+    if len(body) > cap:
+        raise ValueError("the answer was larger than %d MB" % (cap // 1_000_000))
     return body.decode(charset, errors="replace")
+
+
+def api_problem(exc):
+    """A short plain reason the job board API could not be read, for the person and posting.md."""
+    if isinstance(exc, json.JSONDecodeError):
+        return "its answer was not complete JSON"
+    if isinstance(exc, urllib.error.HTTPError):
+        return "it answered with error %s" % exc.code
+    if isinstance(exc, urllib.error.URLError):
+        return "it could not be reached (%s)" % getattr(exc, "reason", exc)
+    return str(getattr(exc, "detail", None) or exc) or exc.__class__.__name__
 
 
 def fetch(url, saved=None):
@@ -536,6 +555,7 @@ def fetch(url, saved=None):
             raise PostingError("Could not follow this short Workable link to its posting. Give the full link "
                                "(apply.workable.com/<employer>/j/<code>), or paste the posting text.")
         link = resolved
+    fallback = None
     if link["ats"] != "page":
         where = api_url(link)
         try:
@@ -552,11 +572,13 @@ def fetch(url, saved=None):
             if exc.code in (404, 410):
                 raise PostingError("This posting is no longer open on the %s board %r. "
                                    "Check the link, or paste the posting text." % (BOARD_NAMES[link["ats"]], link["board"]))
+            fallback = api_problem(exc)
         except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError) as exc:
             if saved:
                 raise PostingError("Could not read the saved response %s: %s" % (
                     C.show_path(saved), getattr(exc, "detail", exc)))
-        # the API was unreachable or changed shape: try the page itself, once
+            fallback = api_problem(exc)
+        # the API was unreachable or changed shape: try the page itself, once, and say so
     if saved:
         with open(saved, encoding="utf-8") as fh:
             raw = fh.read()
@@ -568,8 +590,12 @@ def fetch(url, saved=None):
     base = base_from_page(raw, url)
     if link["ats"] == "workday":
         base["org_name"] = workday_org_name(link["board"], base["org_name"], base["raw_html"])
-    return check_text(role_from_base(base)), {"kind": "page", "link": url, "endpoint": url,
-                                              "org_name": base["org_name"]}
+    source = {"kind": "page", "link": url, "endpoint": url, "org_name": base["org_name"]}
+    if fallback:
+        source["fallback"] = ("The %s job board API could not be read (%s), so this was read from the "
+                              "public web page instead, which may hold less of the posting."
+                              % (BOARD_NAMES[link["ats"]], fallback))
+    return check_text(role_from_base(base)), source
 
 
 def from_text(text, title=None, org_name=None, url=None):

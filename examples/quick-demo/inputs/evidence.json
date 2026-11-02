@@ -21,7 +21,7 @@
      "kind": "eligibility", "level": "self_reported", "dimensions": ["D6"],
      "sources": [{"type": "resume", "ref": "intake/sources/cv-alex-example.md"}], "added_on": "2026-11-02"},
     {"id": "E06", "claim": "Says they know someone at Globex Labs who has seen their work (one yes or no answer)",
-     "kind": "network", "level": "self_reported", "dimensions": ["D3"], "orgs": ["globex"],
+     "kind": "network", "level": "self_reported", "dimensions": ["D3"], "orgs": ["globex_labs_example"],
      "sources": [{"type": "interview", "ref": "intake/answers.md#warm-path"}], "added_on": "2026-11-02"},
     {"id": "E07", "claim": "AI practitioner certificate from Example Academy, 2026",
      "kind": "credential", "level": "self_reported", "dimensions": ["D1"],

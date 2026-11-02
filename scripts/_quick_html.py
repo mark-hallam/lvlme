@@ -217,8 +217,11 @@ def hero(result):
     locs = ", ".join(r["locations"])
     remote = "Remote" if r.get("remote") is True and "remote" not in locs.lower() else ""
     where = " · ".join(x for x in [esc(r["org_name"]), esc(locs), remote] if x)
-    link = (' · <a class="posting" href="%s">Open the posting</a>' % esc(r["url"])) if str(r.get("url") or "").startswith(
-        ("http://", "https://")) else ""
+    real_link = str(r.get("url") or "").startswith(("http://", "https://"))
+    if result.get("fictional"):  # a made-up posting has no page: never send a visitor to a real job board
+        link = " · fictional posting"
+    else:
+        link = (' · <a class="posting" href="%s">Open the posting</a>' % esc(r["url"])) if real_link else ""
     banners = "".join('<div class="banner">%s</div>' % esc(a) for a in adjustments(result))
     return ('<section class="card" aria-labelledby="oddsH"><p class="eyebrow">Your honest odds today</p>'
             '<h1 id="oddsH">%s</h1><p class="sub small">%s%s</p>'

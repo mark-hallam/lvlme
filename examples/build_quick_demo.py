@@ -29,7 +29,7 @@ import quick  # noqa: E402
 
 DATE = "2026-11-02"
 INPUTS = os.path.join(HERE, "quick-demo", "inputs")
-LINK = "https://jobs.ashbyhq.com/globex/0b6f3c2e-1a2b-4c3d-8e9f-000000000001"
+LINK = "https://jobs.ashbyhq.com/globex-labs-example/0b6f3c2e-1a2b-4c3d-8e9f-000000000001"
 COPIES = [("evidence.json", "profile/evidence.json"), ("quick.json", "eval/quick.json"),
           ("review-reply.md", "eval/review-reply.md"), ("answers.md", "intake/answers.md")]
 

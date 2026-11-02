@@ -483,5 +483,67 @@ class WorkableTests(unittest.TestCase):
         return FetchTests.tmp(self)
 
 
+class FakeResponse:
+    """A urlopen answer that honours read(n), like the real one."""
+
+    def __init__(self, body):
+        self.body, self.headers = body, mock.Mock(get_content_charset=lambda: "utf-8")
+
+    def read(self, n=-1):
+        return self.body if n is None or n < 0 else self.body[:n]
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+def big_ashby_board():
+    """The saved Ashby board padded with other roles until it is larger than a web page may be."""
+    data = Q.C.load_json(fx("ashby-board.json"))
+    filler = dict(data["jobs"][1], descriptionHtml="<p>%s</p>" % ("Other team work. " * 4000))
+    n = 0
+    while len(Q.json.dumps(data)) <= Q.MAX_BYTES:
+        n += 1
+        data["jobs"].append(dict(filler, id="00000000-0000-4000-8000-%012d" % n, title="Other role %d" % n))
+    return Q.json.dumps(data).encode("utf-8")
+
+
+class LargeBoardTests(unittest.TestCase):
+    """Ashby sends the employer's whole board: for a big employer that is more than a web page's cap."""
+
+    def test_a_board_larger_than_the_page_cap_is_read_in_full(self):
+        body = big_ashby_board()
+        self.assertGreater(len(body), Q.MAX_BYTES)
+        with mock.patch.object(Q.urllib.request, "urlopen", lambda req, timeout: FakeResponse(body)):
+            role, source = Q.fetch(ASHBY)
+        self.assertEqual(source["kind"], "ashby")                  # the API, not the page
+        self.assertNotIn("fallback", source)
+        self.assertEqual(role["id"], "globex:0b6f3c2e-1a2b-4c3d-8e9f-000000000001")
+        self.assertEqual(role["title"], "Deployment Program Manager, AI Agents")
+
+    def test_an_answer_over_the_cap_is_refused_not_cut_off(self):
+        with mock.patch.object(Q.urllib.request, "urlopen", lambda req, timeout: FakeResponse(b"x" * 11)), \
+                mock.patch.object(Q, "MAX_BYTES", 10):
+            with self.assertRaises(ValueError):
+                Q.http_get("https://example.com/page", "text/html")
+
+    def test_falling_back_to_the_page_is_said_out_loud(self):
+        page = ('<html><head><script type="application/ld+json">{"@type": "JobPosting", "title": "Analyst", '
+                '"hiringOrganization": {"name": "Globex Labs"}, "description": "%s"}'
+                '</script></head></html>' % ("Globex runs warehouse robots. " * 30))
+
+        def get(url, accept):
+            return '{"jobs": [{"id": "cut off' if "api.ashbyhq.com" in url else page
+        with mock.patch.object(Q, "http_get", get):
+            role, source = Q.fetch(ASHBY)
+        self.assertEqual(source["kind"], "page")
+        self.assertIn("Ashby job board API could not be read (its answer was not complete JSON)", source["fallback"])
+        import quick as QK
+        self.assertIn("Note: The Ashby job board API could not be read",
+                      QK.posting_md(role, "Globex Labs", source, "2026-11-04"))
+
+
 if __name__ == "__main__":
     unittest.main()

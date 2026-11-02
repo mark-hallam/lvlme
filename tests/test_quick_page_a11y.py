@@ -181,7 +181,9 @@ class StructureTests(unittest.TestCase):
             self.assertRegex(o.ids.get(label, ""), r"h[1-6]")
 
     def test_the_posting_link_has_a_bigger_tap_area(self):
-        self.assertEqual([a.get("class") for a in self.o.links], ["posting"])
+        self.assertEqual([a.get("class") for a in self.o.links], [])   # the demo's posting is fictional: no link
+        real = outline(QH.render(dict(self.result, fictional=False)))
+        self.assertEqual([a.get("class") for a in real.links], ["posting"])
         self.assertIn("a.posting{padding:10px 4px;margin:0 -4px}", QH.CSS)
 
     def test_meters_say_where_on_the_scale_without_repeating_the_band(self):

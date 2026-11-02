@@ -94,7 +94,7 @@ class DemoTests(Base):
         self.assertEqual(r["review"]["agreed"], ["D1", "D6"])
         [dispute] = r["review"]["disputes"]
         self.assertEqual((dispute["item_id"], dispute["stands"], dispute["decided_by"]),
-                         ("globex:0b6f3c2e-1a2b-4c3d-8e9f-000000000001/D2", 2, "awaiting_tie_break"))
+                         ("globex_labs_example:0b6f3c2e-1a2b-4c3d-8e9f-000000000001/D2", 2, "awaiting_tie_break"))
         self.assertEqual(self.factor(r, "D3")["review"]["status"], "not_needed")
 
     def test_fixes_are_ranked_and_capped(self):
@@ -111,6 +111,21 @@ class DemoTests(Base):
         self.assertEqual([e["id"] for e in r["brief"]["back_up"]], ["E03"])
         page = open(os.path.join(self.folder, "index.html"), encoding="utf-8").read()
         self.assertIn("never application answers", page)
+
+    def test_a_fictional_posting_sends_no_one_to_a_real_job_board(self):
+        """The demo's made-up posting is shown as plain text, never as a link to a real board."""
+        page = open(os.path.join(self.folder, "index.html"), encoding="utf-8").read()
+        self.assertNotIn("Open the posting", page)
+        self.assertNotRegex(page, r'href="https?://[^"]*(ashbyhq|greenhouse|lever|workday|smartrecruiters|workable)')
+        self.assertIn("fictional posting", page)
+        posting = open(os.path.join(self.folder, "posting.md"), encoding="utf-8").read()
+        self.assertIn("(a fictional posting: this address has no real page)", posting)
+        self.assertIn("/globex-labs-example/", D.LINK)  # a board name no real employer uses
+        # a real folder still links to its posting
+        result = Q.build_result(Q.load(self.folder))
+        result["fictional"] = False
+        import _quick_html
+        self.assertIn('<a class="posting" href="%s">Open the posting</a>' % D.LINK, _quick_html.render(result))
 
     def test_page_is_self_contained(self):
         page = open(os.path.join(self.folder, "index.html"), encoding="utf-8").read()
@@ -272,7 +287,7 @@ class NewFolderTests(unittest.TestCase):
                             "--parent", os.path.join(parent, "quick")])
         self.assertEqual(code, 0)
         info = json.loads(out)
-        self.assertEqual(os.path.basename(info["folder"]), "2026-11-02-globex-deployment-program-manager-ai-agents")
+        self.assertEqual(os.path.basename(info["folder"]), "2026-11-02-globex-labs-example-deployment-program-manager-ai-agents")
         for rel in ("config.json", "posting.md", "market/roles/latest.json", "intake/answers.md",
                     "intake/sources/my-cv.txt", "profile/evidence.json", "eval/quick.json"):
             self.assertTrue(os.path.exists(os.path.join(info["folder"], rel)), rel)

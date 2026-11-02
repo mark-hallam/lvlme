@@ -6,7 +6,7 @@
   },
   "targets": [
     {
-      "id": "globex",
+      "id": "globex_labs_example",
       "name": "Globex Labs",
       "ats": "ashby"
     }

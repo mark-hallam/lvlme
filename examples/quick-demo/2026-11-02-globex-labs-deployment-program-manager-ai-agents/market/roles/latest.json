@@ -4,13 +4,13 @@
   "summary": {
     "matched_total": 1,
     "endpoints": {
-      "globex": "https://api.ashbyhq.com/posting-api/job-board/globex?includeCompensation=true"
+      "globex_labs_example": "https://api.ashbyhq.com/posting-api/job-board/globex-labs-example?includeCompensation=true"
     }
   },
   "roles": [
     {
-      "id": "globex:0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
-      "org": "globex",
+      "id": "globex_labs_example:0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
+      "org": "globex_labs_example",
       "title": "Deployment Program Manager, AI Agents",
       "family": "quick",
       "team_or_department": "Customer / Deployments",
@@ -22,7 +22,7 @@
         "quick"
       ],
       "remote": true,
-      "url": "https://jobs.ashbyhq.com/globex/0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
+      "url": "https://jobs.ashbyhq.com/globex-labs-example/0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
       "updated_at": "2026-10-27T00:00:00.000+00:00",
       "published_at": "2026-10-27T00:00:00.000+00:00",
       "compensation": "AUD 170K to 200K",

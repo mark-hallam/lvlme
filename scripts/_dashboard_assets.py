@@ -804,11 +804,12 @@ function buildChartFrame(){
   $("#hit").addEventListener("pointerleave", () => { hideTip(); $("#cross").setAttribute("visibility", "hidden"); });
   chartBuilt = true;
 }
-// Phone end labels sit inside the plot, right aligned: best case and do nothing above their line, expected
-// below its own. They are then stacked at least 13px apart (like the desktop labels), so equal values, as on
-// every first run, read as three separate labels, and the stack stays between top and bottom of the plot.
+// Phone end labels sit inside the plot, right aligned and centred on their own line (the baseline 4px below
+// it), so each number reads beside the line it names. When two would overlap, the lower one moves down, at
+// least 13px apart (like the desktop labels), so equal values, as on every first run, read as three separate
+// labels, and the stack stays between top and bottom of the plot.
 function phoneEndLabels(ends, top, bottom){
-  const GAP = 13, out = ends.map((e, i) => [e[0], e[1] + (i === 1 ? 14 : -6), e[1], i]);
+  const GAP = 13, out = ends.map((e, i) => [e[0], e[1] + 4, e[1], i]);
   const order = out.slice().sort((a, b) => a[2] - b[2] || a[3] - b[3]);   // by line height, ties keep best, expected, do nothing
   order.forEach((e, i) => { e[1] = Math.max(e[1], top + i * GAP); if (i) e[1] = Math.max(e[1], order[i - 1][1] + GAP); });
   for (let i = order.length - 1; i >= 0; i--) order[i][1] = Math.min(order[i][1], i === order.length - 1 ? bottom : order[i + 1][1] - GAP);
@@ -870,10 +871,15 @@ function drawChart(){
   });
   const d1 = hist.length ? hist[0].v : r.fit;
   txt(xT(hist.length ? hist[0].t : T0) + 10, Math.min(PT + IH - 6, yOf(d1) + 24), "Day 1: " + BANDS[bandIdx(d1)] + ", fit " + Math.round(d1), true);
-  // end labels: outside the plot on wide screens, inside it (right aligned, above each line) on a phone
+  // end labels: outside the plot on wide screens, inside it (right aligned, on each line) on a phone
   const ends = [[Math.round(best.end) + " Best case", yOf(best.end)], [Math.round(exp.end) + " Expected", yOf(exp.end)], [Math.round(r.fit) + " Do nothing", yOf(r.fit)]];
-  if (SMALL){
-    phoneEndLabels(ends, PT + 12, PT + IH - 4).forEach(e => txt(PL + IW - 4, e[1], e[0], false, "var(--sub)", "end"));
+  if (SMALL){                                                  // each label ends in a short key drawn like its line
+    const keys = [[c, "7 5"], [c, "none"], ["var(--stop)", "2 4"]];
+    phoneEndLabels(ends, PT + 12, PT + IH - 4).forEach((e, i) => {
+      lab.appendChild(svgEl("line", {x1: PL + IW - 16, x2: PL + IW - 2, y1: e[1] - 4, y2: e[1] - 4, stroke: keys[i][0],
+        "stroke-width": 2, "stroke-dasharray": keys[i][1], "stroke-linecap": "round", class: "end-key"}));
+      txt(PL + IW - 20, e[1], e[0], false, "var(--sub)", "end");
+    });
   } else {                                                     // the offer zone label joins the end labels, so none overlap
     const items = ends.map(e => ({y: e[1] + 4, h: 15, draw: y => txt(PL + IW + 8, y, e[0], false, "var(--sub)")}));
     items.push({y: yOf(70) - 4, h: 29, draw: y => { txt(PL + IW + 8, y, "Offer zone", true, "var(--ok)"); txt(PL + IW + 8, y + 14, "fit 70 and up", false, "var(--sub)"); }});

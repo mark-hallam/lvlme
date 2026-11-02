@@ -1,6 +1,6 @@
 {
   "quick_version": 1,
-  "role_id": "globex:0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
+  "role_id": "globex_labs_example:0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
   "judged_on": "2026-11-02",
   "warm_path": true,
   "eligibility_cleared": [],
