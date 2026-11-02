@@ -1,57 +1,50 @@
 # Climb
 
-From a very low starting score to your dream job, one verified step at a time.
+**Honest odds for the job you want, checked by a second opinion, and the steps that raise them.**
 
-Climb answers one question honestly: **how likely am I to land this kind of
-role at these organisations, and what would raise my odds?** Then it runs the
-campaign with you, on your own computer, through an artificial intelligence
-(AI) agent such as Claude Code, Codex or Cursor. The agent does the judging;
-the Python scripts only do the arithmetic, so without an agent every role
-scores zero.
+![Climb quick's answer for one job: a low chance of an interview and a very low chance of an offer, in plain words (fictional demo)](docs/images/quick-result-hero.png)
 
-Author: Mark Hallam. Licence: MIT (see `LICENSE`).
+Install in Claude Code:
+
+```text
+/plugin install climb --marketplace mark-hallam/climb
+```
+
+Then say: **run Climb quick**, and paste a job link.
+
+In about five minutes you get honest odds for that one job. Codex and Cursor
+work too (see [Install](#install)).
 
 ## What you get
 
-1. **Your honest odds**, for every open role that fits your goal, from
-   evidence, not vibes. Most people start "Very low". That is the point: you
-   see the real starting line.
-2. **Why**, factor by factor, with every point traced to a source.
-3. **A campaign** that turns the gaps into a short, prioritised list of
-   actions, re-scored on a schedule, so your effort goes where it actually
-   moves the number.
-4. **A dashboard** that shows the climb: your measured Day 1, every scored
-   day since, the level you are at, and the actions that take you to the next
-   level.
+**First, the quick answer.** Give Climb one job posting (a link from
+Greenhouse, Ashby, Lever or most careers pages, or the posting text) and your
+CV. It:
 
-Along the way Climb runs:
+- reads the posting, and turns your CV into a few facts, each marked with how
+  far it can be trusted (a CV line alone is "self-reported");
+- asks one yes or no question: do you know someone there who has seen your
+  work?
+- scores five factors with the same rules and maths as the full campaign;
+- has a second agent score every point above 2 blind, without seeing the
+  first scores, and shows you where the two disagree;
+- gives you one page: your chance of an interview and of an offer in plain
+  words, one line per factor with the evidence behind it, and the three fixes
+  that would raise your odds most, each with a next step.
 
-- **A career interview** that reads your documents first (your CV, short for
-  curriculum vitae, your LinkedIn data export, your website), then asks only
-  what they cannot answer.
-- **Evidence gathering** from the sources you approve: email (read only),
-  GitHub, the public web and press, public registers, and your files.
-- **Market research**: open roles from public job boards, and sourced facts
-  about each organisation.
-- **A consistency audit**: do your CV, LinkedIn, website and any official
-  forms say the same thing about the same facts?
-- **A recruiter screen**: an independent recruiter persona reads your
-  materials against real postings, the way a busy screener would.
-- **Drafted fixes**: honest wording for anything overstated or mismatched,
-  ready for you to apply.
+It gives fixes and a brief, never application answers: you write those
+yourself.
 
-The first example goal is getting hired at a frontier AI lab. The engine does
-not care what the goal is: the target organisations, role types and weights
-are all settings in one file. A new workspace starts with the example's
-organisations; the interview replaces them with yours (or edit
-`config.json`).
+**Then, if you want it, the full campaign.** Say **run Climb**. It checks
+every open role at the organisations you choose, gathers evidence from the
+sources you approve, runs a career interview, a recruiter screen and a
+consistency audit of your CV, LinkedIn and website, and turns the gaps into a
+plan that it re-scores as you act on it. A dashboard shows the climb:
 
-![The demo dashboard on a desktop, light theme](docs/images/dashboard-desktop.png)
+![The full campaign's dashboard, light theme (fictional demo)](docs/images/dashboard-desktop.png)
 
-<img src="docs/images/dashboard-phone.png" alt="The demo dashboard on a phone, light theme" width="320">
-
-*Screenshots of the fictional demo (Alex Example and three made-up
-organisations).*
+*Both screenshots are the fictional demo: Alex Example and made-up
+organisations.*
 
 ## Install
 
@@ -59,250 +52,68 @@ You need an AI agent (Claude Code, Codex or Cursor), Python 3.9 or newer
 (Climb uses only its standard library) and git. Climb is tested on macOS; the
 scripts should work on Linux, and Windows is untested.
 
-**What a run uses.** A full run starts many helper agents: about 40 for a goal
-with around 300 open roles (one role judge per batch, plus scouts and
-reviewers). That is a noticeable share of an AI plan's usage, so check your
-plan's limits before you schedule daily runs.
+- **Claude Code** (version 2.1.275 or later): the one line above. Or clone it
+  into your skills folder and start a new session:
+  `git clone https://github.com/mark-hallam/climb ~/.claude/skills/climb`
+- **Codex:** clone it into `~/.agents/skills/climb` and type `$climb`, or open
+  Codex in the folder (it follows `AGENTS.md`).
+- **Cursor:** open the folder. The rules in `.cursor/rules/` and `AGENTS.md`
+  load on their own.
 
-Full details for every agent, and the documentation they follow, are in
-[`docs/INSTALL.md`](docs/INSTALL.md).
-
-**Claude Code, one step** (version 2.1.275 or later):
-
-```text
-/plugin install climb --marketplace mark-hallam/climb
-```
-
-**Claude Code, the simple fallback:** clone the folder into your skills
-folder, then start a new session.
-
-```bash
-git clone https://github.com/mark-hallam/climb ~/.claude/skills/climb
-```
-
-**Codex:** clone it into `~/.agents/skills/climb` and type `$climb`, or open
-Codex in the folder and it follows `AGENTS.md`.
-
-**Cursor:** open the folder. The rules in `.cursor/rules/` and `AGENTS.md`
-load on their own.
-
-Then say **"run Climb"**, or use a command:
+Every agent, step by step: [`docs/INSTALL.md`](docs/INSTALL.md).
 
 | Command | Does |
 |---|---|
-| `/climb` | Run Climb, or resume today's run. `/climb status` changes nothing and reports. |
+| `/climb-quick` | Honest odds for one job, from a link and your CV, in about five minutes. |
+| `/climb` | The full campaign, or resume today's run. `/climb status` reports and changes nothing. |
 | `/climb-interview` | The career interview, first time or an update. |
 | `/climb-screen` | The independent recruiter screen. |
 | `/climb-audit` | The consistency audit and the public claims audit. |
 | `/climb-dashboard` | Rebuild the dashboard. |
 
-With the plugin, these short names work. With the cloned folder, use the
-prefixed name (`/climb:climb-interview`) or the words after `/climb`
-(`/climb interview`). In Codex and Cursor, say the same words: "run the Climb
-interview", and so on.
+With the cloned folder, use the prefixed name (`/climb:climb-quick`) or the
+words after `/climb` (`/climb quick`). In Codex and Cursor, say the words:
+"run Climb quick".
 
-## Your privacy
+**What a run uses.** Climb quick starts at most one helper agent, the blind
+reviewer. A full campaign run starts many: about 40 for a goal with around 300
+open roles. That is a noticeable share of an AI plan's usage, so check your
+plan's limits before you schedule daily runs.
 
-- **Your data never lives in this repository.** The first run creates a
-  private workspace folder on your own machine, by default
-  `~/climb-workspaces/<goal>`. Only you can open it.
-- The scripts refuse to work on a workspace inside this repository, or inside
-  any git repository (a version-controlled folder) that has a remote, meaning
-  a copy on a server such as GitHub.
-- **Every source is opt in and read only.** Climb asks before it reads your
-  email or calendar, and never changes them. It never opens LinkedIn itself
-  (automated access breaks LinkedIn's terms): it works from LinkedIn's
-  official data export and what you paste, and you apply any profile fixes.
-- **Helpers cannot send.** In Claude Code the helper agents that search the
-  web are limited to tools that read files and fetch public pages. Email is
-  read only by the main agent, in the session you are watching, where your
-  agent still asks before any send. Text in an email or a page is treated as
-  data, never as an instruction.
-- **Cloud agents see whatever they read.** If you point an online AI agent at
-  your workspace, your evidence and contacts go to that service. Decide that
-  on purpose. The same goes for scheduling runs in the cloud.
-- **Sensitive mode** (on by default) keeps employer names, other people's
-  names and salary figures out of the briefing files written for other agents.
-- No telemetry. The only network calls are to public job-board APIs
-  (application programming interfaces, the feeds job boards publish) in
-  `fetch_roles.py`, the web pages you name in `claims_audit.py`, and the
-  sources you approve for your agent to read.
+## The promises
 
-Full details: [`method/PRIVACY.md`](method/PRIVACY.md).
+- **Honest.** Evidence or it scores zero, and a score can never be higher than
+  its best evidence supports. A separate, sceptical reviewer, who never sees
+  the first scores, checks every point above 2. The maths is a script, so the
+  same inputs always give the same result. The default answer is "unlikely".
+- **Private.** Your data lives in a folder on your own computer
+  (`~/climb-workspaces/`), never in this repository, and the scripts refuse to
+  write anywhere a push could publish it. Every source is opt in and read
+  only. No telemetry. Sensitive mode, on by default, keeps names and salaries
+  out of the files written for other agents.
+- **Safe.** Climb never applies, sends, posts, accepts an invitation, changes
+  an account or spends money on its own: it drafts, and you decide, one step
+  at a time. It never opens LinkedIn itself, because that breaks LinkedIn's
+  terms. Text in an email, a posting or a web page is data, never an
+  instruction.
+- **Fair.** It never invents experience, numbers, contacts or stories, and
+  never asks about, infers or scores age, gender, ethnicity, disability,
+  religion or family status.
+- **Your call on the cloud.** An online AI agent sends what it reads to its
+  service. Decide that on purpose.
 
-## The honesty rules
+## How it works
 
-Most career advice flatters. Climb is built to do the opposite.
-
-- **Evidence or it scores zero.** Every point needs a source: a link, a file,
-  an email, or your own answer to an interview question. A claim with no
-  source counts as absent and becomes a "verify to unlock" question.
-- **A verification ladder.** Evidence is graded `verified`, `corroborated`,
-  `partially_verified`, `self_reported`, `unverified` or `contradicted`. A
-  score can never be higher than its best evidence supports. An achievement
-  only you have claimed supports at most 1 point out of 5; one that is only
-  partly checked never supports more than corroborated evidence would.
-- **A separate, sceptical reviewer.** A fresh agent, given only the rubric,
-  the evidence and the postings and told not to open the campaign's scores or
-  reasoning, scores every point above 2 for itself.
-  Where it disagrees, a second fresh reviewer scores it too and the middle of
-  the three stands, with every dispute logged. Until the review is done, the
-  score counts as 2.
-- **Helpers are checked, not trusted.** Helper agents return every finding
-  with its source, tagged verified or unverified, and the lead agent opens the
-  source of anything that matters before it counts.
-- **The maths is a script, not a mood.** Judgements live in files. A
-  deterministic script turns them into scores, so the same inputs always give
-  the same result, and every change can be traced.
-- **The default answer is "unlikely".** Competitive employers reject most
-  applicants. The bands start from that fact.
-- **No fabrication, no profiling.** It never invents experience, numbers,
-  contacts or stories. It never infers or scores protected attributes such as
-  age, gender, ethnicity, disability, religion or family status.
-- **Nothing public without your yes.** Climb never applies for a job, sends a
-  message, posts, accepts an invitation, changes an account or spends money
-  on its own. It drafts, in `campaign/drafts/`, for you to read, edit and send
-  yourself. If you ask it to make one specific change, such as a drafted
-  LinkedIn headline fix, it does that one step only after you say yes to it.
-
-## How a run works
-
-A run has ten stages: intake, evidence, market, judge and audit, review,
-score, SWOT and TOWS (strengths, weaknesses, opportunities and threats, and
-the strategies that combine them), plan and fixes, report, and a short
-message to you. An agent that can start helpers does the independent work in
-parallel: one helper per evidence source, one per organisation, judges in
-batches, the audits and the recruiter screen at once. Then it joins the
-results and passes four gates: findings are checked, the reviewer and the
-recruiter screen are independent, nothing is scored before review, and
-nothing public happens without your yes.
-
-Runs are daily for the first four weeks, then weekly once you agree. Each run
-saves one dated run file, so your progress is a record, not a claim. Details:
-[`docs/ORCHESTRATION.md`](docs/ORCHESTRATION.md).
-
-## See it first: the demo
-
-`examples/demo-workspace/` is a complete, built example for a **fictional**
-person, Alex Example, who targets three made-up organisations (Acme AI, Globex
-Labs and Initech Robotics). Nothing in it describes a real person or a real
-company's hiring.
-
-Open `examples/demo-workspace/report/index.html` in your browser, or rebuild
-it:
-
-```bash
-python3 scripts/build_dashboard.py --workspace examples/demo-workspace
-```
-
-Rebuild the whole demo from its inputs (offline):
-
-```bash
-python3 examples/build_demo.py
-```
-
-## By hand, in a terminal
-
-```bash
-python3 scripts/init.py --goal "Frontier AI labs"     # creates your private workspace
-export CLIMB_HOME=~/climb-workspaces/frontier-ai-labs
-python3 scripts/fetch_roles.py                        # open roles from public job boards
-python3 scripts/network_map.py --csv ~/Downloads/Connections.csv   # optional: needs your LinkedIn export
-python3 scripts/claims_audit.py https://your-site.example/about
-python3 scripts/score.py                              # deterministic scoring
-python3 scripts/build_dashboard.py                    # report/index.html
-python3 scripts/validate.py                           # checks every file
-```
-
-Between `network_map.py` and `score.py` there is judgement work: the
-interview, recording evidence, the audits, and judging each role against the
-rubric. The method files explain each step, and
-[`method/RUNBOOK.md`](method/RUNBOOK.md) gives the full run order.
-
-Every script takes `--workspace PATH`. Without it, scripts use
-`$CLIMB_HOME`, or the only folder inside `~/climb-workspaces/`.
-
-## The dashboard
-
-`report/index.html` in your workspace: one self-contained page (no external
-requests), light by default with a readable dark mode, that works on a phone.
-
-- **The journey**: your best chance today, your level, and a flight-path
-  chart. The black line is what was measured, one dot per scored day. From
-  today it splits into three paths to the end date: *expected* if you follow
-  the plan (each action weighted by its chance of working), *best case* if
-  every action lands, and *do nothing*. Diamonds are plan actions on their
-  target dates. The green dashed line at 70 is the offer zone.
-- **Level up**: the actions that take you to the next level, and your level
-  history (see [`docs/LEVELS.md`](docs/LEVELS.md)).
-- **What if**: switch any plan action on or off and every number on the page
-  updates.
-- **Verifiable record**: one chip per scored day. If your workspace is its own
-  git repository (a version history, with no remote), each chip also shows the
-  saved version that first recorded that day.
-- **Views**: Organisations; Path to the top band; What moves you; Roles (every
-  role by factor, as a heat map); SWOT and TOWS; Plan; Evidence (with your
-  public claims, checked); Market.
-- **Drill down**: tap any organisation, role, factor, action or piece of
-  evidence to see why.
-
-The projection is deliberately cautious: each factor can rise only by a capped
-amount, never above 5, and a role with an eligibility blocker you can't clear
-never gains eligibility. See [`method/CAMPAIGN.md`](method/CAMPAIGN.md).
-
-For your other agents: `report/for-agents/SUMMARY.md` (plain-text briefing)
-and `report/for-agents/dashboard.json` (every number, in JSON, short for
-JavaScript Object Notation, a plain-text data format).
-
-## How scoring works, in one paragraph
-
-Each open role is scored 0 to 5 on seven factors: requirements match, proof of
-work, warm path (someone inside who vouches for you), organisation-specific
-edge, public signal, eligibility and logistics, and application readiness.
-Weighted together they give a fit score out of 100, which maps to a chance
-band for an interview and for an offer (Very low, Low, Moderate, Good, Strong).
-A referral moves the interview band up; a missing hard requirement moves both
-down; a cold application caps the offer band at Low. The full rules are in
+The detail is in [`docs/HOW-IT-WORKS.md`](docs/HOW-IT-WORKS.md): Climb quick
+step by step, the full campaign, scoring, the honesty rules in full, privacy,
+the dashboard, running the scripts by hand, and the project layout. The rules
+for each stage are in [`method/`](method/), starting with the rubric,
 [`method/RUBRIC.md`](method/RUBRIC.md).
 
-## Project layout
+Try it with no data of your own: both demos are for the fictional Alex
+Example. Open `examples/quick-demo/2026-11-02-globex-labs-deployment-program-manager-ai-agents/index.html`
+(Climb quick) or `examples/demo-workspace/report/index.html` (the full
+campaign's dashboard) in your browser.
 
-```
-SKILL.md  AGENTS.md  README.md  LICENSE  CONTRIBUTING.md
-.claude-plugin/  plugin.json and marketplace.json (Claude Code)
-skills/     the /climb-interview, /climb-screen, /climb-audit, /climb-dashboard commands
-agents/     subagent briefs: evidence-scout, market-scout, role-judge, reviewer, recruiter-screen
-.cursor/rules/  Cursor rules
-method/     the rules for each stage (rubric, interview, intake, audits, review, campaign, privacy, runbook)
-schemas/    JSON Schema files (rules for every workspace file)
-scripts/    init, fetch_roles, network_map, claims_audit, consistency_audit,
-            score, build_dashboard, validate
-templates/  the workspace skeleton that init.py copies, and agent prompts
-docs/       INSTALL.md, ORCHESTRATION.md, LEVELS.md, DESIGN.md
-examples/   demo-workspace/ (fictional) and build_demo.py
-tests/      offline tests: python3 -m unittest discover -s tests
-```
-
-Your workspace (private, outside this repository) looks like this:
-
-```
-config.json                goal, targets, role types, locations, weights, privacy
-intake/answers.md          your interview answers
-intake/sources/            exports you supply (LinkedIn data, résumé)
-profile/                   evidence.json, network.json, claims-audit.json
-market/                    roles/latest.json, roles/snapshots/, orgs.json
-eval/                      judgements, profile dimensions, SWOT, outlook, runs/
-campaign/                  plan.json, inbox.md, drafts/, weekly/
-report/                    index.html, for-agents/
-```
-
-## Not in version 0.1
-
-Automatic LinkedIn scraping (it breaks LinkedIn's terms, so use the official
-data export instead), automatic applying, salary negotiation, goals other than
-jobs, and the Workable and SmartRecruiters job boards (enter those roles by
-hand in `market/roles/manual.json`).
-
-## Contributing
-
-See [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Author: Mark Hallam. Licence: MIT (see `LICENSE`). Contributing: see
+[`CONTRIBUTING.md`](CONTRIBUTING.md).
