@@ -1,0 +1,42 @@
+{
+  "additional": "<div>Initech Robotics is a fictional company for the Climb tests. We review every application by hand.</div>",
+  "additionalPlain": "Initech Robotics is a fictional company for the Climb tests. We review every application by hand.",
+  "applyUrl": "https://jobs.lever.co/initech/7c1d2e3f-4a5b-4c6d-9e8f-000000000101/apply",
+  "categories": {
+    "commitment": "Full-time",
+    "department": "Operations",
+    "location": "Melbourne, Australia",
+    "team": "Fleet",
+    "allLocations": [
+      "Melbourne, Australia"
+    ]
+  },
+  "country": "AU",
+  "createdAt": 1761523200000,
+  "description": "<div>Initech Robotics builds warehouse robots.</div><div>Plan and run robot fleet rollouts at customer warehouses, and keep every site safe while the fleet goes live.</div>",
+  "descriptionPlain": "Initech Robotics builds warehouse robots.",
+  "hostedUrl": "https://jobs.lever.co/initech/7c1d2e3f-4a5b-4c6d-9e8f-000000000101",
+  "id": "7c1d2e3f-4a5b-4c6d-9e8f-000000000101",
+  "lists": [
+    {
+      "text": "What you will do",
+      "content": "<li>Run deployment programs across customer warehouse sites</li><li>Coordinate hardware, software and site teams on one plan</li><li>Write the go-live checklist for each site and sign it off</li>"
+    },
+    {
+      "text": "Requirements",
+      "content": "<li>4+ years of program or project management</li><li>Experience with hardware, logistics or warehouse operations</li><li>Must hold a current driver's licence</li><li>Comfort working on customer sites</li>"
+    },
+    {
+      "text": "Nice to have",
+      "content": "<li>Experience with robotics or automation projects</li>"
+    }
+  ],
+  "salaryRange": {
+    "currency": "AUD",
+    "interval": "per-year-salary",
+    "min": 140000,
+    "max": 165000
+  },
+  "text": "Program Manager, Robot Fleet Deployments",
+  "workplaceType": "onsite"
+}
