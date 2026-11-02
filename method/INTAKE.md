@@ -10,8 +10,11 @@ Intake is how evidence gets into the workspace. It has three parts:
 3. **Recording**: every fact becomes one item in `profile/evidence.json`, with
    a verification level.
 
-On the first run, work through the whole question bank. On later runs, ask
-only about what has changed, and about the open questions in
+On the first run, start with the short first message in `INTERVIEW.md`, then
+work through the question bank in rounds, skipping what the documents
+already answer (the order is in ["First run"](../SKILL.md#first-run)). Two
+questions are asked only when an open role needs them: they say so. On later
+runs, ask only about what has changed, and about the open questions in
 `profile/evidence.json`.
 
 ## The verification ladder
@@ -169,9 +172,13 @@ that is a fact as an evidence item with a source of type `interview` and a
    citizen, a US permanent resident, or a protected individual)? [D6]
    Why we ask: roles under ITAR (the US International Traffic in Arms
    Regulations) and other export controls are closed to everyone else.
+   Ask only when an open role needs it: `summary.blocker_counts.us_person_export_control`
+   in `market/roles/latest.json` is above 0 (`INTERVIEW.md`, "Work rights").
 5. Do you hold, or could you obtain, a government security clearance? Which
    country and level? [D6]
    Why we ask: clearance roles are closed without one.
+   Ask only when an open role needs it: `summary.blocker_counts.security_clearance`
+   is above 0.
 6. Do you hold any professional licence a target role might require (for
    example a driving licence, an engineering registration, a financial
    services licence)? [D6, D1]

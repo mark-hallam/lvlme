@@ -131,6 +131,14 @@ automatically:
 Cursor also reads `AGENTS.md`. Say "run LVLme quick" with a job link, or
 "run LVLme".
 
+## Your first run
+
+Say "run LVLme quick" with a job link for one honest answer, or "run LVLme"
+for the full campaign. The full campaign's first message is short: it asks
+you to confirm three facts from your CV, which organisations you want, and
+for your LinkedIn data export. Every step of a first run, in order, is in
+["First run"](../SKILL.md#first-run).
+
 ## Coming from Climb
 
 LVLme was called Climb until 3 November 2026. What changed, and what still

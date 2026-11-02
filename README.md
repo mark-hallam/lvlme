@@ -52,7 +52,10 @@ yourself.
 every open role at the organisations you choose, gathers evidence from the
 sources you approve, runs a career interview, a recruiter screen and a
 consistency audit of your CV, LinkedIn and website, and turns the gaps into a
-plan that it re-scores as you act on it. A dashboard shows the climb:
+plan that it re-scores as you act on it. It starts with one short message:
+three facts from your CV to confirm, which organisations you want, and a
+request for your LinkedIn data export ([the first run, in order](SKILL.md#first-run)).
+A dashboard shows the climb:
 
 ![The full campaign's dashboard, light theme (fictional demo)](docs/images/dashboard-desktop.png)
 

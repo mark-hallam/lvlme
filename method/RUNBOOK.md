@@ -42,27 +42,12 @@ when `~/lvlme-workspaces/` does not exist. The commands below omit
 
 ## First run only
 
-1. Create the workspace:
-
-   ```bash
-   python3 scripts/init.py --goal "Frontier AI labs"
-   ```
-
-   It refuses a non-empty folder, a folder inside the engine repository, or
-   one inside a git repository that has a remote.
-2. `config.json` starts with the goal and no targets or role families (unless
-   you used `--example`), so `validate.py` and `fetch_roles.py` stop until
-   they are set. Fill it in with the person: targets (organisation id, name,
-   applicant tracking system (ATS): `greenhouse`, `ashby`, `lever` or
-   `manual`, and the board slug), role families and keywords, location
-   classes, `candidate.timezone`, `candidate.eligibility_cleared`,
-   `privacy.redact_terms` (their employers' names).
-3. Interview the person with the full question bank in `INTAKE.md`,
-   document-led and in short rounds (`INTERVIEW.md`). Save the answers in
-   `intake/answers.md`.
-4. Ask for the LinkedIn data export and a résumé, saved in `intake/sources/`.
-5. Fill `eval/profile-dimensions.json` D6 rules for every location class, from
-   the work-rights answers.
+Follow ["First run"](../SKILL.md#first-run) in `SKILL.md`: it is the one
+list, in order, from creating the workspace to the work rights rules. In
+short: `scripts/init.py` makes the workspace, a short first message
+(`INTERVIEW.md`) confirms three facts from the CV and asks for the target
+organisations and the LinkedIn data export, then the interview carries on in
+rounds while roles and evidence are gathered.
 
 ## Every run
 
@@ -78,9 +63,11 @@ when `~/lvlme-workspaces/` does not exist. The commands below omit
    ```
 
    Note new and closed roles (printed, and in the summary of
-   `market/roles/latest.json`). Add roles from boards without an adapter to
-   `market/roles/manual.json`. Add sourced organisation facts to
-   `market/orgs.json`.
+   `market/roles/latest.json`). If `blocker_counts` there is above 0 for US
+   export control or security clearance and that question has not been
+   asked yet, ask it (`INTERVIEW.md`, "Work rights"). Add roles from boards
+   without an adapter to `market/roles/manual.json`. Add sourced
+   organisation facts to `market/orgs.json`.
 
 3. **Evidence.** Look for anything new since the last run date (the newest
    file in `eval/runs/`) and add it to `profile/evidence.json`. Keep ids

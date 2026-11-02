@@ -16,8 +16,8 @@ Last updated:
 - Countries where I can work without sponsorship:
 - Visa routes I qualify for, and what they need:
 - Degree (level and field), or what I hold instead:
-- US person for export-control purposes (yes or no):
-- Security clearance (country and level, or none):
+- US person for export-control purposes (yes or no; asked only if an open role needs it):
+- Security clearance (country and level, or none; asked only if an open role needs it):
 - Licences a role might require:
 - Anything that could affect a background or reference check (no detail needed):
 - Possible conflicts of interest with past employers or clients:

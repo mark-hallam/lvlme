@@ -62,6 +62,9 @@ Every script takes `--workspace PATH`.
 1. **Intake**: the document-led interview in `method/INTERVIEW.md`: read the
    documents the person supplies first, then ask only the gaps, using the
    question bank in `method/INTAKE.md`. Save answers in `intake/answers.md`.
+   For a new goal, follow ["First run"](SKILL.md#first-run): it starts with
+   one short message (three facts from the CV to confirm, which
+   organisations, the LinkedIn data export).
 2. **Evidence**: search each approved source (email, GitHub, public web and
    press, public registers, the LinkedIn data export, supplied documents) and
    record facts in `profile/evidence.json`; run

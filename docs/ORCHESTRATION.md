@@ -88,8 +88,10 @@ it is listed as a question instead.
 
 ### 1. Intake (lead and person, foreground)
 
-The document-led interview in `method/INTERVIEW.md`. On the first run, ask
-for approvals first (which sources, which connectors), so fan-out 1 can start
+The document-led interview in `method/INTERVIEW.md`. On the first run,
+follow ["First run"](../SKILL.md#first-run): the short first message settles
+the target organisations and asks for the LinkedIn data export, and the next
+asks for approvals (which sources, which connectors), so fan-out 1 can start
 while the interview carries on. Later runs ask only what changed.
 
 ### Fan-out 1: gather (stages 2 and 3, background)

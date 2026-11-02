@@ -1,4 +1,5 @@
 """fetch_roles.py: adapters against saved job-board JSON, classification, flags, snapshots. No network."""
+import json
 import os
 import shutil
 import unittest
@@ -170,6 +171,30 @@ class MainTests(unittest.TestCase):
         self.assertEqual(latest["summary"]["closed_role_ids"], ["gh:4100001"])
         self.assertEqual(latest["summary"]["new_role_ids"], [])
         self.assertTrue(all(r["first_seen"] == "2026-11-01" for r in latest["roles"]))
+
+    def test_blocker_counts_say_which_eligibility_questions_matter(self):
+        """The interview asks the export control and clearance questions only when an open role needs them."""
+        with mock.patch("sys.stdout") as out:
+            self.assertEqual(F.main(["--workspace", self.ws, "--fixtures", self.fx, "--date", "2026-11-01"]), 0)
+        latest = H.load(os.path.join(self.ws, "market", "roles", "latest.json"))
+        counts = latest["summary"]["blocker_counts"]
+        self.assertEqual(list(counts), ["us_person_export_control", "security_clearance", "citizenship", "licence"])
+        for kind, n in counts.items():
+            with self.subTest(kind=kind):
+                self.assertEqual(n, sum(1 for r in latest["roles"]
+                                        if kind in {b["type"] for b in r["eligibility_blockers"]}))
+        self.assertGreaterEqual(counts["us_person_export_control"], 1)   # the government partnerships role
+        self.assertGreaterEqual(counts["security_clearance"], 1)
+        printed = json.loads("".join(c.args[0] for c in out.write.call_args_list))
+        self.assertEqual(printed["blocker_counts"], counts)
+        self.assertEqual(V.check(latest, H.schema("roles.schema.json")), [])
+
+    def test_blocker_counts_count_a_role_once_and_list_every_type(self):
+        roles = [{"eligibility_blockers": [{"type": "security_clearance", "text": "a"},
+                                           {"type": "security_clearance", "text": "b"}]},
+                 {"eligibility_blockers": []}, {}]
+        self.assertEqual(F.blocker_counts(roles), {"us_person_export_control": 0, "security_clearance": 1,
+                                                   "citizenship": 0, "licence": 0})
 
     def test_no_targets_stops_with_one_line(self):
         cfg = H.load(os.path.join(self.ws, "config.json"))

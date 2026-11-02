@@ -14,17 +14,22 @@ filled in, it is the folder two levels above this file).
    create the workspace" steps. Everything below is the **interview** entry
    point of that procedure.
 2. If `config.json` has no target organisations or role families yet (a new
-   workspace: `scripts/validate.py` says so), start there. Ask the "Goals and
-   motivation" questions 1 and 5 in `method/INTAKE.md`, then fill in
-   `config.json` with the person: targets, role families and keywords, any
-   title exclusions, location classes and time zone. Run
-   `scripts/validate.py` again.
-3. Ask which documents and sources the person is happy for you to read (for
-   example a CV, the LinkedIn data export, their website). Each one is opt in
-   and read only. Save supplied files in `intake/sources/`.
+   workspace: `scripts/validate.py` says so), this is a first run: follow
+   ["First run"](../../SKILL.md#first-run) in the engine's `SKILL.md`. It
+   starts with one short message ("The first message" in
+   `method/INTERVIEW.md`, about 120 words): confirm three facts from the CV,
+   ask which organisations, ask for the LinkedIn data export. From the
+   reply, fill in `config.json` with the person (targets, role families and
+   keywords, any title exclusions, time zone) and run `scripts/validate.py`
+   again.
+3. Ask which other documents and sources the person is happy for you to
+   read (for example their website, or email). Each one is opt in and read
+   only. Save supplied files in `intake/sources/`.
 4. Follow `method/INTERVIEW.md`: read the documents first, then ask only the
    gaps, a few questions at a time. Use the question bank in
-   `method/INTAKE.md` as the checklist.
+   `method/INTAKE.md` as the checklist. Ask about US export control and
+   security clearance only when an open role needs them ("Work rights" in
+   `method/INTERVIEW.md`).
 5. With the argument `update` (or when `intake/answers.md` already has
    answers), ask only about what changed since the last run and the open
    questions in `profile/evidence.json`.

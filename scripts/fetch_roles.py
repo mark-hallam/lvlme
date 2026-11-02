@@ -23,6 +23,10 @@ Field notes
                 only when the same location line names no region.
   eligibility_blockers  postings that say US person / ITAR / export control,
                 security clearance, a named citizenship, or a licence.
+  blocker_counts  (in the summary, and printed) how many matched open roles
+                state each blocker type. The interview asks the export
+                control and clearance questions only when their count is
+                above 0 (method/INTERVIEW.md, "Work rights").
   requires_heavy_coding  heuristic; coding_signals lists the phrases found.
 """
 import argparse
@@ -389,6 +393,16 @@ def eligibility_blockers(full_text):
     return out
 
 
+def blocker_counts(roles):
+    """{blocker type: how many of these roles state it}, every type listed, 0 when none do."""
+    counts = {t: 0 for t in C.BLOCKER_TYPES}
+    for r in roles:
+        for t in {b.get("type") for b in r.get("eligibility_blockers") or []}:
+            if t in counts:
+                counts[t] += 1
+    return counts
+
+
 def visa_note(full_text):
     for sent in re.split(r"(?<=[.!?])\s+", full_text):
         if re.search(r"\bvisa|relocation (assistance|support|package)|sponsor", sent, re.I):
@@ -676,6 +690,7 @@ def main(argv=None):
         "remote_true": sum(1 for r in roles if r["remote"] is True),
         "blocked_by_eligibility": sum(1 for r in roles if any(
             b["type"] not in cleared for b in r.get("eligibility_blockers", []))),
+        "blocker_counts": blocker_counts(roles),
         "excluded_count": len(excluded),
         "endpoint_errors": errors,
         "previous_snapshot": prev_date,
@@ -693,7 +708,7 @@ def main(argv=None):
     C.write_json(os.path.join(snap_dir, "%s.json" % date), snapshot)
     print(json.dumps({"fetched_on": date, "total_postings_fetched": fetched, "matched_counts": counts,
                       "new_roles": len(new_ids), "closed_roles": len(closed_ids),
-                      "endpoint_errors": errors}, indent=2))
+                      "blocker_counts": summary["blocker_counts"], "endpoint_errors": errors}, indent=2))
     return 0
 
 

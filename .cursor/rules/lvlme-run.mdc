@@ -10,8 +10,8 @@ Follow `SKILL.md` in this folder exactly. It is the full procedure, and
 
 1. Find the workspace: `$LVLME_HOME` (or the older `$CLIMB_HOME`), or the one
    folder in `~/lvlme-workspaces/` (or `~/climb-workspaces/` if only that
-   older folder exists), or ask for the goal and run
-   `python3 scripts/init.py --goal "<goal>"`.
+   older folder exists). For a new goal, follow "First run" in `SKILL.md`:
+   `python3 scripts/init.py --goal "<goal>"`, then one short first message.
 2. Run the ten stages in `SKILL.md`: intake (`method/INTERVIEW.md`), evidence,
    market, judge and audit (`method/RUBRIC.md`, `method/CONSISTENCY.md`,
    `method/RECRUITER_SCREEN.md`), review (`method/REVIEW.md`), score, SWOT and

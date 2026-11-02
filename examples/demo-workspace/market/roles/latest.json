@@ -39,6 +39,12 @@
     "matched_total": 12,
     "remote_true": 1,
     "blocked_by_eligibility": 1,
+    "blocker_counts": {
+      "us_person_export_control": 1,
+      "security_clearance": 1,
+      "citizenship": 0,
+      "licence": 1
+    },
     "excluded_count": 1,
     "endpoint_errors": {},
     "previous_snapshot": "2026-10-25",

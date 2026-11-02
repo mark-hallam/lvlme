@@ -8,7 +8,8 @@ together, then corroborate what they say from independent sources.
 This module is how to run the first intake interview (and any later one
 about a gap in the record). It sits in front of the question bank in
 `INTAKE.md`: the question bank says what to ask; this says how to ask it so
-the answers can be trusted.
+the answers can be trusted. Where the interview sits in a first run is in
+["First run"](../SKILL.md#first-run).
 
 ## The rules
 
@@ -28,14 +29,49 @@ the answers can be trusted.
 7. **Keep it private.** Everything stays in the workspace. See "What never
    to record" below.
 
+## The first message
+
+The first thing the person reads from LVLme is one short message: about
+120 words at most, three parts, in this order.
+
+1. **Three facts from the CV, to confirm.** Pick facts the scores depend
+   on: the latest title and employer with dates, the highest qualification,
+   and the achievement the CV makes most of. Ask whether each is right: a
+   yes or a correction is all you need.
+2. **Which organisations.** Ask which organisations they want to work for,
+   and the kind of role if the goal does not already say.
+3. **The LinkedIn data export.** Say how to ask LinkedIn for it and which
+   files you will read. It can take LinkedIn up to a day to send, so ask now:
+   it arrives while the interview goes on.
+
+Nothing else yet. Work rights, pay, other sources and the document rules
+come in the rounds, once the targets are set. No CV yet? Ask for it (a file
+or pasted text) instead of the three facts, and confirm them in the next
+message.
+
+An example, for the fictional Alex Example (112 words):
+
+> Thanks, Alex. First, three facts from your CV. Is each right?
+>
+> 1. Program Manager at Contoso Freight since 2021, after five years there as
+>    an Operations Analyst.
+> 2. A Bachelor of Business (Logistics), finished in 2015.
+> 3. You led the warehouse scheduling rollout across all 6 sites.
+>
+> Next, which organisations do you want to work for? Add the kind of role,
+> if you know it.
+>
+> Last, your LinkedIn data export. On LinkedIn, open Settings, then Data
+> privacy, then "Get a copy of your data". LinkedIn emails you a link,
+> sometimes a day later. When it arrives, tell me where you saved the ZIP
+> file. I read only your profile, positions, education, certifications,
+> skills and connections.
+
 ## Before the first round
 
-If `config.json` has no target organisations or role families yet (a new
-workspace), settle them first: ask the "Goals and motivation" questions 1 and
-5 in `INTAKE.md`, fill in `config.json` with the person, and run
-`scripts/validate.py`.
-
-Then tell the person, in plain words:
+From the reply, set the targets and role families in `config.json` with the
+person and run `scripts/validate.py` (["First run"](../SKILL.md#first-run),
+step 3). Then tell the person, in plain words:
 
 > I'll ask a few questions at a time, starting with your education and
 > working forward. Wherever you can, show me a document instead of
@@ -72,6 +108,8 @@ Each round is 4 to 6 questions. A good order:
 
 ### Round 1: education
 
+Skip what the first message already confirmed.
+
 1. What did you study, where, and when did it start and finish (month and
    year if you know)?
 2. Do you have the certificate, a transcript, or a graduation email?
@@ -94,6 +132,24 @@ Each round is 4 to 6 questions. A good order:
 
 Question 6 matters. In practice it is where a raised title, or work the
 person never did, comes to light.
+
+### Work rights
+
+Ask the "Eligibility and work rights" questions in `INTAKE.md`: where the
+person can work without sponsorship, visa routes, the degree, licences, the
+background check and conflicts of interest. Ask two of them only when an
+open role needs them, which `fetch_roles.py` counts in
+`market/roles/latest.json` under `summary.blocker_counts`:
+
+- the US export control question (`INTAKE.md` 1.4), only when
+  `us_person_export_control` is above 0;
+- the security clearance question (1.5), only when `security_clearance` is
+  above 0.
+
+Until the person says they meet a requirement, the roles that state it
+count as blocked (D6 = 0), which is the honest default. If a later run's
+count goes above 0 for a question not yet asked, ask it then. If the person
+raises either one themselves, record what they say.
 
 ### Gaps
 

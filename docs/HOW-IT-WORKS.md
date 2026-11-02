@@ -88,6 +88,10 @@ Along the way it runs:
 
 - **A career interview** that reads your documents first (your CV, your
   LinkedIn data export, your website), then asks only what they cannot answer.
+  Its first message is short: three facts from your CV to confirm, which
+  organisations you want, and a request for your LinkedIn data export. It
+  asks about US export control or a security clearance only when an open
+  role needs one.
 - **Evidence gathering** from the sources you approve: email (read only),
   GitHub, the public web and press, public registers, and your files.
 - **Market research**: open roles from public job boards, and sourced facts
@@ -101,8 +105,8 @@ Along the way it runs:
 
 The first example goal is getting hired at a frontier AI lab. The engine does
 not care what the goal is: the target organisations, role types and weights
-are all settings in one file. A new workspace starts with the example's
-organisations; the interview replaces them with yours (or edit
+are all settings in one file. A new workspace starts with your goal and no
+organisations; the interview's first message asks for yours (or edit
 `config.json`).
 
 ### A run, stage by stage

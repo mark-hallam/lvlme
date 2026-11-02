@@ -87,13 +87,10 @@ of the `/lvlme-*` commands), run only that part, with the hard rules.
 - If `$LVLME_HOME` is set, that is the workspace. If not, `$CLIMB_HOME` (the
   setting's name before Climb became LVLme) still counts.
 - Otherwise look in `~/lvlme-workspaces/`, or in `~/climb-workspaces/` if only
-  that older folder exists. One folder there: use it.
+  that older folder exists. One campaign folder there (a folder with a
+  `config.json`; the `quick` folder is not one): use it.
   Several: ask which goal.
-- None: ask the person for their goal in one sentence, then run
-  `python3 scripts/init.py --goal "<goal>"`. Edit `config.json` with them:
-  targets (organisation, applicant tracking system (ATS) and board slug), role
-  families and keywords, location classes, time zone, and
-  `candidate.eligibility_cleared`.
+- None: this is a first run. Follow "First run" below.
 - Run `python3 scripts/validate.py --workspace <path>` before and after
   your edits. Stop if it refuses the location.
 
@@ -104,6 +101,39 @@ file and what to do (for example a file that is not valid JSON, with the line
 and column). Fix that and run it again; tell the person in plain words only if
 they need to act. To see the full Python details, run it again with
 `LVLME_DEBUG=1` in front.
+
+## First run
+
+The first full run for a goal, in this order. This is the one list: every
+other file that describes a first run links here.
+
+1. **Workspace.** Ask for the goal in one sentence, then run
+   `python3 scripts/init.py --goal "<goal>"`. It starts with no target
+   organisations or role families.
+2. **The first message**, about 120 words at most (`method/INTERVIEW.md`,
+   "The first message"): confirm three facts from the CV, ask which
+   organisations they want, and ask for the LinkedIn data export. No CV yet?
+   Ask for it instead of the three facts. If they ran LVLme quick, offer the
+   CV they gave it (in the quick folder's `intake/sources/`).
+3. **Config.** From the reply, fill in `config.json` with the person:
+   targets (look up each organisation's applicant tracking system (ATS) and
+   board slug), role families and keywords, `candidate.home_region`,
+   `candidate.timezone` and `privacy.redact_terms` (their employers' names).
+   Run `python3 scripts/validate.py`.
+4. **Gather.** Ask which other sources you may read (each opt in, read
+   only), then start stages 2 and 3: `fetch_roles.py` now, `network_map.py`
+   when the export arrives.
+5. **The rounds.** The rest of the interview in short rounds
+   (`method/INTERVIEW.md`), skipping what the CV and the export already
+   answer. Ask about US export control and security clearance only when
+   `blocker_counts` in `market/roles/latest.json` shows an open role that
+   needs it (`method/INTERVIEW.md`, "Work rights"). Add each requirement the
+   person says they meet to `candidate.eligibility_cleared`.
+6. **Work rights rules.** Fill the D6 rules in
+   `eval/profile-dimensions.json` for every location class, from the work
+   rights answers.
+7. **Carry on.** Finish stages 2 and 3, then run stages 4 to 10 as in any
+   run.
 
 ## Run it in parallel
 
@@ -150,13 +180,14 @@ Full detail, the stage graph and the subagent briefs:
 
 ### 1. Intake
 
-Follow `method/INTERVIEW.md`. Ask which documents and sources you may read
-(each opt in, read only): the official LinkedIn data export (the "Get a copy
-of your data" ZIP file), a résumé (or CV, short for curriculum vitae), their
-site. Save files in `intake/sources/`. Read them first, then ask only what
-they do not answer, using the question bank in `method/INTAKE.md`. Later runs:
-ask only about what changed, and the open questions in
-`profile/evidence.json`.
+The first time, follow "First run" above. Follow `method/INTERVIEW.md`. Ask
+which documents and sources you may read (each opt in, read only): the
+official LinkedIn data export (the "Get a copy of your data" ZIP file), a
+résumé (or CV, short for curriculum vitae), their site. Save files in
+`intake/sources/`. Read them first, then ask only what they do not answer,
+using the question bank in `method/INTAKE.md`. Later runs: ask only about
+what changed, the open questions in `profile/evidence.json`, and a work
+rights question when `fetch_roles.py` first finds an open role that needs it.
 
 ### 2. Evidence
 
