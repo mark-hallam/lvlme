@@ -55,8 +55,10 @@ class CheckTests(unittest.TestCase):
         self.assertGreaterEqual(len(names), 10)
         ws = H.new_workspace(self)
         errors, warnings, checked = V.validate_workspace(ws)
-        self.assertEqual(errors, [])
+        self.assertEqual(errors, [C.NO_TARGETS])      # a new workspace waits for the interview
         self.assertIn("config.json", checked)
+        ws = H.new_workspace(self, H.example_config())
+        self.assertEqual(V.validate_workspace(ws)[0], [])
 
 
 class WorkspaceTests(unittest.TestCase):

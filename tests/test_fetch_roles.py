@@ -9,7 +9,7 @@ import fetch_roles as F
 import validate as V
 from _common import matches_any
 
-CFG = H.template_config()
+CFG = H.example_config()
 GH = H.load(os.path.join(H.FIXTURES, "ats", "greenhouse.json"))
 AB = H.load(os.path.join(H.FIXTURES, "ats", "ashby.json"))
 LV = H.load(os.path.join(H.FIXTURES, "ats", "lever.json"))
@@ -132,7 +132,7 @@ class AdapterTests(unittest.TestCase):
 
 class MainTests(unittest.TestCase):
     def setUp(self):
-        cfg = H.template_config()
+        cfg = H.example_config()
         cfg["targets"] = [{"id": "gh", "name": "Acme AI", "ats": "greenhouse", "slug": "acme"},
                           {"id": "ab", "name": "Globex Labs", "ats": "ashby", "slug": "globex"},
                           {"id": "lv", "name": "Initech Robotics", "ats": "lever", "slug": "initech"},

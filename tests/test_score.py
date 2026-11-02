@@ -40,7 +40,7 @@ EVIDENCE = {"schema_version": 1, "items": [
 
 class Base(unittest.TestCase):
     def setUp(self):
-        self.cfg = H.template_config()
+        self.cfg = H.example_config()
         self.cfg["targets"] = [{"id": "acme", "name": "Acme", "ats": "manual"},
                                {"id": "globex", "name": "Globex", "ats": "manual"}]
         self.ws = H.new_workspace(self, self.cfg)

@@ -13,7 +13,7 @@ CSV = os.path.join(H.FIXTURES, "Connections.csv")
 
 
 def config():
-    cfg = H.template_config()
+    cfg = H.example_config()
     cfg["targets"] = [{"id": "acme", "name": "Acme AI", "ats": "manual", "aliases": ["Acme Artificial Intelligence"]},
                       {"id": "globex", "name": "Globex Labs", "ats": "manual"},
                       {"id": "initech", "name": "Initech Robotics", "ats": "manual"}]

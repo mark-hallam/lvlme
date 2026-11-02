@@ -47,7 +47,9 @@ The commands below omit it. Run them from the engine folder.
 
    It refuses a non-empty folder, a folder inside the engine repository, or
    one inside a git repository that has a remote.
-2. Edit `config.json` with the person: targets (organisation id, name,
+2. `config.json` starts with the goal and no targets or role families (unless
+   you used `--example`), so `validate.py` and `fetch_roles.py` stop until
+   they are set. Fill it in with the person: targets (organisation id, name,
    applicant tracking system (ATS): `greenhouse`, `ashby`, `lever` or
    `manual`, and the board slug), role families and keywords, location
    classes, `candidate.timezone`, `candidate.eligibility_cleared`,

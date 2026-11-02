@@ -4,13 +4,18 @@
 The workspace holds all personal data and lives outside the engine repo:
   --workspace PATH, else $CLIMB_HOME, else ~/climb-workspaces/<goal-slug>
 
+The new config.json holds your goal and no target organisations or role
+families: the interview sets those with you. --example starts from a config
+in examples/configs/ instead (for example frontier-ai-labs).
+
 Refuses a folder that already has files in it, a folder inside the engine
 repo, or a folder inside a git repository that has a remote. The new folder
 is readable by its owner only.
 
 Usage
-  python3 scripts/init.py --goal "Frontier AI labs"
+  python3 scripts/init.py --goal "Climate tech product roles"
   python3 scripts/init.py --goal "Climate tech product roles" --workspace ~/private/climate-search
+  python3 scripts/init.py --goal "Frontier AI labs" --example frontier-ai-labs
 """
 import argparse
 import os
@@ -22,6 +27,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 
 SKIP = {".gitkeep", ".DS_Store", "__pycache__"}
+EXAMPLE_DIR = os.path.join(C.ENGINE_ROOT, "examples", "configs")
+NEXT_STEP = 'Next step: say to your agent "run the Climb interview".'
+
+
+def examples():
+    return sorted(n[:-5] for n in os.listdir(EXAMPLE_DIR) if n.endswith(".json"))
 
 
 def slugify(text):
@@ -53,9 +64,11 @@ def copy_skeleton(dest):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Create a private Climb workspace.")
-    ap.add_argument("--goal", required=True, help='your goal in a few words, for example "Frontier AI labs"')
+    ap.add_argument("--goal", required=True, help='your goal in a few words, for example "Climate tech product roles"')
     ap.add_argument("--workspace", help="where to create it (default: $CLIMB_HOME or "
                                         "~/climb-workspaces/<goal-slug>)")
+    ap.add_argument("--example", choices=examples(),
+                    help="start from this example config instead of an empty one")
     args = ap.parse_args(argv)
     slug = slugify(args.goal)
     dest = args.workspace or os.environ.get("CLIMB_HOME") or os.path.join(C.DEFAULT_PARENT, slug)
@@ -72,19 +85,15 @@ def main(argv=None):
         os.chmod(root, 0o700)
     today = C.today_in({"candidate": {"timezone": local_timezone()}})
     cfg_path = C.wpath(dest, "config.json")
-    config = C.load_json(cfg_path)
-    config["goal"]["slug"] = slug
-    config["goal"]["title"] = args.goal.strip()
-    config["goal"]["started_on"] = today
+    source = os.path.join(EXAMPLE_DIR, args.example + ".json") if args.example else cfg_path
+    config = C.load_json(source)
+    config["goal"].update(slug=slug, title=args.goal.strip(), description=args.goal.strip(), started_on=today)
     config.setdefault("candidate", {})["timezone"] = local_timezone()
     C.write_json(cfg_path, config)
     print("Created your private workspace: %s" % dest)
-    print("Next steps:")
-    print("  1. Edit config.json: target organisations, role families and keywords, location classes.")
-    print("  2. Ask your agent to run the intake (method/INTAKE.md), or fill intake/answers.md yourself.")
-    print("  3. Put exports such as LinkedIn's Connections.csv in intake/sources/.")
-    print("  4. Run: python3 scripts/fetch_roles.py --workspace %s" % dest)
-    print("Tip: set CLIMB_HOME=%s so you can leave out --workspace." % dest)
+    env = os.environ.get("CLIMB_HOME")
+    found = os.path.dirname(dest) == C.DEFAULT_PARENT or bool(env) and os.path.abspath(os.path.expanduser(env)) == dest
+    print(NEXT_STEP if found else NEXT_STEP[:-1] + " and tell it the workspace is %s." % dest)
     return 0
 
 
