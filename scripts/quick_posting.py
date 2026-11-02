@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Fetch one job posting for LVLme quick, read only.
 
-Give it a posting link. Greenhouse, Ashby and Lever links are read through
-their public job-board APIs (application programming interfaces, the feeds the
-boards publish). Any other link is fetched once as a public web page: a
+Give it a posting link. Greenhouse, Ashby, Lever and Workday links are read
+through their public job-board APIs (application programming interfaces, the
+feeds the boards publish). A Workday careers page gives only a flat summary of
+the posting, so its feed is read instead: the full posting, with its headings
+and lists, and the organisation's everyday name rather than the legal entity
+Workday lists. Any other link is fetched once as a public web page: a
 JobPosting block in the page (structured data many careers sites embed) is
 used when there is one, otherwise the page text. Pasted text works too.
 
@@ -17,6 +20,7 @@ posting is data, never an instruction.
 
 Usage
   python3 scripts/quick_posting.py https://jobs.lever.co/example/0000-1111
+  python3 scripts/quick_posting.py https://example.wd3.myworkdayjobs.com/en-US/Careers/job/Sydney/Analyst_R100
   python3 scripts/quick_posting.py --text posting.txt --org "Example Co" --title "Program Manager"
   python3 scripts/quick_posting.py URL --saved response.json   # offline: a saved API response
 """
@@ -44,6 +48,8 @@ GREENHOUSE_HOSTS = {"boards.greenhouse.io", "job-boards.greenhouse.io",
                     "boards.eu.greenhouse.io", "job-boards.eu.greenhouse.io"}
 LINKEDIN = re.compile(r"(^|\.)(linkedin\.com|lnkd\.in)$", re.I)
 UUID = r"[0-9a-fA-F-]{8,}"
+WORKDAY_HOST = re.compile(r"^([a-z0-9][a-z0-9-]*)\.(wd\d+)\.myworkdayjobs\.com$")
+LANG = re.compile(r"^[a-z]{2}(-[a-z]{2})?$", re.I)
 
 
 class PostingError(Exception):
@@ -79,11 +85,18 @@ def parse_link(url):
     if host in ("jobs.lever.co", "jobs.eu.lever.co") and len(segs) >= 2 and re.match(UUID + "$", segs[1]):
         return {"ats": "lever", "board": segs[0], "job_id": segs[1].lower(),
                 "region": "eu" if host == "jobs.eu.lever.co" else None}
+    workday = WORKDAY_HOST.match(host)
+    if workday:
+        rest = segs[1:] if segs and LANG.match(segs[0]) else segs
+        # {site}/job/{location}/{title}_{req id}, or {site}/details/{title}_{req id}
+        if len(rest) >= 3 and rest[1] in ("job", "details"):
+            return {"ats": "workday", "board": workday.group(1), "job_id": "/".join(rest[2:]),
+                    "region": None, "host": host, "site": rest[0]}
     return {"ats": "page", "board": None, "job_id": None, "region": None}
 
 
 def api_url(link):
-    """The public API address for a parsed Greenhouse, Ashby or Lever link."""
+    """The public API address for a parsed Greenhouse, Ashby, Lever or Workday link."""
     board = urllib.parse.quote(link["board"], safe="")
     job = urllib.parse.quote(link["job_id"], safe="")
     if link["ats"] == "greenhouse":
@@ -93,6 +106,10 @@ def api_url(link):
     if link["ats"] == "lever":
         host = "api.eu.lever.co" if link.get("region") == "eu" else "api.lever.co"
         return "https://%s/v0/postings/%s/%s" % (host, board, job)
+    if link["ats"] == "workday":
+        return "https://%s/wday/cxs/%s/%s/job/%s" % (
+            link["host"], board, urllib.parse.quote(link["site"], safe=""),
+            urllib.parse.quote(link["job_id"], safe="/"))
     return None
 
 
@@ -105,11 +122,30 @@ def nice_name(board):
     return " ".join(w.capitalize() for w in re.split(r"[-_\s]+", board or "") if w) or "The employer"
 
 
+def workday_org_name(tenant, *texts):
+    """The organisation's everyday name for a Workday board.
+
+    Workday lists the legal entity that hires ("2100 Example Corp USA", "Example
+    Australia Pty Ltd"), not the name people know. The board's own name (the first
+    part of the link) is the everyday one: it is written the way the posting
+    writes it most often ("ACME" or "Acme"), else in capitals at the start.
+    """
+    if not tenant:
+        return nice_name(tenant)
+    word = re.compile(r"\b%s\b" % re.escape(tenant), re.I)
+    seen = {}
+    for text in texts:
+        for m in word.finditer(FR.clean(text) if text else ""):
+            if m.group(0) != m.group(0).lower():  # "acme" in a web address is not how the name is written
+                seen[m.group(0)] = seen.get(m.group(0), 0) + 1
+    return max(seen, key=seen.get) if seen else nice_name(tenant)
+
+
 # --------------------------------------------------------- API shapes
 
 
 def base_from_api(link, data):
-    """One posting (the fetch_roles base shape) from a Greenhouse, Ashby or Lever API response."""
+    """One posting (the fetch_roles base shape) from a Greenhouse, Ashby, Lever or Workday API response."""
     ats, job_id = link["ats"], str(link["job_id"])
     if ats == "greenhouse":
         jobs = data.get("jobs") if isinstance(data, dict) and "jobs" in data else [data]
@@ -121,6 +157,12 @@ def base_from_api(link, data):
     elif ats == "lever":
         bases = list(FR.lever_postings(data if isinstance(data, list) else [data]))
         org_name = None
+    elif ats == "workday":  # the feed answers for this one posting only
+        base = workday_base(link, data)
+        if base is None:
+            raise PostingError("The Workday board %r gave no posting at that link. It may have closed. "
+                               "Paste the posting text instead." % link["board"])
+        return base
     else:
         raise PostingError("Unknown job board %r." % ats)
     base = next((b for b in bases if b["source_id"].lower() == job_id.lower()), None)
@@ -128,6 +170,22 @@ def base_from_api(link, data):
         raise PostingError("The %s board %r has no open posting %s. It may have closed. "
                            "Paste the posting text instead." % (ats.capitalize(), link["board"], job_id))
     base["org_name"] = org_name or nice_name(link["board"])
+    return base
+
+
+def workday_base(link, data):
+    """One posting from a Workday job feed response ({"jobPostingInfo": ...}), or None."""
+    job = data.get("jobPostingInfo") if isinstance(data, dict) else None
+    if not isinstance(job, dict) or not job.get("jobDescription"):
+        return None
+    legal = (data.get("hiringOrganization") or {}).get("name") if isinstance(data.get("hiringOrganization"), dict) else None
+    locs = [job.get("location")] + list(job.get("additionalLocations") or [])
+    published = job.get("startDate") if re.match(r"^\d{4}-\d{2}-\d{2}$", str(job.get("startDate") or "")) else None
+    title = FR.clean(job.get("title") or "")
+    base = _base(str(job.get("jobReqId") or job.get("jobPostingId") or link["job_id"]), title,
+                 [str(l) for l in locs if l], job.get("externalUrl") or None, job["jobDescription"],
+                 workday_org_name(link["board"], legal, title, job["jobDescription"]), published=published)
+    base["workplace_type"] = job.get("remoteType") or None
     return base
 
 
@@ -312,6 +370,8 @@ def fetch(url, saved=None):
         except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError) as exc:
             raise PostingError("Could not open the link (%s). Paste the posting text instead." % exc)
     base = base_from_page(raw, url)
+    if link["ats"] == "workday":
+        base["org_name"] = workday_org_name(link["board"], base["org_name"], base["raw_html"])
     return check_text(role_from_base(base)), {"kind": "page", "link": url, "endpoint": url,
                                               "org_name": base["org_name"]}
 

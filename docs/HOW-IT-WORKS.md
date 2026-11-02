@@ -15,12 +15,15 @@ link, or the posting text, and your CV (short for curriculum vitae: a file, or
 pasted text). The steps are in
 [`skills/lvlme-quick/SKILL.md`](../skills/lvlme-quick/SKILL.md):
 
-1. **The posting.** `scripts/quick_posting.py` reads Greenhouse, Ashby and
-   Lever links through their public job-board APIs (application programming
-   interfaces, the feeds job boards publish). Any other link is fetched once as
-   a public page, using the job details many careers sites build into the page
-   when they are there. If the page gives too little text (many sites draw
-   the page in the browser), you paste the text instead. LinkedIn links are
+1. **The posting.** `scripts/quick_posting.py` reads Greenhouse, Ashby,
+   Lever and Workday links through their public job-board APIs (application
+   programming interfaces, the feeds job boards publish). A Workday careers
+   page holds only a flat summary, so the feed gives the full posting with its
+   headings, which is how its requirements are found, and the employer's
+   everyday name rather than the legal entity Workday lists. Any other link
+   is fetched once as a public page, using the job details many careers sites
+   build into the page when they are there. If the page gives too little text
+   (many sites draw the page in the browser), you paste the text instead. LinkedIn links are
    refused: LVLme never opens LinkedIn.
 2. **Your evidence.** The agent turns your CV into a few evidence items, each
    marked on the verification ladder (below). A line on a CV alone is

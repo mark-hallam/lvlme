@@ -28,8 +28,20 @@ Work on top of 0.3.0 that is not in a released version yet.
   from your computer. `examples/build_demo_site.py` rebuilds it, and refuses
   any workspace that is not marked fictional.
 - **This changelog.**
+- **LVLme quick reads Workday links properly.** Many large employers post
+  jobs on Workday, whose careers pages hold only a flat summary: LVLme quick
+  found no requirements in them and named the organisation by its legal
+  entity ("2100 Example Corp USA"). It now reads the posting through
+  Workday's public job feed, so the requirements, nice to haves and duties
+  come through, and it uses the name people know. If the feed cannot be
+  reached, it falls back to the page as before.
 
 ### Changed
+
+- **More section headings are understood** when a posting is read, in LVLme
+  quick and the full campaign: "What we need to see" lists requirements,
+  "Ways to stand out" and "Good to have" list nice to haves, and "What you'll
+  actually be doing" lists duties. Nothing about the scoring maths changed.
 
 - **LVLme quick says what it could not check.** Public signal and
   application readiness cannot be judged from one posting and a CV. They used

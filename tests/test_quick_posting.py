@@ -1,7 +1,8 @@
-"""LVLme quick's posting fetcher, offline: saved Greenhouse, Ashby and Lever API responses and a saved page."""
+"""LVLme quick's posting fetcher, offline: saved Greenhouse, Ashby, Lever and Workday API responses and a saved page."""
 import io
 import os
 import unittest
+import urllib.error
 from unittest import mock
 
 import helpers as H
@@ -12,6 +13,8 @@ FX = os.path.join(H.FIXTURES, "quick")
 GH = "https://job-boards.greenhouse.io/acmeai/jobs/4200001"
 ASHBY = "https://jobs.ashbyhq.com/globex/0b6f3c2e-1a2b-4c3d-8e9f-000000000001"
 LEVER = "https://jobs.lever.co/initech/7c1d2e3f-4a5b-4c6d-9e8f-000000000101"
+WORKDAY = ("https://globex.wd3.myworkdayjobs.com/en-AU/Globex_Careers/job/Australia-NSW-Sydney/"
+           "Senior-Program-Manager--Fleet-Rollouts_JR0004242")
 
 
 def fx(name):
@@ -141,6 +144,90 @@ class FetchTests(unittest.TestCase):
         d = tempfile.mkdtemp(prefix="lvlme-quick-posting-")
         self.addCleanup(shutil.rmtree, d, True)
         return d
+
+
+class WorkdayTests(unittest.TestCase):
+    """Workday careers pages carry only a flat summary, so LVLme quick reads the board's public job feed."""
+
+    def test_links(self):
+        link = Q.parse_link(WORKDAY + "?source=careers")
+        self.assertEqual(link, {"ats": "workday", "board": "globex", "region": None, "host": "globex.wd3.myworkdayjobs.com",
+                                "site": "Globex_Careers",
+                                "job_id": "Australia-NSW-Sydney/Senior-Program-Manager--Fleet-Rollouts_JR0004242"})
+        no_lang = Q.parse_link(WORKDAY.replace("/en-AU", ""))
+        self.assertEqual((no_lang["site"], no_lang["job_id"]), (link["site"], link["job_id"]))
+        details = Q.parse_link("https://globex.wd3.myworkdayjobs.com/en-US/Globex_Careers/details/Analyst_JR0004243")
+        self.assertEqual(details["job_id"], "Analyst_JR0004243")
+        for page in ("https://globex.wd3.myworkdayjobs.com/en-AU/Globex_Careers",          # the board, not a job
+                     "https://globex.wd3.myworkdayjobs.com/en-AU/Globex_Careers/introduceYourself",
+                     "https://wd3.myworkdayjobs.com/Globex_Careers/job/Sydney/Analyst_JR1"):   # no board name
+            self.assertEqual(Q.parse_link(page)["ats"], "page", page)
+
+    def test_api_address(self):
+        self.assertEqual(Q.api_url(Q.parse_link(WORKDAY)),
+                         "https://globex.wd3.myworkdayjobs.com/wday/cxs/globex/Globex_Careers/job/"
+                         "Australia-NSW-Sydney/Senior-Program-Manager--Fleet-Rollouts_JR0004242")
+        details = Q.parse_link("https://globex.wd3.myworkdayjobs.com/Globex_Careers/details/Analyst_JR0004243")
+        self.assertTrue(Q.api_url(details).endswith("/wday/cxs/globex/Globex_Careers/job/Analyst_JR0004243"))
+
+    def test_feed_gives_the_full_posting(self):
+        role, source = Q.fetch(WORKDAY, saved=fx("workday-job.json"))
+        self.assertEqual(source["kind"], "workday")
+        self.assertEqual(source["endpoint"], Q.api_url(Q.parse_link(WORKDAY)))
+        self.assertEqual(source["org_name"], "Globex")             # not the legal entity "4410 Globex Labs Australia Pty Ltd"
+        self.assertEqual(role["id"], "globex:JR0004242")
+        self.assertEqual(role["title"], "Senior Program Manager, Fleet Rollouts")
+        self.assertEqual(role["locations"], ["Australia, NSW, Sydney", "Australia, VIC, Melbourne"])
+        self.assertEqual(role["published_at"], "2026-10-30")
+        self.assertEqual(role["years_experience"], 7)
+        self.assertIn("7+ years of program management in logistics, robotics or industrial operations.",
+                      role["hard_requirements"])
+        # "Ways to stand out from the crowd" lists nice to haves, never hard requirements
+        self.assertIn("Experience deploying autonomous mobile robots.", role["nice_to_haves"])
+        self.assertNotIn("Experience deploying autonomous mobile robots.", role["hard_requirements"])
+        self.assertEqual(len(role["responsibilities"]), 3)
+        self.assertEqual(schema_errors(role), [])
+
+    def test_empty_feed_asks_for_pasted_text(self):
+        path = os.path.join(self.tmp(), "empty.json")
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write('{"jobPostingInfo": {}}')
+        with self.assertRaises(Q.PostingError) as cm:
+            Q.fetch(WORKDAY, saved=path)
+        self.assertIn("Paste the posting text", str(cm.exception))
+
+    def test_page_fallback_still_uses_the_everyday_name(self):
+        """If the feed cannot be reached, the page's summary is read, under the everyday name."""
+        page = ('<html><head><script type="application/ld+json">{"@type": "JobPosting", "title": "Analyst", '
+                '"hiringOrganization": {"name": "4410 Globex Labs Australia Pty Ltd"}, "description": "%s"}'
+                '</script></head></html>' % ("Globex runs warehouse robots. " * 30))
+        calls = []
+
+        def fake_get(url, accept):
+            calls.append(url)
+            if "/wday/cxs/" in url:
+                raise urllib.error.URLError("feed unreachable")
+            return page
+        with mock.patch.object(Q, "http_get", fake_get):
+            role, source = Q.fetch(WORKDAY)
+        self.assertEqual([("/wday/cxs/" in c) for c in calls], [True, False])
+        self.assertEqual((source["kind"], source["org_name"]), ("page", "Globex"))
+
+    def test_everyday_name(self):
+        self.assertEqual(Q.workday_org_name("acme", "2100 ACME USA", "ACME builds tools. Join ACME."), "ACME")
+        self.assertEqual(Q.workday_org_name("acme", "Acme Pty Ltd", "acme.com is where Acme works"), "Acme")
+        self.assertEqual(Q.workday_org_name("initech-robotics", "Initech Pty Ltd"), "Initech Robotics")  # no mention
+        self.assertEqual(Q.workday_org_name("acme", "<p>Acme&nbsp;builds</p>"), "Acme")
+        self.assertEqual(Q.workday_org_name("acme", "see acme.com, acme.com/jobs or acme.com/about"), "Acme")
+
+    def test_common_section_headings(self):
+        for heading, cat in (("What we need to see:", "req"), ("Ways to stand out from the crowd:", "nice"),
+                             ("What will make you stand out", "nice"), ("Good To Have -", "nice"),
+                             ("Must Have -", "req"), ("What You'll Actually Be Doing", "resp")):
+            self.assertEqual(Q.FR.heading_category(heading), cat, heading)
+
+    def tmp(self):
+        return FetchTests.tmp(self)
 
 
 if __name__ == "__main__":

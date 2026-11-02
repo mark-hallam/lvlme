@@ -183,11 +183,11 @@ STOP_H = re.compile(r"compensation|benefits|logistics|^location|workplace|itar|e
                     r"^about (us|the company|our company)\b", re.I)
 ABOUT_H = re.compile(r"^about\b|^the (role|team)\b|^overview|^who we are", re.I)
 NICE_H = re.compile(r"prefer|nice[- ]to[- ]have|bonus|strong candidates may|\bideally\b|\bplus\b|"
-                    r"additional (skills|qualifications|experience)|desired|great if|extra credit", re.I)
-REQ_H = re.compile(r"qualifications|requirements?\b|good fit|thrive|looking for|seeking|what you.?ll (need|bring)|"
+                    r"additional (skills|qualifications|experience)|desired|great if|extra credit|good to have|stand out", re.I)
+REQ_H = re.compile(r"qualifications|requirements?\b|good fit|thrive|looking for|seeking|what you.?ll (need|bring)|need to see|"
                    r"\byou (have|bring|are|should|might be)\b|about you|who you are|your background|"
                    r"background might|must[- ]have|minimum|basic|skills|experience|ideal candidate", re.I)
-RESP_H = re.compile(r"responsib|what you.?ll (do|be doing|work on)|in this role|you will|"
+RESP_H = re.compile(r"responsib|what you.?ll (actually )?(do|be doing|work on)|in this role|you will|"
                     r"key duties|day[- ]to[- ]day|representative projects|your impact|the work", re.I)
 
 
