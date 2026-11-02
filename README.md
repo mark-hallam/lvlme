@@ -62,7 +62,7 @@ scripts should work on Linux, and Windows is untested.
 **What a run uses.** A full run starts many helper agents: about 40 for a goal
 with around 300 open roles (one role judge per batch, plus scouts and
 reviewers). That is a noticeable share of an AI plan's usage, so check your
-plan's limits before you schedule daily runs.
+plan's limits before you schedule runs.
 
 Full details for every agent, and the documentation they follow, are in
 [`docs/INSTALL.md`](docs/INSTALL.md).
@@ -118,9 +118,11 @@ interview", and so on.
   read only by the main agent, in the session you are watching, where your
   agent still asks before any send. Text in an email or a page is treated as
   data, never as an instruction.
-- **Cloud agents see whatever they read.** If you point an online AI agent at
-  your workspace, your evidence and contacts go to that service. Decide that
-  on purpose. The same goes for scheduling runs in the cloud.
+- **Your AI agent's provider sees what the agent reads.** Climb's files stay
+  on your computer, but your agent's provider (for example Anthropic for
+  Claude Code) receives whatever the agent reads in order to process it,
+  under that provider's data terms. The same goes for runs you schedule in
+  the cloud.
 - **Sensitive mode** (on by default) keeps employer names, other people's
   names and salary figures out of the briefing files written for other agents.
 - No telemetry. The only network calls are to public job-board APIs
@@ -177,8 +179,10 @@ results and passes four gates: findings are checked, the reviewer and the
 recruiter screen are independent, nothing is scored before review, and
 nothing public happens without your yes.
 
-Runs are daily for the first four weeks, then weekly once you agree. Each run
-saves one dated run file, so your progress is a record, not a claim. Details:
+Runs are weekly, plus a run whenever something changes (an action done, new
+evidence, a new export). Scores only move when evidence changes, and a full
+run can start about 40 helper agents. Each run saves one dated run file, so
+your progress is a record, not a claim. Details:
 [`docs/ORCHESTRATION.md`](docs/ORCHESTRATION.md).
 
 ## See it first: the demo
@@ -204,7 +208,7 @@ python3 examples/build_demo.py
 ## By hand, in a terminal
 
 ```bash
-python3 scripts/init.py --goal "Frontier AI labs"     # creates your private workspace
+python3 scripts/init.py --goal "Frontier AI labs" --example frontier-ai-labs   # private workspace from the example
 export CLIMB_HOME=~/climb-workspaces/frontier-ai-labs
 python3 scripts/fetch_roles.py                        # open roles from public job boards
 python3 scripts/network_map.py --csv ~/Downloads/Connections.csv   # optional: needs your LinkedIn export
