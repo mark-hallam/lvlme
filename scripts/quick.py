@@ -487,6 +487,21 @@ def display_path(path):
     return "~" + path[len(home):] if path == home or path.startswith(home + os.sep) else path
 
 
+def review_sentence(result):
+    """One true sentence about the blind review: what it checked, or why it had nothing to check."""
+    statuses = [f["review"]["status"] for f in result["factors"]]
+    needed = [x for x in statuses if x != "not_needed"]
+    waiting = statuses.count("awaiting")
+    n = len(result["review"]["disputes"])
+    if not needed:
+        return "No score was above 2, so the blind reviewer had nothing to check."
+    if waiting:
+        return "%d score%s above 2 still wait%s for the blind reviewer and count%s as 2 until then." % (
+            waiting, "" if waiting == 1 else "s", "s" if waiting == 1 else "", "s" if waiting == 1 else "")
+    return "A blind reviewer checked every score above 2%s." % (
+        "" if not n else "; %d disagreement%s count%s as 2 until settled" % (n, "" if n == 1 else "s", "s" if n == 1 else ""))
+
+
 def message(result, folder):
     r = result["role"]
     lines = ["Climb quick: %s at %s." % (r["title"], r["org_name"]),
@@ -498,9 +513,7 @@ def message(result, folder):
         c = result["if_all_fixes"]
         lines += ["", "If %s: fit %s, %s. Each fix has a concrete next step on the page." % (
             "they all land" if len(result["fixes"]) > 1 else "it lands", QH.num(c["fit"]), QH.headline(c, start=False)), ""]
-    n = len(result["review"]["disputes"])
-    lines.append("A blind reviewer checked every score above 2%s." % (
-        "" if not n else "; %d disagreement%s count%s as 2 until settled" % (n, "" if n == 1 else "s", "s" if n == 1 else "")))
+    lines.append(review_sentence(result))
     lines += ["", "See why, factor by factor:", "", "```bash", "open %s" % display_path(os.path.join(folder, "index.html")),
               "```", "",
               "Go deeper: say \"run Climb\" for the full campaign."]

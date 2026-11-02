@@ -242,3 +242,25 @@ class NewFolderTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ReviewSentence(unittest.TestCase):
+    def _result(self, statuses, disputes=0):
+        return {"factors": [{"review": {"status": st}} for st in statuses],
+                "review": {"disputes": [{}] * disputes}}
+
+    def test_nothing_above_two_says_so(self):
+        import quick
+        self.assertEqual(quick.review_sentence(self._result(["not_needed"] * 4)),
+                         "No score was above 2, so the blind reviewer had nothing to check.")
+
+    def test_awaiting_is_not_called_checked(self):
+        import quick
+        s = quick.review_sentence(self._result(["agreed", "awaiting", "not_needed"]))
+        self.assertIn("still wait", s)
+        self.assertNotIn("checked every", s)
+
+    def test_all_checked_with_dispute(self):
+        import quick
+        s = quick.review_sentence(self._result(["agreed", "disputed"], disputes=1))
+        self.assertTrue(s.startswith("A blind reviewer checked every score above 2; 1 disagreement counts as 2"))
