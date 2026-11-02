@@ -1667,12 +1667,22 @@ function detailAction(id){
 // ---------- share card ----------
 const modal = $("#modal");
 function shareNumbers(){ const r = D.roles[0], e = P[r.id].exp, d1 = D.runs[0] || {top: r.fit, ib: r.ib};
-  return {r, d1: d1.top, d1b: d1.ib, exp: e.end, eb: interviewBand(e.end, e.scores, r.hrl)}; }
+  return {r, d1: d1.top, d1b: d1.ib, exp: e.end, eb: interviewBand(e.end, e.scores, r.hrl),
+          head: shareHeadline(d1.top, r.fit, Math.round((tOf(TODAY) - tOf(D.meta.baseline)) / 864e5) + 1)}; }
+// The share headline states only what was measured: the flight level on day 1 and today, counted in days
+// like the Day number above the chart. It never claims an offer: the card is built to be shared, so it must
+// stay as honest as the dashboard.
+function shareHeadline(d1, now, day){
+  const lv = v => "Level " + (bandIdx(v) + 1) + ", " + BANDS[bandIdx(v)];
+  if (day <= 1) return lv(now) + " on day 1";
+  return bandIdx(d1) === bandIdx(now) ? lv(now) + " on day 1 and day " + day : lv(d1) + " to " + lv(now) + " by day " + day;
+}
 function openShare(){
   const s = shareNumbers();
-  $("#shareCard").innerHTML = `<div class="eyebrow">Dream job journey</div><h3 style="font-size:20px">From ${esc(s.d1b)} to an offer</h3>
+  $("#shareCard").innerHTML = `<div class="eyebrow">Dream job journey</div><h3 style="font-size:20px">${esc(s.head)}</h3>
     <div class="small sub">Measured, dated and checkable. Day 1: ${esc(fmtDate(D.meta.baseline))}.</div>
-    <div class="share-row"><div><span class="tiny sub">Day 1</span><b class="num">${Math.round(s.d1)}</b>${pill(s.d1b)}</div><div><span class="tiny sub">Today</span><b class="num">${Math.round(s.r.fit)}</b>${pill(s.r.ib)}</div><div><span class="tiny sub">Projected</span><b class="num">${Math.round(s.exp)}</b>${pill(s.eb)}</div></div>`;
+    <div class="share-row"><div><span class="tiny sub">Day 1</span><b class="num">${Math.round(s.d1)}</b>${pill(s.d1b)}</div><div><span class="tiny sub">Today</span><b class="num">${Math.round(s.r.fit)}</b>${pill(s.r.ib)}</div><div><span class="tiny sub">Projected</span><b class="num">${Math.round(s.exp)}</b>${pill(s.eb)}</div></div>
+    <div class="tiny sub" style="margin-top:8px">Fit out of 100, interview chance under it. Projection assumes the plan is followed.</div>`;
   modal.classList.add("on"); scrim.classList.add("on");
 }
 function closeShare(){ modal.classList.remove("on"); if (!detail.classList.contains("open") && !$("#rail").classList.contains("open")) scrim.classList.remove("on"); }
@@ -1680,7 +1690,7 @@ function saveImage(){
   const s = shareNumbers(), cv = document.createElement("canvas"); cv.width = 1200; cv.height = 630; const x = cv.getContext("2d"), F = "-apple-system,Helvetica,Arial";
   x.fillStyle = "#f6f8fc"; x.fillRect(0, 0, 1200, 630);
   x.fillStyle = "#56565b"; x.font = "650 26px " + F; x.fillText("DREAM JOB JOURNEY", 70, 100);
-  x.fillStyle = "#1d1d1f"; x.font = "700 54px " + F; x.fillText("From " + s.d1b + " to an offer", 70, 170);
+  x.fillStyle = "#1d1d1f"; let hs = 54; do { x.font = "700 " + hs + "px " + F; } while (x.measureText(s.head).width > 1060 && --hs > 30); x.fillText(s.head, 70, 170);
   x.fillStyle = "#56565b"; x.font = "400 28px " + F; x.fillText("Measured, dated and checkable. Day 1: " + fmtDate(D.meta.baseline), 70, 220);
   [["Day 1", s.d1, s.d1b], ["Today", s.r.fit, s.r.ib], ["Projected", s.exp, s.eb]].forEach((c, i) => {
     const bx = 70 + i * 360; x.fillStyle = "#ffffff"; x.fillRect(bx, 280, 330, 230);
@@ -1688,7 +1698,7 @@ function saveImage(){
     x.fillStyle = "#1d1d1f"; x.font = "700 96px " + F; x.fillText(String(Math.round(c[1])), bx + 30, 435);
     x.fillStyle = "#084c9e"; x.font = "650 28px " + F; x.fillText(c[2], bx + 30, 485);
   });
-  x.fillStyle = "#56565b"; x.font = "400 22px " + F; x.fillText("Fit score out of 100. Projection assumes the plan is followed.", 70, 575);
+  x.fillStyle = "#56565b"; x.font = "400 22px " + F; x.fillText("Fit out of 100, interview chance under it. Projection assumes the plan is followed.", 70, 575);
   const a = document.createElement("a"); a.download = "dream-job-journey.png"; a.href = cv.toDataURL("image/png"); a.click();
 }
 

@@ -281,7 +281,7 @@ open <workspace>/report/index.html
 The first time you show the dashboard, and whenever the person asks what a
 number means, point them to the plain-English guide:
 `docs/for-you/READING-YOUR-DASHBOARD.md` in this folder, also at
-https://github.com/mark-hallam/lvlme/blob/main/docs/for-you/READING-YOUR-DASHBOARD.md.
+https://github.com/mark-hallam/climb/blob/HEAD/docs/for-you/READING-YOUR-DASHBOARD.md.
 
 On the weekly comparison day, also write `campaign/weekly/<date>.md` (see
 `method/RUNBOOK.md`).

@@ -266,6 +266,30 @@ class DocTests(unittest.TestCase):
         for cfg in (H.template_config(), H.example_config()):
             self.assertEqual(cfg["cadence"], {"mode": "weekly", "run_time": "07:00"})
 
+    def test_github_addresses_use_the_repository_that_exists(self):
+        """Every GitHub address names the plugin's own repository, and file links follow its default branch.
+
+        mark-hallam/lvlme is a different, private repository, and the public default branch is not main,
+        so /blob/HEAD/ is the only branch path that works before and after a rename to main.
+        """
+        with open(os.path.join(ROOT, ".claude-plugin", "plugin.json"), encoding="utf-8") as fh:
+            repo = json.load(fh)["repository"]
+        self.assertEqual(repo, "https://github.com/mark-hallam/climb")
+        own = re.compile(r"github\.com/mark-hallam/([A-Za-z0-9_.-]+)(/blob/([^/\s\"')]+)/)?")
+        for dirpath, dirs, files in os.walk(ROOT):
+            dirs[:] = [d for d in dirs if not d.startswith(".") or d in (".claude-plugin", ".cursor")]
+            if os.path.relpath(dirpath, ROOT).split(os.sep)[0] == "tests":
+                continue
+            for name in files:
+                if not name.endswith((".md", ".mdc", ".json", ".html", ".py", ".txt")):
+                    continue
+                rel = os.path.relpath(os.path.join(dirpath, name), ROOT)
+                for m in own.finditer(read(rel)):
+                    with self.subTest(file=rel, address=m.group(0)):
+                        self.assertEqual("https://github.com/mark-hallam/" + m.group(1).rstrip("."), repo)
+                        if m.group(2):
+                            self.assertEqual(m.group(3), "HEAD")
+
     def test_plain_punctuation(self):
         """No em or en dashes, and no spaced hyphen used as a dash, outside code."""
         for rel in packaging_docs():

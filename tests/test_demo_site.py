@@ -82,8 +82,8 @@ class BuildTests(Base):
     def test_every_link_on_the_index_works(self):
         for href in parse(self.index).hrefs:
             if href.startswith("https://"):
-                self.assertTrue(href == S.REPO or href.startswith(S.REPO + "/blob/main/"), href)
-                rel = href[len(S.REPO + "/blob/main/"):] if "/blob/main/" in href else ""
+                self.assertTrue(href == S.REPO or href.startswith(S.REPO + "/blob/HEAD/"), href)
+                rel = href[len(S.REPO + "/blob/HEAD/"):] if "/blob/HEAD/" in href else ""
                 if rel:
                     self.assertTrue(os.path.exists(os.path.join(H.ENGINE, rel)), href)
             else:

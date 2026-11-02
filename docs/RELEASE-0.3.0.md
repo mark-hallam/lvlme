@@ -15,9 +15,9 @@ Nothing about scoring, evidence or privacy changed in this release.
   result page.
 - **Plugin and marketplace.** Both are named `lvlme` (were `climb`), and the
   plugin's display name is LVLme. Install:
-  `/plugin install lvlme --marketplace mark-hallam/lvlme`.
-- **Repository.** https://github.com/mark-hallam/lvlme. GitHub forwards the
-  old address, https://github.com/mark-hallam/climb.
+  `/plugin install lvlme --marketplace mark-hallam/climb`.
+- **Repository.** Still https://github.com/mark-hallam/climb for now, so the
+  install lines and links use that address.
 - **Commands.** `/lvlme`, `/lvlme-quick`, `/lvlme-interview`, `/lvlme-screen`,
   `/lvlme-audit` and `/lvlme-dashboard` (were `/climb`, `/climb-quick` and so
   on). The words "run LVLme" and "run LVLme quick" start them in any agent.

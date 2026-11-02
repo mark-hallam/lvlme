@@ -38,7 +38,7 @@ import build_quick_demo as QD  # noqa: E402
 
 OUT = os.path.join(ENGINE, "docs", "demo")
 DEMO = os.path.join(HERE, "demo-workspace")
-REPO = "https://github.com/mark-hallam/lvlme"
+REPO = "https://github.com/mark-hallam/climb"
 # (folder the page is copied to, workspace it comes from, the page inside that workspace)
 PAGES = [("quick", None, "index.html"), ("dashboard", DEMO, os.path.join("report", "index.html"))]
 
@@ -134,8 +134,8 @@ def render(result, dash):
         '<p>LVLme is free and open source. It runs in Claude Code, Codex or Cursor on your own computer, keeps '
         'your files there, and drafts everything: it never applies, sends or posts for you.</p>'
         '<ul class="links"><li><a href="%s">LVLme on GitHub</a></li>'
-        '<li><a href="%s/blob/main/docs/INSTALL.md">How to install it</a></li>'
-        '<li><a href="%s/blob/main/docs/for-you/READING-YOUR-DASHBOARD.md">Reading your dashboard</a>, '
+        '<li><a href="%s/blob/HEAD/docs/INSTALL.md">How to install it</a></li>'
+        '<li><a href="%s/blob/HEAD/docs/for-you/READING-YOUR-DASHBOARD.md">Reading your dashboard</a>, '
         'a one-page guide</li></ul></section>') % (rows, REPO, REPO, REPO)
     return ("<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">"
             "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"

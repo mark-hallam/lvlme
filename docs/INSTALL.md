@@ -8,8 +8,8 @@ the agent you use.
 You need Python 3.9 or newer (the scripts use only its standard library) and
 git (a tool that copies and updates the folder). Nothing else.
 
-In the commands below, `mark-hallam/lvlme` is the repository on GitHub, and
-`https://github.com/mark-hallam/lvlme` is its full address. You can also use a
+In the commands below, `mark-hallam/climb` is the repository on GitHub, and
+`https://github.com/mark-hallam/climb` is its full address. You can also use a
 local copy of the folder.
 
 ## Claude Code
@@ -19,7 +19,7 @@ local copy of the folder.
 In a Claude Code session (version 2.1.275 or later):
 
 ```text
-/plugin install lvlme --marketplace mark-hallam/lvlme
+/plugin install lvlme --marketplace mark-hallam/climb
 ```
 
 Claude Code adds the LVLme marketplace (a catalogue of plugins, here just
@@ -29,20 +29,20 @@ one), shows you what the plugin adds, and asks where to install it. Choose
 The same thing from your terminal (version 2.1.292 or later):
 
 ```bash
-claude plugin install lvlme --marketplace mark-hallam/lvlme
+claude plugin install lvlme --marketplace mark-hallam/climb
 ```
 
 Or in two steps, on any recent version:
 
 ```text
-/plugin marketplace add mark-hallam/lvlme
+/plugin marketplace add mark-hallam/climb
 /plugin install lvlme@lvlme
 ```
 
 ### Option B: clone into your skills folder (the simple fallback)
 
 ```bash
-git clone https://github.com/mark-hallam/lvlme ~/.claude/skills/lvlme
+git clone https://github.com/mark-hallam/climb ~/.claude/skills/lvlme
 ```
 
 Start a new Claude Code session. Because the folder holds
@@ -108,7 +108,7 @@ claude plugin update lvlme@lvlme
 Codex reads personal skills from `~/.agents/skills/`, and `AGENTS.md` from the
 folder you work in.
 
-- **As a skill:** `git clone https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme`,
+- **As a skill:** `git clone https://github.com/mark-hallam/climb ~/.agents/skills/lvlme`,
   then in Codex type `$lvlme` (or pick it from `/skills`) and say "run
   LVLme quick" with a job link, or "run LVLme".
 - **In the engine folder:** open Codex in the cloned folder. It reads
@@ -158,7 +158,7 @@ works:
 - **The commands.** `/climb`, `/climb-quick` and the rest are now `/lvlme`,
   `/lvlme-quick` and so on, and the helper agents are `lvlme:reviewer` and so
   on. Saying "run Climb" or "run Climb quick" still starts the same thing.
-- **A cloned folder.** GitHub forwards the old address, so
+- **A cloned folder.** The repository address has not changed, so
   `git -C ~/.claude/skills/climb pull` keeps updating it. The skill inside is
   now called `lvlme`. In Codex, type `$lvlme`.
 - **Your workspace.** Nothing to do. When `LVLME_HOME` is not set, the scripts
