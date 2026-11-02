@@ -49,7 +49,9 @@ would raise it most. Aim for a couple of minutes and at most two questions.
    `--cv-text <file>`. Greenhouse, Ashby, Lever, Workday, SmartRecruiters and
    Workable links are read through their public job-board APIs; any other link is fetched once as a public
    page. If it prints that the page gave too little text, ask for the pasted
-   text. It prints the folder; everything below happens there.
+   text. If its output has a `warning` (the job board API could not be read,
+   so the posting came from the public web page), tell the person in one
+   line. It prints the folder; everything below happens there.
 3. **Read `posting.md` and the CV.** Write 4 to 8 evidence items to
    `profile/evidence.json` (`schemas/evidence.schema.json`), one fact each,
    ids `E01`, `E02` and so on, with the verification ladder level from
