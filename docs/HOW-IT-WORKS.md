@@ -8,7 +8,7 @@ LVLme runs on your own computer, through an artificial intelligence (AI) agent
 such as Claude Code, Codex or Cursor. The agent does the judging; the Python
 scripts only do the arithmetic, so without an agent every role scores zero.
 
-## LVLme quick: one job, about five minutes
+## LVLme quick: one job, a couple of minutes
 
 Say "run LVLme quick" (or `/lvlme-quick`) and give two things: one job posting
 link, or the posting text, and your CV (short for curriculum vitae: a file, or

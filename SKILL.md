@@ -74,7 +74,7 @@ of the `/lvlme-*` commands), run only that part, with the hard rules.
 | Asked for | Do |
 |---|---|
 | `/lvlme`, `/lvlme run`, "run LVLme" (or the old name, "run Climb") | A full run, stages 1 to 10. If today's run stopped part way, resume it. |
-| `/lvlme quick`, `/lvlme-quick`, "run LVLme quick" (or "run Climb quick"), or one job link with a CV | LVLme quick: honest odds for that one posting in about five minutes. Follow `skills/lvlme-quick/SKILL.md`. Its folder, `~/lvlme-workspaces/quick/` (or `~/climb-workspaces/quick/` while only the old folder exists), is not a campaign workspace. |
+| `/lvlme quick`, `/lvlme-quick`, "run LVLme quick" (or "run Climb quick"), or one job link with a CV | LVLme quick: honest odds for that one posting in a couple of minutes. Follow `skills/lvlme-quick/SKILL.md`. Its folder, `~/lvlme-workspaces/quick/` (or `~/climb-workspaces/quick/` while only the old folder exists), is not a campaign workspace. |
 | `/lvlme resume` | Resume today's run at the first stage not yet done (see "Resume" in `docs/ORCHESTRATION.md`). |
 | `/lvlme interview`, `/lvlme-interview` | Stage 1 only. |
 | `/lvlme audit`, `/lvlme-audit` | The claims and consistency audits from stage 4. |

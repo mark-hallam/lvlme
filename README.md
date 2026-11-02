@@ -12,7 +12,7 @@ Install in Claude Code:
 
 Then say: **run LVLme quick**, and paste a job link.
 
-In about five minutes you get honest odds for that one job. Codex and Cursor
+In a couple of minutes you get honest odds for that one job. Codex and Cursor
 work too (see [Install](#install)).
 
 ## Why LVLme is different
@@ -78,7 +78,7 @@ Every agent, step by step: [`docs/INSTALL.md`](docs/INSTALL.md).
 
 | Command | Does |
 |---|---|
-| `/lvlme-quick` | Honest odds for one job, from a link and your CV, in about five minutes. |
+| `/lvlme-quick` | Honest odds for one job, from a link and your CV, in a couple of minutes. |
 | `/lvlme` | The full campaign, or resume today's run. `/lvlme status` reports and changes nothing. |
 | `/lvlme-interview` | The career interview, first time or an update. |
 | `/lvlme-screen` | The independent recruiter screen. |

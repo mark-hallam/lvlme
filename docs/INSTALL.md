@@ -66,7 +66,7 @@ claude --plugin-dir /path/to/lvlme
 | Command | Does |
 |---|---|
 | `/lvlme` | Run LVLme, or resume today's run. Also `/lvlme status`. |
-| `/lvlme-quick` | LVLme quick: honest odds for one posting, from a link and your CV, in about five minutes. |
+| `/lvlme-quick` | LVLme quick: honest odds for one posting, from a link and your CV, in a couple of minutes. |
 | `/lvlme-interview` | The document-led career interview, first time or an update. |
 | `/lvlme-screen` | The independent recruiter screen against real postings. |
 | `/lvlme-audit` | The consistency audit (CV, LinkedIn, website, forms) and the public claims audit. |

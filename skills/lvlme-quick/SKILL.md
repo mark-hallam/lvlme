@@ -1,6 +1,6 @@
 ---
 name: lvlme-quick
-description: LVLme quick. Honest odds for one job in about five minutes, from one posting link (or pasted text) and a CV, with a blind second scorer, the campaign's own scoring maths, and the top 3 fixes. Never writes application answers.
+description: LVLme quick. Honest odds for one job in a couple of minutes, from one posting link (or pasted text) and a CV, with a blind second scorer, the campaign's own scoring maths, and the top 3 fixes. Never writes application answers.
 argument-hint: "[posting link]"
 disable-model-invocation: true
 ---
@@ -13,7 +13,7 @@ that folder.
 
 The person gets an honest answer for ONE posting, quickly: the chance of an
 interview and of an offer, why, factor by factor, and the three fixes that
-would raise it most. Aim for about five minutes and at most two questions.
+would raise it most. Aim for a couple of minutes and at most two questions.
 
 ## Rules (the engine's hard rules, plus these)
 
