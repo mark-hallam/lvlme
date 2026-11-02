@@ -137,7 +137,8 @@ The detail is in [`docs/HOW-IT-WORKS.md`](docs/HOW-IT-WORKS.md): LVLme quick
 step by step, the full campaign, scoring, the honesty rules in full, privacy,
 the dashboard, running the scripts by hand, and the project layout. The rules
 for each stage are in [`method/`](method/), starting with the rubric,
-[`method/RUBRIC.md`](method/RUBRIC.md).
+[`method/RUBRIC.md`](method/RUBRIC.md). What changed in each version is in
+[`CHANGELOG.md`](CHANGELOG.md).
 
 Try it with no data of your own: both demos are for the fictional Alex
 Example. Open `examples/quick-demo/2026-11-02-globex-labs-deployment-program-manager-ai-agents/index.html`

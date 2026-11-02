@@ -50,7 +50,7 @@ def read(rel):
 
 def packaging_docs():
     docs = ["SKILL.md", "AGENTS.md", "README.md", "docs/INSTALL.md", "docs/ORCHESTRATION.md",
-            "docs/for-you/READING-YOUR-DASHBOARD.md"]
+            "docs/for-you/READING-YOUR-DASHBOARD.md", "CHANGELOG.md"]
     for pattern in ("skills/*/SKILL.md", "agents/*.md", ".cursor/rules/*.mdc"):
         docs += sorted(os.path.relpath(p, ROOT) for p in glob.glob(os.path.join(ROOT, pattern)))
     return docs

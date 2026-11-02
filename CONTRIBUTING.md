@@ -45,6 +45,9 @@ run.
 4. If you changed the scoring rules, bump the rubric version in
    `method/RUBRIC.md` and in `scripts/score.py`, and say so in the pull
    request. Runs before and after are not directly comparable.
+5. Add a line to the Unreleased section of [`CHANGELOG.md`](CHANGELOG.md)
+   for anything a person using LVLme would notice: under Added, Changed or
+   Fixed, in plain words.
 
 ## Writing style for docs
 

@@ -195,6 +195,11 @@ See "By hand, in a terminal" in
 - **Version.** `version` in `plugin.json` pins users to that version until it
   changes, so bump it with every release. Do not also set a version in the
   marketplace entry.
+- **Changelog.** In the same change, turn the Unreleased section of
+  [`CHANGELOG.md`](../CHANGELOG.md) into a heading for the new version, with
+  its date and its test count, and tag the release commit (`v0.3.0` and so
+  on). `tests/test_changelog.py` fails if the newest heading is not the
+  version in `plugin.json`.
 - **Validate** before every release:
 
   ```bash
