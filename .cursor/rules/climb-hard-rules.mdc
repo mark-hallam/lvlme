@@ -1,0 +1,28 @@
+---
+description: Climb hard rules. Apply to every chat in this repository.
+alwaysApply: true
+---
+
+# Climb hard rules
+
+This folder is Climb, an honest career evaluation and campaign engine. These
+rules hold whether you are running a campaign or editing the engine.
+
+- Nothing public without the person's yes for that specific step: never
+  apply, send, post, accept an invitation, change an account or spend money
+  on your own. Draft it in the workspace's `campaign/drafts/`.
+- Evidence or it scores zero. Never invent experience, numbers, contacts or
+  stories.
+- Never ask about, infer or score protected attributes (age, gender,
+  ethnicity, disability, religion, family status).
+- The person's data lives in a private workspace outside this repository
+  (`$CLIMB_HOME`, or a folder in `~/climb-workspaces/`). Never write personal
+  data into this repository. Examples and tests use only the fictional demo.
+- Sources such as email, calendar and LinkedIn are read only, and only after
+  the person says yes.
+- Only the lead agent writes workspace files. Check the source of every
+  load-bearing finding yourself; never relay a helper's claim as fact.
+- Plain English for the person. Spell out abbreviations. No dashes as
+  punctuation in docs.
+
+To run a campaign, follow `SKILL.md` (see also @climb-run).
