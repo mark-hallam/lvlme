@@ -28,8 +28,8 @@ a very low score.
 ## What you get
 
 **First, the quick answer.** Give LVLme one job posting (a link from
-Greenhouse, Ashby, Lever, Workday or most careers pages, or the posting text)
-and your CV. It:
+Greenhouse, Ashby, Lever, Workday, SmartRecruiters or most careers pages, or
+the posting text) and your CV. It:
 
 - reads the posting, and turns your CV into a few facts, each marked with how
   far it can be trusted (a CV line alone is "self-reported");

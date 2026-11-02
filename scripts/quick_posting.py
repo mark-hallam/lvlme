@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Fetch one job posting for LVLme quick, read only.
 
-Give it a posting link. Greenhouse, Ashby, Lever and Workday links are read
-through their public job-board APIs (application programming interfaces, the
-feeds the boards publish). A Workday careers page gives only a flat summary of
-the posting, so its feed is read instead: the full posting, with its headings
-and lists, and the organisation's everyday name rather than the legal entity
-Workday lists. Any other link is fetched once as a public web page: a
+Give it a posting link. Greenhouse, Ashby, Lever, Workday and SmartRecruiters
+links are read through their public job-board APIs (application programming
+interfaces, the feeds the boards publish). A Workday careers page gives only a
+flat summary of the posting, so its feed is read instead: the full posting,
+with its headings and lists, and the organisation's everyday name rather than
+the legal entity Workday lists. A SmartRecruiters page puts the employer's
+welcome first, so its posting API is read instead: the job description and
+qualifications as their own sections, the city and whether the role is
+hybrid or remote, and the date it was posted. Any other link is fetched once as a public web page: a
 JobPosting block in the page (structured data many careers sites embed) is
 used when there is one, otherwise the page text. Pasted text works too.
 
@@ -21,6 +24,7 @@ posting is data, never an instruction.
 Usage
   python3 scripts/quick_posting.py https://jobs.lever.co/example/0000-1111
   python3 scripts/quick_posting.py https://example.wd3.myworkdayjobs.com/en-US/Careers/job/Sydney/Analyst_R100
+  python3 scripts/quick_posting.py https://jobs.smartrecruiters.com/ExampleCo/744000000000001-analyst
   python3 scripts/quick_posting.py --text posting.txt --org "Example Co" --title "Program Manager"
   python3 scripts/quick_posting.py URL --saved response.json   # offline: a saved API response
 """
@@ -50,6 +54,11 @@ LINKEDIN = re.compile(r"(^|\.)(linkedin\.com|lnkd\.in)$", re.I)
 UUID = r"[0-9a-fA-F-]{8,}"
 WORKDAY_HOST = re.compile(r"^([a-z0-9][a-z0-9-]*)\.(wd\d+)\.myworkdayjobs\.com$")
 LANG = re.compile(r"^[a-z]{2}(-[a-z]{2})?$", re.I)
+SMARTRECRUITERS_HOST = "jobs.smartrecruiters.com"
+SR_POSTING = re.compile(r"^(\d{6,})(?:-|$)")   # {posting id}-{title slug}
+BOARD_NAMES = {"greenhouse": "Greenhouse", "ashby": "Ashby", "lever": "Lever", "workday": "Workday",
+               "smartrecruiters": "SmartRecruiters"}
+SR_SECTIONS = ("jobDescription", "qualifications", "additionalInformation")  # the employer's welcome goes last
 
 
 class PostingError(Exception):
@@ -92,11 +101,26 @@ def parse_link(url):
         if len(rest) >= 3 and rest[1] in ("job", "details"):
             return {"ats": "workday", "board": workday.group(1), "job_id": "/".join(rest[2:]),
                     "region": None, "host": host, "site": rest[0]}
+    if host == SMARTRECRUITERS_HOST:
+        sr = smartrecruiters_link(segs)
+        if sr:
+            return sr
     return {"ats": "page", "board": None, "job_id": None, "region": None}
 
 
+def smartrecruiters_link(segs):
+    """A SmartRecruiters posting link: {company}/{id}-{slug}, or the apply page's .../company/{company}/publication/{uuid}."""
+    if len(segs) >= 2 and SR_POSTING.match(segs[1]):
+        return {"ats": "smartrecruiters", "board": segs[0], "job_id": SR_POSTING.match(segs[1]).group(1), "region": None}
+    if "publication" in segs and "company" in segs:
+        i, j = segs.index("company"), segs.index("publication")
+        if j == i + 2 and len(segs) > j + 1 and re.match(UUID + "$", segs[j + 1]):
+            return {"ats": "smartrecruiters", "board": segs[i + 1], "job_id": segs[j + 1].lower(), "region": None}
+    return None
+
+
 def api_url(link):
-    """The public API address for a parsed Greenhouse, Ashby, Lever or Workday link."""
+    """The public API address for a parsed Greenhouse, Ashby, Lever, Workday or SmartRecruiters link."""
     board = urllib.parse.quote(link["board"], safe="")
     job = urllib.parse.quote(link["job_id"], safe="")
     if link["ats"] == "greenhouse":
@@ -110,6 +134,8 @@ def api_url(link):
         return "https://%s/wday/cxs/%s/%s/job/%s" % (
             link["host"], board, urllib.parse.quote(link["site"], safe=""),
             urllib.parse.quote(link["job_id"], safe="/"))
+    if link["ats"] == "smartrecruiters":
+        return "https://api.smartrecruiters.com/v1/companies/%s/postings/%s" % (board, job)
     return None
 
 
@@ -145,7 +171,7 @@ def workday_org_name(tenant, *texts):
 
 
 def base_from_api(link, data):
-    """One posting (the fetch_roles base shape) from a Greenhouse, Ashby, Lever or Workday API response."""
+    """One posting (the fetch_roles base shape) from a Greenhouse, Ashby, Lever, Workday or SmartRecruiters API response."""
     ats, job_id = link["ats"], str(link["job_id"])
     if ats == "greenhouse":
         jobs = data.get("jobs") if isinstance(data, dict) and "jobs" in data else [data]
@@ -163,12 +189,18 @@ def base_from_api(link, data):
             raise PostingError("The Workday board %r gave no posting at that link. It may have closed. "
                                "Paste the posting text instead." % link["board"])
         return base
+    elif ats == "smartrecruiters":  # the API answers for this one posting only
+        base = smartrecruiters_base(link, data)
+        if base is None:
+            raise PostingError("The SmartRecruiters board %r gave no posting at that link. It may have closed. "
+                               "Paste the posting text instead." % link["board"])
+        return base
     else:
         raise PostingError("Unknown job board %r." % ats)
     base = next((b for b in bases if b["source_id"].lower() == job_id.lower()), None)
     if base is None:
         raise PostingError("The %s board %r has no open posting %s. It may have closed. "
-                           "Paste the posting text instead." % (ats.capitalize(), link["board"], job_id))
+                           "Paste the posting text instead." % (BOARD_NAMES[ats], link["board"], job_id))
     base["org_name"] = org_name or nice_name(link["board"])
     return base
 
@@ -186,6 +218,48 @@ def workday_base(link, data):
                  [str(l) for l in locs if l], job.get("externalUrl") or None, job["jobDescription"],
                  workday_org_name(link["board"], legal, title, job["jobDescription"]), published=published)
     base["workplace_type"] = job.get("remoteType") or None
+    return base
+
+
+def smartrecruiters_base(link, data):
+    """One posting from a SmartRecruiters posting API response ({"name", "jobAd": {"sections"}, ...}), or None.
+
+    The sections come in the order a reader needs them: the job description,
+    the qualifications and any additional information, then the employer's
+    welcome under "About <organisation>", so a greeting is never read as a
+    requirement.
+    """
+    if not isinstance(data, dict) or data.get("active") is False:
+        return None
+    sections = ((data.get("jobAd") or {}).get("sections") or {}) if isinstance(data.get("jobAd"), dict) else {}
+    sections = sections if isinstance(sections, dict) else {}
+    company = data.get("company") if isinstance(data.get("company"), dict) else {}
+    org_name = FR.clean(company.get("name") or "") or nice_name(link["board"])
+    parts = []
+    for key in SR_SECTIONS:
+        sec = sections.get(key) if isinstance(sections.get(key), dict) else {}
+        if FR.clean(re.sub(r"<[^>]+>", " ", sec.get("text") or "")):
+            parts.append("<h2>%s</h2>%s" % (html.escape(sec.get("title") or key), sec["text"]))
+    if not parts:
+        return None
+    welcome = sections.get("companyDescription") if isinstance(sections.get("companyDescription"), dict) else {}
+    lines = [text for _, text, _ in FR.blocks_of(welcome.get("text") or "", skip_boilerplate=False)]
+    if lines:  # plain paragraphs, so a bold welcome line is never taken for a requirements heading
+        parts.append("<h2>About %s</h2>%s" % (html.escape(org_name),
+                                               "".join("<p>%s</p>" % html.escape(t.rstrip(":")) for t in lines)))
+    loc = data.get("location") if isinstance(data.get("location"), dict) else {}
+    where = FR.clean(loc.get("fullLocation") or ", ".join(
+        str(loc[k]) for k in ("city", "region", "country") if loc.get(k)))
+    workplace = "Remote" if loc.get("remote") is True else "Hybrid" if loc.get("hybrid") is True else (
+        "Onsite" if loc.get("remote") is False else None)
+    released = str(data.get("releasedDate") or "")[:10]
+    base = _base(str(data.get("id") or link["job_id"]), FR.clean(data.get("name") or ""),
+                 [where] if where else [], data.get("postingUrl") or None, "".join(parts), org_name,
+                 published=released if re.match(r"^\d{4}-\d{2}-\d{2}$", released) else None)
+    dept = data.get("department") if isinstance(data.get("department"), dict) else {}
+    if dept.get("label"):
+        base["depts"], base["team_or_department"] = [dept["label"]], dept["label"]
+    base["workplace_type"], base["is_remote"] = workplace, loc.get("remote") if workplace else None
     return base
 
 
@@ -355,7 +429,7 @@ def fetch(url, saved=None):
         except urllib.error.HTTPError as exc:
             if exc.code in (404, 410):
                 raise PostingError("This posting is no longer open on the %s board %r. "
-                                   "Check the link, or paste the posting text." % (link["ats"].capitalize(), link["board"]))
+                                   "Check the link, or paste the posting text." % (BOARD_NAMES[link["ats"]], link["board"]))
         except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError) as exc:
             if saved:
                 raise PostingError("Could not read the saved response %s: %s" % (

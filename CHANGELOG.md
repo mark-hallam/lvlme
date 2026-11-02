@@ -35,13 +35,25 @@ Work on top of 0.3.0 that is not in a released version yet.
   Workday's public job feed, so the requirements, nice to haves and duties
   come through, and it uses the name people know. If the feed cannot be
   reached, it falls back to the page as before.
+- **LVLme quick reads SmartRecruiters links properly.** Canva, ServiceNow,
+  Bosch and many others post jobs on SmartRecruiters
+  (`jobs.smartrecruiters.com`). Its pages open with the employer's welcome,
+  and LVLme quick used to read that greeting as the role's requirements and
+  find no location. It now reads the posting through SmartRecruiters' public
+  posting API: the job description and qualifications as their own sections,
+  the welcome last (never as a requirement), the city, whether the role is
+  hybrid or remote, and the date it was posted. A closed posting gets a plain
+  message, and the apply page's link works too.
 
 ### Changed
 
 - **More section headings are understood** when a posting is read, in LVLme
   quick and the full campaign: "What we need to see" lists requirements,
   "Ways to stand out" and "Good to have" list nice to haves, and "What you'll
-  actually be doing" lists duties. Nothing about the scoring maths changed.
+  actually be doing" lists duties, "You're probably a match if" lists
+  requirements, "This role is focused on" lists duties, and "What you'll
+  learn" is about the role, not a requirement. Nothing about the scoring
+  maths changed.
 
 - **LVLme quick says what it could not check.** Public signal and
   application readiness cannot be judged from one posting and a CV. They used

@@ -16,11 +16,16 @@ pasted text). The steps are in
 [`skills/lvlme-quick/SKILL.md`](../skills/lvlme-quick/SKILL.md):
 
 1. **The posting.** `scripts/quick_posting.py` reads Greenhouse, Ashby,
-   Lever and Workday links through their public job-board APIs (application
-   programming interfaces, the feeds job boards publish). A Workday careers
-   page holds only a flat summary, so the feed gives the full posting with its
-   headings, which is how its requirements are found, and the employer's
-   everyday name rather than the legal entity Workday lists. Any other link
+   Lever, Workday and SmartRecruiters links through their public job-board
+   APIs (application programming interfaces, the feeds job boards publish). A
+   Workday careers page holds only a flat summary, so the feed gives the full
+   posting with its headings, which is how its requirements are found, and
+   the employer's everyday name rather than the legal entity Workday lists. A
+   SmartRecruiters page (used by Canva, ServiceNow and Bosch, among others)
+   opens with the employer's welcome, so the posting API is read instead: the
+   job description and qualifications come first and the welcome last, where
+   it is never mistaken for a requirement, with the city, whether the role is
+   hybrid or remote, and the date it was posted. Any other link
    is fetched once as a public page, using the job details many careers sites
    build into the page when they are there. If the page gives too little text
    (many sites draw the page in the browser), you paste the text instead. LinkedIn links are

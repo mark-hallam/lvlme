@@ -122,8 +122,9 @@ sensitive, the agent does not record it.
   programming interfaces) for the targets in your config.
 - `claims_audit.py` fetches only the addresses you pass it.
 - `quick_posting.py` (LVLme quick) fetches only the one posting link you give
-  it: through the public job-board API for Greenhouse, Ashby, Lever and
-  Workday links, otherwise the page itself, once. It never opens LinkedIn.
+  it: through the public job-board API for Greenhouse, Ashby, Lever, Workday
+  and SmartRecruiters links, otherwise the page itself, once. It never opens
+  LinkedIn.
 - No other script uses the network.
 
 ## What the engine never does

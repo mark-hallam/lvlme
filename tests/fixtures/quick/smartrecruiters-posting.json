@@ -1,0 +1,55 @@
+{
+  "id": "744000000004242",
+  "name": "Operations Program Lead, Robot Fleets",
+  "uuid": "0b6f3c2e-1a2b-4c3d-8e9f-000000004242",
+  "refNumber": "REF4242F",
+  "company": {
+    "name": "Initech Robotics",
+    "identifier": "InitechRobotics"
+  },
+  "location": {
+    "city": "Melbourne",
+    "region": "VIC",
+    "country": "au",
+    "remote": false,
+    "hybrid": true,
+    "fullLocation": "Melbourne, VIC, Australia"
+  },
+  "releasedDate": "2026-10-28T23:15:02.000Z",
+  "postingUrl": "https://jobs.smartrecruiters.com/InitechRobotics/744000000004242-operations-program-lead-robot-fleets",
+  "applyUrl": "https://jobs.smartrecruiters.com/InitechRobotics/744000000004242-operations-program-lead-robot-fleets?oga=true",
+  "active": true,
+  "visibility": "PUBLIC",
+  "department": {
+    "id": 4242,
+    "label": "Field Operations"
+  },
+  "experienceLevel": {
+    "id": "mid_senior_level",
+    "label": "Mid-Senior Level"
+  },
+  "typeOfEmployment": {
+    "id": "permanent",
+    "label": "Full-time"
+  },
+  "jobAd": {
+    "sections": {
+      "companyDescription": {
+        "title": "Company Description",
+        "text": "<p><strong>Join the team building the robots that run Australia's warehouses.</strong></p><p>Hello, g'day, kia ora! Thanks for stopping by. This fictional posting is test data for LVLme.</p>"
+      },
+      "jobDescription": {
+        "title": "Job Description",
+        "text": "<p><strong>At the moment, this role is focused on:</strong></p><ul><li>Running the rollout of new robot fleets at customer sites, from survey to handover.</li><li>Keeping engineering, field and customer teams on one deployment plan.</li><li>Reporting progress and risks to the operations leadership every week.</li></ul><p><strong>You're probably a match if</strong></p><ul><li>You have 6+ years of program or operations management in logistics or industrial settings.</li><li>You have led cross-functional teams through complex hardware deployments.</li></ul><p><strong>What you'll learn and how you'll develop at Initech Robotics</strong></p><ul><li>You'll learn how autonomous fleets are commissioned at scale.</li></ul>"
+      },
+      "qualifications": {
+        "title": "Qualifications",
+        "text": "<ul><li>Experience with safety management systems in a regulated industry.</li></ul><p><strong>Nice to have</strong></p><ul><li>Experience deploying autonomous mobile robots.</li></ul>"
+      },
+      "additionalInformation": {
+        "title": "Additional Information",
+        "text": "<p>Our campus is in Melbourne, and you choose the balance of office and home that works for your team.</p>"
+      }
+    }
+  }
+}

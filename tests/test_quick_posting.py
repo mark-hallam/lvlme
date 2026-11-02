@@ -1,4 +1,4 @@
-"""LVLme quick's posting fetcher, offline: saved Greenhouse, Ashby, Lever and Workday API responses and a saved page."""
+"""LVLme quick's posting fetcher, offline: saved Greenhouse, Ashby, Lever, Workday and SmartRecruiters API responses and a saved page."""
 import io
 import os
 import unittest
@@ -15,6 +15,7 @@ ASHBY = "https://jobs.ashbyhq.com/globex/0b6f3c2e-1a2b-4c3d-8e9f-000000000001"
 LEVER = "https://jobs.lever.co/initech/7c1d2e3f-4a5b-4c6d-9e8f-000000000101"
 WORKDAY = ("https://globex.wd3.myworkdayjobs.com/en-AU/Globex_Careers/job/Australia-NSW-Sydney/"
            "Senior-Program-Manager--Fleet-Rollouts_JR0004242")
+SMART = "https://jobs.smartrecruiters.com/InitechRobotics/744000000004242-operations-program-lead-robot-fleets"
 
 
 def fx(name):
@@ -224,6 +225,93 @@ class WorkdayTests(unittest.TestCase):
         for heading, cat in (("What we need to see:", "req"), ("Ways to stand out from the crowd:", "nice"),
                              ("What will make you stand out", "nice"), ("Good To Have -", "nice"),
                              ("Must Have -", "req"), ("What You'll Actually Be Doing", "resp")):
+            self.assertEqual(Q.FR.heading_category(heading), cat, heading)
+
+    def tmp(self):
+        return FetchTests.tmp(self)
+
+
+class SmartRecruitersTests(unittest.TestCase):
+    """SmartRecruiters pages open with the employer's welcome, so LVLme quick reads the posting API instead."""
+
+    def test_links(self):
+        link = Q.parse_link(SMART + "?trid=abc")
+        self.assertEqual(link, {"ats": "smartrecruiters", "board": "InitechRobotics", "job_id": "744000000004242",
+                                "region": None})
+        self.assertEqual(Q.parse_link("https://jobs.smartrecruiters.com/InitechRobotics/744000000004242")["job_id"],
+                         "744000000004242")
+        apply_page = Q.parse_link("https://jobs.smartrecruiters.com/oneclick-ui/company/InitechRobotics/publication/"
+                                  "0B6F3C2E-1A2B-4C3D-8E9F-000000004242?dcr_ci=InitechRobotics")
+        self.assertEqual((apply_page["board"], apply_page["job_id"]),
+                         ("InitechRobotics", "0b6f3c2e-1a2b-4c3d-8e9f-000000004242"))
+        for page in ("https://jobs.smartrecruiters.com/InitechRobotics",                 # the board, not a job
+                     "https://jobs.smartrecruiters.com/InitechRobotics/careers-at-initech",
+                     "https://careers.smartrecruiters.com/InitechRobotics/744000000004242"):  # another host
+            self.assertEqual(Q.parse_link(page)["ats"], "page", page)
+
+    def test_api_address(self):
+        self.assertEqual(Q.api_url(Q.parse_link(SMART)),
+                         "https://api.smartrecruiters.com/v1/companies/InitechRobotics/postings/744000000004242")
+
+    def test_api_gives_the_sections_in_order(self):
+        role, source = Q.fetch(SMART, saved=fx("smartrecruiters-posting.json"))
+        self.assertEqual(source["kind"], "smartrecruiters")
+        self.assertEqual(source["endpoint"], Q.api_url(Q.parse_link(SMART)))
+        self.assertEqual(source["org_name"], "Initech Robotics")   # the API's company name, not the board id
+        self.assertEqual(role["id"], "initechrobotics:744000000004242")
+        self.assertEqual(role["title"], "Operations Program Lead, Robot Fleets")
+        self.assertEqual(role["locations"], ["Melbourne, VIC, Australia"])
+        self.assertIs(role["remote"], False)                        # hybrid is not remote
+        self.assertEqual(role["published_at"], "2026-10-28")
+        self.assertEqual(role["team_or_department"], "Field Operations")
+        self.assertEqual(role["years_experience"], 6)
+        self.assertEqual(role["hard_requirements"], [
+            "You have 6+ years of program or operations management in logistics or industrial settings.",
+            "You have led cross-functional teams through complex hardware deployments.",
+            "Experience with safety management systems in a regulated industry."])
+        self.assertEqual(role["nice_to_haves"], ["Experience deploying autonomous mobile robots."])
+        self.assertEqual(len(role["responsibilities"]), 3)
+        # the welcome is kept for the reader, last, and never read as a requirement
+        text = role["description_text"]
+        self.assertIn("Hello, g'day, kia ora!", text)
+        self.assertGreater(text.index("Hello, g'day"), text.index("Experience deploying autonomous"))
+        self.assertFalse(any("g'day" in r or "Join the team" in r for r in role["hard_requirements"]))
+        self.assertEqual(schema_errors(role), [])
+
+    def test_posting_file_names_the_board(self):
+        import quick
+        role, source = Q.fetch(SMART, saved=fx("smartrecruiters-posting.json"))
+        text = quick.posting_md(role, source["org_name"], source, "2026-11-03")
+        self.assertIn("Initech Robotics · Melbourne, VIC, Australia", text)
+        self.assertIn("from the public SmartRecruiters job board, read only", text)
+
+    def test_remote_flag(self):
+        data = Q.C.load_json(fx("smartrecruiters-posting.json"))
+        data["location"].update({"remote": True, "hybrid": False})
+        base = Q.smartrecruiters_base(Q.parse_link(SMART), data)
+        self.assertEqual((base["workplace_type"], base["is_remote"]), ("Remote", True))
+
+    def test_closed_or_empty_posting_asks_for_pasted_text(self):
+        data = Q.C.load_json(fx("smartrecruiters-posting.json"))
+        for change in ({"active": False}, {"jobAd": {"sections": {}}}, {"jobAd": None}):
+            path = os.path.join(self.tmp(), "posting.json")
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(Q.json.dumps(dict(data, **change)))
+            with self.assertRaises(Q.PostingError) as cm:
+                Q.fetch(SMART, saved=path)
+            self.assertIn("SmartRecruiters board 'InitechRobotics' gave no posting", str(cm.exception))
+
+    def test_a_closed_link_names_the_board_plainly(self):
+        def gone(url, accept):
+            raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)
+        with mock.patch.object(Q, "http_get", gone):
+            with self.assertRaises(Q.PostingError) as cm:
+                Q.fetch(SMART)
+        self.assertIn("no longer open on the SmartRecruiters board 'InitechRobotics'", str(cm.exception))
+
+    def test_more_headings(self):
+        for heading, cat in (("You're probably a match if", "req"), ("At the moment, this role is focused on:", "resp"),
+                             ("What you'll learn and how you'll develop at Initech", "about")):
             self.assertEqual(Q.FR.heading_category(heading), cat, heading)
 
     def tmp(self):
