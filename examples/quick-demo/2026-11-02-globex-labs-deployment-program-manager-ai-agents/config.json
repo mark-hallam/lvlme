@@ -1,0 +1,15 @@
+{
+  "quick": true,
+  "fictional": true,
+  "goal": {
+    "title": "Climb quick: Deployment Program Manager, AI Agents at Globex Labs"
+  },
+  "targets": [
+    {
+      "id": "globex",
+      "name": "Globex Labs",
+      "ats": "ashby"
+    }
+  ],
+  "candidate": {}
+}

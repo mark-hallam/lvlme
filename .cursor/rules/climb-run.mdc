@@ -1,5 +1,5 @@
 ---
-description: How to run, resume or update a Climb career campaign, or one part of it (interview, consistency audit, recruiter screen, dashboard). Use when the person asks to run Climb, asks how likely they are to get a kind of job, or wants their CV, LinkedIn or website checked.
+description: How to run, resume or update a Climb career campaign, or one part of it (Climb quick for one posting, interview, consistency audit, recruiter screen, dashboard). Use when the person asks to run Climb, asks how likely they are to get a kind of job, or wants their CV, LinkedIn or website checked.
 alwaysApply: false
 ---
 
@@ -26,5 +26,8 @@ Follow `SKILL.md` in this folder exactly. It is the full procedure, and
    actions, what needs the person's answer or yes, and
    `open <workspace>/report/index.html`.
 
-For one part only, the person may ask for: interview, audit, screen,
-dashboard, status, or resume (see "Entry points" in `SKILL.md`).
+For one part only, the person may ask for: quick (honest odds for one
+posting from a link and a CV, in about five minutes: follow
+`skills/climb-quick/SKILL.md`, and run its blind review in a new chat),
+interview, audit, screen, dashboard, status, or resume (see "Entry points" in
+`SKILL.md`).

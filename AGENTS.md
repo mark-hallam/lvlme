@@ -104,17 +104,19 @@ cannot, run the same stages one after another; the gates do not change. See
 
 ## Entry points
 
-If the person asks for one part only, run only that part, with the hard
-rules: `interview` (stage 1), `audit` (the two audits), `screen` (the
-recruiter screen), `dashboard` (stage 9), `status` (stage 10 from the newest
-files, changing nothing), or `resume` (the first stage not yet done today).
+If the person asks for one part only, run only that part, with the hard rules:
+`quick` (honest odds for one posting from a link and a CV, in about five
+minutes: follow `skills/climb-quick/SKILL.md`), `interview` (stage 1), `audit`
+(the two audits), `screen` (the recruiter screen), `dashboard` (stage 9),
+`status` (stage 10 from the newest files, changing nothing), or `resume` (the
+first stage not yet done today).
 
 ## Working on the engine itself
 
 - Python 3.9 or newer, standard library only. No telemetry. Network calls only
   in `fetch_roles.py` (public job-board APIs, or application programming
-  interfaces) and `claims_audit.py` (addresses
-  the person passes).
+  interfaces), `claims_audit.py` (addresses the person passes) and
+  `quick_posting.py` (the one posting link the person gives Climb quick).
 - Tests run offline: `python3 -m unittest discover -s tests`.
   `tests/test_packaging.py` checks the plugin manifests, the skill and
   subagent files, and that every engine path the packaging docs name exists.
