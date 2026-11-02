@@ -35,7 +35,9 @@ workspace.
 4. **Private by default.** The workspace stays on the person's machine,
    outside this repository. Never copy it anywhere public. Third-party names
    (contacts, email senders) never go into briefings or drafts unless the
-   person opts in.
+   person opts in. Be plain that what you read goes to your provider to be
+   processed, under its data terms; never say the data goes nowhere
+   (`method/PRIVACY.md`).
 5. **Connectors are read only and opt in.** Ask before reading email,
    calendar or any other source. Read, never change. Never open LinkedIn
    yourself (automated access breaks LinkedIn's terms): use the person's

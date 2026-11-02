@@ -1,8 +1,10 @@
 # Privacy
 
 Climb handles some of the most personal data there is: your work
-history, your contacts, your pay, your plans. It is built to keep that data on
-your machine and out of anyone else's hands.
+history, your contacts, your pay, your plans. Climb's files stay on your
+computer, and its scripts send none of it anywhere. Your AI agent is
+different: its provider receives whatever the agent reads (see "Your AI
+agent's provider" below).
 
 ## Where your data lives
 
@@ -66,15 +68,24 @@ Contact names appear in the agent files only if
 `privacy.share_contact_names_with_agents` is true **and** sensitive mode is
 off.
 
-## Cloud agents see whatever they read
+## Your AI agent's provider
 
-An AI agent that runs in the cloud sends what it reads to its provider. If
-you point one at your workspace, your evidence, contacts and plans go with it.
-Before you do:
+Climb's files stay on your computer. Your AI agent's provider (for example
+Anthropic for Claude Code, or OpenAI for Codex) receives whatever the agent
+reads, in order to process it. That is true even when the agent's program
+runs on your computer, because the model that does the reading runs on the
+provider's servers. So when the agent reads your evidence, contacts, plans,
+documents or approved emails, that text goes to the provider and is handled
+under the provider's data terms: what it keeps, for how long, and whether it
+is used for training depend on those terms and your account settings, not on
+Climb. Read them on the provider's own site. Only a model that runs entirely
+on your computer keeps everything there.
+
+To limit what is sent:
 
 - keep sensitive mode on;
 - point helper agents at `report/for-agents/` only;
-- prefer an agent that runs on your own machine for the full run.
+- approve only the sources a run needs.
 
 ## Connectors
 
@@ -99,7 +110,8 @@ sensitive, the agent does not record it.
 
 ## Network access and telemetry
 
-- No telemetry. Nothing reports back to anyone.
+- No telemetry. Climb's scripts report nothing to anyone. (Your AI agent
+  still sends what it reads to its provider, as above.)
 - `fetch_roles.py` calls only the public job-board APIs (application
   programming interfaces) for the targets in your config.
 - `claims_audit.py` fetches only the addresses you pass it.
@@ -119,5 +131,6 @@ sensitive, the agent does not record it.
 Your data is just files in your workspace. To delete it all, delete the
 workspace folder. To delete one kind of data, delete that file (for example
 `profile/network.json` and `intake/sources/Connections.csv` for your
-contacts). If you used a cloud agent, its provider may keep its own copy:
-check that provider's settings.
+contacts). Deleting files does not delete what your AI agent's provider has
+already received: that is under the provider's data terms and your account
+settings there.

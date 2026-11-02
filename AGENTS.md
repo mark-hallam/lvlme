@@ -24,7 +24,8 @@ version, and it runs the same procedure. Install notes for every agent:
 - The person's data lives in a **private workspace** outside this repository
   (`$CLIMB_HOME`, or a folder in `~/climb-workspaces/`). Never
   write personal data into this repository and never copy the workspace
-  anywhere public.
+  anywhere public. Be plain that what an agent reads goes to its provider to
+  be processed, under that provider's data terms (`method/PRIVACY.md`).
 - Read-only access to any source (email, calendar), and only when the person
   has said yes. Never open LinkedIn itself: use the official data export and
   what the person pastes.

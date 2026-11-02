@@ -18,6 +18,8 @@ rules hold whether you are running a campaign or editing the engine.
 - The person's data lives in a private workspace outside this repository
   (`$CLIMB_HOME`, or a folder in `~/climb-workspaces/`). Never write personal
   data into this repository. Examples and tests use only the fictional demo.
+  Be plain that what you read goes to your provider to be processed, under
+  its data terms (`method/PRIVACY.md`).
 - Sources such as email and calendar are read only, and only after the
   person says yes. Never open LinkedIn itself: use the official data export
   and what the person pastes.
