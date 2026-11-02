@@ -1,8 +1,10 @@
 """_levels.py: levels, the next-level set (reachable, cannot reach, caps, chance), quests, level history, streak."""
+import html
 import json
 import os
 import re
 import unittest
+from types import SimpleNamespace
 from unittest import mock
 
 import helpers as H
@@ -44,7 +46,7 @@ class LevelBasics(unittest.TestCase):
                          [0, 0, 1, 1, 2, 2, 3, 3, 4, 4])
 
     def test_top_level_has_no_next(self):
-        nl = L.next_level(role([5, 5, 5, 4, 4, 5, 5]), [], CAPS, WEIGHTS, TODAY)
+        nl = L.next_level([role([5, 5, 5, 4, 4, 5, 5])], [], CAPS, WEIGHTS, TODAY)
         self.assertTrue(nl["top"])
         self.assertEqual((nl["level"], nl["band"]), (5, "Strong"))
         self.assertNotIn("target", nl)
@@ -59,7 +61,7 @@ class NextLevelSet(unittest.TestCase):
                         act("A02", [eff("D2", 1)], date="2026-11-20"),              # +4
                         act("A03", [eff("D7", 3)], date="2026-11-05"),              # +3
                         act("A04", [eff("D4", 1)], date="2026-11-30")])             # +2
-        nl = L.next_level(r, acts, CAPS, WEIGHTS, TODAY)
+        nl = L.next_level([r], acts, CAPS, WEIGHTS, TODAY)
         self.assertEqual((nl["level"], nl["target"], nl["points_to_next"]), (2, 55, 14))
         self.assertTrue(nl["reachable"])
         self.assertEqual(nl["set"]["ids"], ["A03", "A01"])          # three pairs reach 55; this one lands first
@@ -73,17 +75,17 @@ class NextLevelSet(unittest.TestCase):
         acts = by_date([act("A01", [eff("D3", at_least=4)], date="2026-11-30", hours=2),
                         act("A02", [eff("D2", 1)], date="2026-11-10", hours=6),
                         act("A03", [eff("D7", 3)], date="2026-11-10", hours=1)])
-        nl = L.next_level(r, acts, CAPS, WEIGHTS, TODAY)
+        nl = L.next_level([r], acts, CAPS, WEIGHTS, TODAY)
         self.assertEqual(nl["set"]["ids"], ["A03", "A01"])          # same landing date as A02 + A01, an hour instead of six
 
     def test_chance_of_working_weights_the_effect(self):
         r = role([2, 2, 1, 2, 1, 5, 1])                            # fit 39, one point short of Level 2
-        low = L.next_level(r, [act("A01", [eff("D5", 1)], p=0.4)], CAPS, WEIGHTS, TODAY)   # 0.4 x 2 points = 0.8
+        low = L.next_level([r], [act("A01", [eff("D5", 1)], p=0.4)], CAPS, WEIGHTS, TODAY)   # 0.4 x 2 points = 0.8
         self.assertFalse(low["reachable"])
         self.assertEqual(low["missing"]["points"], 0.2)
         self.assertEqual(low["best_case"]["ids"], ["A01"])
         self.assertAlmostEqual(low["best_case"]["chance"], 0.4)
-        high = L.next_level(r, [act("A01", [eff("D5", 1)], p=0.6)], CAPS, WEIGHTS, TODAY)  # 1.2 points
+        high = L.next_level([r], [act("A01", [eff("D5", 1)], p=0.6)], CAPS, WEIGHTS, TODAY)  # 1.2 points
         self.assertTrue(high["reachable"])
         self.assertAlmostEqual(high["set"]["chance"], 0.6)          # the level really arrives only if it works
 
@@ -92,7 +94,7 @@ class NextLevelSet(unittest.TestCase):
         acts = by_date([act("A01", [eff("D1", 3)]),                              # D1 cap 0: years don't change
                         act("A02", [eff("D3", at_least=5)], p=0.5),             # cap 3: 1 to 4 at most
                         act("A03", [eff("D2", 3)], p=1.0, date="2026-11-12")])  # cap 1
-        nl = L.next_level(r, acts, CAPS, WEIGHTS, TODAY)
+        nl = L.next_level([r], acts, CAPS, WEIGHTS, TODAY)
         self.assertEqual(nl["relevant"], ["A02", "A03"])            # A01 can't move this role at all
         self.assertFalse(nl["reachable"])
         self.assertEqual(nl["plan"]["fit_expected"], 51)            # 41 + 0.5 x 12 + 4
@@ -109,14 +111,14 @@ class NextLevelSet(unittest.TestCase):
 
     def test_ceiling_below_the_next_level(self):
         caps = [0, 0, 0, 0, 0, 0, 1]
-        nl = L.next_level(role(self.R), [act("A01", [eff("D7", 1)])], caps, WEIGHTS, TODAY)
+        nl = L.next_level([role(self.R)], [act("A01", [eff("D7", 1)])], caps, WEIGHTS, TODAY)
         self.assertFalse(nl["reachable"])
         self.assertIsNone(nl["best_case"])
         self.assertLess(nl["missing"]["ceiling"], nl["target"])
 
     def test_hard_eligibility_block_never_counts(self):
         r = role([2, 2, 1, 2, 1, 0, 1], hard=True)                  # fit 34; eligibility can't be cleared
-        nl = L.next_level(r, [act("A01", [eff("D6", at_least=5)])], [0, 1, 3, 1, 1, 5, 3], WEIGHTS, TODAY)
+        nl = L.next_level([r], [act("A01", [eff("D6", at_least=5)])], [0, 1, 3, 1, 1, 5, 3], WEIGHTS, TODAY)
         self.assertEqual(nl["relevant"], [])
         self.assertFalse(nl["reachable"])
         self.assertNotIn("D6", [x["dimension"] for x in nl["missing"]["room"]])
@@ -125,13 +127,13 @@ class NextLevelSet(unittest.TestCase):
         r = role([2, 2, 1, 2, 1, 5, 1])
         acts = [act("A01", [eff("D5", 1)], status="done"), act("A02", [eff("D5", 1, orgs=["globex"])]),
                 act("A03", [eff("D5", 1)], status="dropped")]
-        nl = L.next_level(r, acts, CAPS, WEIGHTS, TODAY)
+        nl = L.next_level([r], acts, CAPS, WEIGHTS, TODAY)
         self.assertEqual(nl["relevant"], [])
         self.assertFalse(nl["reachable"])
 
     def test_overdue_action_lands_today(self):
         r = role([2, 2, 1, 2, 1, 5, 1])
-        nl = L.next_level(r, [act("A01", [eff("D5", 1)], date="2026-10-20")], CAPS, WEIGHTS, TODAY)
+        nl = L.next_level([r], [act("A01", [eff("D5", 1)], date="2026-10-20")], CAPS, WEIGHTS, TODAY)
         self.assertEqual(nl["set"]["date"], TODAY)
 
     def test_long_plans_use_a_flagged_greedy_search(self):
@@ -139,7 +141,7 @@ class NextLevelSet(unittest.TestCase):
         acts = by_date([act("A0%d" % i, [eff(d, 1)], hours=h) for i, (d, h) in enumerate([("D2", 1), ("D4", 1), ("D5", 1), ("D7", 4)], 1)]
                        + [act("A05", [eff("D3", at_least=4)], hours=2)])
         with mock.patch.object(L, "MAX_EXACT", 2):
-            nl = L.next_level(r, acts, CAPS, WEIGHTS, TODAY)
+            nl = L.next_level([r], acts, CAPS, WEIGHTS, TODAY)
         self.assertTrue(nl["reachable"])
         self.assertFalse(nl["set"]["exact"])
         self.assertEqual(nl["set"]["ids"], ["A01", "A05"])          # best gain per hour first, then nothing it can drop
@@ -153,20 +155,142 @@ class Quests(unittest.TestCase):
                         act("A02", [eff("D2", 1)], p=0.5, hours=1, date="2026-11-20"),            # 2 points, 2 an hour
                         act("A03", [eff("D7", 3)], p=1.0, hours=0.5, date="2026-11-05"),          # 3 points, 6 an hour
                         act("A04", [], hours=0.5, date="2026-11-06", priority=9)])                # credibility only
-        nl = L.next_level(r, acts, CAPS, WEIGHTS, TODAY)
-        qs = L.quests(r, acts, CAPS, WEIGHTS, nl)
+        nl = L.next_level([r], acts, CAPS, WEIGHTS, TODAY)
+        qs = L.quests([r], acts, CAPS, WEIGHTS, nl)
         self.assertEqual([q["a"]["id"] for q in qs], ["A03", "A01", "A02", "A04"])
         self.assertEqual({q["a"]["id"] for q in qs if q["crit"]}, set(nl["set"]["ids"]))
         a02 = next(q for q in qs if q["a"]["id"] == "A02")
         self.assertEqual((a02["exp"], a02["works"]), (2, 4))         # if it works, it adds its full 4 points
-        lift = L.project(r, acts, CAPS, WEIGHTS)[0] - L.project(r, [a for a in acts if a["id"] != "A02"], CAPS, WEIGHTS)[0]
-        self.assertAlmostEqual(a02["exp"], L.r1(lift))               # the same number as the what-if rail
+        alone = L.project(r, [a for a in acts if a["id"] == "A02"], CAPS, WEIGHTS)[0]
+        self.assertAlmostEqual(a02["exp"], L.r1(alone - r["fit"]))   # the action on its own, on the best fit
+        self.assertIs(a02["role"], r)
         self.assertEqual(next(q for q in qs if q["a"]["id"] == "A04")["exp"], 0)
+
+    def test_one_action_set_and_its_quest_tell_the_same_story(self):
+        # The bug first seen on a real workspace: the set reached the next level with one action alone, but
+        # the quest counted that action on top of every other action raising the same capped factors, so its
+        # card showed a fraction of what the panel promised.
+        caps = [0, 1, 2, 1, 1, 1, 3]
+        r = role([1, 1, 2, 2, 1, 5, 2])                              # fit 35, Level 1; Level 2 starts at 40
+        acts = by_date([act("A01", [eff("D2", 1), eff("D5", 1)], p=0.95, hours=3, date="2026-11-06"),
+                        act("A02", [eff("D5", 1)], p=0.9, hours=2, date="2026-11-14"),
+                        act("A03", [eff("D2", 1), eff("D5", 1)], p=0.7, hours=8, date="2026-11-21")])
+        nl = L.next_level([r], acts, caps, WEIGHTS, TODAY)
+        self.assertEqual((nl["set"]["ids"], nl["set"]["fit"]), (["A01"], 40.7))
+        a01 = next(q for q in L.quests([r], acts, caps, WEIGHTS, nl) if q["a"]["id"] == "A01")
+        self.assertEqual(a01["exp"], L.r1(nl["set"]["fit"] - r["fit"]))   # +5.7: 35 + 5.7 is the 40.7 the panel shows
+        self.assertEqual(a01["works"], 6)
+        self.assertTrue(a01["crit"])
+        rail = L.r1(L.project(r, acts, caps, WEIGHTS)[0] - L.project(r, acts[1:], caps, WEIGHTS)[0])
+        self.assertEqual(rail, 1.2)                                  # on top of the rest: what the old card showed
 
     def test_tell_agent_names_the_action_and_asks_for_evidence(self):
         text = L.tell_agent(act("A07", []))
         self.assertTrue(text.startswith("Mark action A07 done"))
         self.assertIn("Evidence: <paste a link, file path or email reference>", text)
+
+
+def lifted_fixture():
+    """Page data where one action reaches the next level through a role other than today's best.
+
+    Today's best: Acme AI, Program Manager, fit 39 (Level 1). Second: Globex Labs, Solutions Lead, fit 37.
+    A01 lifts only the second role, to 44.2 expected (past Level 2 at 40); A02 nudges today's best to 39.8."""
+    best = dict(role([2, 2, 1, 2, 1, 5, 1], org="acme", rid="acme:1"), g="acme", on="Acme AI", title="Program Manager")
+    other = dict(role([2, 2, 1, 2, 1, 4, 1], org="globex", rid="globex:7"), g="globex", on="Globex Labs", title="Solutions Lead")
+    acts = by_date([act("A01", [eff("D3", at_least=3, role_ids=["globex:7"])], p=0.9, hours=2, date="2026-11-12"),
+                    act("A02", [eff("D5", 1, role_ids=["acme:1"])], p=0.4, hours=1, date="2026-11-08")])
+    for a in acts:
+        a.update(owner="You", effort="", derived=False, stale=None)
+    return {"weights": WEIGHTS, "caps": CAPS, "dims": L.DIMS, "dimNames": dict(L.C.DIMENSION_NAMES),
+            "roles": [best, other], "actions": acts, "runs": [],
+            "orgs": {"acme": {"best": "acme:1", "name": "Acme AI"}, "globex": {"best": "globex:7", "name": "Globex Labs"}},
+            "orgOrder": ["acme", "globex"], "meta": {"run_date": TODAY, "end": "2027-01-31", "title": "Fixture"}}
+
+
+def plain(markup):
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", markup))).strip()
+
+
+class LiftedRole(unittest.TestCase):
+    """The next level follows the best fit across roles, and the panel and the quests say which role carries it."""
+
+    def setUp(self):
+        self.page = lifted_fixture()
+        self.rs = L.journey_roles(self.page["roles"])
+        self.nl = L.next_level(self.rs, self.page["actions"], CAPS, WEIGHTS, TODAY)
+        self.qs = L.quests(self.rs, self.page["actions"], CAPS, WEIGHTS, self.nl)
+
+    def test_a_non_best_role_can_carry_the_next_level(self):
+        nl, other = self.nl, self.page["roles"][1]
+        self.assertEqual((nl["level"], nl["target"], nl["points_to_next"]), (1, 40, 1))
+        self.assertTrue(nl["reachable"])                             # today's best alone would only reach 39.8
+        self.assertEqual((nl["set"]["ids"], nl["set"]["fit"], nl["set"]["date"]), (["A01"], 44.2, "2026-11-12"))
+        self.assertIs(nl["set"]["role"], other)
+        self.assertAlmostEqual(nl["set"]["chance"], 0.9)
+        alone = L.next_level([self.rs[0]], self.page["actions"], CAPS, WEIGHTS, TODAY)
+        self.assertFalse(alone["reachable"])
+
+    def test_panel_names_the_lifted_role_with_its_before_and_after_fit(self):
+        text = plain(LH.verdict(self.page, self.nl, self.rs[0]))
+        self.assertIn("One action can get you there", text)
+        self.assertIn("reach Level 2 (Low) on 12 Nov 2026 by lifting your fit for Solutions Lead (Globex Labs) from 37 to 44.2", text)
+        self.assertIn("That role would then be your best.", text)
+        self.assertNotRegex(text, "[\u2013\u2014]| - ")
+
+    def test_quest_points_are_the_best_fit_delta_toward_the_next_level(self):
+        self.assertEqual([q["a"]["id"] for q in self.qs], ["A01", "A02"])          # 2.6 points an hour, then 0.8
+        a01 = self.qs[0]
+        before = max(r["fit"] for r in self.rs)
+        after = L.best_of(self.rs, [self.page["actions"][1]], CAPS, WEIGHTS)["fit"]
+        self.assertEqual(a01["exp"], L.r1(after - before))                         # 44.2 - 39 = 5.2
+        self.assertEqual((a01["exp"], a01["works"], a01["rate"]), (5.2, 6, 2.6))
+        self.assertTrue(a01["crit"])
+        self.assertIs(a01["role"], self.page["roles"][1])
+        self.assertEqual((a01["lead_exp"], a01["lead_works"]), (0, 0))              # nothing on today's best role
+        self.assertEqual(self.qs[1]["exp"], 0.8)
+        self.assertIs(self.qs[1]["role"], self.rs[0])
+        via = plain(LH.via(a01, self.rs[0]))
+        self.assertEqual(via, "Lifts Solutions Lead (Globex Labs) from 37 to 44.2, which would then be your best role. "
+                              "On your best role today: no change.")
+        self.assertEqual(LH.via(self.qs[1], self.rs[0]), "")
+
+    def test_best_case_and_missing_name_the_role_too(self):
+        acts = [dict(a, p=0.1) for a in self.page["actions"]]                      # too unlikely to count on
+        nl = L.next_level(self.rs, acts, CAPS, WEIGHTS, TODAY)
+        self.assertFalse(nl["reachable"])
+        self.assertIs(nl["missing"]["role"], self.rs[0])                           # 39.2 beats 37.8: the plan's closest role
+        self.assertIs(nl["best_case"]["role"], self.rs[0])                         # A02 alone reaches 41 first, on 8 Nov
+        text = plain(LH.verdict(self.page, nl, self.rs[0]))
+        self.assertIn("Best case only: A02 reaches 41 by 8 Nov 2026", text)
+
+
+class AgentFilesMirrorThePanel(unittest.TestCase):
+    """dashboard.json and SUMMARY.md carry the same lifted role, fits and quest points as the page."""
+
+    def test_lifted_role_and_level_points_in_the_agent_files(self):
+        page = dict(lifted_fixture(), streak=0, progress=[])
+        plan = [{"id": a["id"], "title": a["title"], "target_date": a["date"], "owner": "you", "effort_hours": a["hours"],
+                 "done_when": "proof"} for a in page["actions"]]
+        data = SimpleNamespace(plan={"actions": plan}, org=lambda o: page["orgs"][o]["name"])
+        lv = B.levels_payload(data, page)
+        best = lv["best_role"]
+        self.assertEqual((best["role_id"], best["fit"], best["points_to_next"]), ("acme:1", 39, 1))
+        self.assertEqual(best["smallest_set"]["lifted_role"], {"role_id": "globex:7", "org": "globex", "title": "Solutions Lead",
+                                                               "fit_before": 37, "fit_after": 44.2, "is_best_role_today": False})
+        self.assertEqual(best["smallest_set"]["fit_expected"], 44.2)
+        self.assertTrue(lv["per_org"]["globex"]["smallest_set"]["lifted_role"]["is_best_role_today"])
+        self.assertEqual(lv["per_org"]["acme"]["missing"]["closest_role"]["role_id"], "acme:1")
+        a01, a02 = lv["quests"]
+        self.assertEqual((a01["id"], a01["points_expected"], a01["points_if_it_works"], a01["points_per_hour"]), ("A01", 5.2, 6, 2.6))
+        self.assertEqual(a01["lifted_role"]["fit_after"], 44.2)
+        self.assertEqual(a01["on_best_role_today"], {"points_expected": 0, "points_if_it_works": 0})
+        self.assertTrue(a01["on_path_to_next_level"])
+        self.assertIsNone(a02["on_best_role_today"])                     # it counts on today's best role already
+        md = "\n".join(B.levels_md(data, lv))
+        self.assertIn("level reached 2026-11-12 by lifting Solutions Lead (globex) from 37 to 44.2, which would then be the best role", md)
+        self.assertIn("A01 Action A01 [on the path to the next level]: +5.2 toward the next level expected, +6 if it works, 2.6 per hour, "
+                      "by lifting Solutions Lead (globex) from 37 to 44.2; on the best role today +0 expected", md)
+        self.assertIn("Level 2 Low starts at 40: 1 point to go.", md)
 
 
 class HistoryAndStreak(unittest.TestCase):

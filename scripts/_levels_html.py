@@ -4,7 +4,9 @@ The page script renders the same markup again on load (so the what-if switches
 and the organisation selector can change it); this first render means the next
 level, the quests and the level history are readable even with JavaScript off.
 It follows the best role overall with every open action switched on, which is
-also what the agent briefing reports. Keep the markup in step with JS_LEVELS in
+also what the agent briefing reports. The next level and the quest points are
+measured on the best fit across every role, so a role other than today's best
+can carry the level; it is named wherever it does. Keep the markup in step with JS_LEVELS in
 _dashboard_assets.py.
 """
 import datetime as dt
@@ -47,10 +49,15 @@ def cap1(s):
 
 
 def compute(page):
-    """The next level and the quests for the best role overall, every open action on."""
-    r, acts, today = page["roles"][0], page["actions"], page["meta"]["run_date"]
-    nl = L.next_level(r, acts, page["caps"], page["weights"], today)
-    return r, nl, L.quests(r, acts, page["caps"], page["weights"], nl)
+    """The next level and the quests on the best fit across every role, every open action on."""
+    rs, acts, today = L.journey_roles(page["roles"]), page["actions"], page["meta"]["run_date"]
+    nl = L.next_level(rs, acts, page["caps"], page["weights"], today)
+    return rs[0], nl, L.quests(rs, acts, page["caps"], page["weights"], nl)
+
+
+def role_name(r):
+    """A role named in a sentence: its title in bold, then its organisation."""
+    return "<b>%s</b> (%s)" % (esc(r["title"]), esc(r["on"]))
 
 
 def nl_line(nl, today):
@@ -117,7 +124,7 @@ def _chance(found, lead):
                                                   ", treating each action's chance as independent" if len(found["acts"]) > 1 else "")
 
 
-def verdict(page, nl):
+def verdict(page, nl, lead):
     if nl["top"]:
         return ('<div class="lv-verdict"><div class="lv-v-h">Top level</div><p class="small">Strong is the highest band. '
                 'The work now is keeping the evidence fresh and the warm paths warm.</p></div>')
@@ -125,9 +132,14 @@ def verdict(page, nl):
     if nl["reachable"]:
         s = nl["set"]
         n = len(s["acts"])
+        if s["role"] is lead:
+            how = ", at a fit of %s counting each action's chance of working." % fp(s["fit"])
+        else:
+            how = (" by lifting your fit for %s from %s to %s, counting each action's chance of working. That role would then be "
+                   "your best." % (role_name(s["role"]), fp(s["role"]["fit"]), fp(s["fit"])))
         out = ['<div class="lv-verdict"><div class="lv-v-h">%s can get you there</div>' % ("One action" if n == 1 else "%d actions" % n),
-               '<p class="small">If %s, you\'re expected to reach %s on <b>%s</b>, at a fit of %s counting each action\'s chance of working.</p>' % (
-                   "it lands on its target date" if n == 1 else "they land on their target dates", lvl, long_date(s["date"]), fp(s["fit"])),
+               '<p class="small">If %s, you\'re expected to reach %s on <b>%s</b>%s</p>' % (
+                   "it lands on its target date" if n == 1 else "they land on their target dates", lvl, long_date(s["date"]), how),
                _chance(s, "Chance it really happens: ")]
         if nl["plan"]["date"] and nl["plan"]["date"] < s["date"]:
             out.append('<p class="small sub">Doing everything switched on in the plan is expected to get there sooner, on %s.</p>'
@@ -136,26 +148,32 @@ def verdict(page, nl):
             out.append('<p class="small sub">The plan is long, so this set comes from a quick search; a smaller one may exist.</p>')
         return "".join(out) + _steps(s["acts"]) + "</div>"
     m, bc = nl["missing"], nl.get("best_case")
+    same = m["role"] is lead
     out = ['<div class="lv-verdict"><div class="lv-v-h">Not reachable on the current plan</div>',
            '<p class="small">Counting each action\'s chance of working, no set of your switched-on actions reaches %s. All of them together '
-           'are expected to take this role to %s, which is <b>%s points short</b>.</p>' % (lvl, fp(nl["plan"]["fit_expected"]), fp(m["points"]))]
+           'are expected to take %s to %s, which is <b>%s points short</b>.</p>' % (
+               lvl, "this role" if same else "your best fit, on %s," % role_name(m["role"]), fp(nl["plan"]["fit_expected"]), fp(m["points"]))]
     if bc:
         k = len(bc["acts"])
-        out.append('<p class="small"><b>Best case only:</b> %s together reach %s by %s, but only if %s.</p>' % (
-            esc(and_list(bc["ids"])), fp(bc["fit"]), long_date(bc["date"]),
+        reach = ("reach%s %s" % ("es" if k == 1 else "", fp(bc["fit"])) if bc["role"] is lead
+                 else "lift%s %s from %s to %s" % ("s" if k == 1 else "", role_name(bc["role"]), fp(bc["role"]["fit"]), fp(bc["fit"])))
+        out.append('<p class="small"><b>Best case only:</b> %s%s %s by %s, but only if %s.</p>' % (
+            esc(and_list(bc["ids"])), "" if k == 1 else " together", reach, long_date(bc["date"]),
             "it works" if k == 1 else "both work" if k == 2 else "all of them work"))
         out.append(_chance(bc, "Chance of that: ") + _steps(bc["acts"]))
     else:
-        out.append('<p class="small sub">Not even the best case gets there: if every action works, this role reaches %s.</p>'
+        out.append('<p class="small sub">Not even the best case gets there: if every action works, your best fit reaches %s.</p>'
                    % fp(nl["plan"]["fit_best"]))
     out.append('<div class="eyebrow" style="margin-top:16px">What is missing</div>')
+    who = "this role" if same else role_name(m["role"])
     if m["ceiling"] < nl["target"]:
-        out.append('<p class="small">Even with every factor at the most the plan\'s caps allow, this role tops out at %s. Reaching %s needs '
+        out.append('<p class="small">Even with every factor at the most the plan\'s caps allow, %s tops out at %s. Reaching %s needs '
                    'something the caps rule out within this plan, such as more years in a similar role, or a different role.</p>'
-                   % (fp(m["ceiling"]), lvl))
+                   % (who, fp(m["ceiling"]), lvl))
     else:
-        out.append('<p class="small sub">Room left on this role within the plan\'s caps, in fit points, if new actions fully work. The %s '
-                   'points have to come from here: add an action where none exists, or raise the odds of the ones you have.</p>' % fp(m["points"]))
+        out.append('<p class="small sub">Room left on %s within the plan\'s caps, in fit points, if new actions fully work. The %s '
+                   'points have to come from here: add an action where none exists, or raise the odds of the ones you have.</p>' % (
+                       who if same else who + ", the role the plan takes closest,", fp(m["points"])))
     rows = "".join('<div class="lv-room"><span><b style="font-weight:600">%s</b><div class="tiny sub">%s</div></span><b class="num">+%s</b></div>' % (
         esc(page["dimNames"][x["dimension"]]), "Open actions cover part of it" if x["covered"] else "No open action raises it for this role",
         fp(x["points"])) for x in m["room"])
@@ -163,7 +181,24 @@ def verdict(page, nl):
     return "".join(out)
 
 
-def quest_card(q, nl):
+def no_points(q, nl):
+    """What a quest card says when the action alone adds nothing to the best fit."""
+    toward = "to your best fit" if nl["top"] else "toward Level %d" % nl["next_level"]
+    if q["crit"] or (q["bc"] and not nl.get("reachable")):
+        return "No points %s on its own; it counts together with the others in the set" % toward
+    return "No points %s on its own" % toward
+
+
+def via(q, lead):
+    """The second line of a quest card when the action carries the level through a role other than today's best."""
+    if q["role"] is lead or q["exp"] <= 0:
+        return ""
+    on_lead = "+%s expected" % fp(q["lead_exp"]) if q["lead_exp"] > 0 else "no change"
+    return ('<div class="tiny sub q-via">Lifts %s from %s to %s, which would then be your best role. On your best role today: %s.</div>' % (
+        role_name(q["role"]), fp(q["role"]["fit"]), fp(q["fit_after"]), on_lead))
+
+
+def quest_card(q, nl, lead):
     a = q["a"]
     tags = "".join([
         '<span class="tag crit">On the path to Level %d</span>' % nl["next_level"] if q["crit"] else "",
@@ -173,15 +208,15 @@ def quest_card(q, nl):
     if not a["effects"]:
         pts = '<span class="small sub">Protects credibility, no score change</span>'
     elif q["exp"] <= 0 and q["works"] <= 0:
-        pts = '<span class="small sub">No points on this role</span>'
+        pts = '<span class="small sub">%s</span>' % no_points(q, nl)
     else:
         pts = ('<span><b class="num">+%s</b> <span class="tiny sub">expected</span></span><span><b class="num q-alt">+%s</b> '
                '<span class="tiny sub">if it works</span></span><span class="tiny sub num">%s per hour</span>') % (fp(q["exp"]), fp(q["works"]), fp(q["rate"]))
     return ('<div class="quest%s"><div class="q-top"><div class="q-tags">%s</div><span class="q-id">%s · %s</span></div>'
-            '<div class="q-title">%s</div><div class="q-pts">%s</div><div class="q-meta">%s%s · %s · %d%% chance</div>'
+            '<div class="q-title">%s</div><div class="q-pts">%s</div>%s<div class="q-meta">%s%s · %s · %d%% chance</div>'
             '<div class="small"><span class="sub">Done when:</span> %s</div>'
             '<div class="q-foot small"><span><span class="sub">Done? Tell your agent:</span><span class="q-text">%s</span></span></div></div>') % (
-        " crit" if q["crit"] else "", tags, esc(a["id"]), STATUS.get(a["status"], "To do"), esc(a["title"]), pts, esc(a["owner"]),
+        " crit" if q["crit"] else "", tags, esc(a["id"]), STATUS.get(a["status"], "To do"), esc(a["title"]), pts, via(q, lead), esc(a["owner"]),
         " · " + esc(a["effort"]) if a.get("effort") else "", "due " + long_date(a["date"]) if a.get("dated") else "no due date yet",
         L.pct(a["p"]), esc(a.get("done_when")), esc(L.tell_agent(a)))
 
@@ -220,6 +255,14 @@ def progress(page):
             '<div>%s</div>') % ("" if n else " zero", n, "scored day" if n == 1 else "scored days", note, dots, rows)
 
 
+def quests_intro(nl):
+    """How quest points are counted, in plain words."""
+    toward = "" if nl["top"] else ", counted toward Level %d" % nl["next_level"]
+    return ("Your open actions, most points per hour first. Points are what each action on its own adds to your best fit%s: expected "
+            "counts its chance of working, if it works assumes it does. Actions that raise the same factor overlap, so their points "
+            "don't simply add up; the panel above shows what they do together." % toward)
+
+
 def render(page):
     """(level card HTML, level-up view HTML) for the static first render."""
     if not page["roles"]:
@@ -230,12 +273,11 @@ def render(page):
         nl["level"], esc(nl["band"]), "" if nl["top"] else ' <span class="arrow">→</span> Level %d, %s' % (nl["next_level"], esc(nl["next_band"])),
         esc(r["on"]), esc(r["title"]),
         "" if nl["top"] else '<div class="lv-need"><b class="num">%s</b><span class="tiny sub">points to go</span></div>' % fp(nl["points_to_next"]))
-    quests = ('<div class="quests">%s</div>' % "".join(quest_card(q, nl) for q in qs) if qs
+    quests = ('<div class="quests">%s</div>' % "".join(quest_card(q, nl, r) for q in qs) if qs
               else '<div class="card small sub">No open actions. The next run adds some from the biggest gaps.</div>')
     view = ('<div class="card lv-card">%s%s%s</div><div class="eyebrow" style="margin:22px 4px 4px">Quests%s</div>'
-            '<p class="small" style="margin:0 4px 12px">Your open actions, most points per hour first. Points are fit points on this role: '
-            'expected counts each action\'s chance of working, if it works assumes it does. Your plan file is the record, so when one is done, '
-            'tell your agent.</p>%s<div class="card" style="margin-top:16px">%s</div>') % (
-        head, "" if nl["top"] else _track(nl), verdict(page, nl), "" if nl["top"] else " toward Level %d" % nl["next_level"],
-        quests, progress(page))
+            '<p class="small" style="margin:0 4px 12px">%s Your plan file is the record, so when one is done, tell your agent.</p>'
+            '%s<div class="card" style="margin-top:16px">%s</div>') % (
+        head, "" if nl["top"] else _track(nl), verdict(page, nl, r), "" if nl["top"] else " toward Level %d" % nl["next_level"],
+        quests_intro(nl), quests, progress(page))
     return level_card(page, nl), view

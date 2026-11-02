@@ -20,6 +20,12 @@ never rises more than the projection cap over today's score, or above 5; the
 expected path weights each rise by the action's chance of working, the best
 case assumes it works. A role whose eligibility blocker cannot be cleared keeps
 eligibility at its score today.
+
+The level follows the best fit across the roles a journey follows (every role,
+or one organisation's), as the level history does, so an action can reach the
+next level by lifting a role other than today's best. The next-level set, its
+date and chance, and each quest's points are all measured on that best fit; the
+role that then holds it is named wherever it is not today's best.
 """
 import itertools
 import math
@@ -105,6 +111,33 @@ def cross_at(pts, target):
             return d
     return None
 
+
+def best_of(roles, actions, caps, weights, mode="exp", sure=None, today=None):
+    """The best fit across roles after the same actions: every role is walked, and the highest end fit kept.
+
+    Returns {"fit", "role", "scores", "pts"}: the best fit at the end, the role holding it (ties go to the
+    role listed first, so today's best wins a tie), that role's factor scores, and pts, the best fit across
+    the roles at each step [(date, fit)]. The level is the band of this best fit, so any role can carry it."""
+    if not roles:
+        return None
+    best, path = None, None
+    for r in roles:
+        pts, s = walk(r, actions, caps, weights, mode, sure, today)
+        end = fit_of(s, weights)
+        if best is None or end > best["fit"]:
+            best = {"fit": end, "role": r, "scores": s}
+        path = pts if path is None else [(d, max(v, w)) for (d, v), (_, w) in zip(path, pts)]
+    best["pts"] = path
+    return best
+
+
+def journey_roles(roles, lead=None, group=None):
+    """The roles a journey follows, today's best first: every role (the page keeps them best first),
+    or one organisation group's roles with its best role (lead) first."""
+    if group is None:
+        return list(roles)
+    return [lead] + [r for r in roles if r.get("g") == group and r is not lead]
+
 # ------------------------------------------------------------ next level
 
 
@@ -121,41 +154,40 @@ def _hours(acts):
     return total
 
 
-def _found(acts, w, target, weights, exact):
-    return {"ids": [a["id"] for a in acts], "acts": list(acts), "date": cross_at(w[0], target),
-            "fit": fit_of(w[1], weights), "exact": exact}
+def _found(acts, w, target, exact):
+    return {"ids": [a["id"] for a in acts], "acts": list(acts), "date": cross_at(w["pts"], target),
+            "fit": w["fit"], "exact": exact, "role": w["role"]}
 
 
-def smallest_set(role, acts, target, caps, weights, mode, today):
-    """The fewest actions (from acts, kept in date order) whose projection reaches target.
+def smallest_set(roles, acts, target, caps, weights, mode, today):
+    """The fewest actions (from acts, kept in date order) that take the best fit across roles to target.
 
     Ties go to the earliest date the level is reached, then the least effort,
     then the higher fit, then the action ids. Returns None if even all of them
-    together fall short."""
-    if project(role, acts, caps, weights, mode)[0] < target:
+    together fall short. role in the result is the role that then holds the best fit."""
+    if not roles or best_of(roles, acts, caps, weights, mode)["fit"] < target:
         return None
     if len(acts) > MAX_EXACT:
-        return _greedy_set(role, acts, target, caps, weights, mode, today)
+        return _greedy_set(roles, acts, target, caps, weights, mode, today)
     for k in range(1, len(acts) + 1):
         best = None
         for combo in itertools.combinations(acts, k):
-            w = walk(role, combo, caps, weights, mode, today=today)
-            end = fit_of(w[1], weights)
-            if end < target:
+            w = best_of(roles, combo, caps, weights, mode, today=today)
+            if w["fit"] < target:
                 continue
-            key = (cross_at(w[0], target), _hours(combo), -end, ",".join(a["id"] for a in combo))
+            key = (cross_at(w["pts"], target), _hours(combo), -w["fit"], ",".join(a["id"] for a in combo))
             if best is None or key < best[0]:
                 best = (key, combo, w)
         if best:
-            return _found(best[1], best[2], target, weights, True)
+            return _found(best[1], best[2], target, True)
     return None
 
 
-def _greedy_set(role, acts, target, caps, weights, mode, today):
+def _greedy_set(roles, acts, target, caps, weights, mode, today):
     """For long plans: add the action with the most fit gained per hour until the target is reached,
     then drop any action the rest can do without (latest first). Flagged as not exact."""
     def fit(lst):
-        return project(role, lst, caps, weights, mode)[0]
+        return best_of(roles, lst, caps, weights, mode)["fit"]
 
     def in_order(lst):
         return [a for a in acts if a in lst]
@@ -176,13 +208,13 @@ def _greedy_set(role, acts, target, caps, weights, mode, today):
         rest = chosen[:i] + chosen[i + 1:]
         if fit(rest) >= target:
             chosen = rest
-    return _found(chosen, walk(role, chosen, caps, weights, mode, today=today), target, weights, False)
+    return _found(chosen, best_of(roles, chosen, caps, weights, mode, today=today), target, False)
 
 
-def chance_of(role, acts, target, caps, weights):
+def chance_of(roles, acts, target, caps, weights):
     """The chance the level is actually reached by these actions, treating each action's chance of
     working as independent: every works or fails outcome is projected, and the chances of the
-    outcomes that reach the target are added up. None for sets too long to enumerate."""
+    outcomes that take any of the roles to the target are added up. None for sets too long to enumerate."""
     n = len(acts)
     if n > MAX_EXACT:
         return None
@@ -195,77 +227,97 @@ def chance_of(role, acts, target, caps, weights):
                 works.append(a)
             else:
                 pr *= 1 - a["p"]
-        if pr > 0 and project(role, works, caps, weights, "best")[0] >= target:
+        if pr > 0 and any(project(r, works, caps, weights, "best")[0] >= target for r in roles):
             total += pr
     return total
 
 
-def next_level(role, actions, caps, weights, today):
-    """What gets this role to the next level.
+def next_level(roles, actions, caps, weights, today):
+    """What gets the best fit across these roles to the next level.
 
+    roles: the roles the journey follows (every role, or one organisation's), today's best first.
     actions: the page actions, in target-date order (only open ones count).
-    Returns the current level, the points to the next, and either the smallest
-    set of open actions whose expected effects (weighted by their chance of
-    working, within the caps) reach it, with the date that happens if they land
-    on their target dates, or, when no set does, how far short the whole plan
-    falls, the best-case set, and the room left under the caps factor by factor."""
-    idx = band_index(role["fit"])
-    out = {"role_id": role["id"], "fit": role["fit"], "level": idx + 1, "band": BANDS[idx], "top": idx >= 4}
+    The level is the band of the best fit among the roles, so the next level is
+    reached when any of them crosses the line, not only today's best. Returns
+    the current level, the points to the next, and either the smallest set of
+    open actions whose expected effects (weighted by their chance of working,
+    within the caps) reach it, with the date that happens if they land on their
+    target dates and the role they lift there, or, when no set does, how far
+    short the whole plan falls, the best-case set, and the room left under the
+    caps factor by factor on the role the plan takes closest."""
+    lead = roles[0]
+    idx = band_index(lead["fit"])
+    out = {"role_id": lead["id"], "fit": lead["fit"], "level": idx + 1, "band": BANDS[idx], "top": idx >= 4}
     if out["top"]:
         return out
     target = THRESH[idx + 1]
     acts = [a for a in actions if is_live(a)]
-    rel = [a for a in acts if raises(role, a, caps, weights)]
-    every = walk(role, acts, caps, weights, "exp", today=today)
-    fit_exp, fit_best = fit_of(every[1], weights), project(role, acts, caps, weights, "best")[0]
-    out.update(target=target, next_level=idx + 2, next_band=BANDS[idx + 1], points_to_next=r1(target - role["fit"]),
+    rel = [a for a in acts if any(raises(r, a, caps, weights) for r in roles)]
+    every = best_of(roles, acts, caps, weights, "exp", today=today)
+    out.update(target=target, next_level=idx + 2, next_band=BANDS[idx + 1], points_to_next=r1(target - lead["fit"]),
                relevant=[a["id"] for a in rel],
-               plan={"fit_expected": fit_exp, "fit_best": fit_best, "date": cross_at(every[0], target)})
-    found = smallest_set(role, rel, target, caps, weights, "exp", today)
+               plan={"fit_expected": every["fit"], "fit_best": best_of(roles, acts, caps, weights, "best")["fit"],
+                     "date": cross_at(every["pts"], target)})
+    # Only roles that could reach the line if every helpful action worked can carry the level there.
+    cands = [r for r in roles if project(r, rel, caps, weights, "best")[0] >= target]
+    use = [a for a in rel if any(raises(r, a, caps, weights) for r in cands)]
+    found = smallest_set(cands, use, target, caps, weights, "exp", today)
     out["reachable"] = found is not None
     if found:
-        found["chance"] = chance_of(role, found["acts"], target, caps, weights)
+        found["chance"] = chance_of(cands, found["acts"], target, caps, weights)
         out["set"] = found
         return out
-    best = smallest_set(role, rel, target, caps, weights, "best", today)
+    best = smallest_set(cands, use, target, caps, weights, "best", today)
     if best:
-        best["chance"] = chance_of(role, best["acts"], target, caps, weights)
+        best["chance"] = chance_of(cands, best["acts"], target, caps, weights)
     out["best_case"] = best
+    out["missing"] = _missing(every, rel, target, caps, weights)
+    return out
+
+
+def _missing(every, rel, target, caps, weights):
+    """Room left under the caps, factor by factor, on the role the whole plan takes closest to the target."""
+    role, s = every["role"], every["scores"]
     ceil = [v if (k == 5 and role.get("hard")) else min(5, v + caps[k]) for k, v in enumerate(role["s"])]
     total = sum(weights) or 1
     covered = [False] * len(DIMS)
     for a in rel:
-        _, s = project(role, [a], caps, weights, "best")
-        covered = [c or s[k] > role["s"][k] + 1e-9 for k, c in enumerate(covered)]
-    room = [{"dimension": d, "points": r1((ceil[k] - every[1][k]) * weights[k] / 5.0 * 100.0 / total), "covered": covered[k]}
+        _, after = project(role, [a], caps, weights, "best")
+        covered = [c or after[k] > role["s"][k] + 1e-9 for k, c in enumerate(covered)]
+    room = [{"dimension": d, "points": r1((ceil[k] - s[k]) * weights[k] / 5.0 * 100.0 / total), "covered": covered[k]}
             for k, d in enumerate(DIMS)]
     room = sorted([x for x in room if x["points"] > 0], key=lambda x: (-x["points"], DIMS.index(x["dimension"])))
-    out["missing"] = {"points": r1(target - fit_exp), "ceiling": fit_of(ceil, weights), "room": room}
-    return out
+    return {"points": r1(target - every["fit"]), "ceiling": fit_of(ceil, weights), "room": room, "role": role}
 
 
-def quests(role, actions, caps, weights, nl, enabled=None):
-    """Every open action as a quest for this role, most expected points per hour first.
+def quests(roles, actions, caps, weights, nl, enabled=None):
+    """Every open action as a quest: the points it brings toward the next level on its own.
 
-    points_expected: what it adds to the role's fit, weighted by its chance, on
-    top of the other switched-on actions (the same number as the what-if rail).
-    points_if_it_works: what it adds when it does work. critical: in the
-    smallest set that reaches the next level. best_case: in the best-case set
-    (shown only when no set reaches it on expected odds)."""
+    roles: as for next_level, today's best first. exp: the best fit across the
+    roles after this action alone (weighted by its chance, within the caps),
+    minus the best fit today; role is the role that then holds the best fit
+    (today's best unless another role ends higher) and fit_after its fit. works: the same if it works. rate: exp
+    per hour; quests are sorted by it. lead_exp and lead_works: what the action
+    alone adds to today's best role (shown second when role differs).
+    critical: in the smallest set that reaches the next level. best_case: in
+    the best-case set (shown only when no set reaches it on expected odds).
+    Points are counted one action at a time, so actions that raise the same
+    factor overlap and their points do not simply add up."""
+    lead = roles[0]
     acts = [a for a in actions if is_live(a)]
     on = set(a["id"] for a in acts) if enabled is None else set(enabled)
     crit = set((nl.get("set") or {}).get("ids") or [])
     bc = set((nl.get("best_case") or {}).get("ids") or [])
     out = []
     for a in acts:
-        w = [x for x in acts if x["id"] in on or x["id"] == a["id"]]
-        wo = [x for x in acts if x["id"] in on and x["id"] != a["id"]]
-        base = project(role, wo, caps, weights, "exp")[0]
-        exp = r1(project(role, w, caps, weights, "exp")[0] - base)
-        works = r1(project(role, w, caps, weights, "exp", sure=a["id"])[0] - base)
+        w = best_of(roles, [a], caps, weights, "exp")
+        ok = best_of(roles, [a], caps, weights, "exp", sure=a["id"])
+        exp, works = r1(w["fit"] - lead["fit"]), r1(ok["fit"] - lead["fit"])
         rate = exp / a["hours"] if a.get("hours") else 0.0
         out.append({"a": a, "exp": exp, "works": works, "rate": rate, "crit": a["id"] in crit, "bc": a["id"] in bc,
-                    "on": a["id"] in on})
+                    "on": a["id"] in on, "role": w["role"], "fit_after": w["fit"],
+                    "lead_exp": r1(project(lead, [a], caps, weights, "exp")[0] - lead["fit"]),
+                    "lead_works": r1(project(lead, [a], caps, weights, "best")[0] - lead["fit"])})
     out.sort(key=lambda q: (-q["rate"], -q["exp"], -q["a"].get("priority", 0), q["a"]["date"], q["a"]["id"]))
     return out
 

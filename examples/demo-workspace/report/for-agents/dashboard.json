@@ -453,7 +453,7 @@
     }
   ],
   "levels": {
-    "how": "Levels are the rubric's fit bands (1 Very low, 2 Low from 40, 3 Moderate from 55, 4 Good from 70, 5 Strong from 85). The smallest set is the fewest open actions whose expected effects (each weighted by its chance, within the projection caps) reach the next level; the date assumes they land on their target dates. Quest points are fit points on the best role, on top of the other open actions. Nothing here is made up: it all comes from the runs and the plan.",
+    "how": "Levels are the rubric's fit bands (1 Very low, 2 Low from 40, 3 Moderate from 55, 4 Good from 70, 5 Strong from 85), taken from the best fit across your roles, so any role can carry you to the next level. The smallest set is the fewest open actions whose expected effects (each weighted by its chance, within the projection caps) take that best fit to the next level; the date assumes they land on their target dates, and lifted_role is the role that then holds the best fit. Quest points are points toward the next level: what each action alone adds to the best fit, chance weighted and within the caps, counted on lifted_role, with on_best_role_today when that differs. Actions that raise the same factor overlap, so quest points do not simply add up. Nothing here is made up: it all comes from the runs and the plan.",
     "best_role": {
       "role_id": "initech:i-0001",
       "org": "initech",
@@ -487,12 +487,28 @@
         ],
         "level_reached_on": "2026-12-10",
         "fit_if_all_work": 70.0,
+        "lifted_role": {
+          "role_id": "initech:i-0001",
+          "org": "initech",
+          "title": "Program Manager, Robot Fleet Deployments",
+          "fit_before": 57.0,
+          "fit_after": 70.0,
+          "is_best_role_today": true
+        },
         "chance_it_happens": 0.16,
         "exact_search": true
       },
       "missing": {
         "points_short": 7.2,
         "ceiling_within_caps": 79.0,
+        "closest_role": {
+          "role_id": "initech:i-0001",
+          "org": "initech",
+          "title": "Program Manager, Robot Fleet Deployments",
+          "fit_before": 57.0,
+          "fit_expected": 62.8,
+          "is_best_role_today": true
+        },
         "room_by_factor": [
           {
             "dimension": "D3",
@@ -550,6 +566,14 @@
         "missing": {
           "points_short": 8.0,
           "ceiling_within_caps": 68.0,
+          "closest_role": {
+            "role_id": "acme:4100001",
+            "org": "acme",
+            "title": "Technical Program Manager, Model Launches",
+            "fit_before": 46.0,
+            "fit_expected": 47.0,
+            "is_best_role_today": true
+          },
           "room_by_factor": [
             {
               "dimension": "D3",
@@ -612,6 +636,14 @@
           ],
           "level_reached_on": "2026-11-15",
           "fit_expected": 41.0,
+          "lifted_role": {
+            "role_id": "globex:g-0003",
+            "org": "globex",
+            "title": "AI Success Manager, Asia",
+            "fit_before": 39.0,
+            "fit_after": 41.0,
+            "is_best_role_today": true
+          },
           "chance_it_happens": 0.5,
           "exact_search": true
         }
@@ -649,12 +681,28 @@
           ],
           "level_reached_on": "2026-12-10",
           "fit_if_all_work": 70.0,
+          "lifted_role": {
+            "role_id": "initech:i-0001",
+            "org": "initech",
+            "title": "Program Manager, Robot Fleet Deployments",
+            "fit_before": 57.0,
+            "fit_after": 70.0,
+            "is_best_role_today": true
+          },
           "chance_it_happens": 0.16,
           "exact_search": true
         },
         "missing": {
           "points_short": 7.2,
           "ceiling_within_caps": 79.0,
+          "closest_role": {
+            "role_id": "initech:i-0001",
+            "org": "initech",
+            "title": "Program Manager, Robot Fleet Deployments",
+            "fit_before": 57.0,
+            "fit_expected": 62.8,
+            "is_best_role_today": true
+          },
           "room_by_factor": [
             {
               "dimension": "D3",
@@ -700,9 +748,19 @@
         "target_date": "2026-11-22",
         "chance": 0.4,
         "done_when": "Someone has agreed to introduce you to a person at Initech (email or message)",
-        "points_expected": 2.6,
-        "points_if_it_works": 6.4,
-        "points_per_hour": 1.3,
+        "points_expected": 3.2,
+        "points_if_it_works": 8.0,
+        "points_per_hour": 1.6,
+        "changes_a_score": true,
+        "lifted_role": {
+          "role_id": "initech:i-0001",
+          "org": "initech",
+          "title": "Program Manager, Robot Fleet Deployments",
+          "fit_before": 57.0,
+          "fit_after": 60.2,
+          "is_best_role_today": true
+        },
+        "on_best_role_today": null,
         "on_path_to_next_level": false,
         "needed_for_best_case": false,
         "tell_your_agent": "Mark action A07 done (\"Ask your three closest logistics contacts whether they know anyone at Initech Robotics\"). Evidence: <paste a link, file path or email reference>. Done when: Someone has agreed to introduce you to a person at Initech (email or message)"
@@ -719,6 +777,16 @@
         "points_expected": 0.8,
         "points_if_it_works": 1.0,
         "points_per_hour": 0.8,
+        "changes_a_score": true,
+        "lifted_role": {
+          "role_id": "initech:i-0001",
+          "org": "initech",
+          "title": "Program Manager, Robot Fleet Deployments",
+          "fit_before": 57.0,
+          "fit_after": 57.8,
+          "is_best_role_today": true
+        },
+        "on_best_role_today": null,
         "on_path_to_next_level": false,
         "needed_for_best_case": true,
         "tell_your_agent": "Mark action A06 done (\"Apply to the Initech Robotics fleet deployments role once A04 is done\"). Evidence: <paste a link, file path or email reference>. Done when: Application submitted (confirmation email)"
@@ -732,9 +800,19 @@
         "target_date": "2026-12-10",
         "chance": 0.2,
         "done_when": "Met at least one Initech employee who has seen your work (follow-up email)",
-        "points_expected": 1.8,
-        "points_if_it_works": 8.8,
-        "points_per_hour": 0.45,
+        "points_expected": 2.4,
+        "points_if_it_works": 12.0,
+        "points_per_hour": 0.6,
+        "changes_a_score": true,
+        "lifted_role": {
+          "role_id": "initech:i-0001",
+          "org": "initech",
+          "title": "Program Manager, Robot Fleet Deployments",
+          "fit_before": 57.0,
+          "fit_after": 59.4,
+          "is_best_role_today": true
+        },
+        "on_best_role_today": null,
         "on_path_to_next_level": false,
         "needed_for_best_case": true,
         "tell_your_agent": "Mark action A11 done (\"Go to the Initech warehouse operators meetup in Melbourne\"). Evidence: <paste a link, file path or email reference>. Done when: Met at least one Initech employee who has seen your work (follow-up email)"
@@ -751,6 +829,16 @@
         "points_expected": 0.0,
         "points_if_it_works": 0.0,
         "points_per_hour": 0.0,
+        "changes_a_score": false,
+        "lifted_role": {
+          "role_id": "initech:i-0001",
+          "org": "initech",
+          "title": "Program Manager, Robot Fleet Deployments",
+          "fit_before": 57.0,
+          "fit_after": 57.0,
+          "is_best_role_today": true
+        },
+        "on_best_role_today": null,
         "on_path_to_next_level": false,
         "needed_for_best_case": false,
         "tell_your_agent": "Mark action A04 done (\"Fix the LinkedIn headline: 'led a team of 40' should say 'led a team of 8'\"). Evidence: <paste a link, file path or email reference>. Done when: Headline changed (screenshot or link), claim C001 re-checked as supported"
@@ -767,6 +855,16 @@
         "points_expected": 0.0,
         "points_if_it_works": 0.0,
         "points_per_hour": 0.0,
+        "changes_a_score": true,
+        "lifted_role": {
+          "role_id": "initech:i-0001",
+          "org": "initech",
+          "title": "Program Manager, Robot Fleet Deployments",
+          "fit_before": 57.0,
+          "fit_after": 57.0,
+          "is_best_role_today": true
+        },
+        "on_best_role_today": null,
         "on_path_to_next_level": false,
         "needed_for_best_case": false,
         "tell_your_agent": "Mark action A08 done (\"Answer the notice period and non-compete question (Q01)\"). Evidence: <paste a link, file path or email reference>. Done when: Answer recorded in intake/answers.md and evidence.json"
@@ -783,6 +881,16 @@
         "points_expected": 0.0,
         "points_if_it_works": 0.0,
         "points_per_hour": 0.0,
+        "changes_a_score": true,
+        "lifted_role": {
+          "role_id": "initech:i-0001",
+          "org": "initech",
+          "title": "Program Manager, Robot Fleet Deployments",
+          "fit_before": 57.0,
+          "fit_after": 57.0,
+          "is_best_role_today": true
+        },
+        "on_best_role_today": null,
         "on_path_to_next_level": false,
         "needed_for_best_case": false,
         "tell_your_agent": "Mark action A02 done (\"Ask [contact] for the introduction to the Globex AI Success lead, and send route-eval first\"). Evidence: <paste a link, file path or email reference>. Done when: The AI Success lead has replied and seen route-eval (email)"
@@ -799,6 +907,16 @@
         "points_expected": 0.0,
         "points_if_it_works": 0.0,
         "points_per_hour": 0.0,
+        "changes_a_score": true,
+        "lifted_role": {
+          "role_id": "initech:i-0001",
+          "org": "initech",
+          "title": "Program Manager, Robot Fleet Deployments",
+          "fit_before": 57.0,
+          "fit_after": 57.0,
+          "is_best_role_today": true
+        },
+        "on_best_role_today": null,
         "on_path_to_next_level": false,
         "needed_for_best_case": false,
         "tell_your_agent": "Mark action A10 done (\"Build a small route-eval demo for Acme AI's quarterly evaluation challenge\"). Evidence: <paste a link, file path or email reference>. Done when: Demo submitted to the challenge (link)"

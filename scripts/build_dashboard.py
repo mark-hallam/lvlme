@@ -641,17 +641,25 @@ def projection_summary(page):
     return {"end_date": page["meta"]["end"], "baseline_date": page["meta"]["baseline"], "roles": out}
 
 
-def _found_json(found, by_id, fit_key):
+def _role_json(role, lead, fit_after, after_key="fit_after"):
+    return {"role_id": role["id"], "org": role["org"], "title": role["title"], "fit_before": role["fit"],
+            after_key: fit_after, "is_best_role_today": role["id"] == lead["id"]}
+
+
+def _found_json(found, by_id, fit_key, lead):
     if not found:
         return None
     return {"actions": [{"id": i, "title": by_id[i].get("title", ""), "target_date": by_id[i].get("target_date")} for i in found["ids"]],
             "level_reached_on": found["date"], fit_key: found["fit"],
+            "lifted_role": _role_json(found["role"], lead, found["fit"]),
             "chance_it_happens": None if found.get("chance") is None else round(found["chance"], 3),
             "exact_search": found["exact"]}
 
 
-def _next_level_json(page, role, by_id):
-    nl = L.next_level(role, page["actions"], page["caps"], page["weights"], page["meta"]["run_date"])
+def _next_level_json(page, roles, by_id):
+    """The next level for a journey: roles is every role, or one organisation's, today's best first."""
+    nl = L.next_level(roles, page["actions"], page["caps"], page["weights"], page["meta"]["run_date"])
+    role = roles[0]
     out = {"role_id": role["id"], "org": role["org"], "title": role["title"], "fit": role["fit"],
            "level": nl["level"], "band": nl["band"], "top_level": nl["top"]}
     if nl["top"]:
@@ -661,11 +669,12 @@ def _next_level_json(page, role, by_id):
                whole_plan={"fit_expected": nl["plan"]["fit_expected"], "fit_best_case": nl["plan"]["fit_best"],
                            "level_reached_on": nl["plan"]["date"]})
     if nl["reachable"]:
-        out["smallest_set"] = _found_json(nl["set"], by_id, "fit_expected")
+        out["smallest_set"] = _found_json(nl["set"], by_id, "fit_expected", role)
     else:
-        out["best_case_set"] = _found_json(nl.get("best_case"), by_id, "fit_if_all_work")
+        out["best_case_set"] = _found_json(nl.get("best_case"), by_id, "fit_if_all_work", role)
         m = nl["missing"]
         out["missing"] = {"points_short": m["points"], "ceiling_within_caps": m["ceiling"],
+                          "closest_role": _role_json(m["role"], role, nl["plan"]["fit_expected"], "fit_expected"),
                           "room_by_factor": [{"dimension": x["dimension"], "name": C.DIMENSION_NAMES[x["dimension"]],
                                               "points": x["points"], "open_action_covers_it": x["covered"]} for x in m["room"]]}
     return out, nl
@@ -677,25 +686,33 @@ def levels_payload(data, page):
     roles = {r["id"]: r for r in page["roles"]}
     if not page["roles"]:
         return None
-    best, nl = _next_level_json(page, page["roles"][0], by_id)
+    every = L.journey_roles(page["roles"])
+    best, nl = _next_level_json(page, every, by_id)
     per_org = {}
     for g in page["orgOrder"]:
         r = roles.get(page["orgs"][g]["best"])
         if r and g != OTHER_KEY:
-            per_org[g] = _next_level_json(page, r, by_id)[0]
-    quests = []
-    for q in L.quests(page["roles"][0], page["actions"], page["caps"], page["weights"], nl):
+            per_org[g] = _next_level_json(page, L.journey_roles(page["roles"], r, g), by_id)[0]
+    lead, quests = every[0], []
+    for q in L.quests(every, page["actions"], page["caps"], page["weights"], nl):
         a, raw = q["a"], by_id.get(q["a"]["id"], {})
+        other = q["role"]["id"] != lead["id"]
         quests.append({"id": a["id"], "title": raw.get("title", ""), "status": a["status"], "owner": raw.get("owner", "you"),
                        "effort_hours": raw.get("effort_hours"), "target_date": raw.get("target_date"), "chance": a["p"],
                        "done_when": raw.get("done_when", ""), "points_expected": q["exp"], "points_if_it_works": q["works"],
-                       "points_per_hour": round(q["rate"], 2), "on_path_to_next_level": q["crit"],
-                       "needed_for_best_case": bool(q["bc"]), "tell_your_agent": L.tell_agent(dict(a, title=raw.get("title", a["title"])))})
+                       "points_per_hour": round(q["rate"], 2), "changes_a_score": bool(a["effects"]),
+                       "lifted_role": _role_json(q["role"], lead, q["fit_after"]),
+                       "on_best_role_today": {"points_expected": q["lead_exp"], "points_if_it_works": q["lead_works"]} if other else None,
+                       "on_path_to_next_level": q["crit"], "needed_for_best_case": bool(q["bc"]),
+                       "tell_your_agent": L.tell_agent(dict(a, title=raw.get("title", a["title"])))})
     return {
-        "how": ("Levels are the rubric's fit bands (1 Very low, 2 Low from 40, 3 Moderate from 55, 4 Good from 70, 5 Strong from 85). "
-                "The smallest set is the fewest open actions whose expected effects (each weighted by its chance, within the "
-                "projection caps) reach the next level; the date assumes they land on their target dates. Quest points are fit "
-                "points on the best role, on top of the other open actions. Nothing here is made up: it all comes from the runs and the plan."),
+        "how": ("Levels are the rubric's fit bands (1 Very low, 2 Low from 40, 3 Moderate from 55, 4 Good from 70, 5 Strong from 85), "
+                "taken from the best fit across your roles, so any role can carry you to the next level. The smallest set is the fewest "
+                "open actions whose expected effects (each weighted by its chance, within the projection caps) take that best fit to the "
+                "next level; the date assumes they land on their target dates, and lifted_role is the role that then holds the best fit. "
+                "Quest points are points toward the next level: what each action alone adds to the best fit, chance weighted and within "
+                "the caps, counted on lifted_role, with on_best_role_today when that differs. Actions that raise the same factor overlap, "
+                "so quest points do not simply add up. Nothing here is made up: it all comes from the runs and the plan."),
         "best_role": best, "per_org": per_org, "quests": quests,
         "level_history": L.level_history(page["runs"]), "streak": page["streak"], "progress_days": page["progress"],
     }
@@ -752,10 +769,16 @@ def agent_payload(data, page):
     return payload
 
 
+def _lift_md(role, before_key="fit_before", after_key="fit_after"):
+    return "%s (%s) from %s to %s" % (role["title"], role["org"], _g(role[before_key]), _g(role[after_key]))
+
+
 def _set_md(found):
     acts = ", ".join("%s (%s, target %s)" % (a["id"], a["title"], a["target_date"] or "none") for a in found["actions"])
     chance = "" if found["chance_it_happens"] is None else "; chance it really happens %d%%" % L.pct(found["chance_it_happens"])
-    return "%s; level reached %s%s" % (acts, found["level_reached_on"], chance)
+    lift = found["lifted_role"]
+    return "%s; level reached %s by lifting %s%s%s" % (acts, found["level_reached_on"], _lift_md(lift),
+                                                       "" if lift["is_best_role_today"] else ", which would then be the best role", chance)
 
 
 def _g(v):
@@ -766,25 +789,44 @@ def _level_md(b):
     head = "%s (%s), Level %d %s, fit %s." % (b["title"], b["org"], b["level"], b["band"], _g(b["fit"]))
     if b["top_level"]:
         return [head + " Top level."]
-    out = [head + " Level %d %s starts at %d: %s points to go." % (b["next_level"], b["next_band"], b["next_level_starts_at"],
-                                                                  _g(b["points_to_next"]))]
+    out = [head + " Level %d %s starts at %d: %s %s to go." % (b["next_level"], b["next_band"], b["next_level_starts_at"],
+                                                              _g(b["points_to_next"]), "point" if b["points_to_next"] == 1 else "points")]
     if b["reachable_on_expected_odds"]:
         out.append("  Smallest set that gets there, counting each action's chance: " + _set_md(b["smallest_set"]) + ".")
         return out
-    out.append("  No set of open actions gets there counting their chances: the whole plan is expected to reach %s, %s short." % (
-        _g(b["whole_plan"]["fit_expected"]), _g(b["missing"]["points_short"])))
+    close = b["missing"]["closest_role"]
+    out.append("  No set of open actions gets there counting their chances: the whole plan is expected to take the best fit to %s, "
+               "%s short (closest role: %s)." % (_g(b["whole_plan"]["fit_expected"]), _g(b["missing"]["points_short"]),
+                                                 _lift_md(close, after_key="fit_expected")))
     if b.get("best_case_set"):
         out.append("  Best case only (every action in it must work): " + _set_md(b["best_case_set"]) + ".")
     room = ", ".join("%s +%s%s" % (x["name"], _g(x["points"]), "" if x["open_action_covers_it"] else " (no open action)")
                      for x in b["missing"]["room_by_factor"])
-    out.append("  Room left within the caps: %s. Ceiling within the caps: %s." % (room or "none", _g(b["missing"]["ceiling_within_caps"])))
+    out.append("  Room left within the caps on the closest role: %s. Its ceiling within the caps: %s." % (
+        room or "none", _g(b["missing"]["ceiling_within_caps"])))
     return out
+
+
+def _quest_md(q):
+    if not q["changes_a_score"]:
+        pts = "protects credibility, no score change"
+    elif not (q["points_expected"] or q["points_if_it_works"]):
+        pts = "no points toward the next level on its own"
+    else:
+        pts = "+%s toward the next level expected, +%s if it works, %s per hour" % (
+            _g(q["points_expected"]), _g(q["points_if_it_works"]), _g(q["points_per_hour"]))
+        if q["on_best_role_today"]:
+            pts += ", by lifting %s; on the best role today +%s expected" % (
+                _lift_md(q["lifted_role"]), _g(q["on_best_role_today"]["points_expected"]))
+    tag = " [on the path to the next level]" if q["on_path_to_next_level"] else " [needed for the best case]" if q["needed_for_best_case"] else ""
+    return "- %s %s%s: %s; %s, target %s, owner %s. Done when: %s" % (
+        q["id"], q["title"], tag, pts, hours(q["effort_hours"]) or "effort not set", q["target_date"] or "none", q["owner"], q["done_when"])
 
 
 def levels_md(data, lv):
     if not lv:
         return []
-    lines = ["", "## Next level (fit bands of the rubric; nothing here is made up)", "- Best role: "]
+    lines = ["", "## Next level (fit bands of the rubric, on the best fit across roles; nothing here is made up)", "- Best role: "]
     first = _level_md(lv["best_role"])
     lines[-1] += first[0]
     lines += first[1:]
@@ -792,14 +834,10 @@ def levels_md(data, lv):
         rows = _level_md(b)
         lines.append("- At %s: %s" % (data.org(oid), rows[0]))
         lines += rows[1:]
-    lines += ["", "## Quests for the best role (most expected fit points per hour first)"]
-    for q in lv["quests"]:
-        tag = " [on the path to the next level]" if q["on_path_to_next_level"] else " [needed for the best case]" if q["needed_for_best_case"] else ""
-        pts = ("+%s expected, +%s if it works" % (_g(q["points_expected"]), _g(q["points_if_it_works"]))
-               if q["points_expected"] or q["points_if_it_works"] else "no fit points on this role")
-        lines.append("- %s %s%s: %s, %s, target %s, owner %s. Done when: %s" % (
-            q["id"], q["title"], tag, pts, hours(q["effort_hours"]) or "effort not set", q["target_date"] or "none",
-            q["owner"], q["done_when"]))
+    lines += ["", "## Quests (points toward the next level, each action on its own; most points per hour first)",
+              "- Points are what one action alone adds to the best fit across roles, chance weighted and within the caps. Actions that",
+              "  raise the same factor overlap, so the points do not simply add up; the smallest set above shows what they do together."]
+    lines += [_quest_md(q) for q in lv["quests"]]
     hist = ", ".join("%s Level %d %s (fit %s%s)" % (h["date"], h["level"], h["band"], _g(h["fit"]),
                                                    ", level up" if h["change"] == "up" else ", level down" if h["change"] == "down" else "")
                      for h in lv["level_history"])
