@@ -294,7 +294,8 @@ rubric. The method files explain each step, and
 
 Every campaign script takes `--workspace PATH`. Without it, scripts use
 `$LVLME_HOME`, or the only folder inside `~/lvlme-workspaces/`. The names from
-before Climb became LVLme, `$CLIMB_HOME` and `~/climb-workspaces/`, still work.
+before Climb became LVLme, `$CLIMB_HOME` and `~/climb-workspaces/`, still work
+(see [Coming from Climb](INSTALL.md#coming-from-climb)).
 
 ## Commands
 

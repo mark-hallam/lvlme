@@ -131,6 +131,35 @@ automatically:
 Cursor also reads `AGENTS.md`. Say "run LVLme quick" with a job link, or
 "run LVLme".
 
+## Coming from Climb
+
+LVLme was called Climb until 3 November 2026. What changed, and what still
+works:
+
+- **The plugin.** The marketplace now lists the plugin as `lvlme` and records
+  that `climb` was renamed to it. On your machine the marketplace keeps the
+  name you added it under, `climb`. Update it, then install the new name once:
+
+  ```text
+  /plugin marketplace update climb
+  /plugin install lvlme@climb
+  ```
+
+  A new install by the old plugin name finds nothing: use `lvlme`, as in the
+  commands at the top of this page.
+- **The commands.** `/climb`, `/climb-quick` and the rest are now `/lvlme`,
+  `/lvlme-quick` and so on, and the helper agents are `lvlme:reviewer` and so
+  on. Saying "run Climb" or "run Climb quick" still starts the same thing.
+- **A cloned folder.** GitHub forwards the old address, so
+  `git -C ~/.claude/skills/climb pull` keeps updating it. The skill inside is
+  now called `lvlme`. In Codex, type `$lvlme`.
+- **Your workspace.** Nothing to do. When `LVLME_HOME` is not set, the scripts
+  read `CLIMB_HOME`. When `~/lvlme-workspaces/` does not exist, they use
+  `~/climb-workspaces/` and say so once. To move to the new names, rename the
+  folder and change the setting at the same time.
+- **The dashboard.** The theme and the "Pending" ticks your browser saved
+  under the old name still load.
+
 ## By hand, in a terminal
 
 See "By hand, in a terminal" in

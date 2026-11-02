@@ -58,6 +58,10 @@ organisations.*
 
 ## Install
 
+LVLme was called Climb until 3 November 2026. The old GitHub address and the
+CLIMB_HOME setting still work. If you installed the Climb plugin, one step
+moves it to the new name: see [Coming from Climb](docs/INSTALL.md#coming-from-climb).
+
 You need an AI agent (Claude Code, Codex or Cursor), Python 3.9 or newer
 (LVLme uses only its standard library) and git. LVLme is tested on macOS; the
 scripts should work on Linux, and Windows is untested.
