@@ -110,7 +110,7 @@ repeatable and auditable; only changed or new items are re-judged each run.
 | Interview questions | `method/INTAKE.md` question bank | eligibility, constraints, motivation, story, notice period, IP/non-compete | D6, D7, SWOT |
 | Résumé / CV | user file | roles, dates, claims to verify | D1 |
 | LinkedIn data export (official "Get a copy of your data" ZIP) | `Positions.csv`, `Education.csv`, `Certifications.csv`, `Skills.csv`, `Connections.csv` | job history, degree, certs, and **the network map** | D1, D6, D3 |
-| LinkedIn profile page (signed-in browser, read only) | agent browser | headline, about, posts, followers | D5, claims audit |
+| LinkedIn profile text | `Profile.csv` in the export, plus follower count and post reach the person types in | headline, about, posts, followers | D5, claims audit |
 | GitHub | `gh` / public API | repos, commits, merged PRs, releases, licences, stars, followers, public vs private | D2, D5 |
 | Personal site, product sites, app stores | fetch | live products, claims, download counts | D2, D5, claims audit |
 | Publications | Google Scholar, ORCID, arXiv, SSRN | papers, citations | D2, D5 |
@@ -125,7 +125,7 @@ repeatable and auditable; only changed or new items are re-judged each run.
 
 Parses LinkedIn `Connections.csv` (First Name, Last Name, URL, Email Address,
 Company, Position, Connected On). Matches companies to target orgs (with
-aliases, e.g. "xAI" ↔ "SpaceX AI"), and lists first-degree contacts per target
+aliases, e.g. "xAI" ↔ "X.AI"), and lists first-degree contacts per target
 org with position and how long connected. Second-degree paths are found by the
 agent asking the user ("who do you know who knows someone at X?") and from
 mutual-connection counts if the user supplies them. Output stays local; names

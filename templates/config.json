@@ -17,7 +17,7 @@
   "targets": [
     {"id": "anthropic", "name": "Anthropic", "ats": "greenhouse", "slug": "anthropic", "aliases": ["Anthropic PBC"]},
     {"id": "openai", "name": "OpenAI", "ats": "ashby", "slug": "openai", "aliases": ["OpenAI LP", "OpenAI Inc"]},
-    {"id": "xai", "name": "xAI", "ats": "greenhouse", "slug": "xai", "aliases": ["X.AI", "xAI Corp", "SpaceX AI", "SpaceXSI"]}
+    {"id": "xai", "name": "xAI", "ats": "greenhouse", "slug": "xai", "aliases": ["X.AI", "xAI Corp"]}
   ],
   "families": [
     {

@@ -28,7 +28,7 @@ The screen is only worth having if the reviewer starts cold and sceptical.
   be the same model. A person (a friend who hires, a mentor) can do it
   instead, with the same prompt.
 - Give it **only what a recruiter would see**: the public website address,
-  LinkedIn as it stands today (a saved copy or the public view), the exact
+  LinkedIn as it stands today (the person saves their profile as a PDF), the exact
   CV file a recruiter would receive, and the postings.
 - **Never** give it the scores, the plan, the SWOT, the evidence file, the
   claims audit, earlier screens, or the person's hopes. A reviewer that knows

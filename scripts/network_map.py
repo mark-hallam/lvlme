@@ -82,8 +82,12 @@ def months_between(start, end):
 
 def read_connections(path):
     """Rows of the Connections.csv export, skipping LinkedIn's 'Notes' preamble."""
-    with open(path, encoding="utf-8-sig", errors="replace") as fh:
-        lines = fh.read().splitlines()
+    try:
+        with open(path, encoding="utf-8-sig", errors="replace") as fh:
+            lines = fh.read().splitlines()
+    except OSError as exc:
+        raise SystemExit("climb: cannot read %s (%s). Download your LinkedIn data "
+                         "export and pass the path to its Connections.csv." % (path, exc.strerror))
     start = next((i for i, line in enumerate(lines) if "First Name" in line and "Company" in line), None)
     if start is None:
         raise SystemExit("climb: %s does not look like a LinkedIn Connections.csv "
