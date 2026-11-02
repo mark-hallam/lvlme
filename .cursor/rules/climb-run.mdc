@@ -1,0 +1,30 @@
+---
+description: How to run, resume or update a Climb career campaign, or one part of it (interview, consistency audit, recruiter screen, dashboard). Use when the person asks to run Climb, asks how likely they are to get a kind of job, or wants their CV, LinkedIn or website checked.
+alwaysApply: false
+---
+
+# Running Climb in Cursor
+
+Follow `SKILL.md` in this folder exactly. It is the full procedure, and
+`AGENTS.md` is the short version. Every script takes `--workspace PATH`.
+
+1. Find the workspace: `$CLIMB_HOME`, or the one folder in
+   `~/climb-workspaces/`, or ask for the goal and run
+   `python3 scripts/init.py --goal "<goal>"`.
+2. Run the ten stages in `SKILL.md`: intake (`method/INTERVIEW.md`), evidence,
+   market, judge and audit (`method/RUBRIC.md`, `method/CONSISTENCY.md`,
+   `method/RECRUITER_SCREEN.md`), review (`method/REVIEW.md`), score, SWOT and
+   TOWS, plan and fixes (`method/PROFILE_FIXES.md`), report, tell the person.
+3. If you can run tasks in parallel, fan out as
+   `docs/ORCHESTRATION.md` describes, using the briefs in `agents/`.
+   Otherwise run the stages one after another; the gates do not change.
+4. The sceptical review and the recruiter screen must be independent: run
+   them in a new chat, give that chat only the packet the procedure names,
+   and paste its answer back. Never show it the campaign's scores.
+5. Nothing is scored until every score above 2 has been reviewed.
+6. Finish with a message under 150 words: the outlook, today's 1 to 3
+   actions, what needs the person's answer or yes, and
+   `open <workspace>/report/index.html`.
+
+For one part only, the person may ask for: interview, audit, screen,
+dashboard, status, or resume (see "Entry points" in `SKILL.md`).
