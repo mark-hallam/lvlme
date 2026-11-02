@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-11-02",
+  "items": [
+    {"id": "E01", "claim": "Program Manager at Contoso Freight, 2021 to now, running warehouse and transport programs across 6 sites",
+     "kind": "job_history", "level": "self_reported", "dimensions": ["D1", "D4"],
+     "sources": [{"type": "resume", "ref": "intake/sources/cv-alex-example.md"}], "added_on": "2026-11-02"},
+    {"id": "E02", "claim": "Operations Analyst at Contoso Freight, 2016 to 2021",
+     "kind": "job_history", "level": "self_reported", "dimensions": ["D1"],
+     "sources": [{"type": "resume", "ref": "intake/sources/cv-alex-example.md"}], "added_on": "2026-11-02"},
+    {"id": "E03", "claim": "Led the rollout of a warehouse scheduling system across 6 sites",
+     "kind": "achievement", "level": "self_reported", "dimensions": ["D2", "D4"],
+     "sources": [{"type": "resume", "ref": "intake/sources/cv-alex-example.md"}], "added_on": "2026-11-02"},
+    {"id": "E04", "claim": "route-eval, an open-source tool that scores AI answers to logistics questions: 14 releases, 2 outside contributors",
+     "kind": "artefact", "level": "verified", "dimensions": ["D1", "D2"],
+     "sources": [{"type": "resume", "ref": "intake/sources/cv-alex-example.md"},
+                 {"type": "github", "ref": "https://example.com/alex-example/route-eval", "checked_on": "2026-11-02",
+                  "note": "Opened the public repository, read only: the releases and outside contributors match the CV."}],
+     "added_on": "2026-11-02"},
+    {"id": "E05", "claim": "Lives in Brisbane and is an Australian citizen, so can work anywhere in Australia without a visa",
+     "kind": "eligibility", "level": "self_reported", "dimensions": ["D6"],
+     "sources": [{"type": "resume", "ref": "intake/sources/cv-alex-example.md"}], "added_on": "2026-11-02"},
+    {"id": "E06", "claim": "Says they know someone at Globex Labs who has seen their work (one yes or no answer)",
+     "kind": "network", "level": "self_reported", "dimensions": ["D3"], "orgs": ["globex"],
+     "sources": [{"type": "interview", "ref": "intake/answers.md#warm-path"}], "added_on": "2026-11-02"},
+    {"id": "E07", "claim": "AI practitioner certificate from Example Academy, 2026",
+     "kind": "credential", "level": "self_reported", "dimensions": ["D1"],
+     "sources": [{"type": "resume", "ref": "intake/sources/cv-alex-example.md"}], "added_on": "2026-11-02",
+     "notes": "A CV line only. The certificate address would make it verified."}
+  ]
+}

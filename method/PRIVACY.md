@@ -103,6 +103,9 @@ sensitive, the agent does not record it.
 - `fetch_roles.py` calls only the public job-board APIs (application
   programming interfaces) for the targets in your config.
 - `claims_audit.py` fetches only the addresses you pass it.
+- `quick_posting.py` (Climb quick) fetches only the one posting link you give
+  it: through the public job-board API for Greenhouse, Ashby and Lever links,
+  otherwise the page itself, once. It never opens LinkedIn.
 - No other script uses the network.
 
 ## What the engine never does

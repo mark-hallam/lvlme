@@ -64,6 +64,7 @@ of the `/climb-*` commands), run only that part, with the hard rules.
 | Asked for | Do |
 |---|---|
 | `/climb`, `/climb run`, "run Climb" | A full run, stages 1 to 10. If today's run stopped part way, resume it. |
+| `/climb quick`, `/climb-quick`, "run Climb quick", or one job link with a CV | Climb quick: honest odds for that one posting in about five minutes. Follow `skills/climb-quick/SKILL.md`. Its folder, `~/climb-workspaces/quick/`, is not a campaign workspace. |
 | `/climb resume` | Resume today's run at the first stage not yet done (see "Resume" in `docs/ORCHESTRATION.md`). |
 | `/climb interview`, `/climb-interview` | Stage 1 only. |
 | `/climb audit`, `/climb-audit` | The claims and consistency audits from stage 4. |

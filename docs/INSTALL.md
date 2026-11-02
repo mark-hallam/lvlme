@@ -66,6 +66,7 @@ claude --plugin-dir /path/to/climb
 | Command | Does |
 |---|---|
 | `/climb` | Run Climb, or resume today's run. Also `/climb status`. |
+| `/climb-quick` | Climb quick: honest odds for one posting, from a link and your CV, in about five minutes. |
 | `/climb-interview` | The document-led career interview, first time or an update. |
 | `/climb-screen` | The independent recruiter screen against real postings. |
 | `/climb-audit` | The consistency audit (CV, LinkedIn, website, forms) and the public claims audit. |
@@ -109,7 +110,7 @@ folder you work in.
 
 - **As a skill:** `git clone https://github.com/mark-hallam/climb ~/.agents/skills/climb`,
   then in Codex type `$climb` (or pick it from `/skills`) and say "run
-  Climb".
+  Climb quick" with a job link, or "run Climb".
 - **In the engine folder:** open Codex in the cloned folder. It reads
   `AGENTS.md`, which runs the same procedure.
 
@@ -127,12 +128,13 @@ automatically:
 - `climb-run.mdc` applies when you ask to run Climb, or when you mention it
   with `@climb-run`.
 
-Cursor also reads `AGENTS.md`. Say "run Climb".
+Cursor also reads `AGENTS.md`. Say "run Climb quick" with a job link, or
+"run Climb".
 
 ## By hand, in a terminal
 
-See "By hand, in a terminal" in the
-[README](../README.md#by-hand-in-a-terminal). Every script takes
+See "By hand, in a terminal" in
+[How Climb works](HOW-IT-WORKS.md#by-hand-in-a-terminal). Every script takes
 `--workspace PATH`.
 
 ## Where your data goes
