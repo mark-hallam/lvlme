@@ -23,6 +23,11 @@ Everything lives in `campaign/plan.json` (see `schemas/plan.schema.json`).
    `scripts/validate.py` reports an error otherwise.
 5. **Never fabricate.** No invented experience, numbers, contacts or stories
    in any draft.
+6. **Follow each organisation's rules on AI use.** Where a target's
+   `ai_policy.first_draft_by_person` is true, never write its application
+   answers, cover letters or résumé text: write a brief and review the
+   person's own draft (see "When an organisation asks for your own first
+   draft" below).
 
 ## Each action
 
@@ -174,6 +179,56 @@ The dashboard records their values each run in
 `campaign/metrics-history.json` and shows each one's change since Day 1 under
 "Campaign progress".
 
+## When an organisation asks for your own first draft
+
+Some organisations publish rules on how candidates may use AI. Anthropic's
+candidate AI guidance (https://www.anthropic.com/candidate-ai-guidance) says
+"Please create your first draft yourself, then use Claude to refine it". It
+does not allow AI-written answers to application questions, asks that
+take-home tests and live interviews are done without AI unless it says
+otherwise, and encourages using AI to research, practise and prepare.
+
+Record such a rule on the target in `config.json`, only from the
+organisation's own page, with its address:
+
+```json
+"ai_policy": {"first_draft_by_person": true, "source": "https://...", "checked_on": "2026-11-02"}
+```
+
+Before drafting application text for any target, check whether it publishes
+guidance like this, and re-read the page before each application, since such
+pages change. Never record a policy you have not read on the organisation's
+own page, and never assume one organisation's rules apply to another.
+
+For a target with `first_draft_by_person` true:
+
+1. **Never write** its application answers, cover letter or résumé text, in
+   whole or in part.
+2. **Write a brief instead**, `campaign/drafts/<org>-<role>-brief.md`: the
+   role's requirements (from the posting), the evidence that meets each one
+   (evidence ids) and the honest gaps, what to lead with and why, and the
+   self-check list below. The plan action is the person's (`owner` `you`).
+3. **Review the person's own draft** when they share it: what is unclear,
+   what has no evidence behind it, what differs from the single source of
+   truth in `profile/consistency.md`, and what from the brief is missing.
+   Suggest changes to their sentences; keep their words and never replace the
+   draft with new text.
+4. **Take-home tests and live interviews are the person's alone** unless the
+   organisation says AI is allowed. Help before, never during.
+5. **Preparation is fine**: research the organisation, practise interview
+   answers, build a study guide, prepare questions to ask.
+
+The self-check list, for the person, before they submit:
+
+- [ ] I wrote the first draft myself; any AI help only refined my own words.
+- [ ] No answer to an application question was written by AI.
+- [ ] Every claim has an evidence id in the brief and matches
+      `profile/consistency.md`.
+- [ ] Each hard requirement in the posting is met, or the gap is named
+      honestly.
+- [ ] It leads with the strongest verified evidence in the brief.
+- [ ] I could defend every sentence in an interview.
+
 ## Cadence
 
 - **Daily** during build-up: the first `cadence.build_up_weeks` weeks
@@ -252,6 +307,11 @@ the person's own time. Adapt the wording; keep the done-when.
 | Tailor a résumé per role family | 3 to 5 hours | Résumé file in `campaign/drafts/` |
 | Write the two-sentence story and the answer to the strongest objection | 1 to 2 hours | Saved in `campaign/drafts/` |
 | Draft a tailored application for a best-fit role, for the person to submit | 2 to 3 hours | The person's confirmation email from the job board |
+| For an organisation that asks for your own first draft: a brief, then your draft, then a review of it | 3 to 5 hours | The brief in `campaign/drafts/`, then the person's confirmation email from the job board |
+
+For an organisation with `ai_policy.first_draft_by_person` true, the résumé
+and application moves above become a brief and a review of the person's own
+draft, as described earlier.
 
 ### By TOWS type
 

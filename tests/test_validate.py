@@ -162,6 +162,22 @@ class WorkspaceTests(unittest.TestCase):
         with mock.patch("sys.stdout"):
             self.assertEqual(V.main(["--workspace", ws]), 1)
 
+    def test_ai_policy_field(self):
+        cfg = H.example_config()
+        policy = cfg["targets"][0]["ai_policy"]
+        self.assertEqual(policy, {"first_draft_by_person": True, "checked_on": "2026-11-02",
+                                  "source": "https://www.anthropic.com/candidate-ai-guidance"})
+        self.assertEqual([t["id"] for t in cfg["targets"] if "ai_policy" in t], ["anthropic"])  # none invented
+        schema = H.schema("config.schema.json")
+        self.assertEqual(V.check(cfg, schema), [])
+        for bad, expected in (({"first_draft_by_person": True}, "missing required field 'source'"),
+                              ({"first_draft_by_person": "yes", "source": "https://example.com/ai"}, "expected boolean"),
+                              ({"first_draft_by_person": True, "source": "their careers page"}, "does not match"),
+                              ({"first_draft_by_person": True, "source": "https://example.com", "strict": 1},
+                               "unexpected field 'strict'")):
+            cfg["targets"][0]["ai_policy"] = bad
+            self.assertIn(expected, "\n".join(V.check(cfg, schema)))
+
     def test_main_exit_codes(self):
         with mock.patch("sys.stdout"):
             self.assertEqual(V.main(["--workspace", H.DEMO, "--json"]), 0)

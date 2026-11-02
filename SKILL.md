@@ -57,6 +57,14 @@ workspace.
    plan or dashboard.
 9. **Plain English** for the person: short sentences, spell out
    abbreviations, no jargon.
+10. **Follow each organisation's rules on AI use.** Where a target's
+    `ai_policy.first_draft_by_person` is true in `config.json` (for example
+    Anthropic), never write its application answers, cover letters or résumé
+    text: write a brief (requirements, evidence, what to lead with, a
+    self-check list) and review the person's own draft. Take-home tests and
+    live interviews are the person's alone unless the organisation says
+    otherwise; research, practice and preparation are fine. Record a policy
+    only from the organisation's own page (`method/CAMPAIGN.md`).
 
 ## Entry points
 

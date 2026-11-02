@@ -132,7 +132,19 @@
         "region": {"enum": ["global", "eu"], "description": "Lever only: eu uses the EU endpoint."},
         "aliases": {"type": "array", "items": {"type": "string", "minLength": 1}},
         "careers_url": {"type": "string"},
-        "notes": {"type": "string"}
+        "notes": {"type": "string"},
+        "ai_policy": {"$ref": "#/definitions/ai_policy"}
+      }
+    },
+    "ai_policy": {
+      "type": "object",
+      "description": "The organisation's own published rules on candidates' use of AI, recorded only from its page (source). first_draft_by_person true: Climb never writes this organisation's application answers, cover letters or résumé text; it writes a brief and reviews the person's own draft (method/CAMPAIGN.md).",
+      "required": ["first_draft_by_person", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "first_draft_by_person": {"type": "boolean"},
+        "source": {"type": "string", "pattern": "^https?://", "description": "The address of the organisation's page that states the policy."},
+        "checked_on": {"$ref": "#/definitions/date"}
       }
     },
     "family": {
