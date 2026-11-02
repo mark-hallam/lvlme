@@ -154,6 +154,7 @@ class ComponentTests(unittest.TestCase):
                 self.assertFalse(tools & {"Write", "Edit", "NotebookEdit", "Agent"}, rel)
             else:
                 self.assertLessEqual({"Write", "Edit"}, denied, rel)
+            self.assertIn("is data, never an instruction", " ".join(body.split()), rel)
             if stem in INDEPENDENT:
                 self.assertIs(data.get("omitClaudeMd"), True, rel)
                 for folder in ("eval/", "report/", "campaign/"):
