@@ -92,7 +92,8 @@ Every script takes `--workspace PATH`.
    actions: `docs/LEVELS.md`).
 10. **Tell the person**: under 150 words, the outlook, today's 1 to 3 actions,
     anything that needs their answer or their yes, and the path to
-    `report/index.html`.
+    `report/index.html`. The first time, also point them to the plain-English
+    guide, `docs/for-you/READING-YOUR-DASHBOARD.md`.
 
 The detailed run order, run modes and weekly comparison are in
 [`method/RUNBOOK.md`](method/RUNBOOK.md).

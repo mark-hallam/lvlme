@@ -224,6 +224,8 @@ Full details: [`method/PRIVACY.md`](../method/PRIVACY.md).
 
 `report/index.html` in your workspace: one self-contained page (no external
 requests), light by default with a readable dark mode, that works on a phone.
+For a plain-English tour of each number and what to do first, see
+[Reading your dashboard](for-you/READING-YOUR-DASHBOARD.md).
 
 ![The demo dashboard on a desktop, light theme](images/dashboard-desktop.png)
 

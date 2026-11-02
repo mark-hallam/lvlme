@@ -1,5 +1,8 @@
 # Levels: what gets you to the next one
 
+This is the detail behind the level view. For a plain-English tour of the
+whole dashboard, see [Reading your dashboard](for-you/READING-YOUR-DASHBOARD.md).
+
 The next level and the quest points use one yardstick, the best fit across your roles (see
 "One yardstick" below). Code:
 `scripts/_levels.py` (the maths), `scripts/_levels_html.py` (the first render of the view)

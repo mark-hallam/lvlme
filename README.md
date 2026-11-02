@@ -62,6 +62,9 @@ A dashboard shows the climb:
 *Both screenshots are the fictional demo: Alex Example and made-up
 organisations.*
 
+New to the dashboard? [Reading your dashboard](docs/for-you/READING-YOUR-DASHBOARD.md)
+explains each number in plain English, and what to do first.
+
 ## Install
 
 LVLme was called Climb until 3 November 2026. The old GitHub address and the

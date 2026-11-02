@@ -25,7 +25,8 @@ Follow `SKILL.md` in this folder exactly. It is the full procedure, and
 5. Nothing is scored until every score above 2 has been reviewed.
 6. Finish with a message under 150 words: the outlook, today's 1 to 3
    actions, what needs the person's answer or yes, and
-   `open <workspace>/report/index.html`.
+   `open <workspace>/report/index.html`. The first time, also point them to
+   the plain-English guide, `docs/for-you/READING-YOUR-DASHBOARD.md`.
 
 For one part only, the person may ask for: quick (honest odds for one
 posting from a link and a CV, in a couple of minutes: follow
