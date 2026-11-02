@@ -179,6 +179,47 @@ The dashboard records their values each run in
 `campaign/metrics-history.json` and shows each one's change since Day 1 under
 "Campaign progress".
 
+## Warm paths: progress with each contact
+
+Referrals are the biggest lever, and they are slow, so the person needs to see
+them move before any score does. `campaign/warm-paths.json`
+(`schemas/warm-paths.schema.json`) records, for each contact the person is
+warming up at a target organisation, one stage on this ladder:
+
+| Stage | Means |
+|---|---|
+| `followed` | You follow their work; they may not know you yet. A LinkedIn connection you have never spoken with is here too. |
+| `talked` | A real exchange: a reply, a call, a chat at an event. |
+| `connected` | A two-way line: they would recognise your name and reply. |
+| `knows_your_work` | They have seen something you made or did. |
+| `would_refer` | They have said they would refer you, or introduce you to the hiring manager. |
+
+Each contact has an `id` (W01, W02 and so on), `org` (a target id), `person`,
+`stage` and `updated_on`, and optionally `role` (their job title),
+`next_step` (one small, honest step), `action` (the plan action it belongs
+to), `evidence` and `history` (each stage with its date, oldest first).
+
+- **It changes no score.** `score.py` never reads this file. The warm path
+  factor (D3) is judged from evidence against the rubric's anchors
+  (`method/RUBRIC.md`), so "would refer" lifts a score only once their own
+  words (an email or a message) are recorded in `profile/evidence.json`.
+  `validate.py` warns when a contact is at `would_refer` with no evidence.
+- **The person's own account.** Record a stage when the person tells you,
+  never from a guess, and never contact anyone to check it. When they say a
+  contact has moved on, set `stage` and `updated_on` and add a `history`
+  entry. Other agents only append the news to `campaign/inbox.md`.
+- **One entry per person.** People found by the network map can be added as
+  `followed`; people met elsewhere belong here too, even with no LinkedIn
+  connection.
+- **Names stay private.** The dashboard shows "a contact" and the agent files
+  show "[contact]" unless the person opts in (`privacy` in `config.json`); in
+  sensitive mode the agent files keep only the counts.
+
+The dashboard shows one small strip per organisation under Do next (filled to
+the furthest stage anyone there has reached, with the stage in words and the
+count at each stage), and the contacts with their next steps in the
+organisation's pane. The agent briefing lists the same.
+
 ## When an organisation asks for your own first draft
 
 Some organisations publish rules on how candidates may use AI. Anthropic's

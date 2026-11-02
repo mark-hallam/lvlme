@@ -1876,5 +1876,53 @@
         "scope": "overall"
       }
     ]
+  },
+  "warm_paths": {
+    "about": "Progress only: score.py never reads campaign/warm-paths.json, so it changes no score. The warm path factor (D3) is judged from evidence.",
+    "stages": [
+      "followed",
+      "talked",
+      "connected",
+      "knows_your_work",
+      "would_refer"
+    ],
+    "per_org": {
+      "acme": {
+        "org_name": "Acme AI",
+        "people": 1,
+        "furthest_stage": "talked",
+        "by_stage": {
+          "followed": 0,
+          "talked": 1,
+          "connected": 0,
+          "knows_your_work": 0,
+          "would_refer": 0
+        }
+      },
+      "globex": {
+        "org_name": "Globex Labs",
+        "people": 2,
+        "furthest_stage": "connected",
+        "by_stage": {
+          "followed": 1,
+          "talked": 0,
+          "connected": 1,
+          "knows_your_work": 0,
+          "would_refer": 0
+        }
+      },
+      "initech": {
+        "org_name": "Initech Robotics",
+        "people": 1,
+        "furthest_stage": "followed",
+        "by_stage": {
+          "followed": 1,
+          "talked": 0,
+          "connected": 0,
+          "knows_your_work": 0,
+          "would_refer": 0
+        }
+      }
+    }
   }
 }

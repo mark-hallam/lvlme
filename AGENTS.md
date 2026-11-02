@@ -65,8 +65,9 @@ Every script takes `--workspace PATH`.
 2. **Evidence**: search each approved source (email, GitHub, public web and
    press, public registers, the LinkedIn data export, supplied documents) and
    record facts in `profile/evidence.json`; run
-   `python3 scripts/network_map.py --csv <Connections.csv>`; process
-   `campaign/inbox.md`.
+   `python3 scripts/network_map.py --csv <Connections.csv>`; record each
+   contact's stage in `campaign/warm-paths.json` (progress only, no score:
+   `method/CAMPAIGN.md`); process `campaign/inbox.md`.
 3. **Market**: `python3 scripts/fetch_roles.py`; research each organisation
    and add sourced facts to `market/orgs.json`.
 4. **Judge and audit**: fill `eval/judgements.json` and

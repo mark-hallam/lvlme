@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Warm-path tracker (campaign/warm-paths.json)",
+  "description": "How far each contact at a target organisation has come, on one ladder: followed, talked, connected, knows_your_work, would_refer. Progress only: score.py never reads this file, so it changes no score. The warm path factor (D3) is judged from evidence in profile/evidence.json. Names stay in the workspace and are hidden on the dashboard and in the agent files unless the person opts in.",
+  "type": "object",
+  "required": ["schema_version", "contacts"],
+  "additionalProperties": false,
+  "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
+  "properties": {
+    "schema_version": {"const": 1},
+    "updated_on": {"$ref": "#/definitions/date"},
+    "contacts": {"type": "array", "items": {"$ref": "#/definitions/contact"}}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "extension": {"description": "Extension field: any key starting x_ holds data the engine never reads. Kept as is."},
+    "stage": {
+      "enum": ["followed", "talked", "connected", "knows_your_work", "would_refer"],
+      "description": "followed: you follow their work and they may not know you yet (a LinkedIn connection you have never spoken with is here too). talked: a real exchange, such as a reply, a call or a chat at an event. connected: a two-way line, they would recognise your name and reply. knows_your_work: they have seen something you made or did. would_refer: they have said they would refer you, or introduce you to the hiring manager."
+    },
+    "contact": {
+      "type": "object",
+      "required": ["id", "org", "person", "stage", "updated_on"],
+      "additionalProperties": false,
+      "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
+      "properties": {
+        "id": {"type": "string", "pattern": "^W[0-9]+$", "description": "W01, W02 and so on."},
+        "org": {"type": "string", "minLength": 1, "description": "A target id from config.json."},
+        "person": {"type": "string", "minLength": 1, "description": "Their name, as the person knows them. Private."},
+        "role": {"type": "string", "description": "Their job title or team, if known."},
+        "stage": {"$ref": "#/definitions/stage"},
+        "updated_on": {"$ref": "#/definitions/date", "description": "When the stage last changed or was last checked."},
+        "next_step": {"type": "string", "description": "The next small, honest step with this person, in plain words."},
+        "action": {"type": "string", "description": "The plan action this next step belongs to, if any (an id from campaign/plan.json)."},
+        "evidence": {"type": "array", "items": {"type": "string"}, "description": "Evidence ids that show the stage, such as their email agreeing to refer. Optional, and it never changes a score here."},
+        "note": {"type": "string"},
+        "history": {
+          "type": "array",
+          "description": "The stages so far, oldest first. The last entry matches stage.",
+          "items": {
+            "type": "object",
+            "required": ["stage", "on"],
+            "additionalProperties": false,
+            "properties": {
+              "stage": {"$ref": "#/definitions/stage"},
+              "on": {"$ref": "#/definitions/date"},
+              "note": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

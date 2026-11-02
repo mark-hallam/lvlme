@@ -97,6 +97,9 @@ the client) backs it up.
 `scripts/network_map.py` gives the first-degree contacts at each target. A
 LinkedIn connection proves the connection exists, not that the person knows
 your work: that needs their own words (an email, a message, a referee note).
+The warm-path tracker (`campaign/warm-paths.json`, `method/CAMPAIGN.md`)
+records how far each contact has come, but it is the person's account, not
+evidence: judge D3 from `profile/evidence.json` only.
 
 **D4 Organisation-specific edge.** Something this organisation values that
 most applicants lack. Examples for an AI lab goal: deep daily use of that lab's

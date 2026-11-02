@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-10-26",
+  "contacts": [
+    {
+      "id": "W01",
+      "org": "globex",
+      "person": "Jordan Sample",
+      "role": "Program Manager",
+      "stage": "connected",
+      "updated_on": "2026-10-24",
+      "next_step": "Send the route-eval write-up, then ask for the introduction to the AI Success lead",
+      "action": "A02",
+      "evidence": ["E09"],
+      "history": [
+        {"stage": "followed", "on": "2022-03-12", "note": "LinkedIn connection from a logistics conference."},
+        {"stage": "talked", "on": "2026-10-12", "note": "Video call about how the AI Success team works."},
+        {"stage": "connected", "on": "2026-10-24", "note": "Agreed by email to introduce Alex once route-eval is shared."}
+      ]
+    },
+    {
+      "id": "W02",
+      "org": "globex",
+      "person": "Casey Demo",
+      "role": "AI Success Manager",
+      "stage": "followed",
+      "updated_on": "2026-10-11",
+      "next_step": "Reply to their next post about customer rollouts with what the scheduling rollout taught you",
+      "history": [
+        {"stage": "followed", "on": "2026-10-11", "note": "LinkedIn connection since January 2024; no conversation yet."}
+      ]
+    },
+    {
+      "id": "W03",
+      "org": "acme",
+      "person": "Riley Placeholder",
+      "role": "Recruiting Coordinator",
+      "stage": "talked",
+      "updated_on": "2026-10-15",
+      "next_step": "Share the route-eval demo when it ships",
+      "action": "A10",
+      "history": [
+        {"stage": "followed", "on": "2026-10-11", "note": "LinkedIn connection since June 2023."},
+        {"stage": "talked", "on": "2026-10-15", "note": "Answered a question about the quarterly evaluation challenge."}
+      ]
+    },
+    {
+      "id": "W04",
+      "org": "initech",
+      "person": "Harper Mock",
+      "role": "Fleet Operations Lead",
+      "stage": "followed",
+      "updated_on": "2026-10-26",
+      "next_step": "Say hello at the Initech warehouse operators meetup",
+      "action": "A11",
+      "history": [
+        {"stage": "followed", "on": "2026-10-26", "note": "Follows their posts on warehouse robot rollouts; not a LinkedIn connection."}
+      ]
+    }
+  ]
+}

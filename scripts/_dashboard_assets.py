@@ -176,6 +176,19 @@ th{font-size:13px;color:var(--sub);font-weight:650}
 .dn-t{font-weight:550;font-size:15px;line-height:1.35}
 .dn-p{font-weight:700;color:var(--ok);font-variant-numeric:tabular-nums;white-space:nowrap}
 .linkbtn{border:none;background:none;color:var(--accent);cursor:pointer;padding:0;font-size:14px;font-weight:550}
+/* warm paths: one strip per organisation, five steps from followed to would refer (progress only, no score reads it) */
+.wp{padding:10px 0;border-top:1px solid var(--rule)}
+.wp:first-child{border-top:none}
+.wp[data-org-open]{cursor:pointer}
+.wp[data-org-open]:hover .wp-n,.wp[data-org-open]:focus .wp-n{color:var(--accent)}
+.wp-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.wp-n{font-weight:550;font-size:15px;line-height:1.35}
+.wp-s{font-size:13px;font-weight:650;color:var(--accent);white-space:nowrap}
+.wp-s.none{color:var(--sub);font-weight:500}
+.wp-bar{display:flex;gap:3px;margin:6px 0 4px}
+.wp-bar i{flex:1;height:6px;border-radius:3px;background:var(--p0)}
+.wp-bar i.on{background:var(--accent)}
+.wp-c{padding:8px 0;border-top:1px solid var(--rule)}
 
 /* views */
 .views-nav{margin:24px 0 14px;position:sticky;top:calc(var(--top-h, 60px) + 4px);z-index:5}
@@ -513,6 +526,7 @@ BODY = r"""
 
   <section class="card static-sum" id="staticSummary" aria-labelledby="staticSummaryH">__STATIC__</section>
   <div class="tiles4" id="tiles4"></div>
+  <div class="card pair" id="warmCard" hidden><div class="eyebrow">Warm paths</div><div class="tiny sub" id="warmSub" style="margin-bottom:4px"></div><div id="warm"></div></div>
   <div class="card pair" id="unlocksCard"><div class="eyebrow">Biggest unlocks</div><div id="unlocks"></div></div>
 
   <nav class="views-nav" aria-label="Views"><div class="hscroll"><div class="seg" id="viewSeg" role="tablist" aria-label="Views"></div></div></nav>
@@ -908,19 +922,45 @@ function unlocksHTML(){
   return D.gaps.slice(0, 4).map(x => `<div class="dn" tabindex="0" data-moves="1"><div style="flex:1;min-width:0"><div class="dn-t">${esc(x.title)}</div><div class="tiny sub">${plural(x.roles, "role")}</div></div><div class="dn-p">+${x.points}</div></div>`).join("") +
     `<button class="linkbtn" data-see-moves="1" style="margin-top:8px">See everything that moves you ›</button>`;
 }
+// Warm paths (campaign/warm-paths.json): how far each contact at each organisation has come. Progress only: no score
+// reads it. One strip per organisation, filled up to the furthest stage anyone there has reached; the words say it too.
+const warmSub = () => "From followed to would refer. Progress only: it changes no score.";
+function warmBar(n){ let s = ""; for (let i = 0; i < 5; i++) s += `<i${i <= n ? ' class="on"' : ""}></i>`; return `<span class="wp-bar" aria-hidden="true">${s}</span>`; }
+function warmRow(o){
+  const W = D.warm, open = D.orgs[o.g] ? ` tabindex="0" data-org-open="${esc(o.g)}"` : "";
+  const counts = o.counts.map((n, i) => n ? n + " " + W.stages[i].toLowerCase() : "").filter(Boolean).join(", ");
+  return `<div class="wp"${open}><div class="wp-h"><span class="wp-n">${esc(o.name)}</span>${o.people ? `<span class="wp-s"><span class="sr-only">furthest stage: </span>${esc(W.stages[o.furthest])}</span>` : '<span class="wp-s none">No one yet</span>'}</div>${warmBar(o.furthest)}${o.people ? `<div class="tiny sub">${o.people === 1 ? "1 person" : esc(plural(o.people, "person", "people") + ": " + counts)}</div>` : ""}</div>`;
+}
+function warmHTML(){
+  const W = D.warm; if (!W || !W.orgs.length) return "";
+  return `<div>${W.orgs.map(warmRow).join("")}</div>` + (W.orgs.some(o => o.people) ? "" : '<div class="tiny sub" style="margin-top:6px">Tell your agent who you know at each organisation and how far you have got.</div>');
+}
+function warmDetail(L){
+  const W = D.warm, mine = W ? W.orgs.filter(o => L.members.includes(o.id)) : [];
+  if (!mine.length) return "";
+  return `<div class="eyebrow" style="margin-top:16px">Warm paths</div><div class="tiny sub">${esc(W.note)}</div>` + mine.map(o => {
+    const cs = W.contacts.filter(c => c.org === o.id);
+    return `<div class="wp-h" style="margin-top:8px"><span class="small"${mine.length > 1 ? ' style="font-weight:600"' : ""}>${mine.length > 1 ? esc(o.name) : "Furthest stage"}</span><span class="wp-s${o.furthest >= 0 ? "" : " none"}">${o.furthest >= 0 ? esc(W.stages[o.furthest]) : "No one yet"}</span></div>` + warmBar(o.furthest) +
+      (cs.map(c => `<div class="wp-c"><span class="tag">${esc(W.stages[c.stage])}</span> <span class="small">${esc(cap1(c.who))}${c.role ? ", " + esc(c.role) : ""}</span>${c.since || c.next ? `<div class="tiny sub">${c.since ? "Updated " + esc(shortDate(c.since)) : ""}${c.since && c.next ? " · " : ""}${c.next ? "Next: " + esc(c.next) : ""}</div>` : ""}</div>`).join("") || '<div class="tiny sub">Nobody tracked here yet.</div>');
+  }).join("");
+}
 function goMoves(){ state.view = "moves"; renderViewSeg(); showView(); $(".views-nav").scrollIntoView({behavior: motionOK() ? "smooth" : "auto", block: "start"}); }
 function bindHome(root){
   root.querySelectorAll(".dn[data-act]").forEach(n => onEnter(n, () => openDetail({type: "action", id: n.dataset.act}, true)));
   root.querySelectorAll("[data-moves],[data-see-moves]").forEach(n => onEnter(n, goMoves));
+  root.querySelectorAll("[data-org-open]").forEach(n => onEnter(n, () => openDetail({type: "org", id: n.dataset.orgOpen}, true)));
 }
 function renderDoNext(){
   $("#doNext").innerHTML = `<div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div>${doNextHTML()}`; $("#nextIn").hidden = false;
-  $("#unlocks").innerHTML = unlocksHTML(); bindHome($("#nextIn")); bindHome($(".pair"));
+  $("#unlocks").innerHTML = unlocksHTML(); bindHome($("#nextIn")); bindHome($("#unlocksCard"));
+  const warm = warmHTML(); $("#warm").innerHTML = warm; $("#warmCard").hidden = !warm;
+  if (warm){ $("#warmSub").textContent = warmSub(); bindHome($("#warmCard")); }
   if (!narrow() && !state.stack.length) renderHome();
 }
 function renderHome(){
-  const card = $("#detailCard");
+  const card = $("#detailCard"), warm = warmHTML();
   card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h2 class="pane-h" style="margin:0">Do next</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div><div>${doNextHTML()}</div>
+    ${warm ? `<h2 class="pane-h" style="margin:18px 0 0">Warm paths</h2><div class="tiny sub" style="margin-bottom:4px">${esc(warmSub())}</div>${warm}` : ""}
     <h2 class="pane-h" style="margin:18px 0 0">Biggest unlocks</h2><div class="tiny sub" style="margin-bottom:4px">Fit points gained, added up across your top roles.</div><div>${unlocksHTML()}</div>
     <div class="tiny sub" style="margin-top:18px;padding-top:12px;border-top:1px solid var(--rule)">Tap any organisation, role, factor, action or piece of evidence to drill in here.</div></div>`;
   bindHome(card);
@@ -1540,6 +1580,7 @@ function detailOrg(g){
     <div class="kv"><span>With an eligibility blocker</span><b class="num">${L.blocked}</b></div>
     <div class="eyebrow" style="margin-top:16px">Who knows you here</div><div class="small">${esc(net)}</div>
     ${L.paths.map(p => `<div class="small sub" style="margin-top:6px"><span class="tag">${esc(cap1(p.status))}</span> ${esc(p.note)}</div>`).join("")}
+    ${warmDetail(L)}
     <div class="eyebrow" style="margin-top:16px">Best roles</div>
     ${D.roles.filter(x => x.g === g).slice(0, 10).map(x => `<div class="row" style="padding:10px 0" data-role-open="${esc(x.id)}"><div class="row-main"><div class="small" style="font-weight:600">${esc(x.title)}</div><div class="tiny sub">${esc(x.loc.slice(0, 2).join(", "))}${x.blocked ? " · eligibility blocker" : ""}</div></div><div class="row-side"><b>${Math.round(fitM(x))}</b></div><span class="chev">›</span></div>`).join("")}`;
 }
@@ -1734,7 +1775,7 @@ HEADER = r"""<!doctype html>
   waypoints, the offer zone is the destination) under a flight strip and a level
   badge. Left rail: the what-if switches with their own lift. Centre below the hero:
   scoreboard tiles, then the views, led by Level up (the next level, quests, level
-  history and streak). Right pane: Start here (Do next, Biggest unlocks), then
+  history and streak). Right pane: Start here (Do next, Warm paths, Biggest unlocks), then
   drill-down with breadcrumbs. One yardstick: Do next, the quests, the badges and the
   plan list share one order (the path to the next level first, then points per hour)
   and one points number per action; only the What if rail shows "with everything else

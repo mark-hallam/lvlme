@@ -6,7 +6,8 @@ the live page and the agent briefing use): the best match today (a fit score out
 of 100, not a probability) with its bands, the level and the points to the next
 one, the outlook, Do next (the live page's one ranked list: the actions on the
 path to the next level first, then the most points per hour, each with its one
-points number) and the best role at each organisation.
+points number), the best role at each organisation and the warm paths (how far
+the contacts at each organisation have come; progress only, never scored).
 
 The page script hides it once it has drawn the live page, which shows the same
 numbers and lets the what-if switches change them, so with JavaScript on nobody
@@ -16,6 +17,7 @@ cells, so a screen reader or a text browser reads it in order.
 import html
 
 import _levels_html as LH
+import _warm_paths as W
 
 TOP_ACTIONS = 4          # as many as the live page's Do next card
 
@@ -72,4 +74,5 @@ def render(page, per_org):
     _, nl, _, up = LH.compute(page)
     return (head + note + _key_numbers(page, nl)
             + '<h3>Do next</h3><div class="static-dn">%s</div>' % LH.do_next_rows(nl, up, TOP_ACTIONS)
-            + '<h3 id="staticOrgsH">Best role at each organisation</h3>' + _per_org(page, per_org))
+            + '<h3 id="staticOrgsH">Best role at each organisation</h3>' + _per_org(page, per_org)
+            + W.static_html(page.get("warm")))

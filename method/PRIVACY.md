@@ -44,10 +44,12 @@ Contacts, referees and email senders did not sign up for this. So:
 - The dashboard shows contact names only if `privacy.show_contact_names_in_dashboard`
   is true. Otherwise it shows counts and positions, and replaces any contact
   name that appears in other text on the page (an evidence note, an action
-  title) with `[contact]`.
+  title) with "a contact".
 - The engine can only hide names it knows: the people listed in
-  `profile/network.json`. Keep other people's names (referees, email senders)
-  out of evidence and plan text, or add them to `privacy.redact_terms`.
+  `profile/network.json` and in the warm-path tracker,
+  `campaign/warm-paths.json`. Keep other people's names (referees, email
+  senders) out of evidence and plan text, or add them to
+  `privacy.redact_terms`.
 - `network_map.py` prints counts only, never names, and does not keep email
   addresses.
 
@@ -61,7 +63,9 @@ the two files written for other agents, `report/for-agents/SUMMARY.md` and
 - omit contact names and compensation figures;
 - replace every word in `privacy.redact_terms` (put your employers' names
   there) with `[redacted]`;
-- replace any contact name from `profile/network.json` with `[contact]`;
+- replace any contact name from `profile/network.json` or
+  `campaign/warm-paths.json` with `[contact]`, and keep only the counts of
+  the warm-path tracker;
 - replace money amounts with `[salary]`.
 
 Contact names appear in the agent files only if

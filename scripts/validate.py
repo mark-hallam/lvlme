@@ -28,6 +28,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 import score as S  # noqa: E402  (the evidence caps, so the warnings match the scoring)
+import _warm_paths as W  # noqa: E402
 
 FILES = [
     ("config.json", "config.schema.json", True),
@@ -43,6 +44,7 @@ FILES = [
     ("eval/swot.json", "swot.schema.json", False),
     ("eval/ceilings.json", "ceilings.schema.json", False),
     ("campaign/plan.json", "plan.schema.json", True),
+    ("campaign/warm-paths.json", "warm-paths.schema.json", False),
 ]
 
 # ------------------------------------------------------------ the validator
@@ -319,6 +321,7 @@ def cross_checks(ws, docs, errors, warnings):
         if r.get("org") not in targets:
             warnings.append("eval/ceilings.json: role %s belongs to %s, not a target id" % (r.get("role_id"), r.get("org")))
     review_checks(docs, ev_ids, errors, warnings)
+    W.checks(docs.get(W.REL), targets, ev_ids, action_ids if "campaign/plan.json" in docs else None, errors, warnings)
 
 
 # Evidence id prefixes LVLme already uses for other ids, so an evidence id with one reads as something else.

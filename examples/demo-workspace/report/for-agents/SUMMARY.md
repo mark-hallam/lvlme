@@ -110,3 +110,12 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 ## Evidence and network
 - Evidence items by level: contradicted 1, corroborated 2, partially_verified 1, self_reported 6, unverified 1, verified 9
 - First-degree contacts per organisation: Acme AI 1, Globex Labs 2, Initech Robotics 0
+
+## Warm paths (progress only: changes no score; the warm path factor moves only with evidence)
+- Stages, in order: followed, talked, connected, knows your work, would refer.
+- Acme AI: furthest Talked; 1 person (1 talked)
+- Globex Labs: furthest Connected; 2 people (1 followed, 1 connected)
+- Initech Robotics: furthest Followed; 1 person (1 followed)
+- Contacts are left out in sensitive mode.
+- When the person says a contact has moved on, the agent running the campaign sets stage and updated_on and
+  adds a history entry in campaign/warm-paths.json. Any other agent appends the message to campaign/inbox.md.

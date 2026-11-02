@@ -159,7 +159,10 @@ ask only about what changed, and the open questions in
   Keep ids stable. Never delete: mark an item `contradicted` instead.
 - Network: `python3 scripts/network_map.py --csv intake/sources/Connections.csv`.
   Then ask about second-degree paths ("who do you know who knows someone at
-  X?") and record them in `second_degree`.
+  X?") and record them in `second_degree`. Update each contact's stage in
+  `campaign/warm-paths.json` (followed, talked, connected, knows your work,
+  would refer) from what the person says; it shows progress and changes no
+  score (`method/CAMPAIGN.md`).
 - Process `campaign/inbox.md`: verify each "New" note against its source,
   then move it to "Processed" with a one-line outcome.
 

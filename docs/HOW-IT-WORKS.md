@@ -227,6 +227,11 @@ requests), light by default with a readable dark mode, that works on a phone.
   history (see [`LEVELS.md`](LEVELS.md)).
 - **What if**: switch any plan action on or off and every number on the page
   updates.
+- **Warm paths**: under Do next, one small strip per organisation showing how
+  far your contacts there have come (followed, talked, connected, knows your
+  work, would refer). It is progress only and changes no score: your warm
+  path score moves when the evidence does. Tap an organisation to see each
+  contact's stage and next step (names stay hidden unless you opt in).
 - **Verifiable record**: one chip per scored day. If your workspace is its own
   git repository (a version history, with no remote), each chip also shows the
   saved version that first recorded that day.
@@ -345,7 +350,7 @@ intake/sources/            exports you supply (LinkedIn data, résumé)
 profile/                   evidence.json, network.json, claims-audit.json
 market/                    roles/latest.json, roles/snapshots/, orgs.json
 eval/                      judgements, profile dimensions, SWOT, outlook, runs/
-campaign/                  plan.json, inbox.md, drafts/, weekly/
+campaign/                  plan.json, warm-paths.json, inbox.md, drafts/, weekly/
 report/                    index.html, for-agents/
 ```
 

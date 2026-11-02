@@ -15,7 +15,13 @@ get there, level history and the progress streak; see docs/LEVELS.md),
 Organisations, Path to the top band (only
 if eval/ceilings.json exists), What moves you, Roles, SWOT and TOWS (only if
 eval/swot.json exists), Plan, Evidence, Market. A right-hand pane drills into
-any organisation, role, factor, action or piece of evidence.
+any organisation, role, factor, action or piece of evidence; its home state is
+Start here: Do next, Warm paths and Biggest unlocks.
+
+Warm paths (campaign/warm-paths.json, see _warm_paths.py) show how far each
+contact at each organisation has come, followed to would refer: a small strip
+per organisation, the contacts in its pane, and a section in both agent files.
+Progress only: nothing here reads it into a score.
 
 One yardstick for actions: Do next, the quests, the badges, the plan list and
 the action pane all use one ranked list (the actions on the path to the next
@@ -72,6 +78,7 @@ import _dashboard_assets as A  # noqa: E402
 import _levels as L  # noqa: E402
 import _levels_html as LH  # noqa: E402
 import _static_html as ST  # noqa: E402
+import _warm_paths as W  # noqa: E402
 
 DIMS = C.DIMENSIONS
 DIM_HELP = {
@@ -188,6 +195,7 @@ class Data:
         self.plan = load("campaign", "plan.json") or {}
         self.evidence = load("profile", "evidence.json") or {}
         self.network = load("profile", "network.json")
+        self.warm = load("campaign", "warm-paths.json")   # progress only: never scored
         self.claims = (load("profile", "claims-audit.json") or {}).get("claims", [])
         self.swot = load("eval", "swot.json")
         self.ceilings = load("eval", "ceilings.json")
@@ -582,6 +590,7 @@ def build_data(data):
                          "result": clean(x.get("result")), "decision": x.get("decision", ""), "why": clean(x.get("why"))}
                         for x in plan.get("experiments_log") or []],
         "backlog": [clean(b) for b in plan.get("backlog") or []],
+        "warm": W.page_data(data.warm, data.targets, data.org_names, group_of, clean),
     }
     out["orgOrder"] = [g for g in groups if g in out["orgs"]]
     out["ceil"] = build_ceilings(data, {x["id"]: x for x in roles}, group_of)
@@ -625,6 +634,7 @@ def make_redactor(data, sensitive, hide_names, placeholder="[contact]"):
         for k in ("via", "target_person"):
             if p.get(k) and re.match(r"^[A-Z][a-z]+(?:\s+[A-Z][\w'-]+)+$", p[k]):
                 names.add(p[k])
+    names |= W.person_names(data.warm)    # a warm-path person is always a name, whatever its form
     if not hide_names:
         names = set()
     own = set(((data.config.get("candidate") or {}).get("display_name") or "").split())
@@ -815,6 +825,7 @@ def agent_payload(data, page):
                             for r in payload["roles"]]
     if share_names and data.network:
         payload["network"] = data.network
+    payload["warm_paths"] = W.agent_data(data.warm, data.targets, data.org_names, include_contacts=not sensitive)
     if sensitive or not share_names:
         clean_text = make_redactor(data, sensitive, hide_names=not share_names)
         payload = scrub(payload, clean_text) if sensitive else _scrub_text(payload, clean_text)
@@ -970,6 +981,7 @@ def summary_md(data, p):
               "- Evidence items by level: %s" % (", ".join("%s %d" % (k, v) for k, v in sorted(p["evidence_counts"].items())) or "none"),
               "- First-degree contacts per organisation: %s" % (", ".join(
                   "%s %d" % (data.org(o), n) for o, n in p["network_first_degree_counts"].items()) or "not mapped yet")]
+    lines += W.summary_lines(p["warm_paths"], data.org)
     return "\n".join(lines) + "\n"
 
 

@@ -82,6 +82,11 @@ someone at this organisation?" Record each path in `second_degree` with its
 status (`idea`, `asked`, `agreed`, `opened`, `declined`). Re-running the script
 keeps those paths and the per-contact `knows_my_work` and `note` fields.
 
+For each person they are warming up at a target, record a stage in
+`campaign/warm-paths.json`: followed, talked, connected, knows your work,
+would refer ("Warm paths" in `method/CAMPAIGN.md`). It shows progress on the
+dashboard and changes no score.
+
 ### The public claims audit
 
 Run, with only the addresses the person gives you:

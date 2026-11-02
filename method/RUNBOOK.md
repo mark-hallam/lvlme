@@ -102,7 +102,8 @@ when `~/lvlme-workspaces/` does not exist. The commands below omit
    ```
 
    Update `second_degree` in `profile/network.json` from what the person tells
-   you.
+   you, and each contact's stage in `campaign/warm-paths.json` (progress only,
+   it changes no score: "Warm paths" in `CAMPAIGN.md`).
 
 5. **Claims** (first run, then whenever public pages change):
 
