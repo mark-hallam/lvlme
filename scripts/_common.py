@@ -41,6 +41,9 @@ BLOCKER_NAMES = {
     "citizenship": "Citizenship",
     "licence": "Licence",
 }
+# The one line a new workspace gets until the interview has set it up.
+NO_TARGETS = "No target organisations yet. Say to your agent: run the Climb interview."
+NO_FAMILIES = "No role families yet. Say to your agent: run the Climb interview."
 
 
 class WorkspaceError(Exception):
@@ -251,6 +254,15 @@ def matches_any(keywords, text):
 def weights_of(config):
     w = ((config or {}).get("scoring") or {}).get("weights") or {}
     return {d: int(w.get(d, DEFAULT_WEIGHTS[d])) for d in DIMENSIONS}
+
+
+def setup_problem(config):
+    """NO_TARGETS or NO_FAMILIES while the config has none yet (targets first), else None."""
+    if not (config or {}).get("targets"):
+        return NO_TARGETS
+    if not (config or {}).get("families"):
+        return NO_FAMILIES
+    return None
 
 
 def target_ids(config):

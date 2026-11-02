@@ -9,7 +9,7 @@ import fetch_roles as F
 import validate as V
 from _common import matches_any
 
-CFG = H.template_config()
+CFG = H.example_config()
 GH = H.load(os.path.join(H.FIXTURES, "ats", "greenhouse.json"))
 AB = H.load(os.path.join(H.FIXTURES, "ats", "ashby.json"))
 LV = H.load(os.path.join(H.FIXTURES, "ats", "lever.json"))
@@ -132,7 +132,7 @@ class AdapterTests(unittest.TestCase):
 
 class MainTests(unittest.TestCase):
     def setUp(self):
-        cfg = H.template_config()
+        cfg = H.example_config()
         cfg["targets"] = [{"id": "gh", "name": "Acme AI", "ats": "greenhouse", "slug": "acme"},
                           {"id": "ab", "name": "Globex Labs", "ats": "ashby", "slug": "globex"},
                           {"id": "lv", "name": "Initech Robotics", "ats": "lever", "slug": "initech"},
@@ -170,6 +170,16 @@ class MainTests(unittest.TestCase):
         self.assertEqual(latest["summary"]["closed_role_ids"], ["gh:4100001"])
         self.assertEqual(latest["summary"]["new_role_ids"], [])
         self.assertTrue(all(r["first_seen"] == "2026-11-01" for r in latest["roles"]))
+
+    def test_no_targets_stops_with_one_line(self):
+        cfg = H.load(os.path.join(self.ws, "config.json"))
+        cfg["targets"] = []
+        H.save(os.path.join(self.ws, "config.json"), cfg)
+        with mock.patch("sys.stdout"), mock.patch("sys.stderr") as err:
+            self.assertEqual(F.main(["--workspace", self.ws, "--fixtures", self.fx, "--date", "2026-11-01"]), 1)
+        printed = "".join(c.args[0] for c in err.write.call_args_list)
+        self.assertEqual(printed.strip(), "No target organisations yet. Say to your agent: run the Climb interview.")
+        self.assertFalse(os.path.exists(os.path.join(self.ws, "market", "roles", "latest.json")))
 
     def test_network_failure_keeps_previous_file(self):
         self.assertEqual(self.run_main("2026-11-01"), 0)

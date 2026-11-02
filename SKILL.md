@@ -35,7 +35,9 @@ workspace.
 4. **Private by default.** The workspace stays on the person's machine,
    outside this repository. Never copy it anywhere public. Third-party names
    (contacts, email senders) never go into briefings or drafts unless the
-   person opts in.
+   person opts in. Be plain that what you read goes to your provider to be
+   processed, under its data terms; never say the data goes nowhere
+   (`method/PRIVACY.md`).
 5. **Connectors are read only and opt in.** Ask before reading email,
    calendar or any other source. Read, never change. Never open LinkedIn
    yourself (automated access breaks LinkedIn's terms): use the person's
@@ -55,6 +57,14 @@ workspace.
    plan or dashboard.
 9. **Plain English** for the person: short sentences, spell out
    abbreviations, no jargon.
+10. **Follow each organisation's rules on AI use.** Where a target's
+    `ai_policy.first_draft_by_person` is true in `config.json` (for example
+    Anthropic), never write its application answers, cover letters or résumé
+    text: write a brief (requirements, evidence, what to lead with, a
+    self-check list) and review the person's own draft. Take-home tests and
+    live interviews are the person's alone unless the organisation says
+    otherwise; research, practice and preparation are fine. Record a policy
+    only from the organisation's own page (`method/CAMPAIGN.md`).
 
 ## Entry points
 
@@ -230,9 +240,11 @@ On the weekly comparison day, also write `campaign/weekly/<date>.md` (see
 
 ## Cadence
 
-Daily during build-up (the first `cadence.build_up_weeks` weeks, default 4),
-then weekly. Each run writes one run file, `eval/runs/<date>.json`. When daily
-runs stop producing score changes or new evidence, suggest the switch. The
-person decides; never change the schedule yourself. A run with nobody
+Weekly, plus a run whenever something changes: an action done, new evidence,
+a new export. Scores only move when evidence changes, and a full run can
+start about 40 helper agents (for around 300 open roles), so a run with
+nothing new costs a lot and moves nothing. Each run writes one run file,
+`eval/runs/<date>.json`. The person decides the rhythm (`cadence.mode`);
+never change the schedule yourself. A run with nobody
 present asks nothing, opts in to nothing and takes no step that needs the
 person: it lists those in its message instead (see `docs/ORCHESTRATION.md`).

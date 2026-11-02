@@ -30,7 +30,12 @@ the answers can be trusted.
 
 ## Before the first round
 
-Tell the person, in plain words:
+If `config.json` has no target organisations or role families yet (a new
+workspace), settle them first: ask the "Goals and motivation" questions 1 and
+5 in `INTAKE.md`, fill in `config.json` with the person, and run
+`scripts/validate.py`.
+
+Then tell the person, in plain words:
 
 > I'll ask a few questions at a time, starting with your education and
 > working forward. Wherever you can, show me a document instead of

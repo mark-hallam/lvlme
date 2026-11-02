@@ -22,6 +22,11 @@ vitae) lines and website copy, each one tied to evidence.
 6. **One version of the truth.** The same title, organisation name and
    month dates on the CV, LinkedIn and website. Achievement lines may be
    shorter on one page than another, but never stronger.
+7. **The organisation's AI rules come first.** A fix corrects the person's
+   own existing text. Never write a résumé, cover letter or application
+   answers for an organisation whose `ai_policy.first_draft_by_person` is
+   true in `config.json` (for example Anthropic): give the person a brief and
+   review their own draft instead, as `CAMPAIGN.md` describes.
 
 ## The draft file
 

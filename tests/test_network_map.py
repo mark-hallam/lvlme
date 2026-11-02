@@ -13,7 +13,7 @@ CSV = os.path.join(H.FIXTURES, "Connections.csv")
 
 
 def config():
-    cfg = H.template_config()
+    cfg = H.example_config()
     cfg["targets"] = [{"id": "acme", "name": "Acme AI", "ats": "manual", "aliases": ["Acme Artificial Intelligence"]},
                       {"id": "globex", "name": "Globex Labs", "ats": "manual"},
                       {"id": "initech", "name": "Initech Robotics", "ats": "manual"}]
@@ -34,6 +34,13 @@ class NetworkMapTests(unittest.TestCase):
         self.assertEqual(match("Globex Labs Research"), "globex")
         self.assertIsNone(match("Initech Consulting Group"))
         self.assertIsNone(match(""))
+
+    def test_example_config_matches_the_xai_board_name(self):
+        """xAI's public Greenhouse board (slug xai) is named SpaceXSI, so a contact listing it counts for xAI."""
+        match = N.org_matcher(H.example_config())
+        self.assertEqual(match("SpaceXSI"), "xai")
+        self.assertEqual(match("xAI Corp"), "xai")
+        self.assertIsNone(match("SpaceX AI"))          # not seen on the board, so not an alias
 
     def test_build_network(self):
         rows = N.read_connections(CSV)

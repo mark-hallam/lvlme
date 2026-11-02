@@ -55,8 +55,10 @@ class CheckTests(unittest.TestCase):
         self.assertGreaterEqual(len(names), 10)
         ws = H.new_workspace(self)
         errors, warnings, checked = V.validate_workspace(ws)
-        self.assertEqual(errors, [])
+        self.assertEqual(errors, [C.NO_TARGETS])      # a new workspace waits for the interview
         self.assertIn("config.json", checked)
+        ws = H.new_workspace(self, H.example_config())
+        self.assertEqual(V.validate_workspace(ws)[0], [])
 
 
 class WorkspaceTests(unittest.TestCase):
@@ -147,6 +149,34 @@ class WorkspaceTests(unittest.TestCase):
         self.assertIn("unexpected field 'mandate'", text)
         self.assertNotIn("x_ok", text)
         self.assertIn("unexpected field 'x_not_here'", text)
+
+    def test_no_targets_or_families_is_one_plain_error(self):
+        cfg = H.template_config()
+        cfg["targets"], cfg["families"] = [], []
+        ws = H.new_workspace(self, cfg)
+        self.assertEqual(V.validate_workspace(ws)[0], [C.NO_TARGETS])
+        self.assertEqual(C.NO_TARGETS, "No target organisations yet. Say to your agent: run the Climb interview.")
+        cfg["targets"] = [{"id": "acme", "name": "Acme AI", "ats": "manual"}]
+        H.save(os.path.join(ws, "config.json"), cfg)
+        self.assertEqual(V.validate_workspace(ws)[0], [C.NO_FAMILIES])
+        with mock.patch("sys.stdout"):
+            self.assertEqual(V.main(["--workspace", ws]), 1)
+
+    def test_ai_policy_field(self):
+        cfg = H.example_config()
+        policy = cfg["targets"][0]["ai_policy"]
+        self.assertEqual(policy, {"first_draft_by_person": True, "checked_on": "2026-11-02",
+                                  "source": "https://www.anthropic.com/candidate-ai-guidance"})
+        self.assertEqual([t["id"] for t in cfg["targets"] if "ai_policy" in t], ["anthropic"])  # none invented
+        schema = H.schema("config.schema.json")
+        self.assertEqual(V.check(cfg, schema), [])
+        for bad, expected in (({"first_draft_by_person": True}, "missing required field 'source'"),
+                              ({"first_draft_by_person": "yes", "source": "https://example.com/ai"}, "expected boolean"),
+                              ({"first_draft_by_person": True, "source": "their careers page"}, "does not match"),
+                              ({"first_draft_by_person": True, "source": "https://example.com", "strict": 1},
+                               "unexpected field 'strict'")):
+            cfg["targets"][0]["ai_policy"] = bad
+            self.assertIn(expected, "\n".join(V.check(cfg, schema)))
 
     def test_main_exit_codes(self):
         with mock.patch("sys.stdout"):

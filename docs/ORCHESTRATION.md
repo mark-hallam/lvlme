@@ -3,8 +3,8 @@
 Most of a Climb run is independent reading and judging: one email search
 does not need to wait for one GitHub search, and one batch of roles does not
 need to wait for another. A capable agent should do that work at the same
-time, with several subagents, and then join the results. That makes a daily
-run fast enough to keep up.
+time, with several subagents, and then join the results. That keeps a full
+run short.
 
 Speed must never cost honesty. So the parallel run has four gates, a single
 writer, and strict rules about what each subagent may see and do. This page
@@ -231,11 +231,11 @@ person sends or makes themselves.
 
 ## Scheduling
 
-- **Build-up:** daily, at `cadence.run_time` in `candidate.timezone`, for
-  the first `cadence.build_up_weeks` weeks (default 4).
-- **Steady state:** weekly, after the person agrees to switch. Suggest the
-  switch when 7 daily runs in a row produce no score change and no new
-  evidence; never change the schedule yourself.
+- **Default:** weekly, at `cadence.run_time` in `candidate.timezone`, plus
+  a run whenever something changes (an action done, new evidence, a new
+  export). Scores only move when evidence changes, and a full run can start
+  about 40 helper agents (for around 300 open roles). The person decides the
+  rhythm; never change the schedule yourself.
 - **One run file per run:** `scripts/score.py` writes
   `eval/runs/<YYYY-MM-DD>.json`. A second run on the same day replaces that
   day's file, so the record stays one point per day.

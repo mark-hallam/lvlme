@@ -632,6 +632,9 @@ def main(argv=None):
     ap.add_argument("--date", help="snapshot date YYYY-MM-DD (default: today in the candidate's time zone)")
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)
+    if C.setup_problem(config):
+        print(C.setup_problem(config), file=sys.stderr)
+        return 1
     date = C.check_date(args.date) if args.date else C.today_in(config)
     roles_dir = C.wpath(ws, "market", "roles")
     prev_latest = C.load_json(os.path.join(roles_dir, "latest.json"), {}) or {}

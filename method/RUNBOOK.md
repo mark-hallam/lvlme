@@ -10,18 +10,19 @@ The commands below omit it. Run them from the engine folder.
 
 ## Run modes
 
-- **Build-up (daily).** For the first `cadence.build_up_weeks` weeks (default
-  4), run every step every day, including the independent reviewer. Write one
-  run file per day: the trend charts are built from them.
-- **Steady state (weekly).** After build-up, one full run a week.
+- **Default: weekly, plus a run when something changes.** One full run a
+  week, every step including the independent reviewer, and another whenever
+  an action is done, new evidence arrives or the person supplies a new
+  export. Scores only move when evidence changes, and a full run can start
+  about 40 helper agents (for around 300 open roles). Each run writes one run
+  file: the trend charts are built from them.
 - **Weekly comparison.** Once a week (on the same weekday), also write
   `campaign/weekly/<YYYY-MM-DD>.md`: what moved since the last comparison,
   what did not, what was dropped and why, and the 3 most important actions for
   the week.
-- **Switching to weekly.** After build-up, if the last 7 daily runs produced
-  no score change and no new evidence, say so and suggest weekly runs. Do not
-  change the schedule yourself. The person decides, and records it in
-  `config.json` under `cadence.mode`.
+- **Changing the rhythm.** The person decides (for example daily runs
+  during a burst of applications) and records it in `config.json` under
+  `cadence.mode`. Do not change the schedule yourself.
 
 ## Hard rules
 
@@ -47,7 +48,9 @@ The commands below omit it. Run them from the engine folder.
 
    It refuses a non-empty folder, a folder inside the engine repository, or
    one inside a git repository that has a remote.
-2. Edit `config.json` with the person: targets (organisation id, name,
+2. `config.json` starts with the goal and no targets or role families (unless
+   you used `--example`), so `validate.py` and `fetch_roles.py` stop until
+   they are set. Fill it in with the person: targets (organisation id, name,
    applicant tracking system (ATS): `greenhouse`, `ashby`, `lever` or
    `manual`, and the board slug), role families and keywords, location
    classes, `candidate.timezone`, `candidate.eligibility_cleared`,
@@ -148,6 +151,9 @@ The commands below omit it. Run them from the engine folder.
 
    Fix every error and every warning about unknown evidence ids, then score
    again. Scores above 2 that are still awaiting review count as 2.
+   `score.py` saves no run while no role is judged: such a run is not a
+   measurement, and the first saved run becomes Day 1. The dashboard also
+   skips any older run file with nothing judged.
 
 9. **SWOT and TOWS.** Update `eval/swot.json` (see `SWOT.md`).
 

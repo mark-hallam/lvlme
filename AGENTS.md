@@ -24,7 +24,8 @@ version, and it runs the same procedure. Install notes for every agent:
 - The person's data lives in a **private workspace** outside this repository
   (`$CLIMB_HOME`, or a folder in `~/climb-workspaces/`). Never
   write personal data into this repository and never copy the workspace
-  anywhere public.
+  anywhere public. Be plain that what an agent reads goes to its provider to
+  be processed, under that provider's data terms (`method/PRIVACY.md`).
 - Read-only access to any source (email, calendar), and only when the person
   has said yes. Never open LinkedIn itself: use the official data export and
   what the person pastes.
@@ -38,6 +39,12 @@ version, and it runs the same procedure. Install notes for every agent:
 - **Independent means fresh.** The sceptical reviewer and the recruiter
   screen run in a fresh session and never see the campaign's scores, notes,
   plan or dashboard.
+- **Follow each organisation's rules on AI use.** Where a target's
+  `ai_policy.first_draft_by_person` is true (for example Anthropic), never
+  write its application answers, cover letters or résumé text: write a brief
+  and review the person's own draft. Take-home tests and live interviews are
+  the person's alone unless the organisation says otherwise
+  (`method/CAMPAIGN.md`).
 
 ## If you are a helper agent, not the one running the campaign
 

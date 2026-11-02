@@ -39,7 +39,13 @@ def save(path, data):
 
 
 def template_config():
+    """The empty config a new workspace starts with: no targets or role families yet."""
     return load(os.path.join(ENGINE, "templates", "config.json"))
+
+
+def example_config():
+    """The frontier AI labs example config: real targets, role families and keywords."""
+    return load(os.path.join(ENGINE, "examples", "configs", "frontier-ai-labs.json"))
 
 
 def new_workspace(test, config=None):

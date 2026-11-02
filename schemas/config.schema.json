@@ -37,8 +37,10 @@
         }
       }
     },
-    "targets": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/target"}},
-    "families": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/family"}},
+    "targets": {"type": "array", "items": {"$ref": "#/definitions/target"},
+                "description": "The organisations to target. Empty in a new workspace until the interview sets them; validate.py reports an empty list as an error and fetch_roles.py stops."},
+    "families": {"type": "array", "items": {"$ref": "#/definitions/family"},
+                 "description": "The role families to look for. Empty in a new workspace until the interview sets them; treated like empty targets."},
     "exclude_title_keywords": {"type": "array", "items": {"type": "string", "minLength": 1}},
     "locations": {
       "type": "object",
@@ -89,8 +91,8 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "mode": {"enum": ["daily", "weekly"]},
-        "build_up_weeks": {"type": "integer", "minimum": 0, "maximum": 52},
+        "mode": {"enum": ["daily", "weekly"], "description": "weekly (the default): one full run a week, plus a run whenever something changes. The person decides."},
+        "build_up_weeks": {"type": "integer", "minimum": 0, "maximum": 52, "description": "Older configs: weeks of daily runs at the start. Default 0."},
         "run_time": {"type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$"}
       }
     },
@@ -130,7 +132,19 @@
         "region": {"enum": ["global", "eu"], "description": "Lever only: eu uses the EU endpoint."},
         "aliases": {"type": "array", "items": {"type": "string", "minLength": 1}},
         "careers_url": {"type": "string"},
-        "notes": {"type": "string"}
+        "notes": {"type": "string"},
+        "ai_policy": {"$ref": "#/definitions/ai_policy"}
+      }
+    },
+    "ai_policy": {
+      "type": "object",
+      "description": "The organisation's own published rules on candidates' use of AI, recorded only from its page (source). first_draft_by_person true: Climb never writes this organisation's application answers, cover letters or résumé text; it writes a brief and reviews the person's own draft (method/CAMPAIGN.md).",
+      "required": ["first_draft_by_person", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "first_draft_by_person": {"type": "boolean"},
+        "source": {"type": "string", "pattern": "^https?://", "description": "The address of the organisation's page that states the policy."},
+        "checked_on": {"$ref": "#/definitions/date"}
       }
     },
     "family": {
