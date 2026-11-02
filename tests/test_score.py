@@ -2,6 +2,7 @@
 import json
 import os
 import unittest
+from unittest import mock
 
 import helpers as H
 import score as S
@@ -246,6 +247,32 @@ class RuleTests(Base):
         self.assertEqual(V.check(run, H.schema("run.schema.json")), [])
         self.assertTrue(run["inputs_digest"].startswith("sha256:"))
         self.assertEqual(run["counts"]["not_judged"], 1)
+
+
+class NoFakeDayOneTests(Base):
+    """A run with nothing judged is not a measurement, so it is never saved (it would become Day 1)."""
+
+    def main(self):
+        self.run_score()
+        with mock.patch("sys.stdout"), mock.patch("sys.stderr") as err:
+            code = S.main(["--workspace", self.ws, "--date", TODAY])
+        return code, "".join(c.args[0] for c in err.write.call_args_list)
+
+    def test_nothing_judged_saves_no_run(self):
+        self.roles = [role("acme:1"), role("acme:2")]
+        code, printed = self.main()
+        self.assertEqual(code, 1)
+        self.assertIn("2 roles not judged yet. Ask your agent to run Climb.", printed)
+        self.assertFalse(os.path.exists(os.path.join(self.ws, "eval", "runs", TODAY + ".json")))
+        self.roles = []
+        self.assertIn("No open roles to score yet.", self.main()[1])
+
+    def test_one_judged_role_saves_the_run(self):
+        self.roles = [role("acme:1"), role("acme:2")]
+        self.judge("acme:1", e(2, ["E02"]), e(1, ["E01"]), e(1, ["E01"]))
+        self.assertEqual(self.main()[0], 0)
+        run = H.load(os.path.join(self.ws, "eval", "runs", TODAY + ".json"))
+        self.assertEqual((run["counts"]["judged"], run["counts"]["not_judged"]), (1, 1))
 
 
 class PartiallyVerifiedTests(Base):

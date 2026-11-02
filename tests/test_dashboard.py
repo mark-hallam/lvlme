@@ -115,6 +115,17 @@ class DemoPageTests(unittest.TestCase):
             self.assertEqual(B.main(["--workspace", self.ws]), 0)
         return page_data(self.ws)
 
+    def test_unjudged_run_is_never_day_one(self):
+        """A run saved with nothing judged (before score.py refused them) is skipped, not used as Day 1."""
+        fake = H.load(os.path.join(self.ws, "eval", "runs", "2026-10-04.json"))
+        fake.update(run_date="2026-09-27", counts=dict(fake["counts"], judged=0, not_judged=fake["counts"]["roles"]))
+        H.save(os.path.join(self.ws, "eval", "runs", "2026-09-27.json"), fake)
+        with mock.patch("sys.stderr") as err:
+            page, d = self.build()
+        self.assertEqual(d["runs"][0]["date"], "2026-10-04")
+        self.assertEqual(d["meta"]["baseline"], "2026-10-04")
+        self.assertIn("ignoring eval/runs/2026-09-27.json", "".join(c.args[0] for c in err.write.call_args_list))
+
     def test_page_data(self):
         page, d = self.build()
         acts = {a["id"]: a for a in d["actions"]}

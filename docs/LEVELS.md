@@ -141,7 +141,8 @@ next level**, owner, effort, due date, chance, and what proves it done.
   - evidence that is verified or corroborated had a source checked since the previous
     scored day (its `checked_on` date, or `added_on` if no source has one);
   - a plan action was finished since the previous scored day, with `done_evidence`.
-  Day 1 is the measured start and never counts. Each row of the history says which of
+  Day 1 is the measured start and never counts. It is the first run with at least one
+  role judged: `score.py` saves no run with nothing judged, and the dashboard skips one. Each row of the history says which of
   these happened that day.
 
 ## Marking a quest done without breaking the source of truth

@@ -11,7 +11,9 @@ Reads
   eval/outlook.json               the agent's outlook band and reasons
   profile/evidence.json           evidence items (levels cap the scores)
 Writes
-  eval/runs/<date>.json           see schemas/run.schema.json
+  eval/runs/<date>.json           see schemas/run.schema.json. Not written (exit 1)
+                                  when no role is judged yet: that would be a
+                                  false Day 1, not a measurement.
 
 Rules (method/RUBRIC.md v1.0), applied in this order per dimension:
   1. evidence cap: a score can be no higher than its best cited evidence
@@ -413,9 +415,14 @@ def main(argv=None):
     ws, config = C.open_workspace(args.workspace)
     run_date = C.check_date(args.date) if args.date else C.today_in(config)
     run = build_run(ws, config, run_date)
+    n = run["counts"]
+    if not n["judged"]:  # nothing judged is not a measurement: saving it would make a false Day 1
+        print(("%d role%s not judged yet. Ask your agent to run Climb." % (n["roles"], "" if n["roles"] == 1 else "s"))
+              if n["roles"] else "No open roles to score yet. Ask your agent to run Climb.", file=sys.stderr)
+        print("No run saved: with nothing judged it would not be a measurement.", file=sys.stderr)
+        return 1
     out = C.wpath(ws, "eval", "runs", "%s.json" % run_date)
     C.write_json(out, run)
-    n = run["counts"]
     print("Wrote eval/runs/%s.json: %d roles (%d not yet judged, %d awaiting review)"
           % (run_date, n["roles"], n["not_judged"], n["awaiting_review"]))
     names = C.target_names(config)

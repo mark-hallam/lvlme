@@ -142,10 +142,16 @@ class Data:
         self.ws, self.config = ws, config
         files = sorted(f for f in glob.glob(C.wpath(ws, "eval", "runs", "*.json"))
                        if re.match(r"\d{4}-\d{2}-\d{2}\.json$", os.path.basename(f)))
-        if not files:
-            raise SystemExit("climb: no runs in eval/runs/. Run scripts/score.py first.")
-        self.run_files = [os.path.basename(f) for f in files]
-        self.runs = [C.load_json(f) for f in files]
+        runs = [(os.path.basename(f), C.load_json(f)) for f in files]
+        for name, run in runs:
+            if not (run.get("counts") or {}).get("judged", 1):  # saved before score.py refused these
+                print("climb: ignoring eval/runs/%s: nothing was judged, so it is not a measurement "
+                      "(it can be deleted)." % name, file=sys.stderr)
+        runs = [(name, run) for name, run in runs if (run.get("counts") or {}).get("judged", 1)]
+        if not runs:
+            raise SystemExit("climb: no scored runs in eval/runs/ yet. Ask your agent to run Climb.")
+        self.run_files = [name for name, _ in runs]
+        self.runs = [run for _, run in runs]
         self.cur = self.runs[-1]
         self.prev = self.runs[-2] if len(self.runs) > 1 else None
         load = lambda *p: C.load_json(C.wpath(ws, *p), None)  # noqa: E731

@@ -150,6 +150,9 @@ The commands below omit it. Run them from the engine folder.
 
    Fix every error and every warning about unknown evidence ids, then score
    again. Scores above 2 that are still awaiting review count as 2.
+   `score.py` saves no run while no role is judged: such a run is not a
+   measurement, and the first saved run becomes Day 1. The dashboard also
+   skips any older run file with nothing judged.
 
 9. **SWOT and TOWS.** Update `eval/swot.json` (see `SWOT.md`).
 
