@@ -1,7 +1,7 @@
 # Levels: what gets you to the next one
 
-Status: added 2026-11-02. The same day, the next level and the quest points moved onto one
-yardstick, the best fit across your roles (see "One yardstick" below). Code:
+The next level and the quest points use one yardstick, the best fit across your roles (see
+"One yardstick" below). Code:
 `scripts/_levels.py` (the maths), `scripts/_levels_html.py` (the first render of the view)
 and the `JS_LEVELS` block in `scripts/_dashboard_assets.py` (the same maths in the page, so
 the switches can change it). Tests: `tests/test_levels.py`, and `tests/test_levels_page.py`,
@@ -24,7 +24,7 @@ game score: every number is a fit point from the rubric or an effect from the pl
      result of the plan and the best case marked, then the verdict (below).
   2. *Quests*: every open plan action as a card.
   3. *Progress you can trust*: the streak and the level history.
-- **The verifiable record** chips under the chart now show each scored day's level, with a
+- **The verifiable record** chips under the chart show each scored day's level, with a
   "Level up" or "Level down" tag when it changed, and the chart marks those days with a
   small triangle.
 - **The action pane** (tap any action) has the same "Done? Tell your agent" button.

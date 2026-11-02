@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the dashboard ("Mission control") and the agent briefing from the scored runs.
+"""Build the dashboard and the agent briefing from the scored runs.
 
 Writes
   report/index.html                 the dashboard, one self-contained page
