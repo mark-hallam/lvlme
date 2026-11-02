@@ -2,7 +2,7 @@
 
 **For the job you can't get yet.** LVLme works out honestly how far you are from it, gives you the steps to climb there, and re-measures as you go.
 
-![LVLme quick's answer for one job: a low chance of an interview and a very low chance of an offer, in plain words (fictional demo)](docs/images/quick-result-hero.png)
+![LVLme quick's answer for one job: a low chance of an interview and a very low chance of an offer, in plain words, and a fit of 41 today, up to 56 if the two factors it cannot check turn out strong (fictional demo)](docs/images/quick-result-hero.png)
 
 Install in Claude Code:
 
@@ -35,7 +35,10 @@ CV. It:
   far it can be trusted (a CV line alone is "self-reported");
 - asks one yes or no question: do you know someone there who has seen your
   work?
-- scores five factors with the same rules and maths as the full campaign;
+- scores five factors with the same rules and maths as the full campaign,
+  and shows the two it cannot check from one posting and a CV (public signal
+  and application readiness) as not checked, so your fit is a range: for
+  example 41 today, up to 56 if those two turn out strong;
 - has a second agent score every point above 2 blind, without seeing the
   first scores, and shows you where the two disagree;
 - gives you one page: your chance of an interview and of an offer in plain

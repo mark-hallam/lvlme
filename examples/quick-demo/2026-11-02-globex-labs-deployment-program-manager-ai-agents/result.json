@@ -191,14 +191,24 @@
     {
       "dimension": "D5",
       "name": "Public signal",
+      "status": "not_checked",
+      "what": "What a hiring manager finds about your work in five minutes of searching: writing, a site, public code, talks, posts. LVLme quick does not search the web for you.",
       "max_points": 10.0
     },
     {
       "dimension": "D7",
       "name": "Application readiness",
+      "status": "not_checked",
+      "what": "A CV, portfolio and story tailored to this role, and consistent with your LinkedIn and website. That needs the consistency audit, not one CV.",
       "max_points": 5.0
     }
   ],
+  "if_unchecked_strong": {
+    "fit": 56.0,
+    "interview_band": "Moderate",
+    "offer_band": "Low",
+    "gain": 15.0
+  },
   "adjustments": [
     "D2 3 counted as 2 until the reviewer agrees",
     "D3 3 counted as 1: best cited evidence is self-reported network, which supports at most 1"

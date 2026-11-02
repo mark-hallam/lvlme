@@ -77,7 +77,10 @@ would raise it most. Aim for a couple of minutes and at most two questions.
    short note if the posting states a hard requirement the person plainly
    lacks. If the posting has an eligibility blocker the person says they meet,
    list its type in `eligibility_cleared`. Public signal (D5) and application
-   readiness (D7) are not checked here and count 0.
+   readiness (D7) cannot be checked from one posting and a CV: do not judge
+   them. The build counts them 0 in today's fit and shows them as not
+   checked, with the fit as a range (today's fit, up to the fit if both
+   turned out strong).
 6. **The blind reviewer**, for any score above 2:
 
    ```bash
@@ -106,7 +109,7 @@ would raise it most. Aim for a couple of minutes and at most two questions.
    three fixes that add the most fit points, and writes `index.html`,
    `result.json` and `message.md`. Fix any error it prints and run it again.
 9. **Tell the person**: paste `message.md` as it is. It holds the odds in
-   plain English, the top fixes, the command to open the page, and the way to
+   plain English, the fit as a range, the top fixes, the command to open the page, and the way to
    go deeper: say "run LVLme" for the full campaign. If they want to go deeper,
    start the full run (the engine's `SKILL.md`), and offer the CV they already
    gave as the first document for the interview.

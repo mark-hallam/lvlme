@@ -64,6 +64,14 @@ p{margin:6px 0}
 .meter i.on{background:var(--accent)}
 .meter-l{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:4px}
 .lead{font-size:17px}
+.fit{margin:14px 0 4px}
+.fit-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;font-size:14px}
+.fit-h .k{color:var(--sub);font-weight:600}
+.track{display:flex;height:10px;border-radius:5px;background:var(--pip);overflow:hidden;margin:6px 0}
+.track .now{background:var(--accent)}
+.track .maybe{background:repeating-linear-gradient(135deg,var(--accent) 0 2px,var(--accent-soft) 2px 5px)}
+.note{background:var(--card2);border-radius:12px;padding:10px 14px;margin-top:10px;font-size:14px}
+.score.nc{color:var(--sub);font-weight:600}
 .banner{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 14px;font-size:14px;font-weight:550;margin-top:12px}
 ul.rows{list-style:none;margin:10px 0 0;padding:0}
 ul.rows>li{border-top:1px solid var(--rule);padding:14px 0}
@@ -123,6 +131,31 @@ def headline(r, start=True):
     return text if start else text[0].lower() + text[1:]
 
 
+def and_list(names):
+    return names[0] if len(names) == 1 else "%s and %s" % (", ".join(names[:-1]), names[-1])
+
+
+def unchecked_names(result):
+    """'public signal and application readiness': the factors LVLme quick cannot check, in a sentence."""
+    return and_list([x["name"].lower() for x in result.get("not_checked") or []])
+
+
+def top_of_range(result):
+    """The fit if the unchecked factors turned out strong, or None when they could add nothing."""
+    top = result.get("if_unchecked_strong")
+    return top if top and top.get("gain", 0) > 0 else None
+
+
+def fit_sentence(result):
+    """'Fit 41 of 100 today, up to 56 if public signal and application readiness (not checked here) turn out
+    strong.' The range is honest about what one posting and a CV cannot show."""
+    top = top_of_range(result)
+    if not top:
+        return "Fit %s of 100." % num(result["fit"])
+    return "Fit %s of 100 today, up to %s if %s (not checked here) turn out strong." % (
+        num(result["fit"]), num(top["fit"]), unchecked_names(result))
+
+
 def long_date(iso):
     months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
               "November", "December"]
@@ -175,13 +208,30 @@ def hero(result):
     return ('<section class="card" aria-labelledby="oddsH"><p class="eyebrow">Your honest odds today</p>'
             '<h1>%s</h1><p class="sub small">%s%s</p>'
             '<div class="odds">%s%s</div>'
-            '<p class="lead" id="oddsH"><b>%s.</b> %s</p>'
-            '<p class="sub small">Fit <b class="num">%s</b> out of 100 on the five factors LVLme quick checks. '
-            'The chances are judgement estimates, not statistics. Most applicants to competitive roles are turned '
-            'down, so LVLme starts from "unlikely" and only evidence moves it.</p>%s</section>'
+            '<p class="lead" id="oddsH"><b>%s.</b> %s</p>%s'
+            '<p class="sub small">The chances are for today\'s fit. They are judgement estimates, not statistics. '
+            'Most applicants to competitive roles are turned down, so LVLme starts from "unlikely" and only evidence '
+            'moves it.</p>%s</section>'
             % (esc(r["title"]), where, link, meter(result["interview_band"], "Interview chance"),
                meter(result["offer_band"], "Offer chance"), esc(headline(result)),
-               esc(EXPLAIN[result["interview_band"]]), num(result["fit"]), banners))
+               esc(EXPLAIN[result["interview_band"]]), fit_range(result), banners))
+
+
+def fit_range(result):
+    """Today's fit as a bar, with the part the unchecked factors could add striped, and the words for it."""
+    top = top_of_range(result)
+    now = '<i class="now" style="width:%s%%"></i>' % num(result["fit"])
+    if not top:
+        return ('<div class="fit"><div class="fit-h"><span class="k">Fit, out of 100</span><span><b class="num">%s'
+                '</b></span></div><div class="track" aria-hidden="true">%s</div></div>' % (num(result["fit"]), now))
+    many = len(result["not_checked"]) > 1
+    return ('<div class="fit"><div class="fit-h"><span class="k">Fit, out of 100</span><span><b class="num">%s</b> '
+            'today, up to <b class="num">%s</b></span></div>'
+            '<div class="track" aria-hidden="true">%s<i class="maybe" style="width:%s%%"></i></div>'
+            '<p class="tiny sub">The striped part is %s. LVLme quick cannot check %s from one posting and a CV, '
+            'so today %s 0.</p></div>' % (
+                num(result["fit"]), num(top["fit"]), now, num(top["gain"]), esc(unchecked_names(result)),
+                "them" if many else "it", "they count" if many else "it counts"))
 
 
 def evidence_list(rows):
@@ -208,15 +258,29 @@ def factors(result):
                         esc(f["name"]), pips(f["score"]), f["score"], num(f["points"]), num(f["max_points"]),
                         chip(label, cls), ('<p class="small">%s</p>' % esc(f["note"])) if f["note"] else "",
                         evidence_list(f["evidence"]), why))
-    nc = result["not_checked"]
-    rows.append('<li><div class="row-h"><h3>Not checked in the quick answer</h3><span class="score num">0 of %s</span></div>'
-                '<p class="small sub">%s. They need more than one posting and a CV, so they count 0 here. '
-                'The full campaign checks them.</p></li>' % (
-                    num(sum(x["max_points"] for x in nc)),
-                    esc(" and ".join(x["name"] if i == 0 else x["name"].lower() for i, x in enumerate(nc)))))
+    for x in result["not_checked"]:
+        rows.append('<li><div class="row-h"><h3>%s</h3><span class="score nc">Not checked</span></div>'
+                    '<p class="tiny sub">Up to %s fit points · %s</p><p class="small">%s</p></li>' % (
+                        esc(x["name"]), num(x["max_points"]), chip("Counts 0 today", "s"), esc(x.get("what", ""))))
+    note = unchecked_note(result)
     return ('<section class="card" aria-labelledby="whyH"><p class="eyebrow">Why</p><h2 id="whyH">Factor by factor</h2>'
             '<p class="small sub">Every point cites evidence, and a score can be no higher than its best evidence '
-            'supports. A line on a CV alone is self-reported.</p><ul class="rows">%s</ul></section>' % "".join(rows))
+            'supports. A line on a CV alone is self-reported.</p><ul class="rows">%s</ul>%s</section>' % (
+                "".join(rows), note))
+
+
+def unchecked_note(result):
+    """The top of the range, in words, under the factors: what the fit would be if the unchecked ones were strong."""
+    top = top_of_range(result)
+    if not top:
+        return ""
+    names = unchecked_names(result)
+    many = len(result["not_checked"]) > 1
+    return ('<p class="note">%s %s not checked here. If %s strong (5 of 5), the fit is <b class="num">%s</b> '
+            'instead of %s: %s. The full campaign checks %s.</p>' % (
+                esc(names[0].upper() + names[1:]), "are" if many else "is",
+                "both turn out" if len(result["not_checked"]) == 2 else "they turn out" if many else "it turns out",
+                num(top["fit"]), num(result["fit"]), esc(headline(top, start=False)), "them" if many else "it"))
 
 
 def band_change(result, f):

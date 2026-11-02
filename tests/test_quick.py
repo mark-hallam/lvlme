@@ -124,6 +124,76 @@ class DemoTests(Base):
         self.assertLess(len(message.split()), 150)
 
 
+class NotCheckedTests(Base):
+    """Public signal and application readiness cannot be checked from one posting and a CV: shown as not
+    checked, with the fit as a range (today's fit, up to the fit if both turned out strong), never a silent 0."""
+
+    def page(self):
+        with open(os.path.join(self.folder, "index.html"), encoding="utf-8") as fh:
+            return fh.read()
+
+    def test_the_fit_is_a_range_and_the_odds_stay_today_s(self):
+        r = self.load("result.json")
+        self.assertEqual((r["fit"], r["interview_band"], r["offer_band"]), (41.0, "Low", "Very low"))
+        self.assertEqual(r["if_unchecked_strong"],
+                         {"fit": 56.0, "interview_band": "Moderate", "offer_band": "Low", "gain": 15.0})
+        # the top of the range adds exactly the unchecked factors' full weight: 10 + 5 out of 100
+        self.assertEqual(r["if_unchecked_strong"]["gain"], sum(x["max_points"] for x in r["not_checked"]))
+        self.assertEqual([(x["dimension"], x["status"], x["max_points"]) for x in r["not_checked"]],
+                         [("D5", "not_checked", 10.0), ("D7", "not_checked", 5.0)])
+        self.assertTrue(all(x["what"] for x in r["not_checked"]))
+
+    def test_strong_unchecked_factors_pass_the_caps_and_keep_the_band_rules(self):
+        """The top of the range is the scoring maths: D5 and D7 count 5, and the cold-application cap still holds."""
+        ev = self.load("profile/evidence.json")
+        quick = self.load("eval/quick.json")
+        for d in ("D1", "D2", "D4"):
+            quick["factors"][d].update(score=5, evidence=["E04"])          # E04 is verified
+        self.save("eval/quick.json", quick)
+        self.write("eval/review-reply.md", "".join("x/%s | %s | 5 | anchor 5 | E04\n" % (d, d) for d in ("D1", "D2", "D4"))
+                   + "D6/quick | D6 | 5 | anchor | E05\n")
+        self.assertIn("E04", [e["id"] for e in ev["items"]])
+        r = self.result()
+        self.assertEqual((r["fit"], r["interview_band"], r["offer_band"]), (69.0, "Moderate", "Low"))
+        top = r["if_unchecked_strong"]
+        self.assertEqual((top["fit"], top["interview_band"]), (84.0, "Good"))
+        self.assertEqual(top["offer_band"], "Low")          # the offer table says Moderate; D3 at 1 caps it at Low
+        docs = Q.load(self.folder)
+        flags = Q.check_flags(docs["quick"], docs["role"])
+        scored, _ = Q.score(docs, flags, set(r["review"]["agreed"]), {"D5": 5, "D7": 5})
+        self.assertEqual((scored["scores"]["D5"]["score"], scored["scores"]["D7"]["score"]), (5, 5))
+
+    def test_the_page_shows_them_as_not_checked_with_the_range(self):
+        page = self.page()
+        self.assertIn('<b class="num">41</b> today, up to <b class="num">56</b>', page)
+        self.assertIn('<i class="maybe" style="width:15%">', page)
+        self.assertEqual(page.count('<span class="score nc">Not checked</span>'), 2)
+        self.assertIn("Up to 10 fit points", page)
+        self.assertIn("Up to 5 fit points", page)
+        self.assertIn("the fit is <b class=\"num\">56</b> instead of 41: moderate chance of an interview, low chance "
+                      "of an offer", page)
+        self.assertNotIn("five factors", page)     # the old line said 41 was out of 100 on five factors: it is not
+
+    def test_the_message_gives_the_range(self):
+        with open(os.path.join(self.folder, "message.md"), encoding="utf-8") as fh:
+            message = fh.read()
+        self.assertIn("Odds today: Low chance of an interview, very low chance of an offer.\n", message)
+        self.assertIn("Fit 41 of 100 today, up to 56 if public signal and application readiness (not checked here) "
+                      "turn out strong.", message)
+
+    def test_no_range_when_the_unchecked_factors_could_add_nothing(self):
+        import _quick_html as QH
+        r = self.load("result.json")
+        r["if_unchecked_strong"] = dict(r["if_unchecked_strong"], fit=r["fit"], gain=0.0)
+        page = QH.render(r)
+        self.assertNotIn("up to <b", page)
+        self.assertNotIn('class="maybe"', page)
+        self.assertNotIn('class="note"', page)
+        self.assertEqual(QH.fit_sentence(r), "Fit 41 of 100.")
+        del r["if_unchecked_strong"]                    # a result.json from before the range still renders
+        self.assertIn("Not checked", QH.render(r))
+
+
 class ReviewTests(Base):
     def test_review_items_hide_the_scores(self):
         code, out, _ = run(["review-items", "--folder", self.folder])

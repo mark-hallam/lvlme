@@ -106,7 +106,7 @@ cannot, run the same stages one after another; the gates do not change. See
 ## Entry points
 
 If the person asks for one part only, run only that part, with the hard rules:
-`quick` (honest odds for one posting from a link and a CV, in about five
+`quick` (honest odds for one posting from a link and a CV, in a couple of
 minutes: follow `skills/lvlme-quick/SKILL.md`), `interview` (stage 1), `audit`
 (the two audits), `screen` (the recruiter screen), `dashboard` (stage 9),
 `status` (stage 10 from the newest files, changing nothing), or `resume` (the

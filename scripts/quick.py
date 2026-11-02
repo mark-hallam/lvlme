@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""LVLme quick: honest odds for one job posting, in about five minutes.
+"""LVLme quick: honest odds for one job posting, in a couple of minutes.
 
 Three steps, with the agent's judgement in between (skills/lvlme-quick/SKILL.md):
 
@@ -23,11 +23,14 @@ brief (agents/reviewer.md) and the scoring code work on it unchanged:
 
 The maths is the campaign's: the evidence caps, the review cap, the hard
 requirement and eligibility rules, the fit and the bands all come from
-score.score_role. Public signal (D5) and application readiness (D7) are not
-checked in the quick answer and count 0, as anything without evidence does.
-A score above 2 stands only when the blind reviewer gives the same score;
-otherwise it counts as 2, the rule for a dispute still waiting for its
-tie-break (method/REVIEW.md). Fixes are ranked by the fit points they add,
+score.score_role. Public signal (D5) and application readiness (D7) cannot be
+checked from one posting and a CV. The fit today counts them 0, as anything
+without evidence does, and the result shows them as not checked, with the fit
+as a range: today's fit, up to the fit if both turned out strong (5 of 5),
+worked out with the same maths (result.json if_unchecked_strong). The odds are
+always today's. A score above 2 stands only when the blind reviewer gives the
+same score; otherwise it counts as 2, the rule for a dispute still waiting for
+its tie-break (method/REVIEW.md). Fixes are ranked by the fit points they add,
 each capped by the dashboard's projection caps (method/CAMPAIGN.md).
 
 Usage
@@ -53,8 +56,15 @@ import score as S  # noqa: E402
 import validate as V  # noqa: E402
 
 QUICK_DIMS = ["D1", "D2", "D3", "D4", "D6"]   # judged in the quick answer, in rubric order
-NOT_CHECKED = ["D5", "D7"]                    # need the full campaign; count 0 here
+NOT_CHECKED = ["D5", "D7"]                    # need the full campaign; count 0 in today's fit
 NOT_CHECKED_NOTE = "Not checked in LVLme quick. The full campaign checks it."
+NOT_CHECKED_WHAT = {   # what each one is, and why one posting and a CV cannot settle it
+    "D5": ("What a hiring manager finds about your work in five minutes of searching: writing, a site, public "
+           "code, talks, posts. LVLme quick does not search the web for you."),
+    "D7": ("A CV, portfolio and story tailored to this role, and consistent with your LinkedIn and website. "
+           "That needs the consistency audit, not one CV."),
+}
+STRONG = 5   # "strong" for the top of the range: the factor's best score
 CLASS = "quick"
 WHATIF = "WHATIF"
 TOP_FIXES = 3
@@ -287,8 +297,9 @@ def inputs(quick, role, flags, reviewed, overrides=None):
     if any(f["flag"] == "eligibility_blocked" for f in applied):
         judgement["eligibility_blocked"] = True
     not_checked = {"score": 0, "evidence": [], "note": NOT_CHECKED_NOTE}
-    profile = {"judged_on": jd, "D3": {org: entry("D3")}, "D5": {org: dict(not_checked)},
-               "D7": {org: dict(not_checked)},
+    unchecked = {d: entry(d) if d in overrides else dict(not_checked) for d in NOT_CHECKED}
+    profile = {"judged_on": jd, "D3": {org: entry("D3")}, "D5": {org: unchecked["D5"]},
+               "D7": {org: unchecked["D7"]},
                "D6_rules": {"classes": {CLASS: entry("D6")},
                             "blocked": {"evidence": [], "note": "The posting has an eligibility blocker."}}}
     return judgement, profile
@@ -394,6 +405,17 @@ def rank_fixes(docs, flags, agreed, scored):
     return top, combined, sorted(dropped, key=lambda x: x["id"])
 
 
+def if_unchecked_strong(docs, flags, agreed, scored):
+    """The top of the fit range: today's scores, with the factors LVLme quick cannot check (D5, D7) strong.
+
+    Worked out with the same maths as the score (score.score_role, so the bands keep every adjustment,
+    such as the cold-application cap). Today's odds stay those of the fit as measured: this is a ceiling,
+    never the answer."""
+    after, _ = score(docs, flags, agreed, {d: STRONG for d in NOT_CHECKED})
+    return {"fit": after["fit"], "interview_band": after["interview_band"], "offer_band": after["offer_band"],
+            "gain": round(after["fit"] - scored["fit"], 1)}
+
+
 # ---------------------------------------------------------------- result
 
 
@@ -457,7 +479,7 @@ def build_result(docs):
                         "max_points": round(ctx.weights[d] * 100.0 / total, 1),
                         "note": quick["factors"][d].get("note", ""), "evidence": evidence_rows(docs, s["evidence"]),
                         "why_counted": why_counted(s), "review": review_rows[d]})
-    not_checked = [{"dimension": d, "name": NAMES[d],
+    not_checked = [{"dimension": d, "name": NAMES[d], "status": "not_checked", "what": NOT_CHECKED_WHAT[d],
                     "max_points": round(ctx.weights[d] * 100.0 / total, 1)} for d in NOT_CHECKED]
     top, combined, dropped = rank_fixes(docs, flags, agreed, scored)
     if quick.get("warm_path") is None:
@@ -476,7 +498,9 @@ def build_result(docs):
         "hard_requirement_lacking": scored["hard_requirement_lacking"],
         "hard_requirement_note": quick.get("hard_requirement_note") or "",
         "warm_path": quick.get("warm_path"),
-        "factors": factors, "not_checked": not_checked, "adjustments": scored["adjustments"],
+        "factors": factors, "not_checked": not_checked,
+        "if_unchecked_strong": if_unchecked_strong(docs, flags, agreed, scored),
+        "adjustments": scored["adjustments"],
         "review": {"agreed": sorted(agreed), "disputes": disputes, "flags": flags},
         "fixes": top, "if_all_fixes": combined, "fixes_not_shown": dropped,
         "brief": brief(docs, factors),
@@ -509,16 +533,17 @@ def review_sentence(result):
 def message(result, folder):
     r = result["role"]
     lines = ["LVLme quick: %s at %s." % (r["title"], r["org_name"]),
-             "Odds today: %s (fit %s of 100)." % (QH.headline(result), QH.num(result["fit"])), ""]
+             "Odds today: %s." % QH.headline(result), QH.fit_sentence(result), ""]
     if result["fixes"]:
         lines.append("The fixes that would raise them most:")
         for i, f in enumerate(result["fixes"], 1):
             lines.append("%d. %s (+%s fit points)" % (i, f["title"], QH.num(f["gain"])))
         c = result["if_all_fixes"]
-        lines += ["", "If %s: fit %s, %s. Each fix has a concrete next step on the page." % (
+        lines += ["", "If %s: fit %s, %s." % (
             "they all land" if len(result["fixes"]) > 1 else "it lands", QH.num(c["fit"]), QH.headline(c, start=False)), ""]
     lines.append(review_sentence(result))
-    lines += ["", "See why, factor by factor:", "", "```bash", "open %s" % display_path(os.path.join(folder, "index.html")),
+    lines += ["", "See why, factor by factor%s:" % (", and the next step for each fix" if result["fixes"] else ""),
+              "", "```bash", "open %s" % display_path(os.path.join(folder, "index.html")),
               "```", "",
               "Go deeper: say \"run LVLme\" for the full campaign."]
     return "\n".join(lines) + "\n"

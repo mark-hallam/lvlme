@@ -32,7 +32,10 @@ pasted text). The steps are in
 4. **The judging.** Five of the seven factors: requirements match, proof of
    work, warm path, organisation-specific edge, and eligibility and logistics.
    Public signal and application readiness need more than one posting and a
-   CV, so they count 0 here, as anything without evidence does.
+   CV, so the answer shows them as not checked and gives the fit as a range:
+   today's fit, which counts them 0 as anything without evidence does, up to
+   the fit if both turned out strong (in the demo, 41 today, up to 56). The
+   odds are always today's.
 5. **The blind second opinion.** For every score above 2, one fresh reviewer,
    given only the rubric, your evidence and the posting, scores it for itself.
    If the two agree, the score stands. If they disagree, the disagreement is
