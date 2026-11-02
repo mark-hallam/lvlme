@@ -407,7 +407,7 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
 .share-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
 .share-row div{background:var(--card);border-radius:12px;padding:10px 12px;min-width:0}
 .share-row b{display:block;font-size:28px;letter-spacing:-.02em}
-.share-row .pill{white-space:normal;max-width:100%}
+.share-row .pill{white-space:normal;max-width:100%;overflow-wrap:normal}
 
 /* motion: only while .animate is on the body (visible tab, motion allowed); every
    animated element also loses its .enter class on a timer, so nothing stays hidden */
@@ -471,7 +471,7 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
 @media (max-width:360px){.seg button{padding:6px 8px;font-size:13px}}
 @media (max-width:420px){.share-row div{padding:8px 7px}.share-row b{font-size:20px}.share-row .pill{font-size:11px;padding:2px 6px}}
 @media (max-width:360px){.share-row{gap:6px}.share-row div{padding:8px 6px}.share-row .pill{padding:2px 5px}}
-@media (max-width:340px){.share-row{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:359px){.share-row{grid-template-columns:minmax(0,1fr)}}
 .sheet-grip{display:none;width:40px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 4px}
 .sheet-done{display:none}
 @media (max-width:759px){.sheet-grip{display:block}.sheet-done{display:block;margin:0 4px 8px auto}}

@@ -63,7 +63,7 @@ class ShareRowFitTests(unittest.TestCase):
         self.assertIn(".share-row .pill{white-space:normal", A.CSS)
         # tighter tiles on a phone, and one tile per row on the narrowest screens
         self.assertIn("@media (max-width:420px){.share-row div{padding:8px 7px}", A.CSS)
-        self.assertIn("@media (max-width:340px){.share-row{grid-template-columns:minmax(0,1fr)}}", A.CSS)
+        self.assertIn("@media (max-width:359px){.share-row{grid-template-columns:minmax(0,1fr)}}", A.CSS)
 
 
 if __name__ == "__main__":
