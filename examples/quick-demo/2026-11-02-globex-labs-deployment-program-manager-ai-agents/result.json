@@ -292,6 +292,7 @@
   "fixes_not_shown": [
     {
       "id": "F4",
+      "dimension": "D1",
       "title": "Add customer-facing deployment experience",
       "why": "this factor does not move in a few months"
     }

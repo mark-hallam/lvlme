@@ -312,12 +312,34 @@ def band_change(result, f):
     return ", ".join(moves) if moves else "chances stay in the same bands"
 
 
+def hard_requirement_line(result):
+    """One plain line when a hard requirement is missing: it holds both chances down and no fix shown changes it,
+    with why the requirements match fix (if one was considered) is not listed. Empty otherwise."""
+    if not result.get("hard_requirement_lacking"):
+        return ""
+    note = result.get("hard_requirement_note")
+    if note:
+        head = "A hard requirement is missing (%s)" % note
+    elif result.get("eligibility_blocked"):
+        head = "The posting has an eligibility rule you have not cleared"
+    else:
+        head = "A hard requirement is missing"
+    line = "%s, so both chances drop a step, and %s changes that." % (
+        head, "none of the fixes below" if result["fixes"] else "no fix found here")
+    d1 = [x for x in result.get("fixes_not_shown") or [] if x.get("dimension") == "D1"]
+    if d1:
+        line += ' The requirements match fix ("%s") is not listed because %s.' % (d1[0]["title"], d1[0]["why"])
+    return line
+
+
 def fixes(result):
+    hrl = hard_requirement_line(result)
+    hrl = '<p class="note">%s</p>' % esc(hrl) if hrl else ""
     if not result["fixes"]:
         return ('<section class="card" aria-labelledby="fixH"><p class="eyebrow">What would raise your odds</p>'
                 '<h2 id="fixH">No fix found</h2>'
                 '<p class="small sub">None of the fixes considered adds fit points. Say "run LVLme" for the full '
-                'campaign, which looks wider.</p></section>')
+                'campaign, which looks wider.</p>%s</section>' % hrl)
     items = []
     for f in result["fixes"]:
         items.append('<li><h3>%s</h3><p class="small"><span class="gain">+%s fit points</span> · %s %d to %d · '
@@ -331,8 +353,8 @@ def fixes(result):
         esc(headline(c, start=False))))
     return ('<section class="card" aria-labelledby="fixH"><p class="eyebrow">What would raise your odds</p>'
             '<h2 id="fixH">The top %s</h2><p class="small sub">Ranked by the fit points each adds, with the same '
-            'maths as the score. Each one is capped at what can realistically change in a few months.</p>'
-            '<ol class="fixes">%s</ol>%s</section>' % ("fix" if n == 1 else "%d fixes" % n, "".join(items), all_line))
+            'maths as the score. Each one is capped at what can realistically change in a few months.</p>%s'
+            '<ol class="fixes">%s</ol>%s</section>' % ("fix" if n == 1 else "%d fixes" % n, hrl, "".join(items), all_line))
 
 
 def brief(result):

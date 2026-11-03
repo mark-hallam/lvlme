@@ -102,7 +102,7 @@ class DemoTests(Base):
         self.assertEqual([(f["id"], f["from"], f["to"], f["gain"]) for f in r["fixes"]],
                          [("F1", 1, 3, 8.0), ("F2", 2, 3, 4.0), ("F3", 2, 3, 2.0)])   # F1 asked for 4; the cap allows +2
         self.assertEqual(r["if_all_fixes"], {"fit": 55.0, "interview_band": "Moderate", "offer_band": "Low", "gain": 14.0})
-        self.assertEqual(r["fixes_not_shown"], [{"id": "F4", "title": "Add customer-facing deployment experience",
+        self.assertEqual(r["fixes_not_shown"], [{"id": "F4", "dimension": "D1", "title": "Add customer-facing deployment experience",
                                                  "why": "this factor does not move in a few months"}])
 
     def test_brief_never_holds_application_answers(self):
@@ -266,6 +266,27 @@ class ReviewTests(Base):
         r = self.result()
         self.assertEqual(r["review"]["flags"][0]["status"], "not_in_posting")
         self.assertEqual(r["fit"], 41.0)
+
+    def test_a_missing_hard_requirement_is_said_in_the_chat_and_the_fixes_card(self):
+        quick = self.load("eval/quick.json")
+        quick["hard_requirement_lacking"] = True
+        quick["hard_requirement_note"] = "5+ years deploying language models"
+        self.save("eval/quick.json", quick)
+        result, message = Q.build(self.folder)
+        self.assertEqual(result["fixes_not_shown"][0]["dimension"], "D1")
+        line = ("A hard requirement is missing (5+ years deploying language models), so both chances drop a step, "
+                "and none of the fixes below changes that. The requirements match fix (\"Add customer-facing "
+                "deployment experience\") is not listed because this factor does not move in a few months.")
+        self.assertIn(line, message)
+        self.assertLess(message.index(line), message.index("The fixes that would raise them most"))
+        page = open(os.path.join(self.folder, "index.html"), encoding="utf-8").read()
+        fixes_card = page[page.index('id="fixH"'):]
+        self.assertIn("none of the fixes below changes that", fixes_card[:fixes_card.index("</section>")])
+
+    def test_no_hard_requirement_line_when_none_is_missing(self):
+        result, message = Q.build(self.folder)
+        self.assertFalse(result["hard_requirement_lacking"])
+        self.assertNotIn("hard requirement", message.lower())
 
     def test_eligibility_blocker_zeroes_eligibility_and_its_fix(self):
         quick = self.load("eval/quick.json")

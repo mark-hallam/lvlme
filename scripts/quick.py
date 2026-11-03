@@ -395,12 +395,12 @@ def rank_fixes(docs, flags, agreed, scored):
         if to <= cur:
             why = ("this factor does not move in a few months" if caps.get(d, 0) == 0 and fx["target_score"] > cur
                    else "already at or above the target")
-            dropped.append({"id": fx["id"], "title": fx["title"], "why": why})
+            dropped.append({"id": fx["id"], "dimension": d, "title": fx["title"], "why": why})
             continue
         after, _ = score(docs, flags, agreed, {d: to})
         gain = round(after["fit"] - scored["fit"], 1)
         if gain <= 0:
-            dropped.append({"id": fx["id"], "title": fx["title"],
+            dropped.append({"id": fx["id"], "dimension": d, "title": fx["title"],
                             "why": "adds no fit points (a blocker or a missing hard requirement holds it down)"})
             continue
         rows.append({"id": fx["id"], "dimension": d, "name": NAMES[d], "title": fx["title"],
@@ -411,12 +411,14 @@ def rank_fixes(docs, flags, agreed, scored):
     ranked, seen = [], set()
     for r in rows:
         if r["dimension"] in seen:
-            dropped.append({"id": r["id"], "title": r["title"], "why": "another fix to the same factor adds more"})
+            dropped.append({"id": r["id"], "dimension": r["dimension"], "title": r["title"],
+                            "why": "another fix to the same factor adds more"})
             continue
         seen.add(r["dimension"])
         ranked.append(r)
     top = ranked[:TOP_FIXES]
-    dropped += [{"id": r["id"], "title": r["title"], "why": "not in the top %d" % TOP_FIXES} for r in ranked[TOP_FIXES:]]
+    dropped += [{"id": r["id"], "dimension": r["dimension"], "title": r["title"], "why": "not in the top %d" % TOP_FIXES}
+                for r in ranked[TOP_FIXES:]]
     combined = None
     if top:
         after, _ = score(docs, flags, agreed, {r["dimension"]: r["to"] for r in top})
@@ -555,6 +557,8 @@ def message(result, folder):
     r = result["role"]
     lines = ["LVLme quick: %s at %s." % (r["title"], r["org_name"]),
              "Odds today: %s." % QH.headline(result), QH.fit_sentence(result), ""]
+    if QH.hard_requirement_line(result):
+        lines += [QH.hard_requirement_line(result), ""]
     if result["fixes"]:
         lines.append("The fixes that would raise them most:")
         for i, f in enumerate(result["fixes"], 1):
