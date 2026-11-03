@@ -224,3 +224,28 @@ class DashboardTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ConnectionsTests(unittest.TestCase):
+    """An organisation with LinkedIn connections but no warm path yet never reads 'No one yet'."""
+
+    def warm(self):
+        network = {"orgs": {"acme": {"count": 1, "first_degree": [{"name": "Pat Doe"}]}, "globex": {"count": 0}}}
+        return W.page_data(None, ["acme", "globex"], {"acme": "Acme", "globex": "Globex"}, {}, lambda x: x,
+                           W.connection_counts(network))
+
+    def test_counts_come_from_the_network_map(self):
+        self.assertEqual(W.connection_counts({"orgs": {"acme": {"count": 2}, "b": {"count": 0}}}), {"acme": 2})
+        self.assertEqual(W.connection_counts(None), {})
+        self.assertEqual([o["connections"] for o in self.warm()["orgs"]], [1, 0])
+
+    def test_the_static_summary_says_not_asked_yet(self):
+        table = W.static_html(self.warm())
+        self.assertIn("1 connection, not asked yet", table)
+        self.assertIn("No one yet", table)   # Globex: no connection, no warm path
+
+    def test_the_card_says_it_too(self):
+        import _dashboard_assets as A
+        js = "".join(v for v in vars(A).values() if isinstance(v, str))
+        self.assertIn("not asked yet", js)
+        self.assertIn("Tell your agent which of them you know", js)

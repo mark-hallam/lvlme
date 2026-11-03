@@ -592,7 +592,8 @@ def build_data(data):
                          "result": clean(x.get("result")), "decision": x.get("decision", ""), "why": clean(x.get("why"))}
                         for x in plan.get("experiments_log") or []],
         "backlog": [clean(b) for b in plan.get("backlog") or []],
-        "warm": W.page_data(data.warm, data.targets, data.org_names, group_of, clean),
+        "warm": W.page_data(data.warm, data.targets, data.org_names, group_of, clean,
+                            W.connection_counts(data.network)),
     }
     out["orgOrder"] = [g for g in groups if g in out["orgs"]]
     out["ceil"] = build_ceilings(data, {x["id"]: x for x in roles}, group_of)

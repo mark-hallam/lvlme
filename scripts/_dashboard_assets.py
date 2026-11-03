@@ -966,11 +966,14 @@ function warmBar(n){ let s = ""; for (let i = 0; i < 5; i++) s += `<i${i <= n ? 
 function warmRow(o){
   const W = D.warm, open = D.orgs[o.g] ? ` tabindex="0" data-org-open="${esc(o.g)}"` : "";
   const counts = o.counts.map((n, i) => n ? n + " " + W.stages[i].toLowerCase() : "").filter(Boolean).join(", ");
-  return `<div class="wp"${open}><div class="wp-h"><span class="wp-n">${esc(o.name)}</span>${o.people ? `<span class="wp-s"><span class="sr-only">furthest stage: </span>${esc(W.stages[o.furthest])}</span>` : '<span class="wp-s none">No one yet</span>'}</div>${warmBar(o.furthest)}${o.people ? `<div class="tiny sub">${o.people === 1 ? "1 person" : esc(plural(o.people, "person", "people") + ": " + counts)}</div>` : ""}</div>`;
+  return `<div class="wp"${open}><div class="wp-h"><span class="wp-n">${esc(o.name)}</span>${o.people ? `<span class="wp-s"><span class="sr-only">furthest stage: </span>${esc(W.stages[o.furthest])}</span>` : o.connections ? `<span class="wp-s none">${o.connections === 1 ? "1 connection" : o.connections + " connections"}, not asked yet</span>` : '<span class="wp-s none">No one yet</span>'}</div>${warmBar(o.furthest)}${o.people ? `<div class="tiny sub">${o.people === 1 ? "1 person" : esc(plural(o.people, "person", "people") + ": " + counts)}</div>` : ""}</div>`;
 }
 function warmHTML(){
   const W = D.warm; if (!W || !W.orgs.length) return "";
-  return `<div>${W.orgs.map(warmRow).join("")}</div>` + (W.orgs.some(o => o.people) ? "" : '<div class="tiny sub" style="margin-top:6px">Tell your agent who you know at each organisation and how far you have got.</div>');
+  const asked = W.orgs.some(o => o.people), conn = W.orgs.some(o => !o.people && o.connections);
+  const hint = conn ? "You have LinkedIn connections where no warm path has started. Tell your agent which of them you know, and it starts one."
+    : asked ? "" : "Tell your agent who you know at each organisation and how far you have got.";
+  return `<div>${W.orgs.map(warmRow).join("")}</div>` + (hint ? `<div class="tiny sub" style="margin-top:6px">${hint}</div>` : "");
 }
 function warmDetail(L){
   const W = D.warm, mine = W ? W.orgs.filter(o => L.members.includes(o.id)) : [];

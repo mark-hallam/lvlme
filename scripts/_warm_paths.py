@@ -86,12 +86,24 @@ def org_line(name, stats):
 # ------------------------------------------------------------------ dashboard
 
 
-def page_data(doc, targets, org_names, group_of, clean):
-    """The page's D.warm: one strip per target organisation, and the contacts for the organisation pane."""
-    stats = per_org(doc, targets)
+def connection_counts(network):
+    """{org: first-degree LinkedIn connections there} from profile/network.json (network_map.py)."""
+    return {o: v.get("count", 0) for o, v in ((network or {}).get("orgs") or {}).items() if v.get("count")}
+
+
+def connections_text(n):
+    return "%d connection%s, not asked yet" % (n, "" if n == 1 else "s")
+
+
+def page_data(doc, targets, org_names, group_of, clean, connections=None):
+    """The page's D.warm: one strip per target organisation, and the contacts for the organisation pane.
+    connections ({org: count}) are the person's first-degree connections there: an organisation with
+    no warm path yet but a connection says so, rather than "No one yet"."""
+    stats, connections = per_org(doc, targets), connections or {}
     return {
         "stages": [STAGE_NAMES[s] for s in STAGES], "note": NOTE, "tracked": doc is not None,
         "orgs": [{"id": t, "g": group_of.get(t, t), "name": org_names.get(t, t), "people": s["people"],
+                  "connections": connections.get(t, 0),
                   "furthest": rank(s["furthest"]) if s["furthest"] else -1,
                   "counts": [s["by_stage"][x] for x in STAGES]} for t, s in stats.items()],
         "contacts": [{"org": c["org"], "who": clean(c.get("person")), "role": clean(c.get("role")),
@@ -106,7 +118,8 @@ def static_html(warm):
         return ""
     rows = []
     for o in warm["orgs"]:
-        furthest = warm["stages"][o["furthest"]] if o["furthest"] >= 0 else "No one yet"
+        furthest = (warm["stages"][o["furthest"]] if o["furthest"] >= 0
+                    else connections_text(o["connections"]) if o.get("connections") else "No one yet")
         counts = ", ".join("%d %s" % (n, warm["stages"][i].lower()) for i, n in enumerate(o["counts"]) if n)
         rows.append('<tr><th scope="row">%s</th><td>%s</td><td>%s</td></tr>' % (
             html.escape(o["name"]), html.escape(furthest), html.escape(counts or "None tracked")))
