@@ -534,7 +534,7 @@ BODY = r"""
   <section class="card static-sum" id="staticSummary" aria-labelledby="staticSummaryH">__STATIC__</section>
   <div class="tiles4" id="tiles4"></div>
   <div class="card pair" id="warmCard" hidden><div class="eyebrow">Warm paths</div><div class="tiny sub" id="warmSub" style="margin-bottom:4px"></div><div id="warm"></div></div>
-  <div class="card pair" id="unlocksCard"><div class="eyebrow">Biggest unlocks</div><div id="unlocks"></div></div>
+  <div class="card pair" id="unlocksCard"><div class="eyebrow">Biggest unlocks</div><div class="tiny sub" id="unlocksSub" style="margin-bottom:4px"></div><div id="unlocks"></div></div>
 
   <nav class="views-nav" aria-label="Views"><div class="hscroll"><div class="seg" id="viewSeg" role="tablist" aria-label="Views"></div></div></nav>
   <section class="view on" id="v-level" role="tabpanel" aria-labelledby="tab-level">__LEVELUP__</section>
@@ -951,8 +951,12 @@ const byWhen = a => a.dated ? "by " + shortDate(a.date) : "no target date yet";
 // Do next is the top of the one ranked list (the quests in the same order): one points number per action.
 const DO_NEXT = 4;
 function doNextHTML(){ const L = lv(); return doNextRows(L.up, L.nl, DO_NEXT); }
+// A gap's points are summed across roles, so the total can pass 100 beside fits out of 100. Show the
+// average a role gains, with how many roles, so every number reads as fit points on one role.
+const UNLOCKS_SUB = "Fit points each role gains on average, and how many of your top judged roles it lifts.";
+const perRole = x => { const v = x.roles ? x.points / x.roles : x.points; return v >= 10 ? Math.round(v) : Math.round(v * 10) / 10; };
 function unlocksHTML(){
-  return D.gaps.slice(0, 4).map(x => `<div class="dn" tabindex="0" data-moves="1"><div style="flex:1;min-width:0"><div class="dn-t">${esc(x.title)}</div><div class="tiny sub">${plural(x.roles, "role")}</div></div><div class="dn-p">+${x.points}</div></div>`).join("") +
+  return D.gaps.slice(0, 4).map(x => `<div class="dn" tabindex="0" data-moves="1"><div style="flex:1;min-width:0"><div class="dn-t">${esc(x.title)}</div><div class="tiny sub">lifts ${plural(x.roles, "role")}</div></div><div class="dn-p">+${perRole(x)}<span class="tiny sub"> each</span></div></div>`).join("") +
     `<button class="linkbtn" data-see-moves="1" style="margin-top:8px">See everything that moves you ›</button>`;
 }
 // Warm paths (campaign/warm-paths.json): how far each contact at each organisation has come. Progress only: no score
@@ -985,7 +989,7 @@ function bindHome(root){
 }
 function renderDoNext(){
   $("#doNext").innerHTML = `<div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div>${doNextHTML()}`; $("#nextIn").hidden = false;
-  $("#unlocks").innerHTML = unlocksHTML(); bindHome($("#nextIn")); bindHome($("#unlocksCard"));
+  $("#unlocksSub").textContent = UNLOCKS_SUB; $("#unlocks").innerHTML = unlocksHTML(); bindHome($("#nextIn")); bindHome($("#unlocksCard"));
   const warm = warmHTML(); $("#warm").innerHTML = warm; $("#warmCard").hidden = !warm;
   if (warm){ $("#warmSub").textContent = warmSub(); bindHome($("#warmCard")); }
   if (!narrow() && !state.stack.length) renderHome();
@@ -994,7 +998,7 @@ function renderHome(){
   const card = $("#detailCard"), warm = warmHTML();
   card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h2 class="pane-h" style="margin:0">Do next</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div><div>${doNextHTML()}</div>
     ${warm ? `<h2 class="pane-h" style="margin:18px 0 0">Warm paths</h2><div class="tiny sub" style="margin-bottom:4px">${esc(warmSub())}</div>${warm}` : ""}
-    <h2 class="pane-h" style="margin:18px 0 0">Biggest unlocks</h2><div class="tiny sub" style="margin-bottom:4px">Fit points gained, added up across your top judged roles.</div><div>${unlocksHTML()}</div>
+    <h2 class="pane-h" style="margin:18px 0 0">Biggest unlocks</h2><div class="tiny sub" style="margin-bottom:4px">${UNLOCKS_SUB}</div><div>${unlocksHTML()}</div>
     <div class="tiny sub" style="margin-top:18px;padding-top:12px;border-top:1px solid var(--rule)">Tap any organisation, role, factor, action or piece of evidence to drill in here.</div></div>`;
   bindHome(card);
 }
