@@ -38,7 +38,7 @@ import build_quick_demo as QD  # noqa: E402
 
 OUT = os.path.join(ENGINE, "docs", "demo")
 DEMO = os.path.join(HERE, "demo-workspace")
-REPO = "https://github.com/mark-hallam/climb"
+REPO = "https://github.com/mark-hallam/lvlme"
 # (folder the page is copied to, workspace it comes from, the page inside that workspace)
 PAGES = [("quick", None, "index.html"), ("dashboard", DEMO, os.path.join("report", "index.html"))]
 

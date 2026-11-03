@@ -274,7 +274,7 @@ class DocTests(unittest.TestCase):
         """
         with open(os.path.join(ROOT, ".claude-plugin", "plugin.json"), encoding="utf-8") as fh:
             repo = json.load(fh)["repository"]
-        self.assertEqual(repo, "https://github.com/mark-hallam/climb")
+        self.assertEqual(repo, "https://github.com/mark-hallam/lvlme")
         own = re.compile(r"github\.com/mark-hallam/([A-Za-z0-9_.-]+)(/blob/([^/\s\"')]+)/)?")
         for dirpath, dirs, files in os.walk(ROOT):
             dirs[:] = [d for d in dirs if not d.startswith(".") or d in (".claude-plugin", ".cursor")]

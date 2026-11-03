@@ -34,4 +34,4 @@ from that folder.
 5. If they ask what a number means, or this is their first dashboard, point
    them to the plain-English guide, `docs/for-you/READING-YOUR-DASHBOARD.md`
    in the engine folder (also at
-   https://github.com/mark-hallam/climb/blob/HEAD/docs/for-you/READING-YOUR-DASHBOARD.md).
+   https://github.com/mark-hallam/lvlme/blob/HEAD/docs/for-you/READING-YOUR-DASHBOARD.md).

@@ -7,7 +7,7 @@
 Install in Claude Code:
 
 ```text
-/plugin install lvlme --marketplace mark-hallam/climb
+/plugin install lvlme --marketplace mark-hallam/lvlme
 ```
 
 Then say: **run LVLme quick**, and paste a job link.
@@ -77,7 +77,7 @@ scripts should work on Linux, and Windows is untested.
 
 - **Claude Code** (version 2.1.275 or later): the one line above. Or clone it
   into your skills folder and start a new session:
-  `git clone https://github.com/mark-hallam/climb ~/.claude/skills/lvlme`
+  `git clone https://github.com/mark-hallam/lvlme ~/.claude/skills/lvlme`
 - **Codex:** clone it into `~/.agents/skills/lvlme` and type `$lvlme`, or open
   Codex in the folder (it follows `AGENTS.md`).
 - **Cursor:** open the folder. The rules in `.cursor/rules/` and `AGENTS.md`

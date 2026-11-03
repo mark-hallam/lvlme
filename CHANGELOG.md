@@ -135,10 +135,9 @@ Work on top of 0.3.0 that is not in a released version yet.
   Low to an offer" even when no offer had come. It now states only what was
   measured, in the dashboard's own words, for example "Level 2, Low to
   Level 3, Moderate by day 29". The saved image says the same.
-- **Install lines and links work.** They point at the repository that
-  exists, https://github.com/mark-hallam/climb, and links to files in it
-  follow its default branch, so "How to install it" and "Reading your
-  dashboard" no longer open a page that is not there.
+- **Links work.** Links to files in the repository follow its default
+  branch, so "How to install it" and "Reading your dashboard" no longer open
+  a page that is not there.
 - A contact recorded by one word, such as "Will", no longer hides the
   ordinary word "will" all over the dashboard.
 - `scripts/validate.py` now says when it skipped the checks across files
@@ -161,15 +160,15 @@ Nothing about scoring, evidence or privacy changed. The full notes are in
 - **The name**, everywhere: the docs, the skills, the helper agents, the
   Cursor rules, the dashboard and the quick result page.
 - **The plugin and marketplace** are both named `lvlme`. Install with
-  `/plugin install lvlme --marketplace mark-hallam/climb`.
+  `/plugin install lvlme --marketplace mark-hallam/lvlme`.
 - **Commands**: `/lvlme`, `/lvlme-quick`, `/lvlme-interview`,
   `/lvlme-screen`, `/lvlme-audit` and `/lvlme-dashboard`. **Helper agents**:
   `lvlme:evidence-scout`, `lvlme:market-scout`, `lvlme:role-judge`,
   `lvlme:reviewer` and `lvlme:recruiter-screen`. In Codex, type `$lvlme`.
 - **The workspace** setting is `LVLME_HOME`, and the folder is
   `~/lvlme-workspaces/`.
-- **The repository** stays at https://github.com/mark-hallam/climb for now,
-  so every install line and link above uses that address.
+- **The repository** is https://github.com/mark-hallam/lvlme. GitHub
+  forwards the old climb address here.
 
 ### Still works
 
