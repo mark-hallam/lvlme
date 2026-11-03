@@ -48,6 +48,8 @@ from html.parser import HTMLParser
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 import fetch_roles as FR  # noqa: E402
+from _boards import (BOARD_NAMES, LANG, LISTED, WORKDAY_HOST, _base, detail_url, nice_name, smartrecruiters_base, spelled_name,  # noqa: E402,F401
+                     workable_base, workable_org_name, workday_base, workday_org_name)
 
 UA = "lvlme/0.4 (LVLme quick: one job posting the person asked about; read only)"
 MAX_BYTES = 3_000_000  # a web page
@@ -57,18 +59,12 @@ GREENHOUSE_HOSTS = {"boards.greenhouse.io", "job-boards.greenhouse.io",
                     "boards.eu.greenhouse.io", "job-boards.eu.greenhouse.io"}
 LINKEDIN = re.compile(r"(^|\.)(linkedin\.com|lnkd\.in)$", re.I)
 UUID = r"[0-9a-fA-F-]{8,}"
-WORKDAY_HOST = re.compile(r"^([a-z0-9][a-z0-9-]*)\.(wd\d+)\.myworkdayjobs\.com$")
-LANG = re.compile(r"^[a-z]{2}(-[a-z]{2})?$", re.I)
 SMARTRECRUITERS_HOST = "jobs.smartrecruiters.com"
 SR_POSTING = re.compile(r"^(\d{6,})(?:-|$)")   # {posting id}-{title slug}
 WORKABLE_HOST = "apply.workable.com"
 WORKABLE_OLD_HOST = re.compile(r"^([a-z0-9][a-z0-9-]*)\.workable\.com$")   # {account}.workable.com/j/{code}
 WORKABLE_CODE = re.compile(r"^[A-Za-z0-9]{6,12}$")
 WORKABLE_NOT_ACCOUNT = {"j", "api", "careers", "www", "apply"}
-WORKABLE_PLACES = {"remote": "Remote", "hybrid": "Hybrid", "on_site": "Onsite", "onsite": "Onsite"}
-BOARD_NAMES = {"greenhouse": "Greenhouse", "ashby": "Ashby", "lever": "Lever", "workday": "Workday",
-               "smartrecruiters": "SmartRecruiters", "workable": "Workable"}
-SR_SECTIONS = ("jobDescription", "qualifications", "additionalInformation")  # the employer's welcome goes last
 
 
 class PostingError(Exception):
@@ -159,43 +155,14 @@ def api_url(link):
     if link["ats"] == "lever":
         host = "api.eu.lever.co" if link.get("region") == "eu" else "api.lever.co"
         return "https://%s/v0/postings/%s/%s" % (host, board, job)
-    if link["ats"] == "workday":
-        return "https://%s/wday/cxs/%s/%s/job/%s" % (
-            link["host"], board, urllib.parse.quote(link["site"], safe=""),
-            urllib.parse.quote(link["job_id"], safe="/"))
-    if link["ats"] == "smartrecruiters":
-        return "https://api.smartrecruiters.com/v1/companies/%s/postings/%s" % (board, job)
-    if link["ats"] == "workable":
-        return "https://apply.workable.com/api/v2/accounts/%s/jobs/%s" % (board, job)
+    if link["ats"] in LISTED:
+        return detail_url(link)
     return None
 
 
 def slug(text, fallback="posting"):
     s = re.sub(r"[^a-z0-9]+", "_", (text or "").lower()).strip("_")
     return s[:40] or fallback
-
-
-def nice_name(board):
-    return " ".join(w.capitalize() for w in re.split(r"[-_\s]+", board or "") if w) or "The employer"
-
-
-def workday_org_name(tenant, *texts):
-    """The organisation's everyday name for a Workday board.
-
-    Workday lists the legal entity that hires ("2100 Example Corp USA", "Example
-    Australia Pty Ltd"), not the name people know. The board's own name (the first
-    part of the link) is the everyday one: it is written the way the posting
-    writes it most often ("ACME" or "Acme"), else in capitals at the start.
-    """
-    if not tenant:
-        return nice_name(tenant)
-    word = re.compile(r"\b%s\b" % re.escape(tenant), re.I)
-    seen = {}
-    for text in texts:
-        for m in word.finditer(FR.clean(text) if text else ""):
-            if m.group(0) != m.group(0).lower():  # "acme" in a web address is not how the name is written
-                seen[m.group(0)] = seen.get(m.group(0), 0) + 1
-    return max(seen, key=seen.get) if seen else nice_name(tenant)
 
 
 # --------------------------------------------------------- API shapes
@@ -237,136 +204,6 @@ def base_from_api(link, data):
         base["org_name_guessed"] = not org_name     # only the link's slug in capitals: the agent should confirm it
     base["org_name"] = org_name or nice_name(link["board"])
     return base
-
-
-def workday_base(link, data):
-    """One posting from a Workday job feed response ({"jobPostingInfo": ...}), or None."""
-    job = data.get("jobPostingInfo") if isinstance(data, dict) else None
-    if not isinstance(job, dict) or not job.get("jobDescription"):
-        return None
-    legal = (data.get("hiringOrganization") or {}).get("name") if isinstance(data.get("hiringOrganization"), dict) else None
-    locs = [job.get("location")] + list(job.get("additionalLocations") or [])
-    published = job.get("startDate") if re.match(r"^\d{4}-\d{2}-\d{2}$", str(job.get("startDate") or "")) else None
-    title = FR.clean(job.get("title") or "")
-    base = _base(str(job.get("jobReqId") or job.get("jobPostingId") or link["job_id"]), title,
-                 [str(l) for l in locs if l], job.get("externalUrl") or None, job["jobDescription"],
-                 workday_org_name(link["board"], legal, title, job["jobDescription"]), published=published)
-    base["workplace_type"] = job.get("remoteType") or None
-    return base
-
-
-def smartrecruiters_base(link, data):
-    """One posting from a SmartRecruiters posting API response ({"name", "jobAd": {"sections"}, ...}), or None.
-
-    The sections come in the order a reader needs them: the job description,
-    the qualifications and any additional information, then the employer's
-    welcome under "About <organisation>", so a greeting is never read as a
-    requirement.
-    """
-    if not isinstance(data, dict) or data.get("active") is False:
-        return None
-    sections = ((data.get("jobAd") or {}).get("sections") or {}) if isinstance(data.get("jobAd"), dict) else {}
-    sections = sections if isinstance(sections, dict) else {}
-    company = data.get("company") if isinstance(data.get("company"), dict) else {}
-    org_name = FR.clean(company.get("name") or "") or nice_name(link["board"])
-    parts = []
-    for key in SR_SECTIONS:
-        sec = sections.get(key) if isinstance(sections.get(key), dict) else {}
-        if FR.clean(re.sub(r"<[^>]+>", " ", sec.get("text") or "")):
-            parts.append("<h2>%s</h2>%s" % (html.escape(sec.get("title") or key), sec["text"]))
-    welcome = sections.get("companyDescription") if isinstance(sections.get("companyDescription"), dict) else {}
-    if not parts:  # some employers put the whole posting under the company description
-        if not FR.clean(re.sub(r"<[^>]+>", " ", welcome.get("text") or "")):
-            return None
-        parts, welcome = [welcome["text"]], {}
-    lines = [text for _, text, _ in FR.blocks_of(welcome.get("text") or "", skip_boilerplate=False)]
-    if lines:  # plain paragraphs, so a bold welcome line is never taken for a requirements heading
-        parts.append("<h2>About %s</h2>%s" % (html.escape(org_name),
-                                               "".join("<p>%s</p>" % html.escape(t.rstrip(":")) for t in lines)))
-    loc = data.get("location") if isinstance(data.get("location"), dict) else {}
-    where = ", ".join(p for p in (FR.clean(x) for x in str(loc.get("fullLocation") or ", ".join(
-        str(loc[k]) for k in ("city", "region", "country") if loc.get(k))).split(",")) if p)  # "Sydney, , Australia"
-    workplace = "Remote" if loc.get("remote") is True else "Hybrid" if loc.get("hybrid") is True else (
-        "Onsite" if loc.get("remote") is False else None)
-    released = str(data.get("releasedDate") or "")[:10]
-    base = _base(str(data.get("id") or link["job_id"]), FR.clean(data.get("name") or ""),
-                 [where] if where else [], data.get("postingUrl") or None, "".join(parts), org_name,
-                 published=released if re.match(r"^\d{4}-\d{2}-\d{2}$", released) else None)
-    dept = data.get("department") if isinstance(data.get("department"), dict) else {}
-    if dept.get("label"):
-        base["depts"], base["team_or_department"] = [dept["label"]], dept["label"]
-    base["workplace_type"], base["is_remote"] = workplace, loc.get("remote") if workplace else None
-    return base
-
-
-def workable_base(link, data):
-    """One posting from a Workable job feed response ({"title", "description", "requirements", "benefits", ...}), or None.
-
-    Workable keeps the requirements and the benefits in their own fields, often
-    with no heading of their own, so each gets its heading here: the
-    requirements are read as requirements, and the benefits come last, where
-    they are never read as one. The feed does not name the organisation, so
-    the name is the account's (see workable_org_name), until fetch() asks
-    the account feed for the name it gives itself.
-    """
-    if not isinstance(data, dict) or str(data.get("state") or "published") != "published":
-        return None
-    parts = []
-    for key, heading in (("description", None), ("requirements", "Requirements"), ("benefits", "Benefits")):
-        text = data.get(key) if isinstance(data.get(key), str) else ""
-        if FR.clean(re.sub(r"<[^>]+>", " ", text)):
-            parts.append(("<h2>%s</h2>" % heading if heading else "") + text)
-    if not parts:
-        return None
-    places = [data.get("location")] + list(data.get("locations") or [])
-    where = [", ".join(FR.clean(str(p[k])) for k in ("city", "region", "country") if p.get(k))
-             for p in places if isinstance(p, dict)]
-    workplace = WORKABLE_PLACES.get(str(data.get("workplace") or "").lower()) or (
-        "Remote" if data.get("remote") is True else None)
-    published = str(data.get("published") or "")[:10]
-    title = FR.clean(data.get("title") or "")
-    raw = "".join(parts)
-    base = _base(str(data.get("shortcode") or link["job_id"]).upper(), title, [w for w in dict.fromkeys(where) if w],
-                 "https://apply.workable.com/%s/j/%s/" % (link["board"], str(data.get("shortcode") or link["job_id"])),
-                 raw, workable_org_name(link["board"], title, raw),
-                 published=published if re.match(r"^\d{4}-\d{2}-\d{2}$", published) else None)
-    depts = [FR.clean(str(d)) for d in (data.get("department") or []) if FR.clean(str(d))] \
-        if isinstance(data.get("department"), list) else [FR.clean(str(data["department"]))] if data.get("department") else []
-    if depts:
-        base["depts"], base["team_or_department"] = depts, depts[0]
-    base["workplace_type"] = workplace
-    base["is_remote"] = True if workplace == "Remote" else (False if workplace else None)
-    return base
-
-
-def workable_org_name(account, *texts):
-    """The organisation's name for a Workable account, from how the posting writes it.
-
-    An account is the name run together in lower case ("acmeai" for "Acme
-    AI"), so the posting's own spelling is found by allowing a space, a hyphen
-    or a full stop between its letters. Written in lower case does not count
-    (that is a web address); with no match, the account in capitals.
-    """
-    return spelled_name(account, *texts) or nice_name(account)
-
-
-def spelled_name(account, *texts):
-    """How the posting itself writes a board's run-together name ("openai" as "OpenAI"), or None.
-
-    Used for every board whose API gives no employer name (Ashby, Lever, and
-    Greenhouse when company_name is missing): the link's slug in capitals is
-    only a guess ("Openai"), so the posting's own spelling wins.
-    """
-    letters = re.sub(r"[^a-z0-9]", "", (account or "").lower())
-    if len(letters) < 3:
-        return None
-    word = re.compile(r"(?<![A-Za-z0-9])%s(?![A-Za-z0-9])" % r"[ .-]?".join(re.escape(ch) for ch in letters), re.I)
-    seen = {}
-    for text in texts:
-        for m in word.finditer(FR.clean(re.sub(r"<[^>]+>", " ", text)) if text else ""):
-            if m.group(0) != m.group(0).lower() and not m.group(0).endswith((" ", "-", ".")):
-                seen[m.group(0)] = seen.get(m.group(0), 0) + 1
-    return max(seen, key=seen.get) if seen else None
 
 
 def workable_account_name(account):
@@ -491,13 +328,6 @@ def base_from_text(text, title=None, org_name=None, url=None):
                     "<p>%s</p>" % html.escape(l) for l in lines if l)
     source_id = "text_" + hashlib.sha256((text or "").encode("utf-8")).hexdigest()[:10]
     return _base(source_id, title, [], url, paras, org_name or "The employer")
-
-
-def _base(source_id, title, locations, url, raw_html, org_name, published=None):
-    return {"source_id": source_id, "title": FR.clean(title) or "Untitled posting", "depts": [],
-            "team_or_department": None, "locations": list(locations), "extra_location_text": [],
-            "workplace_type": None, "is_remote": None, "url": url, "updated_at": None,
-            "published_at": published, "raw_html": raw_html or "", "compensation": None, "org_name": org_name}
 
 
 # ------------------------------------------------------------ the role

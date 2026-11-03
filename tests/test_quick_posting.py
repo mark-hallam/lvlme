@@ -7,6 +7,7 @@ import urllib.error
 from unittest import mock
 
 import helpers as H
+import _boards as B
 import quick_posting as Q
 import validate as V
 
@@ -362,7 +363,7 @@ class SmartRecruitersTests(unittest.TestCase):
         secs = data["jobAd"]["sections"]
         secs["companyDescription"]["text"] = (secs["jobDescription"]["text"] + "<h3>Qualifications</h3>"
                                              + secs["qualifications"]["text"])
-        for key in Q.SR_SECTIONS:
+        for key in B.SR_SECTIONS:
             secs[key]["text"] = ""
         data["location"]["fullLocation"] = "Melbourne, , Australia"
         path = os.path.join(self.tmp(), "posting.json")

@@ -6,8 +6,12 @@ classes) and writes:
   market/roles/latest.json              every open role that matches a family
   market/roles/snapshots/<date>.json    the role ids open on that date
 
-Adapters: Greenhouse, Ashby and Lever public job-board APIs, plus "manual"
-(roles typed into market/roles/manual.json). Standard library only.
+Adapters: Greenhouse, Ashby, Lever, Workday, SmartRecruiters and Workable
+public job-board APIs, plus "manual" (roles typed into market/roles/manual.json).
+Greenhouse, Ashby and Lever give every posting in one answer. Workday,
+SmartRecruiters and Workable list titles only, so the list is read page by
+page and only the postings whose title fits a role family are read, with the
+same readers LVLme quick uses (scripts/_boards.py). Standard library only.
 Read only: nothing is applied to or submitted, and no account is used.
 
 Usage
@@ -44,10 +48,11 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from html.parser import HTMLParser
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
+from _html_text import blocks_of, clean  # noqa: E402,F401  (FR.clean and FR.blocks_of stay in use)
+import _boards as B  # noqa: E402
 
 UA = "lvlme/0.4 (personal job-search research script; read only)"
 MAX_REQ_LEN = 160
@@ -65,14 +70,24 @@ def endpoint(target):
     if ats == "lever":
         host = "api.eu.lever.co" if target.get("region") == "eu" else "api.lever.co"
         return "https://%s/v0/postings/%s?mode=json" % (host, slug)
+    if ats in B.LISTED:
+        try:
+            return B.list_request(target, 0)[0]
+        except ValueError:
+            return None
     return None
 
 
-def fetch_json(url, tries=3, timeout=90):
+def fetch_json(url, tries=3, timeout=90, body=None):
+    """GET a JSON answer, or POST body as JSON (the Workday and Workable job lists ask for a POST)."""
     last = None
+    data = json.dumps(body).encode("utf-8") if body is not None else None
+    headers = {"User-Agent": UA, "Accept": "application/json"}
+    if data is not None:
+        headers["Content-Type"] = "application/json"
     for attempt in range(tries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "application/json"})
+            req = urllib.request.Request(url, data=data, headers=headers)
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 return json.loads(resp.read().decode("utf-8"))
         except (urllib.error.URLError, TimeoutError, ValueError, OSError) as exc:
@@ -82,95 +97,54 @@ def fetch_json(url, tries=3, timeout=90):
     raise RuntimeError("%s: %s" % (type(last).__name__, last))
 
 
-def load_raw(target, fixtures, save_raw):
+def load_raw(target, fixtures, save_raw, config=None):
     """Raw API response for one target: from fixtures if given, else the network."""
     if fixtures:
         path = os.path.join(fixtures, "%s.json" % target["id"])
         if not os.path.exists(path):
             raise RuntimeError("no fixture file %s" % path)
         return C.load_json(path)
-    data = fetch_json(endpoint(target))
+    data = fetch_board(target, config) if target.get("ats") in B.LISTED else fetch_json(endpoint(target))
     if save_raw:
         C.write_json(os.path.join(save_raw, "%s.json" % target["id"]), data)
     return data
 
+
+def fetch_board(target, config, pause=0.2):
+    """Read a Workday, SmartRecruiters or Workable board: page through its job list, then read each posting
+    whose title fits a role family. Other titles are kept as skipped, with the reason, never silently dropped.
+
+    Returns a bundle, saved and read back exactly like any other board's raw answer:
+    {"listed": n, "capped": bool, "postings": [{"link", "data"}], "skipped": [{"title", "url", "reason"}]}.
+    """
+    listed, token, offset, capped, reported = {}, None, 0, False, None
+    while True:
+        url, body = B.list_request(target, offset, token)
+        data = fetch_json(url, body=body)
+        jobs, token = B.list_page(target, data)
+        reported = reported if reported is not None else B.list_total(target, data)
+        fresh = [j for j in jobs if j["url"] not in listed]  # Workday repeats its last page past 2000 jobs
+        listed.update((j["url"], j) for j in fresh)
+        offset += B.PAGE[target["ats"]]
+        if len(listed) >= B.MAX_LISTED:
+            capped = True
+            break
+        if not fresh or (token is None and (target["ats"] == "workable" or len(jobs) < B.PAGE[target["ats"]])):
+            break
+        time.sleep(pause)
+    capped = capped or bool(reported and reported > len(listed))
+    postings, skipped = [], []
+    for job in listed.values():
+        fam, _, reason = classify(job["title"], job["depts"], config)
+        if not fam:
+            skipped.append({"title": job["title"], "url": job["url"], "reason": reason or "no role family matched"})
+            continue
+        time.sleep(pause)
+        postings.append({"link": job["link"], "data": fetch_json(B.detail_url(job["link"]))})
+    return {"listed": len(listed), "capped": capped, **({"reported": reported} if capped and reported else {}),
+            "postings": postings, "skipped": skipped}
+
 # ------------------------------------------------------------ HTML parsing
-
-
-class _Blocks(HTMLParser):
-    """Turn posting HTML into (kind, text, all_bold) blocks; kind is h, li or p."""
-    BLOCK = {"p", "div", "li", "ul", "ol", "br", "tr", "table", "section",
-             "h1", "h2", "h3", "h4", "h5", "h6"}
-    HEAD = {"h1", "h2", "h3", "h4", "h5", "h6"}
-    SKIP_DIV = ("content-intro", "content-conclusion", "content-pay-transparency")
-
-    def __init__(self, skip_boilerplate):
-        super().__init__(convert_charrefs=True)
-        self.skip_boilerplate = skip_boilerplate
-        self.blocks, self.buf = [], []
-        self.bold = self.chars = 0
-        self.li = self.h = self.b = self.skip = self.ignore = 0
-        self.divs = []
-
-    def handle_starttag(self, tag, attrs):
-        if tag == "div":
-            cls = dict(attrs).get("class") or ""
-            hit = self.skip_boilerplate and any(c in cls for c in self.SKIP_DIV)
-            self.divs.append(hit)
-            self.skip += hit
-        if tag in self.BLOCK:
-            self._flush()
-        if tag == "li":
-            self.li += 1
-        elif tag in self.HEAD:
-            self.h += 1
-        elif tag in ("strong", "b"):
-            self.b += 1
-        elif tag in ("script", "style"):
-            self.ignore += 1
-
-    def handle_endtag(self, tag):
-        if tag in self.BLOCK:
-            self._flush()
-        if tag == "li":
-            self.li = max(0, self.li - 1)
-        elif tag in self.HEAD:
-            self.h = max(0, self.h - 1)
-        elif tag in ("strong", "b"):
-            self.b = max(0, self.b - 1)
-        elif tag in ("script", "style"):
-            self.ignore = max(0, self.ignore - 1)
-        elif tag == "div" and self.divs:
-            self.skip -= self.divs.pop()
-
-    def handle_data(self, data):
-        if self.skip or self.ignore:
-            return
-        self.buf.append(data)
-        n = len(re.sub(r"\s", "", data))
-        self.chars += n
-        if self.b:
-            self.bold += n
-
-    def _flush(self):
-        text = clean(" ".join(self.buf))
-        if text:
-            kind = "li" if self.li else "h" if self.h else "p"
-            self.blocks.append((kind, text, self.chars > 0 and self.bold >= 0.9 * self.chars))
-        self.buf, self.bold, self.chars = [], 0, 0
-
-
-def clean(s):
-    s = (s or "").replace("\xa0", " ").replace("\u200b", "").replace("\u200d", "")
-    return re.sub(r"\s+", " ", s).strip()
-
-
-def blocks_of(raw_html, skip_boilerplate=True):
-    p = _Blocks(skip_boilerplate)
-    p.feed(raw_html or "")
-    p.close()
-    p._flush()
-    return p.blocks
 
 
 def shorten(s, limit=MAX_REQ_LEN):
@@ -580,7 +554,8 @@ def manual_postings(data, org):
         }
 
 
-ADAPTERS = {"greenhouse": greenhouse_postings, "ashby": ashby_postings, "lever": lever_postings}
+ADAPTERS = {"greenhouse": greenhouse_postings, "ashby": ashby_postings, "lever": lever_postings,
+            "workday": B.bundle_postings, "smartrecruiters": B.bundle_postings, "workable": B.bundle_postings}
 
 # ----------------------------------------------------------- record build
 
@@ -641,8 +616,8 @@ def previous_snapshot(snap_dir, date):
 
 
 def collect(config, workspace, fixtures=None, save_raw=None):
-    """Fetch and classify every target. Returns (roles, excluded, fetched, errors, endpoints)."""
-    roles, excluded, fetched, errors, endpoints = [], [], {}, {}, {}
+    """Fetch and classify every target. Returns (roles, excluded, fetched, errors, endpoints, notes)."""
+    roles, excluded, fetched, errors, endpoints, notes = [], [], {}, {}, {}, {}
     manual = C.load_json(C.wpath(workspace, "market", "roles", "manual.json"), {"postings": []})
     for target in config["targets"]:
         tid, ats = target["id"], target["ats"]
@@ -651,22 +626,28 @@ def collect(config, workspace, fixtures=None, save_raw=None):
                 postings = list(manual_postings(manual, tid))
                 endpoints[tid] = "market/roles/manual.json"
             else:
-                endpoints[tid] = ("fixture %s.json" % tid) if fixtures else endpoint(target)
-                postings = list(ADAPTERS[ats](load_raw(target, fixtures, save_raw)))
-                if not postings:
+                endpoints[tid] = ("fixture %s.json" % tid) if fixtures else (endpoint(target) or ats)
+                raw = load_raw(target, fixtures, save_raw, config)
+                postings = list(ADAPTERS[ats](raw))
+                if ats in B.LISTED:  # titles that fit no family were never read: list them as excluded
+                    excluded.extend(dict(x, org=tid) for x in raw.get("skipped") or [])
+                    if raw.get("capped"):
+                        notes[tid] = "listed %d of the board's %s jobs only, so some roles may be missing" % (
+                            raw["listed"], raw.get("reported") or "many")
+                if not postings and not (ats in B.LISTED and raw.get("listed")):
                     raise RuntimeError("endpoint returned zero postings")
         except Exception as exc:  # record and carry on with the other targets
             errors[tid] = "%s: %s" % (endpoints.get(tid), exc)
             fetched[tid] = 0
             continue
-        fetched[tid] = len(postings)
+        fetched[tid] = raw.get("listed", len(postings)) if ats in B.LISTED else len(postings)
         for base in postings:
             role, why = build_role(target, base, config)
             if role:
                 roles.append(role)
             elif why:
                 excluded.append({"org": tid, "title": base["title"], "url": base["url"], "reason": why})
-    return roles, excluded, fetched, errors, endpoints
+    return roles, excluded, fetched, errors, endpoints, notes
 
 
 def main(argv=None):
@@ -685,7 +666,7 @@ def main(argv=None):
     prev_latest = C.load_json(os.path.join(roles_dir, "latest.json"), {}) or {}
     prev_roles = {r["id"]: r for r in prev_latest.get("roles", [])}
 
-    roles, excluded, fetched, errors, endpoints = collect(config, ws, args.fixtures, args.save_raw)
+    roles, excluded, fetched, errors, endpoints, notes = collect(config, ws, args.fixtures, args.save_raw)
     remote_targets = [t["id"] for t in config["targets"] if t["ats"] != "manual"]
     if remote_targets and all(t in errors for t in remote_targets) and not roles:
         print(json.dumps({"endpoint_errors": errors}, indent=2), file=sys.stderr)
@@ -724,6 +705,7 @@ def main(argv=None):
         "blocker_counts": blocker_counts(roles),
         "excluded_count": len(excluded),
         "endpoint_errors": errors,
+        **({"endpoint_notes": notes} if notes else {}),
         "previous_snapshot": prev_date,
         "new_role_ids": new_ids,
         "closed_role_ids": closed_ids,
@@ -739,7 +721,8 @@ def main(argv=None):
     C.write_json(os.path.join(snap_dir, "%s.json" % date), snapshot)
     print(json.dumps({"fetched_on": date, "total_postings_fetched": fetched, "matched_counts": counts,
                       "new_roles": len(new_ids), "closed_roles": len(closed_ids),
-                      "blocker_counts": summary["blocker_counts"], "endpoint_errors": errors}, indent=2))
+                      "blocker_counts": summary["blocker_counts"], "endpoint_errors": errors,
+                      **({"endpoint_notes": notes} if notes else {})}, indent=2))
     return 0
 
 

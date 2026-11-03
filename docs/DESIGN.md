@@ -146,7 +146,11 @@ more than gaps, so these become top-priority actions.
 ## 6. Market intelligence
 
 `config.json` lists target orgs with their applicant-tracking system and slug
-(Greenhouse, Ashby, Lever, Workable, SmartRecruiters, or `manual`). For each
+(Greenhouse, Ashby, Lever, Workday, SmartRecruiters, Workable, or `manual`;
+Workday names its careers page in `careers_url`). Workday, SmartRecruiters
+and Workable list titles only, so only the postings whose title fits a role
+family are read in full, with the readers quick uses (`scripts/_boards.py`);
+the rest are listed as excluded. For each
 open role, `fetch_roles.py` extracts: family (keyword taxonomy per goal),
 locations and location class, remote flag and the board's workplace label (remote, hybrid or onsite), years required, degree requirement,
 hard requirements, nice-to-haves, compensation, heavy-coding flag, and

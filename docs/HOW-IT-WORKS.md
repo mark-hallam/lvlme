@@ -404,10 +404,11 @@ campaign/                  plan.json, warm-paths.json, inbox.md, drafts/, weekly
 report/                    index.html, for-agents/
 ```
 
-## Not in version 0.1
+## Not in LVLme yet
 
 Automatic LinkedIn scraping (it breaks LinkedIn's terms, so use the official
-data export instead), automatic applying, salary negotiation, goals other than
-jobs, and the Workable and SmartRecruiters job boards (enter those roles by
-hand in `market/roles/manual.json`). LVLme quick takes a posting from any
+data export instead), automatic applying, salary negotiation, and goals other
+than jobs. The full campaign reads Greenhouse, Ashby, Lever, Workday,
+SmartRecruiters and Workable boards; roles from any other careers site go in
+by hand in `market/roles/manual.json`. LVLme quick takes a posting from any
 site, as a link when the page holds the text, or pasted.

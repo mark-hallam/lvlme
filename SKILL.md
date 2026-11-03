@@ -118,8 +118,10 @@ other file that describes a first run links here.
    Ask for it instead of the three facts. If they ran LVLme quick, offer the
    CV they gave it (in the quick folder's `intake/sources/`).
 3. **Config.** From the reply, fill in `config.json` with the person:
-   targets (look up each organisation's applicant tracking system (ATS) and
-   board slug), role families and keywords, `candidate.home_region`,
+   targets (look up each organisation's applicant tracking system (ATS):
+   Greenhouse, Ashby, Lever, SmartRecruiters or Workable with the board's
+   slug, Workday with its careers page address in `careers_url`, else
+   `manual`), role families and keywords, `candidate.home_region`,
    `candidate.timezone` and `privacy.redact_terms` (their employers' names).
    Run `python3 scripts/validate.py`.
 4. **Gather.** Ask which other sources you may read (each opt in, read
@@ -209,8 +211,9 @@ rights question when `fetch_roles.py` first finds an open role that needs it.
 
 Run `python3 scripts/fetch_roles.py`. Note new and closed roles. Join the
 market scouts' sourced facts (offices in the person's region, growing teams,
-events, partner programmes) into `market/orgs.json`. Roles from boards
-without an adapter go in `market/roles/manual.json`.
+events, partner programmes) into `market/orgs.json`. It reads all six
+boards LVLme quick reads; roles from any other careers site go in
+`market/roles/manual.json`.
 
 ### 4. Judge and audit
 

@@ -28,6 +28,8 @@
                                           "licence": {"type": "integer", "minimum": 0}}},
         "excluded_count": {"type": "integer", "minimum": 0},
         "endpoint_errors": {"type": "object", "additionalProperties": {"type": "string"}},
+        "endpoint_notes": {"type": "object", "additionalProperties": {"type": "string"},
+                           "description": "Per target, anything read in part, such as a board too big to list in full."},
         "previous_snapshot": {"type": ["string", "null"]},
         "new_role_ids": {"type": "array", "items": {"type": "string"}},
         "closed_role_ids": {"type": "array", "items": {"type": "string"}}

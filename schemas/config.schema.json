@@ -127,7 +127,8 @@
       "properties": {
         "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
         "name": {"type": "string", "minLength": 1},
-        "ats": {"enum": ["greenhouse", "ashby", "lever", "manual"]},
+        "ats": {"enum": ["greenhouse", "ashby", "lever", "workday", "smartrecruiters", "workable", "manual"],
+                "description": "The job board the organisation's careers page runs on. slug is its board name (Workable account, SmartRecruiters company); a Workday target names its careers page in careers_url instead."},
         "slug": {"type": "string"},
         "region": {"enum": ["global", "eu"], "description": "Lever only: eu uses the EU endpoint."},
         "aliases": {"type": "array", "items": {"type": "string", "minLength": 1}},

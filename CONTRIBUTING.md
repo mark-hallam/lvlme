@@ -10,8 +10,9 @@ run.
   Example, Acme AI, Globex Labs and Initech Robotics). Never write fictional
   facts about real companies.
 - **Standard library only.** Python 3.9 or newer, no third-party packages, no
-  telemetry. Network calls belong only in `fetch_roles.py` and
-  `claims_audit.py`.
+  telemetry. Network calls belong only in `fetch_roles.py`,
+  `claims_audit.py` and `quick_posting.py`. Board readers shared between
+  them (`_boards.py`) parse answers and never fetch.
 - **Drafts only.** No feature may apply, send, post or change an account.
 - **Deterministic maths.** `score.py` must give the same output for the same
   inputs. Judgement belongs in workspace files, not in code.

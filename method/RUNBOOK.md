@@ -66,7 +66,8 @@ rounds while roles and evidence are gathered.
    `market/roles/latest.json`). If `blocker_counts` there is above 0 for US
    export control or security clearance and that question has not been
    asked yet, ask it (`INTERVIEW.md`, "Work rights"). Add roles from boards
-   without an adapter to `market/roles/manual.json`. Add sourced
+   from any other careers site to `market/roles/manual.json`. If the
+   summary has `endpoint_notes` (a board too big to list in full), say so. Add sourced
    organisation facts to `market/orgs.json`.
 
 3. **Evidence.** Look for anything new since the last run date (the newest
@@ -76,7 +77,8 @@ rounds while roles and evidence are gathered.
    - their public code (for example `gh repo list <user> --json name,visibility,pushedAt`);
    - their sites and product pages;
    - email, read only, since the last run date: messages from target
-     organisations' domains and from job boards (Greenhouse, Ashby, Lever),
+     organisations' domains and from job boards (Greenhouse, Ashby, Lever,
+     Workday, SmartRecruiters, Workable),
      and words such as interview, referral, introduction, recruiter;
    - a fresh LinkedIn data export, if the person has downloaded one (LVLme
      never opens LinkedIn itself: automated access breaks LinkedIn's terms);
