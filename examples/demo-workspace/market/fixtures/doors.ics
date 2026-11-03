@@ -1,0 +1,56 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//LVLme demo//Fictional calendar//EN
+X-WR-CALNAME:Fictional AI events (LVLme demo)
+BEGIN:VEVENT
+UID:demo-evt-001@example.com
+SUMMARY:Acme AI Builders Night\, Brisbane
+DTSTART;TZID=Australia/Brisbane:20261112T180000
+DTEND;TZID=Australia/Brisbane:20261112T203000
+LOCATION:The Wharf Rooms\, Brisbane City QLD
+URL:https://example.com/events/acme-builders-night
+DESCRIPTION:Short demos from the Acme AI Sydney team\, then drinks. Fictional.
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-evt-002@example.com
+SUMMARY:Globex Labs AI Success office hours
+DTSTART:20261118T230000Z
+DTEND:20261119T000000Z
+LOCATION:Online
+URL:https://example.com/events/globex-office-hours
+DESCRIPTION:Ask the Globex Labs AI Success team about customer deployments. Fictional.
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-evt-003@example.com
+SUMMARY:Brisbane AI Product Meetup
+DTSTART;TZID=Australia/Brisbane:20261126T173000
+LOCATION:River Hub\, Brisbane QLD
+URL:https://example.com/events/bne-ai-product
+DESCRIPTION:Product people building with AI. Fictional.
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-evt-004@example.com
+SUMMARY:Warehouse Automation Summit
+DTSTART;VALUE=DATE:20261203
+DTEND;VALUE=DATE:20261205
+LOCATION:Convention Centre\, Melbourne VIC
+URL:https://example.com/events/warehouse-automation-summit
+DESCRIPTION:Speakers include the Initech Robotics fleet team. Fictional.
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-evt-005@example.com
+SUMMARY:Sydney ML Reading Group
+DTSTART;TZID=Australia/Sydney:20261115T100000
+LOCATION:Sydney NSW
+URL:https://example.com/events/syd-ml-reading
+DESCRIPTION:Not near Alex and no target named: left out. Fictional.
+END:VEVENT
+BEGIN:VEVENT
+UID:demo-evt-006@example.com
+SUMMARY:Acme AI open evening
+DTSTART;TZID=Australia/Brisbane:20261020T180000
+LOCATION:Brisbane
+URL:https://example.com/events/acme-open-evening
+DESCRIPTION:Already past on the demo's date: left out. Fictional.
+END:VEVENT
+END:VCALENDAR

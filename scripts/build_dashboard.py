@@ -79,6 +79,7 @@ import _levels as L  # noqa: E402
 import _levels_html as LH  # noqa: E402
 import _posting_checks as PC  # noqa: E402
 import _applications as AP  # noqa: E402
+import _doors as DR  # noqa: E402
 import _autopilot as APL  # noqa: E402
 import _static_html as ST  # noqa: E402
 import _warm_paths as W  # noqa: E402
@@ -178,7 +179,7 @@ def short_date(iso):
 class Data:
     """Everything the page and the agent files are built from."""
 
-    def __init__(self, ws, config):
+    def __init__(self, ws, config, today=None):
         self.ws, self.config = ws, config
         files = sorted(f for f in glob.glob(C.wpath(ws, "eval", "runs", "*.json"))
                        if re.match(r"\d{4}-\d{2}-\d{2}\.json$", os.path.basename(f)))
@@ -200,8 +201,9 @@ class Data:
         self.network = load("profile", "network.json")
         self.warm = load("campaign", "warm-paths.json")   # progress only: never scored
         self.apps = load("campaign", "applications.json")  # progress only: never scored
+        self.doors = load("market", "doors.json")            # progress only: never scored
         self.week = APL.newest_note(ws)                      # Autopilot's latest This week note, if any
-        self.today = C.today_in(config)                     # follow-ups fall due by the calendar
+        self.today = today or C.today_in(config)            # follow-ups fall due, and doors pass, by the calendar
         self.claims = (load("profile", "claims-audit.json") or {}).get("claims", [])
         self.swot = load("eval", "swot.json")
         self.ceilings = load("eval", "ceilings.json")
@@ -612,6 +614,7 @@ def build_data(data):
         "warm": W.page_data(data.warm, data.targets, data.org_names, group_of, clean,
                             W.connection_counts(data.network)),
         "apps": AP.page_data(data.apps, data.today, data.org_names, clean),
+        "doors": DR.page_data(data.doors, data.today, data.org_names),
         "week": APL.page_data(data.week, clean),
     }
     out["orgOrder"] = [g for g in groups if g in out["orgs"]]
@@ -856,6 +859,8 @@ def agent_payload(data, page):
     payload["warm_paths"] = W.agent_data(data.warm, data.targets, data.org_names, include_contacts=not sensitive)
     if data.apps is not None:
         payload["applications"] = AP.agent_data(data.apps, data.today, data.org_names)
+    if data.doors is not None:
+        payload["doors"] = DR.page_data(data.doors, data.today, data.org_names, limit=20)
     if sensitive or not share_names:
         clean_text = make_redactor(data, sensitive, hide_names=not share_names)
         payload = scrub(payload, clean_text) if sensitive else _scrub_text(payload, clean_text)
@@ -1018,15 +1023,17 @@ def summary_md(data, p):
     lines += W.summary_lines(p["warm_paths"], data.org)
     if p.get("applications"):
         lines += AP.summary_lines(p["applications"])
+    lines += DR.summary_lines(p.get("doors"))
     return "\n".join(lines) + "\n"
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Build the dashboard and the agent briefing.")
     ap.add_argument("--workspace", help="workspace folder (default: $LVLME_HOME)")
+    ap.add_argument("--today", help="YYYY-MM-DD for follow-ups and upcoming doors (default: today in the person's time zone)")
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)
-    data = Data(ws, config)
+    data = Data(ws, config, C.check_date(args.today) if args.today else None)
     update_metrics_history(data)
     page_html, page = render_page(data)
     C.write_text(C.wpath(ws, "report", "index.html"), page_html)

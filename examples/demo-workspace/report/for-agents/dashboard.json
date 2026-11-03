@@ -1940,5 +1940,123 @@
         }
       }
     }
+  },
+  "doors": {
+    "rows": [
+      {
+        "id": "DR01",
+        "kind": "Event",
+        "title": "Acme AI Builders Night, Brisbane",
+        "when": "Thu 12 Nov, 6pm",
+        "date": "2026-11-12",
+        "place": "The Wharf Rooms, Brisbane City QLD",
+        "orgs": [
+          "Acme AI"
+        ],
+        "why": "Meet people from Acme AI in person: the start of a warm path.",
+        "dimension": "D3",
+        "status": "new",
+        "status_name": "New",
+        "link": "https://example.com/events/acme-builders-night",
+        "source": "https://example.com/events/acme-builders-night",
+        "action": null,
+        "verified": true
+      },
+      {
+        "id": "DR02",
+        "kind": "Event",
+        "title": "Globex Labs AI Success office hours",
+        "when": "Thu 19 Nov, 9am",
+        "date": "2026-11-19",
+        "place": "Online",
+        "orgs": [
+          "Globex Labs"
+        ],
+        "why": "Talk with people from Globex Labs online: the start of a warm path.",
+        "dimension": "D3",
+        "status": "new",
+        "status_name": "New",
+        "link": "https://example.com/events/globex-office-hours",
+        "source": "https://example.com/events/globex-office-hours",
+        "action": null,
+        "verified": true
+      },
+      {
+        "id": "DR03",
+        "kind": "Event",
+        "title": "Brisbane AI Product Meetup",
+        "when": "Thu 26 Nov, 5:30pm",
+        "date": "2026-11-26",
+        "place": "River Hub, Brisbane QLD",
+        "orgs": [],
+        "why": "People in your field near you: one may know someone at a target.",
+        "dimension": "D3",
+        "status": "new",
+        "status_name": "New",
+        "link": "https://example.com/events/bne-ai-product",
+        "source": "https://example.com/events/bne-ai-product",
+        "action": null,
+        "verified": true
+      },
+      {
+        "id": "DR04",
+        "kind": "Conference",
+        "title": "Warehouse Automation Summit",
+        "when": "Thu 3 Dec",
+        "date": "2026-12-03",
+        "place": "Convention Centre, Melbourne VIC",
+        "orgs": [
+          "Initech Robotics"
+        ],
+        "why": "Meet people from Initech Robotics in person: the start of a warm path.",
+        "dimension": "D3",
+        "status": "new",
+        "status_name": "New",
+        "link": "https://example.com/events/warehouse-automation-summit",
+        "source": "https://example.com/events/warehouse-automation-summit",
+        "action": null,
+        "verified": true
+      },
+      {
+        "id": "DR05",
+        "kind": "Programme",
+        "title": "Acme AI Fellows programme",
+        "when": "Closes Tue 15 Dec",
+        "date": "2026-12-15",
+        "place": "Sydney or remote",
+        "orgs": [
+          "Acme AI"
+        ],
+        "why": "A programme run by Acme AI: an edge there, and people who know your work.",
+        "dimension": "D4",
+        "status": "new",
+        "status_name": "New",
+        "link": "https://example.com/acme/fellows",
+        "source": "https://example.com/acme/fellows",
+        "action": null,
+        "verified": true
+      },
+      {
+        "id": "DR06",
+        "kind": "Community",
+        "title": "Initech Robotics partner community",
+        "when": "Open now",
+        "date": "",
+        "place": "Melbourne",
+        "orgs": [
+          "Initech Robotics"
+        ],
+        "why": "A community where people from Initech Robotics take part: a slow, steady warm path.",
+        "dimension": "D3",
+        "status": "new",
+        "status_name": "New",
+        "link": "https://example.com/initech/partners",
+        "source": "https://example.com/initech/partners",
+        "action": null,
+        "verified": true
+      }
+    ],
+    "total": 6,
+    "more": 0
   }
 }

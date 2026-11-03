@@ -8,6 +8,33 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## Unreleased
+
+### Added
+
+- **Doors: where to meet the people who hire.** Referrals come from people,
+  and people are met at events and programmes. `scripts/fetch_doors.py`
+  reads the public Luma calendars you name in `config.json`
+  (`doors.calendars`) and keeps upcoming events that name a target
+  organisation or are in your home city; it also lists fellowship,
+  residency and ambassador postings already on the job boards. Doors an
+  employer's events page or the market scout found go in with
+  `scripts/doors.py add`. Each door has a date, a place, a link, its source
+  and the factor it can move, shows on a new Doors card on the dashboard,
+  and becomes a plan action with `scripts/doors.py plan`. Someone you met
+  there goes into warm paths by the name you give (`scripts/doors.py met`).
+  Meetup, Eventbrite and LinkedIn are never fetched, and a test keeps it so.
+  You register, RSVP or apply yourself. The weekly note's "event worth a
+  look" is now the next door.
+- `scripts/build_dashboard.py --today` builds the page for a given day, so
+  the demo is the same whenever it is rebuilt.
+
+### Fixed
+
+- The dashboard page ranked a plan action whose roles all look suspicious
+  as high as any other, while the Python ranking (and the static summary)
+  put it last. Both now put it last.
+
 ## 0.5.0 (3 November 2026)
 
 Autopilot for your career: a check-in that runs itself each week, an

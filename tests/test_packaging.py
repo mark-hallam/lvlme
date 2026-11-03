@@ -307,12 +307,12 @@ class DocTests(unittest.TestCase):
 
 
 class NetworkTests(unittest.TestCase):
-    def test_only_three_scripts_can_reach_the_network(self):
-        """AGENTS.md: network calls only in fetch_roles.py, claims_audit.py and quick_posting.py."""
+    def test_only_four_scripts_can_reach_the_network(self):
+        """AGENTS.md: network calls only in fetch_roles.py, fetch_doors.py, claims_audit.py and quick_posting.py."""
         net = re.compile(r"\b(urllib\.request|urlopen|http\.client|socket|ftplib|smtplib)\b")
         found = sorted(name for name in os.listdir(os.path.join(ROOT, "scripts"))
                        if name.endswith(".py") and net.search(read(os.path.join("scripts", name))))
-        self.assertEqual(found, ["claims_audit.py", "fetch_roles.py", "quick_posting.py"])
+        self.assertEqual(found, ["claims_audit.py", "fetch_doors.py", "fetch_roles.py", "quick_posting.py"])
 
 
 if __name__ == "__main__":

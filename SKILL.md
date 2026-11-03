@@ -222,6 +222,16 @@ events, partner programmes) into `market/orgs.json`. It reads all six
 boards LVLme quick reads; roles from any other careers site go in
 `market/roles/manual.json`.
 
+Then find doors: run `python3 scripts/fetch_doors.py`, which reads the
+public Luma calendars in `config.json` (`doors.calendars`) and the
+fellowship, residency and ambassador postings already fetched. Add each
+dated event or programme a scout found, once you have opened its page
+yourself, with `python3 scripts/doors.py add ... --source-kind scout
+--verified`. On the person's yes, `python3 scripts/doors.py plan <id>`
+turns a door into a plan action, and `python3 scripts/doors.py met <id>
+--org <id> --person "<name>"` records someone they met there, by the name
+they give. Never register, RSVP, apply or pay (`method/CAMPAIGN.md`).
+
 ### 4. Judge and audit
 
 - **Judge.** Follow `method/RUBRIC.md` exactly. Judge every role that is new

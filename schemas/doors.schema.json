@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Doors (market/doors.json)",
+  "description": "Events, conferences, communities and programmes where people from the target organisations can be met, each with a date, a place, a link and its source. Written by scripts/fetch_doors.py and scripts/doors.py. Progress only: score.py never reads this file. Each door can become a plan action (scripts/doors.py plan). LVLme never registers, RSVPs, applies or pays.",
+  "type": "object",
+  "required": ["schema_version", "doors"],
+  "additionalProperties": false,
+  "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
+  "properties": {
+    "schema_version": {"const": 1},
+    "updated_on": {"$ref": "#/definitions/date"},
+    "doors": {"type": "array", "items": {"$ref": "#/definitions/door"}}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "extension": {"description": "Extension field: any key starting x_ holds data the engine never reads. Kept as is."},
+    "door": {
+      "type": "object",
+      "required": ["id", "kind", "title", "link", "source", "source_kind", "seen_on", "status"],
+      "additionalProperties": false,
+      "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
+      "properties": {
+        "id": {"type": "string", "pattern": "^DR[0-9]{2,}$", "description": "DR01, DR02 and so on."},
+        "kind": {"enum": ["event", "conference", "community", "programme"]},
+        "title": {"type": "string", "minLength": 1},
+        "orgs": {"type": "array", "items": {"type": "string"}, "description": "Target ids from config.json the door is about. Empty: near the person, not at a target."},
+        "starts_on": {"$ref": "#/definitions/date", "description": "The day it happens, in the person's time zone."},
+        "time": {"type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$", "description": "Local start time, in the person's time zone."},
+        "ends_on": {"$ref": "#/definitions/date"},
+        "closes_on": {"$ref": "#/definitions/date", "description": "Programmes: when applications close."},
+        "place": {"type": "string"},
+        "online": {"type": "boolean"},
+        "link": {"type": "string", "minLength": 1, "description": "Where the person registers or reads more. They register themselves."},
+        "source": {"type": "string", "minLength": 1, "description": "Where the facts come from: the calendar feed, the posting or the page."},
+        "source_kind": {"enum": ["luma_ical", "employer_page", "job_board", "scout", "person"]},
+        "verified": {"type": "boolean", "description": "The lead opened the source itself (a calendar feed or a job board read by a script counts)."},
+        "uid": {"type": "string", "description": "The calendar's event id or the posting id, so a later fetch updates this door instead of adding it again."},
+        "seen_on": {"$ref": "#/definitions/date"},
+        "why": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["dimension"],
+          "properties": {
+            "dimension": {"enum": ["D2", "D3", "D4", "D5"], "description": "The factor this door can move: usually warm path (D3) for meeting people, organisation-specific edge (D4) for a programme."},
+            "note": {"type": "string"}
+          }
+        },
+        "done_when": {"type": "string", "description": "Something the person can show, such as the name of one person they spoke with."},
+        "status": {"enum": ["new", "interested", "going", "went", "applied", "skipped"]},
+        "action": {"type": "string", "pattern": "^A[0-9]{2,}$", "description": "The plan action made from this door, if any."},
+        "note": {"type": "string"}
+      }
+    }
+  }
+}

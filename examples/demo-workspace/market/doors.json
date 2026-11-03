@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "doors": [
+    {
+      "id": "DR01",
+      "kind": "event",
+      "title": "Acme AI Builders Night, Brisbane",
+      "orgs": [
+        "acme"
+      ],
+      "starts_on": "2026-11-12",
+      "place": "The Wharf Rooms, Brisbane City QLD",
+      "online": false,
+      "link": "https://example.com/events/acme-builders-night",
+      "source": "https://example.com/events/acme-builders-night",
+      "source_kind": "luma_ical",
+      "verified": true,
+      "uid": "ical:demo-evt-001@example.com",
+      "why": {
+        "dimension": "D3",
+        "note": "Meet people from Acme AI in person: the start of a warm path."
+      },
+      "time": "18:00",
+      "seen_on": "2026-11-01",
+      "status": "new",
+      "done_when": "Name one person you spoke with there."
+    },
+    {
+      "id": "DR02",
+      "kind": "event",
+      "title": "Globex Labs AI Success office hours",
+      "orgs": [
+        "globex"
+      ],
+      "starts_on": "2026-11-19",
+      "place": "Online",
+      "online": true,
+      "link": "https://example.com/events/globex-office-hours",
+      "source": "https://example.com/events/globex-office-hours",
+      "source_kind": "luma_ical",
+      "verified": true,
+      "uid": "ical:demo-evt-002@example.com",
+      "why": {
+        "dimension": "D3",
+        "note": "Talk with people from Globex Labs online: the start of a warm path."
+      },
+      "time": "09:00",
+      "seen_on": "2026-11-01",
+      "status": "new",
+      "done_when": "Name one person you spoke with there."
+    },
+    {
+      "id": "DR03",
+      "kind": "event",
+      "title": "Brisbane AI Product Meetup",
+      "orgs": [],
+      "starts_on": "2026-11-26",
+      "place": "River Hub, Brisbane QLD",
+      "online": false,
+      "link": "https://example.com/events/bne-ai-product",
+      "source": "https://example.com/events/bne-ai-product",
+      "source_kind": "luma_ical",
+      "verified": true,
+      "uid": "ical:demo-evt-003@example.com",
+      "why": {
+        "dimension": "D3",
+        "note": "People in your field near you: one may know someone at a target."
+      },
+      "time": "17:30",
+      "seen_on": "2026-11-01",
+      "status": "new",
+      "done_when": "Name one person you spoke with there."
+    },
+    {
+      "id": "DR04",
+      "kind": "conference",
+      "title": "Warehouse Automation Summit",
+      "orgs": [
+        "initech"
+      ],
+      "starts_on": "2026-12-03",
+      "place": "Convention Centre, Melbourne VIC",
+      "online": false,
+      "link": "https://example.com/events/warehouse-automation-summit",
+      "source": "https://example.com/events/warehouse-automation-summit",
+      "source_kind": "luma_ical",
+      "verified": true,
+      "uid": "ical:demo-evt-004@example.com",
+      "why": {
+        "dimension": "D3",
+        "note": "Meet people from Initech Robotics in person: the start of a warm path."
+      },
+      "ends_on": "2026-12-05",
+      "seen_on": "2026-11-01",
+      "status": "new",
+      "done_when": "Name one person you spoke with there."
+    },
+    {
+      "id": "DR05",
+      "kind": "programme",
+      "title": "Acme AI Fellows programme",
+      "orgs": [
+        "acme"
+      ],
+      "place": "Sydney or remote",
+      "online": false,
+      "link": "https://example.com/acme/fellows",
+      "source": "https://example.com/acme/fellows",
+      "source_kind": "employer_page",
+      "verified": true,
+      "uid": "added:Acme AI Fellows programme@2026-12-15",
+      "why": {
+        "dimension": "D4",
+        "note": "A programme run by Acme AI: an edge there, and people who know your work."
+      },
+      "closes_on": "2026-12-15",
+      "seen_on": "2026-11-01",
+      "status": "new",
+      "done_when": "Your application is in: the confirmation email."
+    },
+    {
+      "id": "DR06",
+      "kind": "community",
+      "title": "Initech Robotics partner community",
+      "orgs": [
+        "initech"
+      ],
+      "place": "Melbourne",
+      "online": false,
+      "link": "https://example.com/initech/partners",
+      "source": "https://example.com/initech/partners",
+      "source_kind": "employer_page",
+      "verified": true,
+      "uid": "added:Initech Robotics partner community@2026-11-01",
+      "why": {
+        "dimension": "D3",
+        "note": "A community where people from Initech Robotics take part: a slow, steady warm path."
+      },
+      "seen_on": "2026-11-01",
+      "status": "new",
+      "done_when": "You joined, and spoke or posted once."
+    }
+  ],
+  "updated_on": "2026-11-01"
+}

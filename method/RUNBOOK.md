@@ -60,7 +60,11 @@ rounds while roles and evidence are gathered.
 
    ```bash
    python3 scripts/fetch_roles.py
+   python3 scripts/fetch_doors.py
    ```
+
+   The second finds doors: events and programmes at the targets
+   (`CAMPAIGN.md`, "Doors").
 
    Note new and closed roles (printed, and in the summary of
    `market/roles/latest.json`). If `blocker_counts` there is above 0 for US

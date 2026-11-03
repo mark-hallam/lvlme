@@ -186,6 +186,7 @@ th{font-size:13px;color:var(--sub);font-weight:650}
 .wp-s{font-size:13px;font-weight:650;color:var(--accent);white-space:nowrap}
 .wp-s.none{color:var(--sub);font-weight:500}
 .ap-s.due,.ap-s.overdue{color:var(--warn)}
+a.dr-l{color:var(--ink);text-decoration:none}a.dr-l:hover,a.dr-l:focus{color:var(--accent);text-decoration:underline}
 .week{margin-bottom:16px}.week-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .week-pill{background:var(--accent-soft);color:var(--accent)}.week-pill.off{background:var(--rule);color:var(--sub)}
 .week-do{font-size:20px;line-height:1.3;font-weight:700;letter-spacing:-.01em;margin:8px 0 4px}
@@ -541,6 +542,7 @@ BODY = r"""
   <section class="card static-sum" id="staticSummary" aria-labelledby="staticSummaryH">__STATIC__</section>
   <div class="tiles4" id="tiles4"></div>
   <div class="card pair" id="warmCard" hidden><div class="eyebrow">Warm paths</div><div class="tiny sub" id="warmSub" style="margin-bottom:4px"></div><div id="warm"></div></div>
+  <div class="card pair" id="doorsCard" hidden><div class="eyebrow">Doors</div><div class="tiny sub" id="doorsSub" style="margin-bottom:4px"></div><div id="doors"></div></div>
   <div class="card pair" id="appsCard" hidden><div class="eyebrow">Applications</div><div class="tiny sub" id="appsSub" style="margin-bottom:4px"></div><div id="apps"></div></div>
   <div class="card pair" id="unlocksCard"><div class="eyebrow">Biggest unlocks</div><div class="tiny sub" id="unlocksSub" style="margin-bottom:4px"></div><div id="unlocks"></div></div>
 
@@ -1000,6 +1002,16 @@ function appsHTML(){
   return `<div>${A.rows.map(r => `<div class="wp"><div class="wp-h"><span class="wp-n">${esc(r.title)}</span><span class="wp-s${r.status === "none" ? " none" : ""}">${esc(r.stage)}</span></div><div class="tiny sub">${esc(r.org)} · last step ${r.since === 0 ? "today" : plural(r.since, "day") + " ago"}${r.what && r.status !== "waiting" ? ` · <b class="ap-s ${esc(r.status)}">${esc(r.label)}: ${esc(r.what)}</b>` : r.status === "gone_quiet" ? " · gone quiet" : r.what ? " · " + esc(r.what) + " on " + esc(shortDate(r.due)) : ""}</div></div>`).join("")}</div>` +
     (A.due ? '<div class="tiny sub" style="margin-top:6px">Ask your agent to draft a due note. It goes in campaign/drafts/ for you to finish and send.</div>' : "");
 }
+// Doors (market/doors.json, scripts/fetch_doors.py and doors.py): events, programmes and communities where people from
+// the targets can be met, soonest first. Progress only; the person registers, RSVPs or applies themselves.
+const doorsSub = () => `${plural(D.doors.total, "upcoming door")}: where people from your targets will be. You register yourself.`;
+function doorsHTML(){
+  const R = D.doors; if (!R || !R.rows.length) return "";
+  return `<div>${R.rows.map(r => `<div class="wp"><div class="wp-h"><a class="wp-n dr-l" href="${esc(r.link)}" target="_blank" rel="noopener noreferrer">${esc(r.title)}</a><span class="wp-s${r.status === "new" ? " none" : ""}">${esc(r.action ? "In plan" : r.status_name)}</span></div>
+    <div class="tiny sub">${esc(r.kind)} · ${esc(r.when)}${r.place ? " · " + esc(r.place) : ""}${r.orgs.length ? " · " + esc(r.orgs.join(", ")) : ""}</div>
+    <div class="tiny sub">${esc(r.why)}${r.action ? ` Plan action ${esc(r.action)}.` : ""}${r.verified ? "" : " Not yet checked."}</div></div>`).join("")}</div>` +
+    `<div class="tiny sub" style="margin-top:6px">${R.more ? plural(R.more, "more door") + " in market/doors.json. " : ""}Ask your agent to add one to your plan, for example "add ${esc(R.rows[0].id)} to my plan".</div>`;
+}
 // This week (campaign/weekly/<date>.json, written by scripts/autopilot.py week): the one thing to do, what
 // changed, and whether Autopilot runs on its own. The page's first card, so progress is the first thing seen.
 function renderWeek(){
@@ -1030,14 +1042,17 @@ function renderDoNext(){
   $("#unlocksSub").textContent = UNLOCKS_SUB; $("#unlocks").innerHTML = unlocksHTML(); bindHome($("#nextIn")); bindHome($("#unlocksCard"));
   const warm = warmHTML(); $("#warm").innerHTML = warm; $("#warmCard").hidden = !warm;
   if (warm){ $("#warmSub").textContent = warmSub(); bindHome($("#warmCard")); }
+  const doors = doorsHTML(); $("#doors").innerHTML = doors; $("#doorsCard").hidden = !doors;
+  if (doors) $("#doorsSub").textContent = doorsSub();
   const apps = appsHTML(); $("#apps").innerHTML = apps; $("#appsCard").hidden = !apps;
   if (apps) $("#appsSub").textContent = appsSub();
   if (!narrow() && !state.stack.length) renderHome();
 }
 function renderHome(){
-  const card = $("#detailCard"), warm = warmHTML(), apps = appsHTML();
+  const card = $("#detailCard"), warm = warmHTML(), apps = appsHTML(), doors = doorsHTML();
   card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h2 class="pane-h" style="margin:0">Do next</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div><div>${doNextHTML()}</div>
     ${warm ? `<h2 class="pane-h" style="margin:18px 0 0">Warm paths</h2><div class="tiny sub" style="margin-bottom:4px">${esc(warmSub())}</div>${warm}` : ""}
+    ${doors ? `<h2 class="pane-h" style="margin:18px 0 0">Doors</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doorsSub())}</div>${doors}` : ""}
     ${apps ? `<h2 class="pane-h" style="margin:18px 0 0">Applications</h2><div class="tiny sub" style="margin-bottom:4px">${esc(appsSub())}</div>${apps}` : ""}
     <h2 class="pane-h" style="margin:18px 0 0">Biggest unlocks</h2><div class="tiny sub" style="margin-bottom:4px">${UNLOCKS_SUB}</div><div>${unlocksHTML()}</div>
     <div class="tiny sub" style="margin-top:18px;padding-top:12px;border-top:1px solid var(--rule)">Tap any organisation, role, factor, action or piece of evidence to drill in here.</div></div>`;
@@ -1440,7 +1455,7 @@ function questsFor(rs, nl){
     const exp = r1(w.end - lead.fit), works = r1(ok.end - lead.fit);
     return {a, exp, works, rate: a.hours ? exp / a.hours : 0, crit: crit.has(a.id), bc: bc.has(a.id), on: enabled.has(a.id),
       r: w.r, fitAfter: w.end, leadExp: r1(walkL(lead, [a], "exp").end - lead.fit), leadWorks: r1(walkL(lead, [a], "best").end - lead.fit)};
-  }).sort((x, y) => (y.rate - x.rate) || (y.exp - x.exp) || (y.a.priority - x.a.priority) || (x.a.date < y.a.date ? -1 : x.a.date > y.a.date ? 1 : 0) || (x.a.id < y.a.id ? -1 : 1));
+  }).sort((x, y) => (!!x.a.susp - !!y.a.susp) || (y.rate - x.rate) || (y.exp - x.exp) || (y.a.priority - x.a.priority) || (x.a.date < y.a.date ? -1 : x.a.date > y.a.date ? 1 : 0) || (x.a.id < y.a.id ? -1 : 1));
 }
 // ---------- one yardstick: the ranked list every action list follows ----------
 // The actions on the path to the next level: the smallest set, or, when none gets there, the best-case set.

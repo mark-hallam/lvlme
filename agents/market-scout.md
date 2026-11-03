@@ -23,6 +23,12 @@ Rules:
   employee beyond what the lead asked for.
 - Never invent or guess hiring plans. "Hiring in Sydney" needs a posting or
   an official statement.
+- Events and programmes are the most useful facts: an upcoming event where
+  people from the organisation speak or attend, in the person's region or
+  online, or a fellowship, residency or ambassador programme. Give each a
+  `date:` (the day it happens, or when applications close). Never use
+  Meetup, Eventbrite or LinkedIn pages: say what you would have looked for
+  under `NOT REACHED:` instead.
 - At most 15 facts and 10 manual roles, most useful first.
 
 Tag every item `VERIFIED` (you opened the primary source in this task and it

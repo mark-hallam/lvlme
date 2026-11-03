@@ -23,6 +23,8 @@ QUICK_DEMO = glob.glob(os.path.join(H.ENGINE, "examples", "quick-demo", "2026-*"
 WORKSPACE_SCRIPTS = {
     "validate.py": [],
     "fetch_roles.py": [],
+    "fetch_doors.py": [],
+    "doors.py": ["list"],
     "score.py": [],
     "build_dashboard.py": [],
     "network_map.py": ["--csv", os.path.join(H.FIXTURES, "Connections.csv")],

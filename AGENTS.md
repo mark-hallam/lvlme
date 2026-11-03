@@ -75,7 +75,10 @@ Every script takes `--workspace PATH`.
    with `python3 scripts/applications.py` (drafts only, you never send);
    process `campaign/inbox.md`.
 3. **Market**: `python3 scripts/fetch_roles.py`; research each organisation
-   and add sourced facts to `market/orgs.json`.
+   and add sourced facts to `market/orgs.json`; `python3
+   scripts/fetch_doors.py` for events and programmes, and add dated ones
+   the scouts found with `python3 scripts/doors.py add` (doors:
+   `method/CAMPAIGN.md`). Never register, RSVP, apply or pay.
 4. **Judge and audit**: fill `eval/judgements.json` and
    `eval/profile-dimensions.json` using `method/RUBRIC.md`; run
    `python3 scripts/claims_audit.py <their pages>` and judge each pending
@@ -124,8 +127,10 @@ first stage not yet done today).
 
 - Python 3.9 or newer, standard library only. No telemetry. Network calls only
   in `fetch_roles.py` (public job-board APIs, or application programming
-  interfaces), `claims_audit.py` (addresses the person passes) and
-  `quick_posting.py` (the one posting link the person gives LVLme quick).
+  interfaces), `fetch_doors.py` (public Luma calendar feeds the person
+  named; never Meetup, Eventbrite or LinkedIn), `claims_audit.py`
+  (addresses the person passes) and `quick_posting.py` (the one posting
+  link the person gives LVLme quick).
 - Every script ends `sys.exit(C.run_main(main))`, so a failure reaches the
   person as one plain `lvlme:` line, never a traceback (a Python error
   listing). Read workspace JSON with `C.load_json`, which names the file, line

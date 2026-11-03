@@ -31,6 +31,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DEMO = os.path.join(HERE, "demo-workspace")
 sys.path.insert(0, os.path.join(os.path.dirname(HERE), "scripts"))
 import build_dashboard  # noqa: E402
+import doors  # noqa: E402
+import fetch_doors  # noqa: E402
 import fetch_roles  # noqa: E402
 import network_map  # noqa: E402
 import score  # noqa: E402
@@ -40,7 +42,14 @@ WEEKS = ["2026-10-04", "2026-10-11", "2026-10-18", "2026-10-25", "2026-11-01"]
 OPEN = {"acme:4100007": (0, 2), "initech:i-0001": (2, 4), "globex:g-0004": (3, 4), "initech:i-0004": (4, 4)}
 FIXTURE_ORGS = {"acme": "greenhouse", "globex": "ashby", "initech": "lever"}
 METRICS = {"warm_intros": [0, 0, 0, 1, 1], "proof_pieces": [1, 1, 2, 3, 3]}
-OUTPUTS = ["eval/runs", "market/roles", "report", "campaign/metrics-history.json"]
+# Doors added by hand on the demo (scripts/doors.py add), beside the ones read from the fictional calendar.
+DOORS = [["--kind", "programme", "--title", "Acme AI Fellows programme", "--org", "acme", "--closes", "2026-12-15",
+          "--place", "Sydney or remote", "--link", "https://example.com/acme/fellows", "--source-kind", "employer_page",
+          "--verified"],
+         ["--kind", "community", "--title", "Initech Robotics partner community", "--org", "initech",
+          "--place", "Melbourne", "--link", "https://example.com/initech/partners", "--source-kind", "employer_page",
+          "--verified"]]
+OUTPUTS = ["eval/runs", "market/roles", "market/doors.json", "report", "campaign/metrics-history.json"]
 
 
 def load(rel, root=DEMO):
@@ -206,8 +215,12 @@ def main():
         run(fetch_roles.main, ["--workspace", DEMO, "--fixtures", fx, "--date", today])
         run(network_map.main, ["--workspace", DEMO, "--csv", os.path.join(DEMO, "intake", "sources", "Connections.csv"),
                                "--today", today])
+        run(fetch_doors.main, ["--workspace", DEMO, "--ics", os.path.join(DEMO, "market", "fixtures", "doors.ics"),
+                               "--date", today])
+        for door in DOORS:
+            run(doors.main, ["--workspace", DEMO, "add", "--date", today] + door)
         run(score.main, ["--workspace", DEMO, "--date", today])
-        run(build_dashboard.main, ["--workspace", DEMO])
+        run(build_dashboard.main, ["--workspace", DEMO, "--today", today])
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print("Demo rebuilt: examples/demo-workspace/report/index.html")

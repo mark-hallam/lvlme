@@ -120,6 +120,8 @@ sensitive, the agent does not record it.
   still sends what it reads to its provider, as above.)
 - `fetch_roles.py` calls only the public job-board APIs (application
   programming interfaces) for the targets in your config.
+- `fetch_doors.py` reads only the public calendar feeds you list in
+  `doors.calendars`, and never a Meetup, Eventbrite or LinkedIn address.
 - `claims_audit.py` fetches only the addresses you pass it.
 - `quick_posting.py` (LVLme quick) fetches only the one posting link you give
   it: through the public job-board API for Greenhouse, Ashby, Lever, Workday,

@@ -18,6 +18,7 @@ import json
 import os
 
 import _common as C
+import _doors as DR
 import _applications as AP
 
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
@@ -173,7 +174,8 @@ def week_note(ws, config, today):
                   "board_errors": sorted((summary.get("endpoint_errors") or {}).keys())},
         "follow_ups": [{"id": a["id"], "title": a.get("title"), "org": names.get(a.get("org"), a.get("org")),
                         "what": AP.follow_up(a, today)["what"], "due_on": AP.follow_up(a, today)["due_on"]} for a in apps],
-        "event": best_event(_load(ws, "market", "orgs.json"), C.target_ids(config), names),
+        "event": (DR.next_door(_load(ws, "market", "doors.json"), today, names)
+                  or best_event(_load(ws, "market", "orgs.json"), C.target_ids(config), names)),
         "review_waiting": awaiting,
         "action": {"id": top["id"], "title": top.get("title"), "why": top.get("why", "")} if top else None,
         "autopilot": {"enabled": bool(settings(config).get("enabled")), "when": when_text(settings(config)),

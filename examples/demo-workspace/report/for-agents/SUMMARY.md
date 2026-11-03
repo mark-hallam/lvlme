@@ -120,3 +120,14 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 - Contacts are left out in sensitive mode.
 - When the person says a contact has moved on, the agent running the campaign sets stage and updated_on and
   adds a history entry in campaign/warm-paths.json. Any other agent appends the message to campaign/inbox.md.
+
+## Doors (market/doors.json)
+
+6 upcoming. Progress only: score.py never reads doors. Turn one into a plan action with `python3 scripts/doors.py plan <id>` on the person's yes.
+
+- DR01 Event: Acme AI Builders Night, Brisbane, Thu 12 Nov, 6pm, The Wharf Rooms, Brisbane City QLD (Acme AI). Meet people from Acme AI in person: the start of a warm path. Source: https://example.com/events/acme-builders-night
+- DR02 Event: Globex Labs AI Success office hours, Thu 19 Nov, 9am, Online (Globex Labs). Talk with people from Globex Labs online: the start of a warm path. Source: https://example.com/events/globex-office-hours
+- DR03 Event: Brisbane AI Product Meetup, Thu 26 Nov, 5:30pm, River Hub, Brisbane QLD. People in your field near you: one may know someone at a target. Source: https://example.com/events/bne-ai-product
+- DR04 Conference: Warehouse Automation Summit, Thu 3 Dec, Convention Centre, Melbourne VIC (Initech Robotics). Meet people from Initech Robotics in person: the start of a warm path. Source: https://example.com/events/warehouse-automation-summit
+- DR05 Programme: Acme AI Fellows programme, Closes Tue 15 Dec, Sydney or remote (Acme AI). A programme run by Acme AI: an edge there, and people who know your work. Source: https://example.com/acme/fellows
+- DR06 Community: Initech Robotics partner community, Open now, Melbourne (Initech Robotics). A community where people from Initech Robotics take part: a slow, steady warm path. Source: https://example.com/initech/partners

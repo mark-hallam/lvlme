@@ -116,6 +116,10 @@ Along the way it runs:
   GitHub, the public web and press, public registers, and your files.
 - **Market research**: open roles from public job boards, and sourced facts
   about each organisation.
+- **Doors**: upcoming events, conferences, communities and programmes where
+  people from your target organisations will be, each with its date, place
+  and source, and one step from becoming a plan action. You register
+  yourself.
 - **A consistency audit**: do your CV, LinkedIn, website and any official
   forms say the same thing about the same facts?
 - **A recruiter screen**: an independent recruiter persona reads your
@@ -226,9 +230,10 @@ Most career advice flatters. LVLme is built to do the opposite.
 - **Sensitive mode** (on by default) keeps employer names, other people's
   names and salary figures out of the briefing files written for other agents.
 - No telemetry. The only network calls are to public job-board APIs in
-  `fetch_roles.py`, the one posting link you give `quick_posting.py`, the web
-  pages you name in `claims_audit.py`, and the sources you approve for your
-  agent to read.
+  `fetch_roles.py`, the public event calendars you name in `fetch_doors.py`
+  (never Meetup, Eventbrite or LinkedIn), the one posting link you give
+  `quick_posting.py`, the web pages you name in `claims_audit.py`, and the
+  sources you approve for your agent to read.
 
 Full details: [`method/PRIVACY.md`](../method/PRIVACY.md).
 
@@ -258,6 +263,9 @@ For a plain-English tour of each number and what to do first, see
   work, would refer). It is progress only and changes no score: your warm
   path score moves when the evidence does. Tap an organisation to see each
   contact's stage and next step (names stay hidden unless you opt in).
+- **Doors**: the next events, programmes and communities where people from
+  your targets will be, soonest first, with why each one matters. Ask your
+  agent to add one to your plan.
 - **Verifiable record**: one chip per scored day. If your workspace is its own
   git repository (a version history, with no remote), each chip also shows the
   saved version that first recorded that day.
@@ -320,6 +328,7 @@ The full campaign:
 python3 scripts/init.py --goal "Frontier AI labs" --example frontier-ai-labs   # private workspace from the example
 export LVLME_HOME=~/lvlme-workspaces/frontier-ai-labs
 python3 scripts/fetch_roles.py                        # open roles from public job boards
+python3 scripts/fetch_doors.py                        # events and programmes (public calendars you name)
 python3 scripts/network_map.py --csv ~/Downloads/Connections.csv   # optional: needs your LinkedIn export
 python3 scripts/claims_audit.py https://your-site.example/about
 python3 scripts/score.py                              # deterministic scoring
@@ -381,7 +390,7 @@ agents/     subagent briefs: evidence-scout, market-scout, role-judge, reviewer,
 .cursor/rules/  Cursor rules
 method/     the rules for each stage (rubric, interview, intake, audits, review, campaign, privacy, runbook)
 schemas/    JSON Schema files (rules for every workspace file)
-scripts/    init, fetch_roles, network_map, claims_audit, consistency_audit,
+scripts/    init, fetch_roles, fetch_doors, doors, network_map, claims_audit, consistency_audit,
             score, build_dashboard, validate, quick, quick_posting
 templates/  the workspace skeleton that init.py copies, and agent prompts
 docs/       INSTALL.md, HOW-IT-WORKS.md, ORCHESTRATION.md, LEVELS.md, DESIGN.md,
@@ -398,7 +407,7 @@ config.json                goal, targets, role types, locations, weights, privac
 intake/answers.md          your interview answers
 intake/sources/            exports you supply (LinkedIn data, résumé)
 profile/                   evidence.json, network.json, claims-audit.json
-market/                    roles/latest.json, roles/snapshots/, orgs.json
+market/                    roles/latest.json, roles/snapshots/, orgs.json, doors.json
 eval/                      judgements, profile dimensions, SWOT, outlook, runs/
 campaign/                  plan.json, warm-paths.json, inbox.md, drafts/, weekly/
 report/                    index.html, for-agents/

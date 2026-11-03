@@ -179,6 +179,46 @@ The dashboard records their values each run in
 `campaign/metrics-history.json` and shows each one's change since Day 1 under
 "Campaign progress".
 
+## Doors: where to meet people
+
+A referral comes from a person, and people are met at events and
+programmes. Referred candidates reach interview far more often than cold
+applicants (Ashby, 38 million applications, 2025: 40% against 3%).
+`market/doors.json` (`schemas/doors.schema.json`) lists each door: an
+`event`, `conference`, `community` or `programme` (a fellowship, residency
+or ambassador scheme), with its date, place, link and source, the target
+organisations it is about, and the factor it can move (`why`: usually warm
+path D3, or organisation-specific edge D4 for a programme).
+
+- **Where doors come from.** `scripts/fetch_doors.py` reads the public Luma
+  calendars the person named in `config.json` (`doors.calendars`, each
+  calendar's iCal feed address) and keeps events from today to
+  `doors.horizon_days` ahead (default 120) that name a target organisation
+  or are in the person's home city. It also lists fellowship, residency and
+  ambassador postings already in `market/roles/latest.json`, with no new
+  fetching. Doors from employers' own events pages or a market scout are
+  added with `scripts/doors.py add`, once the lead has opened the page
+  itself (`--verified`).
+- **Never fetched:** Meetup and Eventbrite pages (their terms or robots
+  files forbid it) and LinkedIn. `fetch_doors.py` refuses those addresses
+  whatever the config says, and a test keeps it so.
+- **Never done for the person:** registering, replying yes, applying or
+  paying. LVLme links to the page; the person acts.
+- **A door can become a plan action** (`scripts/doors.py plan <id>`, on the
+  person's yes): "Go to", "Join" or "Apply to" the door, on the factor in
+  `why`, dated for the door's day, with a done-when the person can show
+  ("Name one person you spoke with there"). Its effort and chance are first
+  estimates the person can change.
+- **People met go into warm paths by name, from the person**
+  (`scripts/doors.py met <id> --org <id> --person "<name>"`, at `talked`),
+  never from a guess or a scraped attendee list. Some organisations say
+  their staff cannot refer someone who only messaged them online, so a door
+  where you meet in person is worth more than a message.
+- **Progress only.** `score.py` never reads `market/doors.json`. A door
+  lifts a score only through the evidence it leads to.
+- **Facts about organisations only.** Nothing about named employees beyond
+  what the person asked for.
+
 ## Warm paths: progress with each contact
 
 Referrals are the biggest lever, and they are slow, so the person needs to see
