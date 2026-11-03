@@ -27,6 +27,12 @@ before. Nothing here changes how a score is worked out unless it says so.
   "Anthropic asks for your own first draft. Write it, then I'll review it.",
   with a link to the page.
 
+- **Climb from here.** `python3 scripts/quick.py promote` turns a LVLme
+  quick result into a full campaign with nothing redone: the same evidence
+  and levels, the posting as the first role, its employer as the first
+  target on its own job board, and the judgements carried across, with the
+  blind review's agreements and open disputes kept. The campaign's first
+  score matches quick's, and the LinkedIn export can come later.
 - **Autopilot: a check-in that runs itself.** `/lvlme-autopilot` explains
   what will run, asks for each permission once (rhythm, light or full run,
   which read-only sources, whether helper agents may run), then sets up the

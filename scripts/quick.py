@@ -611,6 +611,44 @@ def reviewer_brief(docs, items):
     return "\n".join(lines)
 
 
+def promote(args):
+    """Make a campaign workspace from a finished quick folder, score it, and build its dashboard (scripts/_promote.py)."""
+    import init as I
+    import _promote as PR
+    import score as S
+    import build_dashboard as B
+    import validate as V
+    folder = rel_folder(args.folder)
+    dest = os.path.abspath(os.path.expanduser(args.workspace or C.home_env()
+                                              or os.path.join(C.default_parent(), I.slugify(args.goal))))
+    with open(os.devnull, "w") as quiet:
+        old, sys.stdout = sys.stdout, quiet
+        try:
+            code = I.main(["--goal", args.goal, "--workspace", dest])
+        finally:
+            sys.stdout = old
+    if code:
+        return code
+    date = C.check_date(args.date) if args.date else C.today_in(C.load_json(C.wpath(dest, "config.json")))
+    summary = PR.promote(folder, dest, date)
+    with open(os.devnull, "w") as quiet:
+        old, sys.stdout = sys.stdout, quiet
+        try:
+            S.main(["--workspace", dest, "--date", date])
+            B.main(["--workspace", dest])
+        finally:
+            sys.stdout = old
+    errors = V.validate_workspace(dest)[0]
+    print("Climbing from here: %s is now a campaign with %d evidence items, one target (%s, %s) and its first scored run."
+          % (summary["role"], summary["evidence"], summary["target"]["name"], summary["target"]["ats"]))
+    print("Next: say \"run the LVLme interview\" to add more targets and the factors quick cannot check. "
+          "The LinkedIn export can come later.")
+    print("```bash\nopen %s\n```" % display_path(os.path.join(dest, "report", "index.html")))
+    for e in errors:
+        print("ERROR " + e, file=sys.stderr)
+    return 1 if errors else 0
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="LVLme quick: honest odds for one job posting.")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -629,9 +667,16 @@ def main(argv=None):
     for name in ("review-items", "build"):
         p = sub.add_parser(name)
         p.add_argument("--folder", required=True, help="the quick folder")
+    pr = sub.add_parser("promote", help="climb from here: turn this quick result into a full campaign")
+    pr.add_argument("--folder", required=True, help="the quick folder")
+    pr.add_argument("--goal", required=True, help='the campaign goal in a few words, for example "Applied AI roles"')
+    pr.add_argument("--workspace", help="where to make the campaign (default: as init.py)")
+    pr.add_argument("--date", help="the date, YYYY-MM-DD (default: today)")
     args = ap.parse_args(argv)
     if args.cmd == "new":
         return new(args)
+    if args.cmd == "promote":
+        return promote(args)
     try:
         if args.cmd == "review-items":
             docs = load(args.folder)

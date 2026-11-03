@@ -116,8 +116,11 @@ other file that describes a first run links here.
 2. **The first message**, about 120 words at most (`method/INTERVIEW.md`,
    "The first message"): confirm three facts from the CV, ask which
    organisations they want, and ask for the LinkedIn data export. No CV yet?
-   Ask for it instead of the three facts. If they ran LVLme quick, offer the
-   CV they gave it (in the quick folder's `intake/sources/`).
+   Ask for it instead of the three facts. If they ran LVLme quick, start from
+   it instead: `python3 scripts/quick.py promote --folder <quick folder>
+   --goal "<goal>"` carries its evidence, posting and judgements into the new
+   workspace, so the first score comes at once; the interview then adds
+   targets in short rounds, and the LinkedIn export can arrive later.
 3. **Config.** From the reply, fill in `config.json` with the person:
    targets (look up each organisation's applicant tracking system (ATS):
    Greenhouse, Ashby, Lever, SmartRecruiters or Workable with the board's

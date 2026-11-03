@@ -122,5 +122,10 @@ would raise it most (any fix left out is named, with the reason). Aim for a coup
    go deeper: say "run LVLme" for the full campaign. In Claude chat, where
    the folder is in Claude's sandbox rather than on the person's computer,
    share `index.html` as a file in place of the open command. If they want to go deeper,
-   start the full run (the engine's `SKILL.md`), and offer the CV they already
-   gave as the first document for the interview.
+   climb from here, with nothing redone: ask for the campaign goal in a few
+   words, then run `python3 scripts/quick.py promote --folder <quick folder>
+   --goal "<goal>"`. It makes a campaign workspace with the same evidence,
+   the posting as the first role, its employer as the first target, and the
+   judgements carried across, scored and with a dashboard. Then continue
+   with the interview (the engine's `SKILL.md`); the LinkedIn export can come
+   later.
