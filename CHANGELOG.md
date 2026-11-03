@@ -27,6 +27,14 @@ before. Nothing here changes how a score is worked out unless it says so.
   "Anthropic asks for your own first draft. Write it, then I'll review it.",
   with a link to the page.
 
+- **Autopilot: a check-in that runs itself.** `/lvlme-autopilot` explains
+  what will run, asks for each permission once (rhythm, light or full run,
+  which read-only sources, whether helper agents may run), then sets up the
+  schedule with the Claude desktop app's scheduled tasks or prints a line
+  for your computer's own scheduler. Each run leaves a "This week" note, the
+  dashboard's new first card: what changed, your level, new and closed
+  roles, follow-ups due, one event worth a look, and the one thing to do.
+  Off is one command. It never sends, applies or contacts anyone.
 - **Know the size of a run before it starts.** `scripts/run_plan.py` says
   how many roles need judging (new, changed posting, or new evidence) and
   about how many helpers a full run and a light run (your top 30, plus new

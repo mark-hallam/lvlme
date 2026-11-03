@@ -253,6 +253,10 @@ person sends or makes themselves.
   nothing new, take no step from the right-hand column. Still run the review
   gate; if no fresh reviewer can be started, leave the scores capped at 2 and
   say so. Put every question and every pending yes in the message.
+- **Autopilot** (`skills/lvlme-autopilot/SKILL.md`, `scripts/autopilot.py`)
+  sets up runs with nobody present on the person's yes, and ends each with
+  `python3 scripts/autopilot.py week`: the "This week" note and the
+  dashboard's first card.
 - **Where to schedule:** a scheduler on the person's own machine, such as a
   scheduled task in a desktop agent app or the operating system's own
   scheduler running the agent's command line mode. A cloud scheduler runs on

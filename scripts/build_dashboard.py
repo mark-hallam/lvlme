@@ -79,6 +79,7 @@ import _levels as L  # noqa: E402
 import _levels_html as LH  # noqa: E402
 import _posting_checks as PC  # noqa: E402
 import _applications as AP  # noqa: E402
+import _autopilot as APL  # noqa: E402
 import _static_html as ST  # noqa: E402
 import _warm_paths as W  # noqa: E402
 
@@ -199,6 +200,7 @@ class Data:
         self.network = load("profile", "network.json")
         self.warm = load("campaign", "warm-paths.json")   # progress only: never scored
         self.apps = load("campaign", "applications.json")  # progress only: never scored
+        self.week = APL.newest_note(ws)                      # Autopilot's latest This week note, if any
         self.today = C.today_in(config)                     # follow-ups fall due by the calendar
         self.claims = (load("profile", "claims-audit.json") or {}).get("claims", [])
         self.swot = load("eval", "swot.json")
@@ -610,6 +612,7 @@ def build_data(data):
         "warm": W.page_data(data.warm, data.targets, data.org_names, group_of, clean,
                             W.connection_counts(data.network)),
         "apps": AP.page_data(data.apps, data.today, data.org_names, clean),
+        "week": APL.page_data(data.week, clean),
     }
     out["orgOrder"] = [g for g in groups if g in out["orgs"]]
     out["ceil"] = build_ceilings(data, {x["id"]: x for x in roles}, group_of)

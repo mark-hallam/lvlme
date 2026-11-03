@@ -83,6 +83,7 @@ of the `/lvlme-*` commands), run only that part, with the hard rules.
 | `/lvlme screen`, `/lvlme-screen` | The recruiter screen from stage 4. |
 | `/lvlme dashboard`, `/lvlme-dashboard` | Stage 9 only, then a short message. |
 | `/lvlme status` | Change nothing. Read the newest run and the plan, then do stage 10. |
+| `/lvlme autopilot`, `/lvlme-autopilot`, "turn on LVLme autopilot" | Turn the self-running check-in on or off, after asking for each permission. Follow `skills/lvlme-autopilot/SKILL.md`. |
 
 ## Find or create the workspace
 

@@ -71,6 +71,7 @@ claude --plugin-dir /path/to/lvlme
 | `/lvlme-screen` | The independent recruiter screen against real postings. |
 | `/lvlme-audit` | The consistency audit (CV, LinkedIn, website, forms) and the public claims audit. |
 | `/lvlme-dashboard` | Rebuild the dashboard and print the command to open it. |
+| `/lvlme-autopilot` | Turn Autopilot on or off: a check-in that runs itself on your schedule, after asking for each permission. Needs a scheduler: the Claude desktop app's scheduled tasks, or your computer's own. |
 
 Plugin commands also have a full name with the plugin prefix:
 `/lvlme:lvlme`, `/lvlme:lvlme-interview` and so on. The short name works

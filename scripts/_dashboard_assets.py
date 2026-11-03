@@ -186,6 +186,11 @@ th{font-size:13px;color:var(--sub);font-weight:650}
 .wp-s{font-size:13px;font-weight:650;color:var(--accent);white-space:nowrap}
 .wp-s.none{color:var(--sub);font-weight:500}
 .ap-s.due,.ap-s.overdue{color:var(--warn)}
+.week{margin-bottom:16px}.week-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.week-pill{background:var(--accent-soft);color:var(--accent)}.week-pill.off{background:var(--rule);color:var(--sub)}
+.week-do{font-size:20px;line-height:1.3;font-weight:700;letter-spacing:-.01em;margin:8px 0 4px}
+.week-list{margin:10px 0 0;padding-left:18px}.week-list li{margin:2px 0}
+.week-facts{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px}
 .wp-bar{display:flex;gap:3px;margin:6px 0 4px}
 .wp-bar i{flex:1;height:6px;border-radius:3px;background:var(--p0)}
 .wp-bar i.on{background:var(--accent)}
@@ -505,6 +510,7 @@ BODY = r"""
  </aside>
 
  <main class="centre" id="centre">
+  <section class="card week" id="weekCard" aria-labelledby="weekH" hidden></section>
   <section class="card hero enter" id="hero" aria-labelledby="heroH">
    <h2 class="sr-only" id="heroH">Journey</h2>
    <div class="strip" id="strip"></div>
@@ -993,6 +999,25 @@ function appsHTML(){
   const A = D.apps; if (!A || !A.rows.length) return "";
   return `<div>${A.rows.map(r => `<div class="wp"><div class="wp-h"><span class="wp-n">${esc(r.title)}</span><span class="wp-s${r.status === "none" ? " none" : ""}">${esc(r.stage)}</span></div><div class="tiny sub">${esc(r.org)} · last step ${r.since === 0 ? "today" : plural(r.since, "day") + " ago"}${r.what && r.status !== "waiting" ? ` · <b class="ap-s ${esc(r.status)}">${esc(r.label)}: ${esc(r.what)}</b>` : r.status === "gone_quiet" ? " · gone quiet" : r.what ? " · " + esc(r.what) + " on " + esc(shortDate(r.due)) : ""}</div></div>`).join("")}</div>` +
     (A.due ? '<div class="tiny sub" style="margin-top:6px">Ask your agent to draft a due note. It goes in campaign/drafts/ for you to finish and send.</div>' : "");
+}
+// This week (campaign/weekly/<date>.json, written by scripts/autopilot.py week): the one thing to do, what
+// changed, and whether Autopilot runs on its own. The page's first card, so progress is the first thing seen.
+function renderWeek(){
+  const W = D.week, card = $("#weekCard"); if (!W) return;
+  const ap = W.autopilot || {}, r = W.roles || {}, facts = [];
+  if (r.new || r.closed) facts.push(`${plural(r.new || 0, "new role")}, ${r.closed || 0} closed`);
+  if (r.suspicious) facts.push(`${plural(r.suspicious, "posting")} to check`);
+  if ((W.follow_ups || []).length) facts.push(plural(W.follow_ups.length, "follow-up") + " due");
+  if (W.review_waiting) facts.push(`${plural(W.review_waiting, "role")} waiting for review`);
+  card.innerHTML = `<div class="week-top"><div class="eyebrow" style="margin:0">This week · ${esc(shortDate(W.date))}</div>
+    <span class="pill week-pill${ap.enabled ? "" : " off"}">${ap.enabled ? "Autopilot on · next " + esc(shortDate(ap.next)) : "Autopilot off"}</span></div>
+    <h2 class="sr-only" id="weekH">This week</h2>
+    ${W.action ? `<div class="tiny sub" style="margin-top:10px">The one thing to do</div><div class="week-do">${esc(W.action.title)}</div>${W.action.why ? `<div class="small sub">${esc(W.action.why)}</div>` : ""}` : ""}
+    <ul class="week-list small">${(W.changed || []).map(c => `<li>${esc(c)}</li>`).join("")}</ul>
+    ${facts.length ? `<div class="week-facts tiny sub">${facts.map(f => `<span>${esc(f)}</span>`).join("")}</div>` : ""}
+    ${W.event ? `<div class="tiny sub" style="margin-top:8px">Event worth a look: ${esc(W.event.text)} (${esc(W.event.org)}, <a href="${esc(W.event.source)}" target="_blank" rel="noopener noreferrer">source</a>)</div>` : ""}
+    ${ap.enabled ? "" : '<div class="tiny sub" style="margin-top:8px">Say "turn on LVLme autopilot" to your agent and this card updates by itself each week.</div>'}`;
+  card.hidden = false;
 }
 function goMoves(){ state.view = "moves"; renderViewSeg(); showView(); $(".views-nav").scrollIntoView({behavior: motionOK() ? "smooth" : "auto", block: "start"}); }
 function bindHome(root){
@@ -1835,7 +1860,7 @@ if (motionOK()) document.body.classList.add("animate");
 document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "visible") document.body.classList.remove("animate"); else if (!reduce) document.body.classList.add("animate"); });
 $("#sampleRow").hidden = !(D.meta.sample_allowed && PREVIEW);     // a design preview, only with ?preview=1
 recompute(); lv().up.forEach((q, i) => RANK[q.a.id] = i);
-renderSegs(); renderViewSeg(); renderMetrics(); renderSwitches(); renderTopline(); drawChart(); renderTiles4(); renderDoNext(); renderHistory(); showView();
+renderWeek(); renderSegs(); renderViewSeg(); renderMetrics(); renderSwitches(); renderTopline(); drawChart(); renderTiles4(); renderDoNext(); renderHistory(); showView();
 $("#staticSummary").hidden = true;   // the live page has rendered the same numbers; the static copy is for readers without JavaScript
 enter($("#hero"), 1500);
 })();

@@ -14,7 +14,8 @@ import unittest
 import helpers as H
 
 ROOT = H.ENGINE
-COMMANDS = {"lvlme", "lvlme-quick", "lvlme-interview", "lvlme-screen", "lvlme-audit", "lvlme-dashboard"}
+COMMANDS = {"lvlme", "lvlme-quick", "lvlme-interview", "lvlme-screen", "lvlme-audit", "lvlme-dashboard",
+            "lvlme-autopilot"}
 AGENTS = {"evidence-scout", "market-scout", "role-judge", "reviewer", "recruiter-screen"}
 INDEPENDENT = {"reviewer", "recruiter-screen"}
 AFTER_MERGE = {"method/INTERVIEW.md", "method/CONSISTENCY.md", "scripts/consistency_audit.py",
