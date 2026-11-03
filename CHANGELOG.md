@@ -8,6 +8,30 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## Unreleased
+
+### Added
+
+- **All six job boards in the full campaign.** A target can now be on
+  Workday, SmartRecruiters or Workable as well as Greenhouse, Ashby or Lever,
+  read with the same code LVLme quick uses. Those boards list titles only,
+  so LVLme reads in full only the postings whose title fits a role family
+  and lists the rest as excluded. A Workday target names its careers page in
+  `careers_url`.
+- **The first-draft rule, checked in code.** For an employer that asks for
+  your own first draft, `scripts/validate.py` reports any draft in
+  `campaign/drafts/` that is not a brief, a review of your draft,
+  preparation or outreach, and asks you to re-read the employer's AI policy
+  when it was last checked over 30 days ago.
+- **LVLme quick names Anthropic's AI guidance** on an Anthropic posting:
+  "Anthropic asks for your own first draft. Write it, then I'll review it.",
+  with a link to the page.
+
+### Fixed
+
+- Three method files told the agent to give the blind reviewer the scores.
+  Every file now says the reviewer never sees them, and a test keeps it so.
+
 ## 0.4.0 (3 November 2026)
 
 Warm paths, a reading guide, six job boards for LVLme quick, and a round of
