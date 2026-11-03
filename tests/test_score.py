@@ -291,6 +291,55 @@ class NoFakeDayOneTests(Base):
         self.assertEqual((run["counts"]["judged"], run["counts"]["not_judged"]), (1, 1))
 
 
+class UnchangedDayTests(Base):
+    """Scoring again with nothing changed adds no day: it would read as a day with no progress."""
+
+    def setUp(self):
+        super().setUp()
+        self.judge("acme:1", e(2, ["E02"]), e(1, ["E01"]), e(1, ["E01"]))
+
+    def main(self, date, *extra):
+        self.run_score(date)
+        with mock.patch("sys.stdout") as out, mock.patch("sys.stderr"):
+            code = S.main(["--workspace", self.ws, "--date", date] + list(extra))
+        return code, "".join(c.args[0] for c in out.write.call_args_list)
+
+    def saved(self, date):
+        return os.path.exists(os.path.join(self.ws, "eval", "runs", date + ".json"))
+
+    def test_same_inputs_on_a_later_day_save_nothing(self):
+        self.assertEqual(self.main(TODAY)[0], 0)
+        code, printed = self.main("2026-11-03")
+        self.assertEqual(code, 0)
+        self.assertFalse(self.saved("2026-11-03"))
+        self.assertIn("Nothing has changed since the run on 2026-11-01", printed)
+        self.assertIn("--force", printed)
+
+    def test_force_saves_anyway(self):
+        self.main(TODAY)
+        self.assertEqual(self.main("2026-11-03", "--force")[0], 0)
+        self.assertTrue(self.saved("2026-11-03"))
+
+    def test_a_changed_input_saves_the_day(self):
+        self.main(TODAY)
+        self.judge("acme:1", e(3, ["E02"]), e(1, ["E01"]), e(1, ["E01"]))
+        self.main("2026-11-03")
+        self.assertTrue(self.saved("2026-11-03"))
+
+    def test_a_finished_action_saves_the_day(self):
+        self.main(TODAY)
+        H.save(os.path.join(self.ws, "campaign", "plan.json"), {"schema_version": 1, "actions": [
+            {"id": "A01", "status": "done", "done_evidence": ["E01"], "finished_on": "2026-11-02"}]})
+        self.main("2026-11-03")
+        self.assertTrue(self.saved("2026-11-03"))
+
+    def test_scoring_again_the_same_day_still_saves(self):
+        self.main(TODAY)
+        os.remove(os.path.join(self.ws, "eval", "runs", TODAY + ".json"))
+        self.main(TODAY)
+        self.assertTrue(self.saved(TODAY))
+
+
 class PartiallyVerifiedTests(Base):
     """Some facts in the claim checked, some not: between self-reported and corroborated, never above corroborated."""
 

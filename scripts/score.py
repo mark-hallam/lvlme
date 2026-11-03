@@ -37,7 +37,11 @@ judged roles (null when an organisation has none judged), and the gap
 leaderboard counts only judged roles.
 
 Usage
-  python3 scripts/score.py --workspace PATH [--date YYYY-MM-DD]
+  python3 scripts/score.py --workspace PATH [--date YYYY-MM-DD] [--force]
+
+A new day is not saved when nothing changed since the last run (same inputs,
+no plan action finished since): it would read as a day with no progress.
+--force saves it anyway.
 """
 import argparse
 import hashlib
@@ -414,10 +418,31 @@ def build_run(ws, config, run_date):
     return run
 
 
+def unchanged_since(ws, run):
+    """The date of the latest earlier run, when its inputs match this run's and no plan
+    action was finished since. Saving again then adds a day that measured nothing new,
+    which reads as a day with no progress. None when anything changed."""
+    runs_dir = C.wpath(ws, "eval", "runs")
+    dates = sorted(f[:-5] for f in (os.listdir(runs_dir) if os.path.isdir(runs_dir) else [])
+                   if f.endswith(".json") and f[:-5] < run["run_date"])
+    if not dates:
+        return None
+    prev = C.load_json(os.path.join(runs_dir, dates[-1] + ".json"), {}) or {}
+    if prev.get("inputs_digest") != run["inputs_digest"]:
+        return None
+    plan = C.load_json(C.wpath(ws, "campaign", "plan.json"), {}) or {}
+    if any(a.get("status") == "done" and dates[-1] < (a.get("finished_on") or "") <= run["run_date"]
+           for a in plan.get("actions") or []):
+        return None
+    return dates[-1]
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Score every open role from the judgement files.")
     ap.add_argument("--workspace", help="workspace folder (default: $LVLME_HOME)")
     ap.add_argument("--date", help="run date YYYY-MM-DD (default: today in the candidate's time zone)")
+    ap.add_argument("--force", action="store_true",
+                    help="save a new dated run even when nothing changed since the last one")
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)
     if C.setup_problem(config):
@@ -431,6 +456,12 @@ def main(argv=None):
               if n["roles"] else "No open roles to score yet. Ask your agent to run LVLme.", file=sys.stderr)
         print("No run saved: with nothing judged it would not be a measurement.", file=sys.stderr)
         return 1
+    same = None if args.force else unchanged_since(ws, run)
+    if same:
+        print("Nothing has changed since the run on %s, so no new day was saved: it would show as a day "
+              "with no progress. The dashboard uses the %s run. To save a new day anyway, add --force."
+              % (same, same))
+        return 0
     out = C.wpath(ws, "eval", "runs", "%s.json" % run_date)
     C.write_json(out, run)
     print("Wrote eval/runs/%s.json: %d roles (%d not yet judged, %d awaiting review)"

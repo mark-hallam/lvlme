@@ -240,7 +240,9 @@ person sends or makes themselves.
   rhythm; never change the schedule yourself.
 - **One run file per run:** `scripts/score.py` writes
   `eval/runs/<YYYY-MM-DD>.json`. A second run on the same day replaces that
-  day's file, so the record stays one point per day.
+  day's file, so the record stays one point per day. A later day with
+  nothing changed (same inputs, no plan action finished since) is not saved,
+  because it would show as a day with no progress; `--force` saves it anyway.
 - **Runs with nobody present** (a scheduled task): ask nothing, approve
   nothing new, take no step from the right-hand column. Still run the review
   gate; if no fresh reviewer can be started, leave the scores capped at 2 and
