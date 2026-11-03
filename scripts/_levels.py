@@ -323,7 +323,9 @@ def quests(roles, actions, caps, weights, nl, enabled=None):
                     "on": a["id"] in on, "role": w["role"], "fit_after": w["fit"],
                     "lead_exp": r1(project(lead, [a], caps, weights, "exp")[0] - lead["fit"]),
                     "lead_works": r1(project(lead, [a], caps, weights, "best")[0] - lead["fit"])})
-    out.sort(key=lambda q: (-q["rate"], -q["exp"], -q["a"].get("priority", 0), q["a"]["date"], q["a"]["id"]))
+    # an action whose roles all look suspicious (scripts/_posting_checks.py) goes after the rest
+    out.sort(key=lambda q: (bool(q["a"].get("susp")), -q["rate"], -q["exp"], -q["a"].get("priority", 0),
+                            q["a"]["date"], q["a"]["id"]))
     return out
 
 

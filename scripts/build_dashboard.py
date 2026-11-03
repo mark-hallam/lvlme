@@ -77,6 +77,7 @@ import _common as C  # noqa: E402
 import _dashboard_assets as A  # noqa: E402
 import _levels as L  # noqa: E402
 import _levels_html as LH  # noqa: E402
+import _posting_checks as PC  # noqa: E402
 import _static_html as ST  # noqa: E402
 import _warm_paths as W  # noqa: E402
 
@@ -202,6 +203,7 @@ class Data:
         self.judgements = (load("eval", "judgements.json") or {}).get("roles", {})
         self.profile = load("eval", "profile-dimensions.json") or {}
         self.roles_doc = load("market", "roles", "latest.json") or {}
+        self.suspicious = PC.suspicious_ids(self.roles_doc)
         self.role_index = {r["id"]: r for r in self.roles_doc.get("roles", [])}
         self.targets = C.target_ids(config)
         self.org_names = C.target_names(config)
@@ -331,6 +333,12 @@ in_scope, r1, fit_of, project = L.in_scope, L.r1, L.fit_of, L.project
 # ------------------------------------------------------------ page data
 
 
+def posting_label(p):
+    """The role's posting check for the page: nothing for a likely real opening, a quiet note otherwise."""
+    pc = p.get("posting_check") or {}
+    return {"pc": clean(pc.get("note")), "pcl": pc.get("label")} if pc.get("label") in ("check_first", "suspicious") else {}
+
+
 def build_roles(data, group_of, hard_types):
     cleared = set((data.config.get("candidate") or {}).get("eligibility_cleared") or [])
     roles = []
@@ -352,6 +360,7 @@ def build_roles(data, group_of, hard_types):
             "fit": r["fit"], "ib": r["interview_band"], "ob": r["offer_band"],
             "adj": [clean(x) for x in r.get("adjustments") or []], "rn": clean(r.get("reviewer_note")),
             "hardReq": [clean(h) for h in (p.get("hard_requirements") or [])[:5]],
+            **posting_label(p),
         })
     roles.sort(key=lambda x: (not x["judged"], -x["fit"], x["id"]))   # an unjudged role is never the best role
     return roles
@@ -384,6 +393,9 @@ def build_actions(data, end):
             "status": st, "date": when(a), "dated": bool(a.get("target_date")), "p": float(a.get("chance", 0)),
             "effects": effects, "derived": derived, "done_when": clean(a.get("done_when")),
             "dim": a.get("dimension"), "priority": priority(a), "stale": stale.get(a["id"]),
+            **({"susp": True, "why": clean(((a.get("why") or "") + " Every role it names looks stale or reposted, "
+                                            "so it ranks lower: check those postings first.").strip())}
+               if PC.only_suspicious(a, data.suspicious) else {}),
             "group": "now" if a["id"] in now_ids else st if st in ("done", "dropped") else "later",
             "metric": clean(metric_names.get(a.get("metric"), "")), "draft": a.get("draft", ""),
             "doneEvidence": clean(a.get("done_evidence")), "notes": clean(a.get("notes")),

@@ -27,6 +27,12 @@ before. Nothing here changes how a score is worked out unless it says so.
   "Anthropic asks for your own first draft. Write it, then I'll review it.",
   with a link to the page.
 
+- **Is this job still open?** Every role gets a quiet label from its age and
+  reposts: likely real, check first, or suspicious ("Open, but posted 14
+  months ago", "reposted 2 times in 90 days"), on the dashboard and in
+  `market/roles/latest.json`. A plan action whose roles all look suspicious
+  ranks lower in Do next. Scores never change, and LVLme never calls a
+  posting fake.
 - **Install in Claude chat**, tried for real: `docs/INSTALL.md` has the
   steps (Customize, Plugins, add the `mark-hallam/lvlme` marketplace) and
   says what works in chat and what needs Claude Code.

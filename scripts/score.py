@@ -398,7 +398,9 @@ def build_run(ws, config, run_date):
         "rubric_version": RUBRIC_VERSION,
         "goal": (config.get("goal") or {}).get("title", ""),
         "weights": ctx.weights,
-        "inputs_digest": digest(config, roles, judgements_doc, profile, templates, outlook, evidence),
+        # posting_check holds a posting's age, which moves every day: it is a label, never an input to a score
+        "inputs_digest": digest(config, [{k: v for k, v in r.items() if k != "posting_check"} for r in roles],
+                                judgements_doc, profile, templates, outlook, evidence),
         "counts": {
             "roles": len(scored),
             "judged": sum(1 for r in scored if r["judged"]),

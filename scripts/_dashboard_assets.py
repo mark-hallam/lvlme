@@ -1224,7 +1224,7 @@ function fillHeat(){
   const shown = list.slice(0, 80);
   const short = ["Match","Proof","Warm path","Edge","Signal","Eligible","Ready"];
   $("#heatWrap").innerHTML = list.length ? `<table class="heat"><thead><tr><th>Role</th>${DIMS.map((d, k) => `<th title="${esc(D.dimNames[d])}">${short[k]}<div class="tiny sub">${W[k]}</div></th>`).join("")}<th>Fit</th></tr></thead><tbody>${shown.map(r => { const s = scoresM(r);
-    return `<tr${r.judged ? "" : ' class="nj"'}><td class="name" data-role-open="${esc(r.id)}"><div class="row-title small"><i class="org-key" style="background:${orgColour(r.g)};margin-right:6px"></i>${esc(r.title)}</div><div class="tiny sub">${esc(r.on)} · ${esc(r.loc.slice(0, 1).join(""))}${r.blocked ? " · eligibility blocker" : ""}${r.judged ? "" : " · not judged yet"}</div></td>
+    return `<tr${r.judged ? "" : ' class="nj"'}><td class="name" data-role-open="${esc(r.id)}"><div class="row-title small"><i class="org-key" style="background:${orgColour(r.g)};margin-right:6px"></i>${esc(r.title)}</div><div class="tiny sub">${esc(r.on)} · ${esc(r.loc.slice(0, 1).join(""))}${r.blocked ? " · eligibility blocker" : ""}${r.pc ? " · " + esc(r.pc) : ""}${r.judged ? "" : " · not judged yet"}</div></td>
     ${s.map((v, k) => !r.judged && JUDGED_DIMS.includes(DIMS[k]) ? `<td><div class="cell nj" data-tip="${esc(D.dimNames[DIMS[k]])}: not judged yet.">?</div></td>` : `<td><div class="cell" style="${cellStyle(v)}" data-tip="${esc(D.dimNames[DIMS[k]])}: ${r1(v)} of 5. ${esc(r.n[k])}">${Number.isInteger(v) ? v : v.toFixed(1)}</div></td>`).join("")}
     <td>${r.judged ? `<div class="cell" style="background:var(--card2);color:var(--ink)">${Math.round(fitM(r))}</div>` : '<div class="cell nj tiny" data-tip="Not judged yet, so no fit score.">Not judged</div>'}</td></tr>`; }).join("")}</tbody></table>
     ${list.length > shown.length ? `<div class="small sub" style="margin-top:8px">Showing the top ${shown.length} of ${list.length}. Narrow the filters to see more.</div>` : ""}` : '<div class="small sub">No roles match these filters.</div>';
@@ -1632,7 +1632,7 @@ function detailOrg(g){
     ${L.paths.map(p => `<div class="small sub" style="margin-top:6px"><span class="tag">${esc(cap1(p.status))}</span> ${esc(p.note)}</div>`).join("")}
     ${warmDetail(L)}
     ${L.judged ? `<div class="eyebrow" style="margin-top:16px">Best roles</div>` : ""}
-    ${D.roles.filter(x => x.g === g && x.judged).slice(0, 10).map(x => `<div class="row" style="padding:10px 0" data-role-open="${esc(x.id)}"><div class="row-main"><div class="small" style="font-weight:600">${esc(x.title)}</div><div class="tiny sub">${esc(x.loc.slice(0, 2).join(", "))}${x.blocked ? " · eligibility blocker" : ""}</div></div><div class="row-side"><b>${Math.round(fitM(x))}</b></div><span class="chev">›</span></div>`).join("")}
+    ${D.roles.filter(x => x.g === g && x.judged).slice(0, 10).map(x => `<div class="row" style="padding:10px 0" data-role-open="${esc(x.id)}"><div class="row-main"><div class="small" style="font-weight:600">${esc(x.title)}</div><div class="tiny sub">${esc(x.loc.slice(0, 2).join(", "))}${x.blocked ? " · eligibility blocker" : ""}${x.pc ? " · " + esc(x.pc) : ""}</div></div><div class="row-side"><b>${Math.round(fitM(x))}</b></div><span class="chev">›</span></div>`).join("")}
     ${nj ? `<div class="tiny sub" style="margin-top:8px">${esc(plural(nj, "role"))} not judged yet: see them in Roles.</div>` : ""}`;
 }
 function raisingActions(r, k){ if (CAPS[k] === 0 || hardBlock(r, k)) return []; return D.actions.filter(a => enabled.has(a.id) && switchable(a) && a.effects.some(e => e.dimension === DIMS[k] && inScope(r, e.scope || {}))); }
@@ -1646,6 +1646,7 @@ function detailRole(id){
     <div class="kv" style="margin-top:8px"><span>Interview chance now</span>${pill(r.ib)}</div><div class="kv"><span>Offer chance now</span>${pill(r.ob)}</div>
     <div class="kv"><span>If the plan works</span>${pill(interviewBand(exp.end, exp.scores, r.hrl))}</div>
     ${block ? `<div class="small warnline">${esc(block)}</div>` : ""}
+    ${r.pc ? `<div class="small ${r.pcl === "suspicious" ? "warnline" : "sub"}" style="margin-top:8px">The posting: ${esc(r.pc)}. ${r.pcl === "suspicious" ? "Check it is a live opening before you spend time on it." : "Worth a quick check that it is still a live opening."} The score is unchanged.</div>` : ""}
     ${!r.judged ? '<div class="small warnline">Not judged yet: requirements match, proof of work and the organisation edge count as 0 until the next run judges it.</div>' : ""}
     ${r.awaiting.length ? `<div class="small sub" style="margin-top:8px">Waiting for the reviewer: ${esc(r.awaiting.map(d => D.dimNames[d]).join(", "))}. Each counts as 2 until reviewed.</div>` : ""}
     ${r.rn ? `<div class="small" style="margin-top:10px"><b>Reviewer:</b> ${esc(r.rn)}</div>` : ""}

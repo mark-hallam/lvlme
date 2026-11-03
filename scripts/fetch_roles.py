@@ -53,6 +53,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 from _html_text import blocks_of, clean  # noqa: E402,F401  (FR.clean and FR.blocks_of stay in use)
 import _boards as B  # noqa: E402
+import _posting_checks as P  # noqa: E402
 
 UA = "lvlme/0.4 (personal job-search research script; read only)"
 MAX_REQ_LEN = 160
@@ -615,6 +616,16 @@ def previous_snapshot(snap_dir, date):
     return (os.path.basename(older[-1])[:10], C.load_json(older[-1])) if older else (None, None)
 
 
+def snapshot_history(snap_dir, date):
+    """[(date, roles)] for the snapshots before date, within the repost window (scripts/_posting_checks.py)."""
+    out = []
+    for f in sorted(glob.glob(os.path.join(snap_dir, "*.json"))):
+        d = os.path.basename(f)[:10]
+        if re.match(r"\d{4}-\d{2}-\d{2}$", d) and d < date and (P.age_days(d, date) or 0) <= P.WINDOW_DAYS:
+            out.append((d, (C.load_json(f, {}) or {}).get("roles") or {}))
+    return out
+
+
 def collect(config, workspace, fixtures=None, save_raw=None):
     """Fetch and classify every target. Returns (roles, excluded, fetched, errors, endpoints, notes)."""
     roles, excluded, fetched, errors, endpoints, notes = [], [], {}, {}, {}, {}
@@ -681,6 +692,10 @@ def main(argv=None):
     roles.sort(key=lambda r: (order.get(r["org"], 99), r["family"], r["title"].lower(), r["id"]))
 
     snap_dir = os.path.join(roles_dir, "snapshots")
+    snap_roles = {r["id"]: {"org": r["org"], "title": r["title"], "family": r["family"], "url": r.get("url"),
+                            "published_at": r.get("published_at")} for r in roles}
+    checks = P.apply_checks(roles, snapshot_history(snap_dir, date) + [(date, snap_roles)], date,
+                            {t["id"]: t.get("ats") for t in config["targets"]})
     prev_date, prev_snap = previous_snapshot(snap_dir, date)
     prev_ids = set((prev_snap or {}).get("roles", {}))
     cur_ids = {r["id"] for r in roles}
@@ -704,6 +719,7 @@ def main(argv=None):
             b["type"] not in cleared for b in r.get("eligibility_blockers", []))),
         "blocker_counts": blocker_counts(roles),
         "excluded_count": len(excluded),
+        "posting_checks": checks,
         "endpoint_errors": errors,
         **({"endpoint_notes": notes} if notes else {}),
         "previous_snapshot": prev_date,
@@ -716,12 +732,12 @@ def main(argv=None):
     if args.fixtures:  # offline runs are reproducible: no wall-clock time in the output
         out["fetched_at_utc"] = date + "T00:00:00Z"
     C.write_json(os.path.join(roles_dir, "latest.json"), out)
-    snapshot = {"schema_version": 1, "date": date,
-                "roles": {r["id"]: {"org": r["org"], "title": r["title"], "family": r["family"]} for r in roles}}
+    snapshot = {"schema_version": 1, "date": date, "roles": snap_roles}
     C.write_json(os.path.join(snap_dir, "%s.json" % date), snapshot)
     print(json.dumps({"fetched_on": date, "total_postings_fetched": fetched, "matched_counts": counts,
                       "new_roles": len(new_ids), "closed_roles": len(closed_ids),
-                      "blocker_counts": summary["blocker_counts"], "endpoint_errors": errors,
+                      "blocker_counts": summary["blocker_counts"], "posting_checks": checks,
+                      "endpoint_errors": errors,
                       **({"endpoint_notes": notes} if notes else {})}, indent=2))
     return 0
 

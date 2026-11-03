@@ -67,7 +67,12 @@ rounds while roles and evidence are gathered.
    export control or security clearance and that question has not been
    asked yet, ask it (`INTERVIEW.md`, "Work rights"). Add roles from boards
    from any other careers site to `market/roles/manual.json`. If the
-   summary has `endpoint_notes` (a board too big to list in full), say so. Add sourced
+   summary has `endpoint_notes` (a board too big to list in full), say so.
+   Each role carries a `posting_check` label (likely real, check first,
+   suspicious) from its age and reposts; mention any suspicious role the
+   person cares about, saying what was seen ("posted 14 months ago",
+   "reposted 2 times in 90 days"), never that a posting is fake. It never
+   changes a score. Add sourced
    organisation facts to `market/orgs.json`.
 
 3. **Evidence.** Look for anything new since the last run date (the newest
