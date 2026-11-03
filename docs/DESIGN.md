@@ -163,8 +163,9 @@ edge 10 · D5 public signal 10 · D6 eligibility and logistics 10 · D7 applicat
 readiness 5. Fit = Σ score/5 × weight. Bands (Very low → Strong) for interview
 and offer, with three adjustments (referral up, hard requirement lacking down,
 cold-only caps offer at Low). Full rules: `method/RUBRIC.md`. Review protocol:
-`method/REVIEW.md` (the reviewer gets the rubric, evidence and scores, but not
-the scorer's reasoning, and must justify every change).
+`method/REVIEW.md` (the review is blind: the reviewer gets the rubric, the
+evidence, the postings and the list of items, never the scores or the scorer's
+reasoning, and scores each item itself with the anchor and evidence ids).
 
 ## 8. SWOT, then TOWS
 

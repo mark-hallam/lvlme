@@ -22,25 +22,34 @@ reasoning reads the same evidence cold, the way a hiring manager would.
 
 ## What the reviewer gets
 
-Give it:
+The review is **blind**: the reviewer scores each item itself and never sees
+the score it is checking. A reviewer that can see the answer tends to agree
+with it. `docs/ORCHESTRATION.md` (stage 5) and `agents/reviewer.md` run it
+this way.
+
+Give it only:
 
 1. `method/RUBRIC.md` (the rules and anchors).
 2. `profile/evidence.json` (every fact and its level).
-3. The scores: the newest `eval/runs/<date>.json`, or the judgement files
-   **with every `note` field removed**.
-4. The postings for the roles under review, from `market/roles/latest.json`.
+3. The postings for the roles under review, from `market/roles/latest.json`
+   (and `market/roles/manual.json`), plus `market/orgs.json` and
+   `config.json`.
+4. The list of items to review (role or organisation id and dimension). Mix
+   in other new or changed items, so the list does not show which scores are
+   high.
 
 Do **not** give it:
 
+- Any score, band, level or run file: nothing from `eval/`, `report/`,
+  `campaign/` or `intake/`.
 - The scorer's `note` fields or any other reasoning.
 - The person's hopes, the conversation, or the plan.
 
 ## What the reviewer does
 
-1. **Challenge every score above 2.** For each one, find the anchor it claims
-   to meet and the evidence ids that support it. If either is missing or weak,
-   lower it.
-2. **Challenge anything generous.** Look especially for:
+1. **Score every item itself.** For each one, find the highest anchor the
+   evidence actually meets, and name the evidence ids that prove it.
+2. **Look for generosity.** Look especially for:
    - achievement claims counted above 1 with only one source;
    - D3 above 1 based on a LinkedIn connection alone (a connection is not
      someone who knows the work);
@@ -48,15 +57,17 @@ Do **not** give it:
    - D4 for generic strengths every applicant claims;
    - D6 that ignores a blocker in the posting text, or a location the person
      cannot work in;
-   - hard requirements in the posting that the judgement did not flag.
-3. **Check the flags.** Is `hard_requirement_lacking` right? Is
-   `eligibility_blocked` right? A wrong "not blocked" is the most expensive
-   mistake in the file.
-4. **Justify every change.** Each change names the anchor (for example "D3
+   - hard requirements in the posting.
+3. **Set the flags.** Should `hard_requirement_lacking` be set? Should
+   `eligibility_blocked`? A wrong "not blocked" is the most expensive mistake
+   in the file.
+4. **Justify every score.** Each score names the anchor (for example "D3
    anchor 1: first-degree contact, has not seen the work") and the evidence ids
    (or their absence).
-5. **Agree explicitly.** For each score it accepts, the reviewer says so.
-   Silence is not agreement.
+
+The lead then compares the reviewer's score with the scorer's: the same score
+is agreed, a different one goes to the tie-break below. Every score above 2
+is challenged this way, because each one is scored again from scratch.
 
 ## Recording the review
 
@@ -129,29 +140,30 @@ scores go in it; agreed scores are recorded as `reviewed_on` and
 
 ```
 You are an independent, sceptical reviewer for a career evaluation. You have
-not seen the scorer's reasoning and must not ask for it.
+not seen the scorer's scores or reasoning and must not ask for them.
 
 You have: the rubric (method/RUBRIC.md), the evidence file
-(profile/evidence.json), the scores (with the scorer's notes removed), and the
-job postings.
+(profile/evidence.json), the job postings, the organisation notes, and a list
+of items to review (role or organisation id and dimension). If you are given
+a score, a band, a level or the scorer's notes, say so and stop: the review
+is no longer independent.
 
 Rules:
 - Competitive employers reject most applicants. Assume "unlikely" unless the
   evidence says otherwise.
-- Challenge every score above 2. For each, name the rubric anchor it meets and
-  the evidence ids that prove it. If you cannot, lower it.
+- For each item, find the highest rubric anchor the evidence actually meets
+  and give that score, with the evidence ids that prove it.
 - Look hard for generosity: achievement claims above 1 with one source; a warm
   path score above 1 from a LinkedIn connection alone; proof of work a
   stranger cannot check; organisation-specific edge that every applicant
   claims; eligibility or location problems in the posting text; hard
-  requirements the scorer did not flag.
+  requirements in the posting.
 - Never invent evidence. Never use or infer age, gender, ethnicity,
   disability, religion or family status.
 
-Output, for each role or entry reviewed:
-- id, dimension, scorer's score, your score
-- AGREE or CHANGE
-- one line: the anchor and the evidence ids (or "no evidence")
-Then a list of any flags (hard requirement lacking, eligibility blocked) you
-would change, with the posting sentence that shows it.
+Output, one line per item:
+- id, dimension, your score, the anchor met, the evidence ids (or "no
+  evidence")
+Then any flags you would set (hard requirement lacking, eligibility blocked),
+each with the posting sentence that shows it.
 ```

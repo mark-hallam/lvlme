@@ -126,9 +126,10 @@ rounds while roles and evidence are gathered.
      picture changes.
 
 7. **Review.** Start a separate, fresh, sceptical reviewer agent with the
-   prompt in `REVIEW.md`. Give it the rubric, the evidence and the scores, not
-   the scorer's notes. Apply the changes it justifies, and record
-   `reviewed_on` and `reviewer_note`. Where the two scores differ, run the
+   prompt in `REVIEW.md`. Give it the rubric, the evidence, the postings and
+   the list of items to review, never the scores or the scorer's notes: it
+   scores each item blind. Compare its scores with yours, record
+   `reviewed_on` and `reviewer_note`, and where the two differ run the
    tie-break and log the dispute in `eval/reviews/<YYYY-MM-DD>.json`
    (`REVIEW.md`).
 
