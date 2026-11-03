@@ -566,8 +566,10 @@ def message(result, folder):
         c = result["if_all_fixes"]
         lines += ["", "If %s: fit %s, %s." % (
             "they all land" if len(result["fixes"]) > 1 else "it lands", QH.num(c["fit"]), QH.headline(c, start=False)), ""]
+    if len(result["fixes"]) < TOP_FIXES and QH.not_shown_lines(result):  # fewer shown than promised: say why
+        lines += QH.not_shown_lines(result) + [""]
     lines.append(review_sentence(result))
-    lines += ["", "See why, factor by factor%s:" % (", and the next step for each fix" if result["fixes"] else ""),
+    lines += ["", "Why, factor by factor%s:" % (", with each fix's next step" if result["fixes"] else ""),
               "", "```bash", "open %s" % display_path(os.path.join(folder, "index.html")),
               "```", "",
               "Go deeper: say \"run LVLme\" for the full campaign."]

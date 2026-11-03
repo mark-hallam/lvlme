@@ -42,8 +42,9 @@ the posting text) and your CV. It:
 - has a second agent score every point above 2 blind, without seeing the
   first scores, and shows you where the two disagree;
 - gives you one page: your chance of an interview and of an offer in plain
-  words, one line per factor with the evidence behind it, and the three fixes
-  that would raise your odds most, each with a next step.
+  words, one line per factor with the evidence behind it, and up to three fixes
+  that would raise your odds most, each with a next step (with a reason for any
+  fix it leaves out).
 
 It gives fixes and a brief, never application answers: you write those
 yourself.

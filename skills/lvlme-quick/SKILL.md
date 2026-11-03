@@ -12,8 +12,8 @@ filled in, it is the folder two levels above this file). Run the commands from
 that folder.
 
 The person gets an honest answer for ONE posting, quickly: the chance of an
-interview and of an offer, why, factor by factor, and the three fixes that
-would raise it most. Aim for a couple of minutes and at most two questions.
+interview and of an offer, why, factor by factor, and up to three fixes that
+would raise it most (any fix left out is named, with the reason). Aim for a couple of minutes and at most two questions.
 
 ## Rules (the engine's hard rules, plus these)
 
@@ -114,7 +114,8 @@ would raise it most. Aim for a couple of minutes and at most two questions.
    ```
 
    It scores with the campaign's own maths (`scripts/score.py`), keeps the
-   three fixes that add the most fit points, and writes `index.html`,
+   three fixes that add the most fit points (naming any it leaves out, and
+   why), and writes `index.html`,
    `result.json` and `message.md`. Fix any error it prints and run it again.
 9. **Tell the person**: paste `message.md` as it is. It holds the odds in
    plain English, the fit as a range, the top fixes, the command to open the page, and the way to

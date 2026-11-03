@@ -11,7 +11,7 @@ If they all land: fit 55, moderate chance of an interview, low chance of an offe
 
 A blind reviewer checked every score above 2; 1 disagreement counts as 2 until settled.
 
-See why, factor by factor, and the next step for each fix:
+Why, factor by factor, with each fix's next step:
 
 ```bash
 open examples/quick-demo/2026-11-02-globex-labs-deployment-program-manager-ai-agents/index.html

@@ -106,6 +106,7 @@ color:var(--accent);font-weight:700;display:grid;place-items:center}
 .step{font-size:15px}
 .step b{font-weight:650}
 .all{background:var(--accent-soft);border-radius:14px;padding:12px 16px;margin-top:6px;font-size:15px}
+.gone{margin:10px 0 0}
 table{border-collapse:collapse;width:100%;font-size:14px;margin-top:8px}
 th,td{text-align:left;padding:7px 8px;border-top:1px solid var(--rule);vertical-align:top}
 th{font-weight:600;color:var(--sub)}
@@ -332,14 +333,32 @@ def hard_requirement_line(result):
     return line
 
 
+SHOWN_REASONS = ("this factor does not move", "adds no fit points", "already at or above")
+
+
+def not_shown_lines(result):
+    """One plain line per fix the agent suggested that is left off for a reason the person would
+    wonder about (it cannot move in a few months, it adds nothing, it is already met). A fix
+    beaten by a bigger one on the same factor, or outside the top, needs no line. The
+    requirements match fix is skipped when the hard requirement line already explains it."""
+    skip = None
+    if result.get("hard_requirement_lacking"):
+        d1 = [x for x in result.get("fixes_not_shown") or [] if x.get("dimension") == "D1"]
+        skip = d1[0]["id"] if d1 else None
+    return ['Not listed: "%s", because %s.' % (x["title"], x["why"])
+            for x in result.get("fixes_not_shown") or []
+            if x["id"] != skip and x["why"].startswith(SHOWN_REASONS)]
+
+
 def fixes(result):
     hrl = hard_requirement_line(result)
     hrl = '<p class="note">%s</p>' % esc(hrl) if hrl else ""
+    gone = "".join('<p class="small sub gone">%s</p>' % esc(x) for x in not_shown_lines(result))
     if not result["fixes"]:
         return ('<section class="card" aria-labelledby="fixH"><p class="eyebrow">What would raise your odds</p>'
                 '<h2 id="fixH">No fix found</h2>'
                 '<p class="small sub">None of the fixes considered adds fit points. Say "run LVLme" for the full '
-                'campaign, which looks wider.</p>%s</section>' % hrl)
+                'campaign, which looks wider.</p>%s%s</section>' % (hrl, gone))
     items = []
     for f in result["fixes"]:
         items.append('<li><h3>%s</h3><p class="small"><span class="gain">+%s fit points</span> · %s %d to %d · '
@@ -348,13 +367,15 @@ def fixes(result):
                          esc(band_change(result, f)), esc(f["next_step"])))
     c = result["if_all_fixes"]
     n = len(result["fixes"])
-    all_line = ('<div class="all">If %s land: fit <b class="num">%s</b> (up %s), %s.</div>' % (
-        "all three" if n == 3 else "both" if n == 2 else "all %d" % n if n > 1 else "it", num(c["fit"]), num(c["gain"]),
+    all_line = ('<div class="all">If %s: fit <b class="num">%s</b> (up %s), %s.</div>' % (
+        "all three land" if n == 3 else "both land" if n == 2 else "all %d land" % n if n > 1 else "it lands",
+        num(c["fit"]), num(c["gain"]),
         esc(headline(c, start=False))))
     return ('<section class="card" aria-labelledby="fixH"><p class="eyebrow">What would raise your odds</p>'
             '<h2 id="fixH">The top %s</h2><p class="small sub">Ranked by the fit points each adds, with the same '
             'maths as the score. Each one is capped at what can realistically change in a few months.</p>%s'
-            '<ol class="fixes">%s</ol>%s</section>' % ("fix" if n == 1 else "%d fixes" % n, hrl, "".join(items), all_line))
+            '<ol class="fixes">%s</ol>%s%s</section>' % ("fix" if n == 1 else "%d fixes" % n, hrl, "".join(items),
+                                                           all_line, gone))
 
 
 def brief(result):
