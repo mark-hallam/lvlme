@@ -103,6 +103,17 @@ def previous_note(ws, today):
     return C.load_json(notes[-1], {}) if notes else None
 
 
+def previous_run(ws, today):
+    """{"date", "fit"} for the newest scored run before today (its best judged fit), or None."""
+    runs = sorted(f for f in glob.glob(os.path.join(C.wpath(ws, "eval", "runs"), "*.json"))
+                  if os.path.basename(f)[:10] < today)
+    if not runs:
+        return None
+    run = C.load_json(runs[-1], {}) or {}
+    fits = [r.get("fit") for r in run.get("roles") or [] if r.get("judged", True) and r.get("fit") is not None]
+    return {"date": run.get("run_date") or os.path.basename(runs[-1])[:10], "fit": max(fits) if fits else None}
+
+
 def newest_note(ws):
     notes = sorted(glob.glob(os.path.join(C.wpath(ws, *WEEKLY_DIR), "*.json")))
     return C.load_json(notes[-1], None) if notes else None
@@ -128,7 +139,7 @@ def week_note(ws, config, today):
     summary = roles_doc.get("summary") or {}
     names = C.target_names(config)
     best = (dash.get("levels") or {}).get("best_role") or {}
-    prev = previous_note(ws, today)
+    prev = previous_note(ws, today) or previous_run(ws, today)   # a first note compares with the last scored run
     since = (prev or {}).get("date")
     days = [d for d in (dash.get("levels") or {}).get("progress_days") or [] if not since or d.get("date", "") > since]
     changed = []
@@ -145,7 +156,7 @@ def week_note(ws, config, today):
     if evidence:
         changed.append("%d new piece%s of evidence counted." % (len(evidence), "" if len(evidence) == 1 else "s"))
     if not changed:
-        changed.append("Nothing moved since %s." % since if since else "This is the first note: next week's says what moved.")
+        changed.append("Nothing moved since %s." % since if since else "This is the first scored run: the next note says what moved.")
     apps = AP.due_now(_load(ws, *AP.REL.split("/")), today)
     top = (dash.get("actions_active") or [None])[0]
     runs = sorted(glob.glob(os.path.join(C.wpath(ws, "eval", "runs"), "*.json")))
@@ -207,7 +218,8 @@ def write_note(ws, config, today):
     n = week_note(ws, config, today)
     C.write_json(C.wpath(ws, *WEEKLY_DIR, today + ".json"), n)
     md = C.wpath(ws, *WEEKLY_DIR, today + ".md")
-    if not os.path.exists(md):
+    mine = os.path.exists(md) and open(md, encoding="utf-8").read().startswith("# This week: ")
+    if mine or not os.path.exists(md):   # rewrite our own note; never one the agent wrote
         C.write_text(md, note_md(n))
     return n
 

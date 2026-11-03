@@ -33,7 +33,7 @@ def save_config(ws, config):
 
 def turn_on(ws, config, args, today):
     ap = {"enabled": True, "rhythm": args.rhythm, "time": args.time, "run": args.run,
-          "sources": [s.strip() for s in (args.sources or "").split(",") if s.strip()],
+          "sources": [s.strip() for s in (args.sources or "").split(",") if s.strip() and s.strip().lower() != "none"],
           "helpers": args.helpers == "yes", "scheduler": args.scheduler, "approved_on": today}
     if args.rhythm == "weekly":
         ap["day"] = args.day

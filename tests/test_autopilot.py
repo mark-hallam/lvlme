@@ -68,7 +68,8 @@ class AutopilotTests(unittest.TestCase):
         self.run_cli("on")
         self.run_cli("week", "--date", "2026-11-03", "--no-dashboard")
         first = H.load(os.path.join(self.ws, "campaign", "weekly", "2026-11-03.json"))
-        self.assertIsNone(first["since"])
+        self.assertEqual(first["since"], "2026-11-01")        # a first note compares with the last scored run
+        self.assertIn("Best fit unchanged, from 57 to 57.", first["changed"])
         self.assertTrue(first["action"]["title"])
         self.run_cli("week", "--date", "2026-11-10", "--no-dashboard")
         second = H.load(os.path.join(self.ws, "campaign", "weekly", "2026-11-10.json"))
@@ -78,6 +79,15 @@ class AutopilotTests(unittest.TestCase):
             md = f.read()
         self.assertEqual(md.count("The one thing to do this week:"), 1)
         self.assertIn("Level 3, Moderate: fit 57", md)
+
+    def test_its_own_note_is_rewritten_on_a_second_run_that_day(self):
+        self.run_cli("week", "--date", "2026-11-03", "--no-dashboard")
+        path = os.path.join(self.ws, "campaign", "weekly", "2026-11-03.md")
+        with open(path, "a", encoding="utf-8") as f:
+            f.write("stale line\n")
+        self.run_cli("week", "--date", "2026-11-03", "--no-dashboard")
+        with open(path, encoding="utf-8") as f:
+            self.assertNotIn("stale line", f.read())
 
     def test_a_note_the_agent_wrote_is_kept(self):
         path = os.path.join(self.ws, "campaign", "weekly", "2026-11-03.md")
