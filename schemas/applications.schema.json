@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Application tracker (campaign/applications.json)",
+  "description": "Each job the person has applied for or is weighing up, its stage, and when the last step happened. Stages use career-ops' ten names so the two tools can talk. Every stage change is one the person confirmed, and each is also appended to campaign/applications-log.tsv, which is never edited. Progress only: score.py never reads this file. scripts/applications.py writes both files.",
+  "type": "object",
+  "required": ["schema_version", "applications"],
+  "additionalProperties": false,
+  "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
+  "properties": {
+    "schema_version": {"const": 1},
+    "updated_on": {"$ref": "#/definitions/date"},
+    "applications": {"type": "array", "items": {"$ref": "#/definitions/application"}}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "extension": {"description": "Extension field: any key starting x_ holds data the engine never reads. Kept as is."},
+    "stage": {
+      "enum": ["evaluated", "applied", "responded", "assessment", "interview", "offer", "rejected", "discarded", "skip", "hired"],
+      "description": "career-ops' stage names. evaluated: looked at, not applied. applied: sent. responded: the employer replied. assessment: a test or take-home. interview: an interview happened (last_step_on is its date). offer, rejected, hired: the outcome. discarded: the person stopped. skip: decided not to apply."
+    },
+    "application": {
+      "type": "object",
+      "required": ["id", "org", "title", "stage", "last_step_on"],
+      "additionalProperties": false,
+      "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
+      "properties": {
+        "id": {"type": "string", "pattern": "^ap[0-9]+$"},
+        "org": {"type": "string", "description": "A target id from config.json, or another organisation's short name."},
+        "title": {"type": "string", "minLength": 1},
+        "role_id": {"type": "string", "description": "The role in market/roles/latest.json, when it is one."},
+        "url": {"type": "string"},
+        "stage": {"$ref": "#/definitions/stage"},
+        "applied_on": {"$ref": "#/definitions/date"},
+        "last_step_on": {"$ref": "#/definitions/date", "description": "The date of the last real step (a stage change or a follow-up sent)."},
+        "nudges": {"type": "integer", "minimum": 0, "maximum": 2, "description": "Follow-ups sent since the last stage change; at most 2."},
+        "thanked": {"type": "boolean", "description": "A thank-you note was sent after the latest interview."},
+        "notes": {"type": "string"}
+      }
+    }
+  }
+}

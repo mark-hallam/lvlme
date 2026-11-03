@@ -220,6 +220,31 @@ the furthest stage anyone there has reached, with the stage in words and the
 count at each stage), and the contacts with their next steps in the
 organisation's pane. The agent briefing lists the same.
 
+## Applications and follow-ups
+
+When the person applies for a job, or is weighing one up, track it in
+`campaign/applications.json` with `scripts/applications.py`. Each change is
+also added to `campaign/applications-log.tsv`, which is never edited. The
+stages are career-ops' ten names (evaluated, applied, responded, assessment,
+interview, offer, rejected, discarded, skip, hired), so the two tools can talk.
+
+- **Record only what the person confirms.** "I applied to the Acme role
+  today" becomes `python3 scripts/applications.py add --org acme --title
+  "..."`. A reply the person pastes, or (only with their yes) an email you
+  read in Gmail, read only, is a proposed stage change: say what you would
+  record and wait for their yes, then run `move`. Never hand email to a
+  helper agent.
+- **Follow-ups are timed.** The first nudge is due 7 days after the last
+  step, then every 7 days, at most 2; a thank-you note 1 day after an
+  interview. Each open application shows waiting, due, overdue or gone quiet
+  on the dashboard.
+- **Drafts only.** `python3 scripts/applications.py draft <id>` writes the
+  facts and a gap for the person's own words to `campaign/drafts/`; for an
+  employer that asks for the person's own first draft it carries the
+  `LVLme outreach` line. When the person says it is sent, run `followup`
+  (or `thanks`).
+- Progress only: no score reads this file.
+
 ## When an organisation asks for your own first draft
 
 Some organisations publish rules on how candidates may use AI. Anthropic's

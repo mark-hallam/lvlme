@@ -71,7 +71,9 @@ Every script takes `--workspace PATH`.
    record facts in `profile/evidence.json`; run
    `python3 scripts/network_map.py --csv <Connections.csv>`; record each
    contact's stage in `campaign/warm-paths.json` (progress only, no score:
-   `method/CAMPAIGN.md`); process `campaign/inbox.md`.
+   `method/CAMPAIGN.md`); record confirmed applications and stage changes
+   with `python3 scripts/applications.py` (drafts only, you never send);
+   process `campaign/inbox.md`.
 3. **Market**: `python3 scripts/fetch_roles.py`; research each organisation
    and add sourced facts to `market/orgs.json`.
 4. **Judge and audit**: fill `eval/judgements.json` and

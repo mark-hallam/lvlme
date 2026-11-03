@@ -185,6 +185,7 @@ th{font-size:13px;color:var(--sub);font-weight:650}
 .wp-n{font-weight:550;font-size:15px;line-height:1.35}
 .wp-s{font-size:13px;font-weight:650;color:var(--accent);white-space:nowrap}
 .wp-s.none{color:var(--sub);font-weight:500}
+.ap-s.due,.ap-s.overdue{color:var(--warn)}
 .wp-bar{display:flex;gap:3px;margin:6px 0 4px}
 .wp-bar i{flex:1;height:6px;border-radius:3px;background:var(--p0)}
 .wp-bar i.on{background:var(--accent)}
@@ -534,6 +535,7 @@ BODY = r"""
   <section class="card static-sum" id="staticSummary" aria-labelledby="staticSummaryH">__STATIC__</section>
   <div class="tiles4" id="tiles4"></div>
   <div class="card pair" id="warmCard" hidden><div class="eyebrow">Warm paths</div><div class="tiny sub" id="warmSub" style="margin-bottom:4px"></div><div id="warm"></div></div>
+  <div class="card pair" id="appsCard" hidden><div class="eyebrow">Applications</div><div class="tiny sub" id="appsSub" style="margin-bottom:4px"></div><div id="apps"></div></div>
   <div class="card pair" id="unlocksCard"><div class="eyebrow">Biggest unlocks</div><div class="tiny sub" id="unlocksSub" style="margin-bottom:4px"></div><div id="unlocks"></div></div>
 
   <nav class="views-nav" aria-label="Views"><div class="hscroll"><div class="seg" id="viewSeg" role="tablist" aria-label="Views"></div></div></nav>
@@ -984,6 +986,14 @@ function warmDetail(L){
       (cs.map(c => `<div class="wp-c"><span class="tag">${esc(W.stages[c.stage])}</span> <span class="small">${esc(cap1(c.who))}${c.role ? ", " + esc(c.role) : ""}</span>${c.since || c.next ? `<div class="tiny sub">${c.since ? "Updated " + esc(shortDate(c.since)) : ""}${c.since && c.next ? " · " : ""}${c.next ? "Next: " + esc(c.next) : ""}</div>` : ""}</div>`).join("") || '<div class="tiny sub">Nobody tracked here yet.</div>');
   }).join("");
 }
+// Applications (campaign/applications.json): each application's stage, days since the last step and any follow-up
+// due. Progress only: no score reads it. The person sends every note; the agent drafts it on request.
+const appsSub = () => { const A = D.apps; return A.due ? `${plural(A.due, "follow-up")} due. You send every note yourself.` : "Stage, days since the last step, and when to follow up."; };
+function appsHTML(){
+  const A = D.apps; if (!A || !A.rows.length) return "";
+  return `<div>${A.rows.map(r => `<div class="wp"><div class="wp-h"><span class="wp-n">${esc(r.title)}</span><span class="wp-s${r.status === "none" ? " none" : ""}">${esc(r.stage)}</span></div><div class="tiny sub">${esc(r.org)} · last step ${r.since === 0 ? "today" : plural(r.since, "day") + " ago"}${r.what && r.status !== "waiting" ? ` · <b class="ap-s ${esc(r.status)}">${esc(r.label)}: ${esc(r.what)}</b>` : r.status === "gone_quiet" ? " · gone quiet" : r.what ? " · " + esc(r.what) + " on " + esc(shortDate(r.due)) : ""}</div></div>`).join("")}</div>` +
+    (A.due ? '<div class="tiny sub" style="margin-top:6px">Ask your agent to draft a due note. It goes in campaign/drafts/ for you to finish and send.</div>' : "");
+}
 function goMoves(){ state.view = "moves"; renderViewSeg(); showView(); $(".views-nav").scrollIntoView({behavior: motionOK() ? "smooth" : "auto", block: "start"}); }
 function bindHome(root){
   root.querySelectorAll(".dn[data-act]").forEach(n => onEnter(n, () => openDetail({type: "action", id: n.dataset.act}, true)));
@@ -995,12 +1005,15 @@ function renderDoNext(){
   $("#unlocksSub").textContent = UNLOCKS_SUB; $("#unlocks").innerHTML = unlocksHTML(); bindHome($("#nextIn")); bindHome($("#unlocksCard"));
   const warm = warmHTML(); $("#warm").innerHTML = warm; $("#warmCard").hidden = !warm;
   if (warm){ $("#warmSub").textContent = warmSub(); bindHome($("#warmCard")); }
+  const apps = appsHTML(); $("#apps").innerHTML = apps; $("#appsCard").hidden = !apps;
+  if (apps) $("#appsSub").textContent = appsSub();
   if (!narrow() && !state.stack.length) renderHome();
 }
 function renderHome(){
-  const card = $("#detailCard"), warm = warmHTML();
+  const card = $("#detailCard"), warm = warmHTML(), apps = appsHTML();
   card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h2 class="pane-h" style="margin:0">Do next</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div><div>${doNextHTML()}</div>
     ${warm ? `<h2 class="pane-h" style="margin:18px 0 0">Warm paths</h2><div class="tiny sub" style="margin-bottom:4px">${esc(warmSub())}</div>${warm}` : ""}
+    ${apps ? `<h2 class="pane-h" style="margin:18px 0 0">Applications</h2><div class="tiny sub" style="margin-bottom:4px">${esc(appsSub())}</div>${apps}` : ""}
     <h2 class="pane-h" style="margin:18px 0 0">Biggest unlocks</h2><div class="tiny sub" style="margin-bottom:4px">${UNLOCKS_SUB}</div><div>${unlocksHTML()}</div>
     <div class="tiny sub" style="margin-top:18px;padding-top:12px;border-top:1px solid var(--rule)">Tap any organisation, role, factor, action or piece of evidence to drill in here.</div></div>`;
   bindHome(card);

@@ -27,6 +27,12 @@ before. Nothing here changes how a score is worked out unless it says so.
   "Anthropic asks for your own first draft. Write it, then I'll review it.",
   with a link to the page.
 
+- **Applications and follow-ups.** `scripts/applications.py` tracks each
+  application in `campaign/applications.json` with career-ops' ten stage
+  names, and keeps every change in an append-only log. Follow-ups are timed
+  (7 days, then 7 more, at most 2; a thank-you note the day after an
+  interview), shown on a new Applications card, and drafted for you to
+  finish and send. Nothing is ever sent for you.
 - **Is this job still open?** Every role gets a quiet label from its age and
   reposts: likely real, check first, or suspicious ("Open, but posted 14
   months ago", "reposted 2 times in 90 days"), on the dashboard and in

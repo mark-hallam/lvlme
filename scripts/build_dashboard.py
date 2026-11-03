@@ -78,6 +78,7 @@ import _dashboard_assets as A  # noqa: E402
 import _levels as L  # noqa: E402
 import _levels_html as LH  # noqa: E402
 import _posting_checks as PC  # noqa: E402
+import _applications as AP  # noqa: E402
 import _static_html as ST  # noqa: E402
 import _warm_paths as W  # noqa: E402
 
@@ -197,6 +198,8 @@ class Data:
         self.evidence = load("profile", "evidence.json") or {}
         self.network = load("profile", "network.json")
         self.warm = load("campaign", "warm-paths.json")   # progress only: never scored
+        self.apps = load("campaign", "applications.json")  # progress only: never scored
+        self.today = C.today_in(config)                     # follow-ups fall due by the calendar
         self.claims = (load("profile", "claims-audit.json") or {}).get("claims", [])
         self.swot = load("eval", "swot.json")
         self.ceilings = load("eval", "ceilings.json")
@@ -606,6 +609,7 @@ def build_data(data):
         "backlog": [clean(b) for b in plan.get("backlog") or []],
         "warm": W.page_data(data.warm, data.targets, data.org_names, group_of, clean,
                             W.connection_counts(data.network)),
+        "apps": AP.page_data(data.apps, data.today, data.org_names, clean),
     }
     out["orgOrder"] = [g for g in groups if g in out["orgs"]]
     out["ceil"] = build_ceilings(data, {x["id"]: x for x in roles}, group_of)
@@ -847,6 +851,8 @@ def agent_payload(data, page):
     if share_names and data.network:
         payload["network"] = data.network
     payload["warm_paths"] = W.agent_data(data.warm, data.targets, data.org_names, include_contacts=not sensitive)
+    if data.apps is not None:
+        payload["applications"] = AP.agent_data(data.apps, data.today, data.org_names)
     if sensitive or not share_names:
         clean_text = make_redactor(data, sensitive, hide_names=not share_names)
         payload = scrub(payload, clean_text) if sensitive else _scrub_text(payload, clean_text)
@@ -1007,6 +1013,8 @@ def summary_md(data, p):
               "- First-degree contacts per organisation: %s" % (", ".join(
                   "%s %d" % (data.org(o), n) for o, n in p["network_first_degree_counts"].items()) or "not mapped yet")]
     lines += W.summary_lines(p["warm_paths"], data.org)
+    if p.get("applications"):
+        lines += AP.summary_lines(p["applications"])
     return "\n".join(lines) + "\n"
 
 

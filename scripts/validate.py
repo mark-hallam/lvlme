@@ -32,6 +32,7 @@ import _common as C  # noqa: E402
 import score as S  # noqa: E402  (the evidence caps, so the warnings match the scoring)
 import _warm_paths as W  # noqa: E402
 import _first_draft as F  # noqa: E402
+import _applications as AP  # noqa: E402
 
 FILES = [
     ("config.json", "config.schema.json", True),
@@ -48,6 +49,7 @@ FILES = [
     ("eval/ceilings.json", "ceilings.schema.json", False),
     ("campaign/plan.json", "plan.schema.json", True),
     ("campaign/warm-paths.json", "warm-paths.schema.json", False),
+    ("campaign/applications.json", "applications.schema.json", False),
 ]
 
 # ------------------------------------------------------------ the validator
@@ -326,6 +328,7 @@ def cross_checks(ws, docs, errors, warnings):
     review_checks(docs, ev_ids, errors, warnings)
     W.checks(docs.get(W.REL), targets, ev_ids, action_ids if "campaign/plan.json" in docs else None, errors, warnings)
     F.checks(ws, cfg, errors, warnings)
+    AP.checks(docs.get(AP.REL), targets, role_ids, errors, warnings)
 
 
 # Evidence id prefixes LVLme already uses for other ids, so an evidence id with one reads as something else.

@@ -204,6 +204,9 @@ rights question when `fetch_roles.py` first finds an open role that needs it.
   `campaign/warm-paths.json` (followed, talked, connected, knows your work,
   would refer) from what the person says; it shows progress and changes no
   score (`method/CAMPAIGN.md`).
+- Applications: record each one the person confirms, and each stage change,
+  with `python3 scripts/applications.py`; draft any due follow-up for them
+  to send (`method/CAMPAIGN.md`, "Applications and follow-ups").
 - Process `campaign/inbox.md`: verify each "New" note against its source,
   then move it to "Processed" with a one-line outcome.
 
