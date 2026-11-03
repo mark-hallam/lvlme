@@ -657,22 +657,36 @@ function bestOf(rs, acts, mode, sure){
 const state = {org: "best", mode: "today", sample: false, view: "level", stack: []};
 let P = {};                                                // role id -> {exp, best}
 let LV = null;                                             // the journey's next level, quests and Do next order (see lv())
-function recompute(){ P = {}; LV = null; D.roles.forEach(r => P[r.id] = {exp: project(r, "exp"), best: project(r, "best")}); }
+let JPC = {};                                              // journey -> its projection (see jp())
+function recompute(){ P = {}; LV = null; JPC = {}; D.roles.forEach(r => P[r.id] = {exp: project(r, "exp"), best: project(r, "best")}); }
 function fitM(r, mode){ mode = mode || state.mode; return mode === "today" ? r.fit : P[r.id][mode].end; }
 function scoresM(r, mode){ mode = mode || state.mode; return mode === "today" ? r.s : P[r.id][mode].scores; }
 function ibM(r, mode){ mode = mode || state.mode; return mode === "today" ? r.ib : interviewBand(fitM(r, mode), scoresM(r, mode), r.hrl); }
 function obM(r, mode){ mode = mode || state.mode; return mode === "today" ? r.ob : offerBand(fitM(r, mode), scoresM(r, mode), r.hrl); }
 const MODES = [["today","Today"],["exp","Plan expected"],["best","Plan best case"]];
 const modeName = () => ({today:"today", exp:"if you follow the plan, by " + shortDate(D.meta.end), best:"if every action lands, by " + shortDate(D.meta.end)})[state.mode];
-function headlineRole(){
-  if (state.org === "best") return D.roles[0];
-  return roleById[D.orgs[state.org].best] || D.roles.find(r => r.g === state.org);
+// Today's best role on a journey ("best" for every role, or an organisation key; the selector's by default).
+function headlineRole(org){
+  org = org || state.org;
+  if (org === "best") return D.roles[0];
+  return roleById[D.orgs[org].best] || D.roles.find(r => r.g === org);
 }
 // The roles the journey follows, today's best first: every role, or the selected organisation's.
-function journeyRoles(){
-  const h = headlineRole();
-  return state.org === "best" ? D.roles : [h].concat(D.roles.filter(r => r.g === state.org && r !== h));
+function journeyRoles(org){
+  org = org || state.org;
+  const h = headlineRole(org);
+  return org === "best" ? D.roles : [h].concat(D.roles.filter(r => r.g === org && r !== h));
 }
+// The journey's projection under the switches: at each step the best fit across its roles, the same yardstick
+// as the level (bestOf), so the chart, its tiles, the phone bar, the share card, What if and Level up give one
+// answer. exp.r and best.r: the role holding each end (a tie keeps today's order, so today's best wins it).
+function planProj(rs, on){
+  on = on || enabled;
+  const acts = D.actions.filter(a => on.has(a.id));
+  const end = w => ({end: w.end, scores: w.scores, r: w.r, pts: w.pts.concat([{d: D.meta.end, v: w.end}])});
+  return {exp: end(bestOf(rs, acts, "exp")), best: end(bestOf(rs, acts, "best"))};
+}
+function jp(org){ org = org || state.org; if (!JPC[org]) JPC[org] = planProj(journeyRoles(org)); return JPC[org]; }
 function crossDate(pts, threshold){
   for (let i = 0; i < pts.length; i++) if (pts[i].v >= threshold) return pts[i].d;   // an action lands on its target date
   return null;
@@ -705,7 +719,7 @@ function onEnter(n, go){ n.addEventListener("click", go); n.addEventListener("ke
 
 // ---------- flight strip, best chance, level ----------
 function renderTopline(){
-  const r = headlineRole(), exp = P[r.id].exp;
+  const r = headlineRole(), exp = jp().exp;
   const sp = state.sample ? sampleProgress(r) : [];
   const last = sp.length ? sp[sp.length - 1] : {t: tOf(TODAY), v: r.fit};
   const day = Math.round((last.t - T0) / 864e5) + 1;
@@ -716,8 +730,7 @@ function renderTopline(){
     <span>Altitude<b class="num">${Math.round(last.v)}</b></span><span>Flight level<b>${esc(BANDS[bi])}</b></span>
     <span>Next level (${esc(nextT != null ? BANDS[bi + 1] : "top")})<b>${nextDate ? esc(fmtDate(nextDate)) : "not on the current plan"}</b></span>`;
   // best chance (mode aware)
-  const best = D.roles.reduce((a, b) => fitM(b) > fitM(a) ? b : a, D.roles[0]);
-  const focus = state.org === "best" ? best : r;
+  const focus = journeyRoles().reduce((a, b) => fitM(b) > fitM(a) ? b : a);   // the role the journey's projection follows
   $("#bestLabel").textContent = (state.org === "best" ? "Best match " : D.orgs[focus.g].name + ", best match ") + modeName();
   countTo($("#bestNum"), fitM(focus));
   $("#bestPills").innerHTML = `Interview ${pill(ibM(focus))} Offer ${pill(obM(focus))}`;
@@ -758,7 +771,7 @@ const sampleSeries = pts => SAMPLE_T.map(t => valueAt(pts, t));
 const pathFrom = vals => vals.map((v, i) => (i ? "L" : "M") + xT(SAMPLE_T[i]).toFixed(1) + "," + yOf(v).toFixed(1)).join(" ");
 const pathPts = list => list.map((p, i) => (i ? "L" : "M") + xT(p.t).toFixed(1) + "," + yOf(p.v).toFixed(1)).join(" ");
 function sampleProgress(r){
-  const exp = P[r.id].exp.pts, out = [], base = r.fit; let seed = 7;
+  const exp = jp().exp.pts, out = [], base = r.fit; let seed = 7;
   const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
   for (let w = 1; w <= 12; w++){ const t = TN + w * 7 * 864e5; if (t > T1) break;
     out.push({t, v: r1(Math.max(base, base + (valueAt(exp, t) - base) * 0.9 + (rnd() - 0.5) * 1.6))}); }
@@ -819,7 +832,7 @@ function phoneEndLabels(ends, top, bottom){
 }
 function drawChart(){
   if (!chartBuilt) buildChartFrame();
-  const r = headlineRole(), c = orgColour(r.g), exp = P[r.id].exp, best = P[r.id].best;
+  const r = headlineRole(), J = jp(), exp = J.exp, best = J.best, c = orgColour(exp.r.g);
   const vals = {exp: sampleSeries(exp.pts), best: sampleSeries(best.pts), none: SAMPLE_T.map(() => r.fit)};
   $("#pExp").setAttribute("stroke", c); $("#pBest").setAttribute("stroke", c);
   const ids = {exp: "#pExp", best: "#pBest", none: "#pNone"};
@@ -897,17 +910,17 @@ function drawChart(){
   const rows = hist.slice(0, -1).map(p => `<tr><td>${fmtT(p.t)}</td><td class="num">${Math.round(p.v)}</td><td></td><td></td><td></td></tr>`).join("") +
     exp.pts.map((p, i) => `<tr><td>${fmtDate(p.d)}${i === 0 ? " (today)" : ""}</td><td class="num">${i === 0 ? Math.round(r.fit) : ""}</td><td class="num">${Math.round(p.v)}</td><td class="num">${Math.round(best.pts[i].v)}</td><td class="num">${Math.round(r.fit)}</td></tr>`).join("");
   $("#journeyTable").innerHTML = `<div class="tscroll"><table><tr><th>Date</th><th>Measured</th><th>Expected</th><th>Best case</th><th>Do nothing</th></tr>${rows}</table></div>`;
-  $("#tiles3").innerHTML = [["Expected by " + shortDate(D.meta.end), exp.end, interviewBand(exp.end, exp.scores, r.hrl)],
-    ["If every action lands", best.end, interviewBand(best.end, best.scores, r.hrl)], ["If you do nothing", r.fit, r.ib]]
+  $("#tiles3").innerHTML = [["Expected by " + shortDate(D.meta.end), exp.end, interviewBand(exp.end, exp.scores, exp.r.hrl)],
+    ["If every action lands", best.end, interviewBand(best.end, best.scores, best.r.hrl)], ["If you do nothing", r.fit, r.ib]]
     .map(t => `<div class="tile3"><div class="l">${esc(t[0])}</div><div class="v num" data-to="${t[1]}">${Math.round(t[1])}</div>${pill(t[2])} <span class="tiny sub">interview</span></div>`).join("");
   $("#tiles3").querySelectorAll("[data-to]").forEach(n => countTo(n, +n.dataset.to));
-  chartState = {r, exp, best, hist};
+  chartState = {r, c, exp, best, hist};
 }
 function onChartMove(e){
   if (!chartState) return;
   const rect = $("#chartWrap svg").getBoundingClientRect(), sx = (e.clientX - rect.left) * (CW / rect.width);
   const t = Math.max(T0, Math.min(T1, T0 + (sx - PL) / IW * (T1 - T0)));
-  const {r, exp, best, hist} = chartState, c = orgColour(r.g), cr = $("#cross");
+  const {r, c, exp, best, hist} = chartState, cr = $("#cross");
   const row = (val, name, colour, dash) => { const d = el("div", "tip-row"), k = el("i", "lk"); k.style.color = colour; if (dash) k.style.borderTopStyle = dash; d.appendChild(k); d.appendChild(el("span", "tv", String(Math.round(val)))); d.appendChild(el("span", "tn", name)); return d; };
   if (t < TN && hist.length){
     const p = hist.reduce((a, b) => Math.abs(b.t - t) < Math.abs(a.t - t) ? b : a, hist[0]);
@@ -989,7 +1002,7 @@ function renderHome(){
 // The rail keeps the Do next order the page opened with, so its rows never jump while you switch.
 let RANK = {};
 function renderSwitches(){
-  const best = D.roles[0], box = {now: $("#switchesNow"), later: $("#switchesLater"), done: $("#switchesDone")};
+  const box = {now: $("#switchesNow"), later: $("#switchesLater"), done: $("#switchesDone")};
   Object.values(box).forEach(b => b.innerHTML = "");
   const groups = {now: [], later: [], done: []};
   D.actions.forEach(a => { if (groups[a.group]) groups[a.group].push(a); });
@@ -1012,7 +1025,7 @@ function renderSwitches(){
       const on = enabled.has(a.id);
       // The only place the marginal number appears: what this action adds to your best role with everything else switched on.
       const w = new Set(enabled); w.add(a.id); const wo = new Set(enabled); wo.delete(a.id);
-      const lift = r1(project(best, "exp", w).end - project(best, "exp", wo).end);
+      const lift = r1(planProj(D.roles, w).exp.end - planProj(D.roles, wo).exp.end);   // on your best fit, as Level up counts it
       let lifted = 0; D.roles.forEach(r => { if (project(r, "exp", w).end - project(r, "exp", wo).end > 0.05) lifted++; });
       row.innerHTML = `<div class="sw-main"><div class="sw-title">${esc(a.title)}</div>
         <div class="sw-lift">${lift > 0 ? `<b>+${lift.toFixed(1)}</b> with everything else on${lifted ? `, lifts <b>${lifted}</b> ${lifted === 1 ? "role" : "roles"}` : ""}` : !a.effects.length ? "Protects credibility, no score change" : `Little extra with everything else on${lifted ? `, but lifts <b>${lifted}</b> ${lifted === 1 ? "role" : "roles"}` : ""}`}</div>
@@ -1026,9 +1039,9 @@ function renderSwitches(){
   renderBottomBar();
 }
 function renderBottomBar(){
-  const open = D.actions.filter(switchable), on = open.filter(a => enabled.has(a.id)).length, r = D.roles[0];
+  const open = D.actions.filter(switchable), on = open.filter(a => enabled.has(a.id)).length;
   $("#bbMain").textContent = `${on} of ${open.length} actions on`;
-  $("#bbSub").textContent = `Best role expected ${Math.round(P[r.id].exp.end)} by ${shortDate(D.meta.end)}`;
+  $("#bbSub").textContent = `Best role expected ${Math.round(jp("best").exp.end)} by ${shortDate(D.meta.end)}`;
 }
 function renderMetrics(){
   $("#metrics").innerHTML = D.metrics.length ? D.metrics.map(m => { const d = r1(m.current - m.start);
@@ -1076,7 +1089,7 @@ function ring(g, today, exp){
     <text class="ring-num" x="42" y="49" text-anchor="middle">${Math.round(today)}</text></svg>`;
 }
 function trail(g, r){
-  const W2 = 260, H2 = 84, exp = P[r.id].exp, best = P[r.id].best, c = orgColour(g);
+  const W2 = 260, H2 = 84, exp = jp(g).exp, best = jp(g).best, c = orgColour(g);
   const prev = D.runs.map(rn => rn.orgs[g]).filter(v => v != null);
   const lo = Math.max(0, Math.floor(Math.min(r.fit, ...prev) / 5) * 5 - 10), hi = 75;   // zoomed so the climb shows; the green line is the offer zone
   const xx = t => 6 + (t - T0) / (T1 - T0) * (W2 - 12), yy = v => H2 - 6 - (Math.max(lo, v) - lo) / (hi - lo) * (H2 - 12);
@@ -1093,11 +1106,11 @@ function trail(g, r){
 function renderOrgs(){
   $("#v-orgs").innerHTML = `<div class="grid2">${D.orgOrder.map(g => {
     const L = D.orgs[g], r = roleById[L.best]; if (!r) return "";
-    const exp = P[r.id].exp;
+    const J = jp(g), exp = J.exp, m = J[state.mode], ib = m ? interviewBand(m.end, m.scores, m.r.hrl) : r.ib, sr = m ? m.r : r;   // the organisation's journey and the role holding its number
     return `<div class="card org-card" tabindex="0" data-org="${esc(g)}">
-      <div class="org-head">${ring(g, fitM(r), exp.end)}<div style="min-width:0"><div class="org-name"><i class="org-key" style="background:${orgColour(g)}"></i>${esc(L.name)}</div>
-      <div class="small sub">${esc(r.title)}${L.members.length > 1 ? ", " + esc(r.on) : ""}</div></div></div>
-      <div class="kv" style="margin-top:8px"><span>Interview chance, ${esc(state.mode === "today" ? "now" : state.mode === "exp" ? "plan expected" : "plan best case")}</span>${pill(ibM(r))}</div>
+      <div class="org-head">${ring(g, m ? m.end : r.fit, exp.end)}<div style="min-width:0"><div class="org-name"><i class="org-key" style="background:${orgColour(g)}"></i>${esc(L.name)}</div>
+      <div class="small sub">${esc(sr.title)}${L.members.length > 1 ? ", " + esc(sr.on) : ""}</div></div></div>
+      <div class="kv" style="margin-top:8px"><span>Interview chance, ${esc(state.mode === "today" ? "now" : state.mode === "exp" ? "plan expected" : "plan best case")}</span>${pill(ib)}</div>
       <div class="kv"><span>Expected by ${esc(shortDate(D.meta.end))}</span><b class="num">${Math.round(exp.end)}</b></div>
       <div class="kv"><span>Roles with an eligibility blocker</span><b class="num">${L.blocked} of ${L.count}</b></div>
       ${trail(g, r)}
@@ -1679,8 +1692,8 @@ function detailAction(id){
 
 // ---------- share card ----------
 const modal = $("#modal");
-function shareNumbers(){ const r = D.roles[0], e = P[r.id].exp, d1 = D.runs[0] || {top: r.fit, ib: r.ib};
-  return {r, d1: d1.top, d1b: d1.ib, exp: e.end, eb: interviewBand(e.end, e.scores, r.hrl),
+function shareNumbers(){ const r = D.roles[0], e = jp("best").exp, d1 = D.runs[0] || {top: r.fit, ib: r.ib};
+  return {r, d1: d1.top, d1b: d1.ib, exp: e.end, eb: interviewBand(e.end, e.scores, e.r.hrl),
           head: shareHeadline(d1.top, r.fit, Math.round((tOf(TODAY) - tOf(D.meta.baseline)) / 864e5) + 1)}; }
 // The share headline states only what was measured: the flight level on day 1 and today, counted in days
 // like the Day number above the chart. It never claims an offer: the card is built to be shared, so it must
