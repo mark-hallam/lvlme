@@ -241,7 +241,9 @@ guidance like this, and re-read the page before each application, since such
 pages change. Never record a policy you have not read on the organisation's
 own page, and never assume one organisation's rules apply to another.
 
-For a target with `first_draft_by_person` true:
+For a target with `first_draft_by_person` true, say so plainly before any
+application help: "Anthropic asks for your own first draft. Write it, then
+I'll review it." (with the employer's name). Then:
 
 1. **Never write** its application answers, cover letter or résumé text, in
    whole or in part.
@@ -249,6 +251,20 @@ For a target with `first_draft_by_person` true:
    role's requirements (from the posting), the evidence that meets each one
    (evidence ids) and the honest gaps, what to lead with and why, and the
    self-check list below. The plan action is the person's (`owner` `you`).
+   Every draft for this employer starts with a line saying what it is, the
+   policy's address and the date you last read it:
+
+   ```
+   LVLme brief. Policy: https://www.anthropic.com/candidate-ai-guidance, checked 2026-11-02.
+   ```
+
+   The kind is `brief`, `review` (of the person's own draft), `prep`
+   (research, practice, questions to ask) or `outreach` (a message to a
+   person, not part of an application). `scripts/validate.py` reports an
+   error for any draft in `campaign/drafts/` whose path names the employer
+   and that has no such line or another kind, and a warning when the policy
+   was last checked more than 30 days ago: re-read the page, then update
+   the date here and `checked_on` in `config.json`.
 3. **Review the person's own draft** when they share it: what is unclear,
    what has no evidence behind it, what differs from the single source of
    truth in `profile/consistency.md`, and what from the brief is missing.

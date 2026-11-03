@@ -12,7 +12,9 @@ local $ref. Keys starting x_ (extension fields) are allowed on the main
 objects through patternProperties and are never read by the engine.
 
 Also checks the review dispute logs, eval/reviews/<date>.json
-(schemas/reviews.schema.json), against the middle-of-three rule.
+(schemas/reviews.schema.json), against the middle-of-three rule, and the
+drafts for any employer that asks for the person's own first draft
+(scripts/_first_draft.py).
 
 Usage
   python3 scripts/validate.py --workspace PATH [--json]
@@ -29,6 +31,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 import score as S  # noqa: E402  (the evidence caps, so the warnings match the scoring)
 import _warm_paths as W  # noqa: E402
+import _first_draft as F  # noqa: E402
 
 FILES = [
     ("config.json", "config.schema.json", True),
@@ -322,6 +325,7 @@ def cross_checks(ws, docs, errors, warnings):
             warnings.append("eval/ceilings.json: role %s belongs to %s, not a target id" % (r.get("role_id"), r.get("org")))
     review_checks(docs, ev_ids, errors, warnings)
     W.checks(docs.get(W.REL), targets, ev_ids, action_ids if "campaign/plan.json" in docs else None, errors, warnings)
+    F.checks(ws, cfg, errors, warnings)
 
 
 # Evidence id prefixes LVLme already uses for other ids, so an evidence id with one reads as something else.

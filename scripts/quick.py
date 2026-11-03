@@ -49,6 +49,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
+import _ai_policies as AP  # noqa: E402
 import _quick_html as QH  # noqa: E402
 import build_dashboard as B  # noqa: E402  (the projection caps)
 import quick_posting as QP  # noqa: E402
@@ -168,11 +169,13 @@ def new(args):
     if guessed:
         print("lvlme: note: the board gives no employer name, so %r is a guess from the link. Check the name with "
               "the person; if it is wrong, run this again with --org \"<name>\"." % org_name, file=sys.stderr)
+    policy = AP.policy_for(role["org"], org_name)
     folder = rel_folder(args.folder) if args.folder else unique(
         os.path.join(rel_folder(args.parent or default_parent()), folder_name(date, org_name, role["title"])))
     config = {"quick": True, "fictional": bool(args.fictional),
               "goal": {"title": "LVLme quick: %s at %s" % (role["title"], org_name)},
-              "targets": [{"id": role["org"], "name": org_name, "ats": source["kind"]}],
+              "targets": [dict({"id": role["org"], "name": org_name, "ats": source["kind"]},
+                               **({"ai_policy": policy} if policy else {}))],
               "candidate": {}}
     problem = C.location_problem(folder, config)
     if problem:
@@ -515,7 +518,8 @@ def build_result(docs):
                  "locations": role.get("locations") or [], "remote": role.get("remote"),
                  "workplace": role.get("workplace"), "url": role.get("url"),
                  "eligibility_blockers": role.get("eligibility_blockers") or [],
-                 "requires_heavy_coding": bool(role.get("requires_heavy_coding"))},
+                 "requires_heavy_coding": bool(role.get("requires_heavy_coding")),
+                 **({"ai_policy": target["ai_policy"]} if target.get("ai_policy") else {})},
         "fit": scored["fit"], "interview_band": scored["interview_band"], "offer_band": scored["offer_band"],
         "eligibility_blocked": scored["eligibility_blocked"],
         "hard_requirement_lacking": scored["hard_requirement_lacking"],
@@ -569,6 +573,9 @@ def message(result, folder):
     if len(result["fixes"]) < TOP_FIXES and QH.not_shown_lines(result):  # fewer shown than promised: say why
         lines += QH.not_shown_lines(result) + [""]
     lines.append(review_sentence(result))
+    if AP.first_draft_line(r["org_name"], r.get("ai_policy")):
+        lines += ["", "%s Their guidance: %s" % (AP.first_draft_line(r["org_name"], r["ai_policy"]),
+                                                 r["ai_policy"]["source"])]
     lines += ["", "Why, factor by factor%s:" % (", with each fix's next step" if result["fixes"] else ""),
               "", "```bash", "open %s" % display_path(os.path.join(folder, "index.html")),
               "```", "",

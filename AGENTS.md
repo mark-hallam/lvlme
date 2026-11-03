@@ -44,8 +44,9 @@ version, and it runs the same procedure. Install notes for every agent:
   `ai_policy.first_draft_by_person` is true (for example Anthropic), never
   write its application answers, cover letters or résumé text: write a brief
   and review the person's own draft. Take-home tests and live interviews are
-  the person's alone unless the organisation says otherwise
-  (`method/CAMPAIGN.md`).
+  the person's alone unless the organisation says otherwise. Each draft for
+  such an employer starts with a line naming its kind and the policy, and
+  `scripts/validate.py` checks it (`method/CAMPAIGN.md`).
 
 ## If you are a helper agent, not the one running the campaign
 

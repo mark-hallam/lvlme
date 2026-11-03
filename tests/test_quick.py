@@ -368,6 +368,31 @@ class NewFolderTests(unittest.TestCase):
         self.assertEqual(info["org_name"], "Globex Labs")
         self.assertNotIn("is a guess", err)
 
+    def test_an_employer_that_asks_for_your_own_first_draft_is_named(self):
+        """Anthropic's rule (read on its own page) goes on the target, the message and the brief; others get none."""
+        parent = tmpdir(self)
+        code, out, err = run(["new", "--posting", LINK, "--saved-response", BOARD, "--date", "2026-11-02",
+                              "--org", "Anthropic", "--parent", os.path.join(parent, "quick")])
+        self.assertEqual(code, 0, err)
+        folder = json.loads(out)["folder"]
+        target = H.load(os.path.join(folder, "config.json"))["targets"][0]
+        self.assertEqual(target["ai_policy"], {"first_draft_by_person": True, "checked_on": "2026-11-03",
+                                               "source": "https://www.anthropic.com/candidate-ai-guidance"})
+        result = Q.build_result(Q.load(folder))
+        message = Q.message(result, folder)
+        self.assertIn("Anthropic asks for your own first draft. Write it, then I'll review it. Their guidance: "
+                      "https://www.anthropic.com/candidate-ai-guidance", message)
+        self.assertLess(len(message.split()), 150)
+        page = QH.render(result)
+        self.assertIn('Anthropic asks for your own first draft. Write it, then I&#x27;ll review it. <a class="guide" '
+                      'href="https://www.anthropic.com/candidate-ai-guidance">Their guidance on AI use</a>, checked '
+                      '3 November 2026.', page)
+        code, out, _ = run(["new", "--posting", LINK, "--saved-response", BOARD, "--date", "2026-11-02",
+                            "--org", "Globex Labs", "--parent", os.path.join(parent, "quick")])
+        other = json.loads(out)["folder"]
+        self.assertNotIn("ai_policy", H.load(os.path.join(other, "config.json"))["targets"][0])
+        self.assertNotIn("first draft", Q.message(Q.build_result(Q.load(other)), other))
+
     def test_new_refuses_unsafe_places(self):
         inside = os.path.join(H.ENGINE, "examples", "quick-demo", "not-fictional")
         code, _, err = run(["new", "--posting", LINK, "--saved-response", BOARD, "--folder", inside])

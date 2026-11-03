@@ -9,10 +9,12 @@ The colours are the dashboard's tokens, so the two pages look like one product.
 Accessibility (tests/test_quick_page_a11y.py keeps it so): every text colour
 pair passes WCAG AA contrast in both themes, no text is under 12px, the
 meters and bars stay visible in forced colours (Windows contrast themes), the
-device's "increase contrast" setting darkens the grey text, the one link has
-a larger tap area, and nothing that is not a control looks like a button.
+device's "increase contrast" setting darkens the grey text, each link has a
+larger tap area, and nothing that is not a control looks like a button.
 """
 import html
+
+import _ai_policies as AP
 
 BANDS = ["Very low", "Low", "Moderate", "Good", "Strong"]
 LEVELS = {"verified": ("Verified", "v"), "corroborated": ("Corroborated", "v"),
@@ -47,7 +49,7 @@ html,body{margin:0;background:var(--bg);color:var(--ink)}
 body{font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
 -webkit-font-smoothing:antialiased;overflow-wrap:break-word}
 a{color:var(--accent)}
-a.posting{padding:10px 4px;margin:0 -4px}
+a.posting,a.guide{padding:10px 4px;margin:0 -4px}
 .wrap{max-width:780px;margin:0 auto;padding:20px 16px 48px}
 .top{display:flex;align-items:center;gap:10px;margin:4px 2px 16px}
 .mark{width:28px;height:28px;border-radius:8px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center}
@@ -391,8 +393,18 @@ def brief(result):
         parts.append('<h3 style="margin-top:12px">Have a source ready for</h3><ul class="ev">%s</ul>' % back)
     return ('<section class="card" aria-labelledby="briefH"><p class="eyebrow">Your brief</p>'
             '<h2 id="briefH">Before you apply</h2>%s<p class="small sub" style="margin-top:12px">LVLme gives fixes and a '
-            'brief, never application answers: you write those in your own words. Some employers publish guidance on '
-            'how candidates may use AI; check theirs.</p></section>' % "".join(parts))
+            'brief, never application answers: you write those in your own words. %s</p></section>'
+            % ("".join(parts), ai_guidance(result["role"])))
+
+
+def ai_guidance(role):
+    """The employer's own rule on AI use, linked, when LVLme knows it; otherwise a nudge to check."""
+    line = AP.first_draft_line(role["org_name"], role.get("ai_policy"))
+    if not line:
+        return "Some employers publish guidance on how candidates may use AI; check theirs."
+    p = role["ai_policy"]
+    return '%s <a class="guide" href="%s">Their guidance on AI use</a>, checked %s.' % (
+        esc(line), esc(p["source"]), esc(long_date(p["checked_on"])))
 
 
 def checked(result):

@@ -184,7 +184,14 @@ class StructureTests(unittest.TestCase):
         self.assertEqual([a.get("class") for a in self.o.links], [])   # the demo's posting is fictional: no link
         real = outline(QH.render(dict(self.result, fictional=False)))
         self.assertEqual([a.get("class") for a in real.links], ["posting"])
-        self.assertIn("a.posting{padding:10px 4px;margin:0 -4px}", QH.CSS)
+        self.assertIn("a.posting,a.guide{padding:10px 4px;margin:0 -4px}", QH.CSS)
+
+    def test_the_ai_guidance_link_has_a_bigger_tap_area_too(self):
+        role = dict(self.result["role"], org_name="Anthropic", ai_policy={
+            "first_draft_by_person": True, "source": "https://www.anthropic.com/candidate-ai-guidance",
+            "checked_on": "2026-11-03"})
+        o = outline(QH.render(dict(self.result, role=role)))
+        self.assertEqual([a.get("class") for a in o.links], ["guide"])
 
     def test_meters_say_where_on_the_scale_without_repeating_the_band(self):
         self.assertIn('role="img" aria-label="Step 2 of 5, from Very low to Strong"', self.page)

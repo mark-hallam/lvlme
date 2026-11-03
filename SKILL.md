@@ -64,7 +64,9 @@ workspace.
     self-check list) and review the person's own draft. Take-home tests and
     live interviews are the person's alone unless the organisation says
     otherwise; research, practice and preparation are fine. Record a policy
-    only from the organisation's own page (`method/CAMPAIGN.md`).
+    only from the organisation's own page. Each draft for such an employer
+    starts with a line naming its kind and the policy, and
+    `scripts/validate.py` checks it (`method/CAMPAIGN.md`).
 
 ## Entry points
 
