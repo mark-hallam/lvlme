@@ -177,6 +177,51 @@ class DemoPageTests(unittest.TestCase):
 
 
 
+class UnjudgedRoleTests(unittest.TestCase):
+    """A role nobody has judged is "not judged yet": never a best role, a tile count, an unlock or a measured row."""
+
+    def setUp(self):
+        self.ws = H.copy_demo(self)
+        path = os.path.join(self.ws, "eval", "runs", "2026-11-01.json")
+        run = H.load(path)
+        for r in run["roles"]:
+            if r["org"] == "globex":
+                r["judged"] = False
+        run["per_org"]["globex"] = None
+        H.save(path, run)
+        with mock.patch("sys.stdout"):
+            self.assertEqual(B.main(["--workspace", self.ws]), 0)
+        self.page, self.d = page_data(self.ws)
+
+    def read(self, name):
+        with open(os.path.join(self.ws, "report", "for-agents", name), encoding="utf-8") as fh:
+            return fh.read()
+
+    def test_page_data_marks_them(self):
+        d = self.d
+        self.assertEqual(d["orgs"]["globex"]["judged"], 0)
+        self.assertGreater(d["orgs"]["globex"]["count"], 0)
+        judged = [r["judged"] for r in d["roles"]]
+        self.assertEqual(judged, sorted(judged, reverse=True))          # judged roles first
+        self.assertNotIn("globex", [g for g, v in d["runs"][-1]["orgs"].items() if v])
+        for text in ("No role judged yet at", "of ${J.length} judged", "Not judged", "r.lc === m.home && r.judged",
+                     "D.orgOrder.filter(g => D.orgs[g].judged)"):
+            self.assertIn(text, self.page)
+
+    def test_summary_and_agent_data_never_score_them(self):
+        summary = self.read("SUMMARY.md")
+        best = summary.split("## Best role at each organisation")[1].split("##")[0]
+        self.assertIn("Globex Labs: no role judged yet (", best)
+        top = summary.split("## Top 10 judged open roles")[1].split("##")[0]
+        self.assertNotIn("Globex", top)
+        self.assertNotIn("At Globex", summary)                          # no next level for a journey nobody measured
+        payload = json.loads(self.read("dashboard.json"))
+        self.assertIsNone(payload["per_org"]["globex"])
+        self.assertTrue(all(not r["judged"] for r in payload["roles"] if r["org"] == "globex"))
+        self.assertLess(payload["role_counts"]["judged"], payload["role_counts"]["open"])
+        self.assertIn("No role judged yet (", self.page)                # the static summary too
+
+
 class ParkedAndStaticTests(unittest.TestCase):
     def setUp(self):
         self.ws = H.copy_demo(self)

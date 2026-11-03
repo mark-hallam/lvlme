@@ -52,7 +52,9 @@ def _per_org(page, per_org):
     for oid, name in page["orgNames"].items():
         best = by_id.get((per_org.get(oid) or {}).get("role_id"))
         if best is None:
-            rows.append('<tr><th scope="row">%s</th><td colspan="4" class="sub">No matching open role</td></tr>' % esc(name))
+            n = sum(1 for r in page["roles"] if r["org"] == oid)
+            rows.append('<tr><th scope="row">%s</th><td colspan="4" class="sub">%s</td></tr>' % (
+                esc(name), "No role judged yet (%d open)" % n if n else "No matching open role"))
             continue
         rows.append('<tr><th scope="row">%s</th><td>%s</td><td class="num">%s</td><td>%s</td><td>%s</td></tr>' % (
             esc(name), esc(best["title"]), whole(best["fit"]), esc(best["ib"]), esc(best["ob"])))

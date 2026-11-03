@@ -230,7 +230,8 @@ def priority(a):
 
 
 def top_roles(run, n=5):
-    return sorted(run["roles"], key=lambda r: (-r["fit"], r["role_id"]))[:n]
+    """The n best judged roles (a role not judged yet has no real fit score)."""
+    return sorted((r for r in run["roles"] if r.get("judged", True)), key=lambda r: (-r["fit"], r["role_id"]))[:n]
 
 
 def top5_avg(run):
@@ -352,7 +353,7 @@ def build_roles(data, group_of, hard_types):
             "adj": [clean(x) for x in r.get("adjustments") or []], "rn": clean(r.get("reviewer_note")),
             "hardReq": [clean(h) for h in (p.get("hard_requirements") or [])[:5]],
         })
-    roles.sort(key=lambda x: (-x["fit"], x["id"]))
+    roles.sort(key=lambda x: (not x["judged"], -x["fit"], x["id"]))   # an unjudged role is never the best role
     return roles
 
 
@@ -417,6 +418,7 @@ def build_orgs(data, roles, groups):
         single = info["members"][0] if len(info["members"]) == 1 else None
         best = ((data.cur.get("per_org") or {}).get(single) or {}).get("role_id") if single else None
         out[g] = dict(info, count=len(lr), blocked=sum(1 for x in lr if x["blocked"]),
+                      judged=sum(1 for x in lr if x["judged"]),
                       best=best if best in {x["id"] for x in lr} else lr[0]["id"],
                       network=clean((d3.get(single) or {}).get("note")) if single else "",
                       first=(net.get(single) or {}).get("count") if single else None,
@@ -452,7 +454,7 @@ def build_market(data, roles, groups, group_of, locations, home):
 def build_runs(data, group_of):
     out = []
     for f, rr in zip(data.run_files, data.runs):
-        roles = rr.get("roles") or []
+        roles = [x for x in rr.get("roles") or [] if x.get("judged", True)]   # an unjudged role is not a measurement
         top = max(roles, key=lambda x: x["fit"]) if roles else {"fit": 0, "interview_band": "Very low", "title": ""}
         by_group = {}
         for x in roles:
@@ -744,7 +746,7 @@ def levels_payload(data, page):
     per_org = {}
     for g in page["orgOrder"]:
         r = roles.get(page["orgs"][g]["best"])
-        if r and g != OTHER_KEY:
+        if r and g != OTHER_KEY and page["orgs"][g].get("judged", 1):
             per_org[g] = _next_level_json(page, L.journey_roles(page["roles"], r, g), by_id)[0]
     lead, quests = every[0], []
     qs = L.quests(every, page["actions"], page["caps"], page["weights"], nl)
@@ -799,6 +801,7 @@ def agent_payload(data, page):
         "goal": {"title": goal.get("title", ""), "description": goal.get("description", ""),
                  "horizon_months": goal.get("horizon_months", 12)},
         "outlook": cur["outlook"],
+        "role_counts": {"open": len(cur["roles"]), "judged": sum(1 for r in cur["roles"] if r.get("judged", True))},
         "top5_average_fit": top5_avg(cur),
         "top5_average_fit_previous": top5_avg(data.prev) if data.prev else None,
         "per_org": {o: (dict(b, org_name=data.org(o)) if b else None) for o, b in cur["per_org"].items()},
@@ -815,6 +818,7 @@ def agent_payload(data, page):
         "claims_audit_counts": {k: sum(1 for c in data.claims if c["status"] == k) for k, _ in CLAIM_STATUSES},
         "network_first_degree_counts": {o: v.get("count", 0) for o, v in ((data.network or {}).get("orgs") or {}).items()},
         "roles": [{"role_id": r["role_id"], "org": r["org"], "title": r["title"], "family": r["family"],
+                   "judged": r.get("judged", True),
                    "locations": r.get("locations", []), "url": r.get("url"), "fit": r["fit"],
                    "interview_band": r["interview_band"], "offer_band": r["offer_band"],
                    "scores": {d: r["scores"][d]["score"] for d in DIMS},
@@ -947,7 +951,9 @@ def summary_md(data, p):
             p["goal"]["horizon_months"], p["outlook"]["band"]),
         "- %s" % p["outlook"]["text"],
         "- Best match (the best fit across your open roles, a fit score, not a probability): %s of 100" % _g(
-            max([r["fit"] for r in p["roles"]] or [0])),
+            max([r["fit"] for r in p["roles"] if r["judged"]] or [0])),
+        "- Roles judged: %d of %d open. A role not judged yet has no real fit score and is left out of the best roles below." % (
+            p["role_counts"]["judged"], p["role_counts"]["open"]),
         "- Average fit of the 5 best open roles: %s / 100%s" % (
             p["top5_average_fit"],
             "" if p["top5_average_fit_previous"] is None else " (previous run %s)" % p["top5_average_fit_previous"]),
@@ -955,8 +961,10 @@ def summary_md(data, p):
         "## Best role at each organisation",
     ]
     for oid, b in p["per_org"].items():
+        n = sum(1 for r in p["roles"] if r["org"] == oid)
         lines.append("- %s: %s" % (data.org(oid), "%s, fit %s, interview %s, offer %s" % (
-            b["title"], round(b["fit"]), b["interview_band"], b["offer_band"]) if b else "no matching open role"))
+            b["title"], round(b["fit"]), b["interview_band"], b["offer_band"]) if b
+            else "no role judged yet (%d open, none scored)" % n if n else "no matching open role"))
     pr = p["projection"]
     lines += ["", "## Projection to %s (every open action on; expected weights each by its chance)" % pr["end_date"]]
     for r in pr["roles"]:
@@ -974,8 +982,8 @@ def summary_md(data, p):
     lines += ["", "## Biggest gaps"]
     for g in p["gaps"]:
         lines.append("- %s: +%s fit points across %d roles. %s" % (g["title"], g["points_gain"], g["roles_affected"], g["why"]))
-    lines += ["", "## Top 10 open roles"]
-    for r in sorted(p["roles"], key=lambda r: (-r["fit"], r["role_id"]))[:10]:
+    lines += ["", "## Top 10 judged open roles"]
+    for r in sorted((r for r in p["roles"] if r["judged"]), key=lambda r: (-r["fit"], r["role_id"]))[:10]:
         lines.append("- %s  %s: %s (interview %s, offer %s) %s" % (round(r["fit"]), data.org(r["org"]), r["title"],
                                                                   r["interview_band"], r["offer_band"], r.get("url") or ""))
     lines += ["", "## Questions only the person can answer"]

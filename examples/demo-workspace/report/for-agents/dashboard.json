@@ -20,6 +20,10 @@
     ],
     "judged_on": "2026-11-01"
   },
+  "role_counts": {
+    "open": 12,
+    "judged": 11
+  },
   "top5_average_fit": 46.4,
   "top5_average_fit_previous": 45.6,
   "per_org": {
@@ -101,8 +105,8 @@
       "why": "An agreed referral (D3 = 4) also moves the interview band up one step.",
       "dimension": "D3",
       "target_score": 4,
-      "points_gain": 144.0,
-      "roles_affected": 12
+      "points_gain": 128.0,
+      "roles_affected": 11
     },
     {
       "id": "warm-intro",
@@ -110,8 +114,8 @@
       "why": "A named insider who knows your work (D3 = 3) is the strongest single lift for a non-traditional candidate.",
       "dimension": "D3",
       "target_score": 3,
-      "points_gain": 96.0,
-      "roles_affected": 12
+      "points_gain": 84.0,
+      "roles_affected": 11
     },
     {
       "id": "proof-piece",
@@ -119,8 +123,8 @@
       "why": "Shipped, checkable work relevant to the role (D2 = 3) is what screeners look for when the résumé is non-traditional.",
       "dimension": "D2",
       "target_score": 3,
-      "points_gain": 60.0,
-      "roles_affected": 9
+      "points_gain": 48.0,
+      "roles_affected": 8
     },
     {
       "id": "org-edge",
@@ -128,17 +132,8 @@
       "why": "An org-specific edge (D4 = 3) separates you from the general applicant pool.",
       "dimension": "D4",
       "target_score": 3,
-      "points_gain": 36.0,
-      "roles_affected": 10
-    },
-    {
-      "id": "initech-path",
-      "title": "Open a second-degree path into Initech Robotics",
-      "why": "Initech has the best-fit roles and Alex knows nobody there yet (D3 0 to 2).",
-      "dimension": "D3",
-      "target_score": 2,
-      "points_gain": 32.0,
-      "roles_affected": 4
+      "points_gain": 30.0,
+      "roles_affected": 9
     },
     {
       "id": "tailored-application",
@@ -146,8 +141,17 @@
       "why": "A tailored application (D7 = 4) is cheap and lifts every role you apply for.",
       "dimension": "D7",
       "target_score": 4,
-      "points_gain": 28.0,
-      "roles_affected": 12
+      "points_gain": 27.0,
+      "roles_affected": 11
+    },
+    {
+      "id": "initech-path",
+      "title": "Open a second-degree path into Initech Robotics",
+      "why": "Initech has the best-fit roles and Alex knows nobody there yet (D3 0 to 2).",
+      "dimension": "D3",
+      "target_score": 2,
+      "points_gain": 24.0,
+      "roles_affected": 3
     },
     {
       "id": "public-signal",
@@ -155,8 +159,8 @@
       "why": "A hiring manager who searches for you should find your work (D5 = 3).",
       "dimension": "D5",
       "target_score": 3,
-      "points_gain": 24.0,
-      "roles_affected": 12
+      "points_gain": 22.0,
+      "roles_affected": 11
     },
     {
       "id": "work-rights",
@@ -1248,6 +1252,7 @@
       "org": "initech",
       "title": "Program Manager, Robot Fleet Deployments",
       "family": "tpm",
+      "judged": true,
       "locations": [
         "Melbourne, Australia"
       ],
@@ -1272,6 +1277,7 @@
       "org": "acme",
       "title": "Technical Program Manager, Model Launches",
       "family": "tpm",
+      "judged": true,
       "locations": [
         "San Francisco, CA",
         "Sydney, Australia"
@@ -1297,6 +1303,7 @@
       "org": "acme",
       "title": "Applied AI Deployment Lead, Asia Pacific",
       "family": "applied_ai",
+      "judged": true,
       "locations": [
         "Sydney, Australia"
       ],
@@ -1321,6 +1328,7 @@
       "org": "initech",
       "title": "Product Manager, Warehouse Autonomy",
       "family": "product",
+      "judged": true,
       "locations": [
         "Brisbane, Australia"
       ],
@@ -1345,6 +1353,7 @@
       "org": "globex",
       "title": "AI Success Manager, Asia",
       "family": "applied_ai",
+      "judged": true,
       "locations": [
         "Singapore"
       ],
@@ -1372,6 +1381,7 @@
       "org": "globex",
       "title": "Technical Program Manager, Infrastructure",
       "family": "tpm",
+      "judged": true,
       "locations": [
         "Seattle, WA",
         "Toronto, Canada"
@@ -1397,6 +1407,7 @@
       "org": "globex",
       "title": "Product Manager, Developer Platform",
       "family": "product",
+      "judged": true,
       "locations": [
         "Remote"
       ],
@@ -1423,6 +1434,7 @@
       "org": "globex",
       "title": "Trust and Safety Operations Lead",
       "family": "policy_safety",
+      "judged": true,
       "locations": [
         "Dublin, Ireland"
       ],
@@ -1449,6 +1461,7 @@
       "org": "acme",
       "title": "Policy Manager, Safeguards Operations",
       "family": "policy_safety",
+      "judged": true,
       "locations": [
         "London, United Kingdom"
       ],
@@ -1475,6 +1488,7 @@
       "org": "initech",
       "title": "Policy Lead, Robotics Safety Standards",
       "family": "policy_safety",
+      "judged": true,
       "locations": [
         "Austin, TX"
       ],
@@ -1501,6 +1515,7 @@
       "org": "acme",
       "title": "Program Manager, Government Partnerships",
       "family": "tpm",
+      "judged": true,
       "locations": [
         "Washington, DC"
       ],
@@ -1528,6 +1543,7 @@
       "org": "initech",
       "title": "Customer Success Manager, Fleet Operations",
       "family": "applied_ai",
+      "judged": false,
       "locations": [
         "Auckland, New Zealand"
       ],

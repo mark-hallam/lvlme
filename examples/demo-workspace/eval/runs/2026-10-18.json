@@ -952,8 +952,8 @@
       "why": "An agreed referral (D3 = 4) also moves the interview band up one step.",
       "dimension": "D3",
       "target_score": 4,
-      "points_gain": 144.0,
-      "roles_affected": 11
+      "points_gain": 128.0,
+      "roles_affected": 10
     },
     {
       "id": "warm-intro",
@@ -961,8 +961,8 @@
       "why": "A named insider who knows your work (D3 = 3) is the strongest single lift for a non-traditional candidate.",
       "dimension": "D3",
       "target_score": 3,
-      "points_gain": 100.0,
-      "roles_affected": 11
+      "points_gain": 88.0,
+      "roles_affected": 10
     },
     {
       "id": "proof-piece",
@@ -970,8 +970,8 @@
       "why": "Shipped, checkable work relevant to the role (D2 = 3) is what screeners look for when the résumé is non-traditional.",
       "dimension": "D2",
       "target_score": 3,
-      "points_gain": 60.0,
-      "roles_affected": 9
+      "points_gain": 48.0,
+      "roles_affected": 8
     },
     {
       "id": "org-edge",
@@ -979,8 +979,8 @@
       "why": "An org-specific edge (D4 = 3) separates you from the general applicant pool.",
       "dimension": "D4",
       "target_score": 3,
-      "points_gain": 36.0,
-      "roles_affected": 10
+      "points_gain": 30.0,
+      "roles_affected": 9
     },
     {
       "id": "tailored-application",
@@ -988,17 +988,8 @@
       "why": "A tailored application (D7 = 4) is cheap and lifts every role you apply for.",
       "dimension": "D7",
       "target_score": 4,
-      "points_gain": 33.0,
-      "roles_affected": 11
-    },
-    {
-      "id": "initech-path",
-      "title": "Open a second-degree path into Initech Robotics",
-      "why": "Initech has the best-fit roles and Alex knows nobody there yet (D3 0 to 2).",
-      "dimension": "D3",
-      "target_score": 2,
-      "points_gain": 24.0,
-      "roles_affected": 3
+      "points_gain": 30.0,
+      "roles_affected": 10
     },
     {
       "id": "public-signal",
@@ -1006,8 +997,17 @@
       "why": "A hiring manager who searches for you should find your work (D5 = 3).",
       "dimension": "D5",
       "target_score": 3,
-      "points_gain": 22.0,
-      "roles_affected": 11
+      "points_gain": 20.0,
+      "roles_affected": 10
+    },
+    {
+      "id": "initech-path",
+      "title": "Open a second-degree path into Initech Robotics",
+      "why": "Initech has the best-fit roles and Alex knows nobody there yet (D3 0 to 2).",
+      "dimension": "D3",
+      "target_score": 2,
+      "points_gain": 16.0,
+      "roles_affected": 2
     },
     {
       "id": "work-rights",

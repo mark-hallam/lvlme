@@ -31,6 +31,11 @@ default, scoring.gap_pool "overall"), or, with gap_pool "per_org", over each
 target organisation's own top scoring.top_n_per_org_for_gaps roles, so a gap
 at an organisation whose roles are not in the overall top still counts.
 
+A role nobody has judged yet keeps a fit in the roles list (marked judged:
+false) so it can be found, but it is not a measurement: per_org names only
+judged roles (null when an organisation has none judged), and the gap
+leaderboard counts only judged roles.
+
 Usage
   python3 scripts/score.py --workspace PATH [--date YYYY-MM-DD]
 """
@@ -268,7 +273,9 @@ def gap_pools(ctx, scored):
 
     overall (the default): one pool, the top top_n_for_gaps roles overall.
     per_org: one pool per target organisation (config order, then any other
-    organisation with roles), each its own top top_n_per_org_for_gaps roles."""
+    organisation with roles), each its own top top_n_per_org_for_gaps roles.
+    Only judged roles count."""
+    scored = [r for r in scored if r["judged"]]   # an unjudged role's gap is not measured
     if ctx.gap_pool != "per_org":
         return {None: scored[:ctx.top_n]}
     orgs = list(C.target_ids(ctx.config))
@@ -368,7 +375,7 @@ def build_run(ws, config, run_date):
     scored = sorted((score_role(ctx, r, judgements.get(r["id"])) for r in roles), key=sort_key)
     per_org = {}
     for tid in C.target_ids(config):
-        best = next((r for r in scored if r["org"] == tid), None)
+        best = next((r for r in scored if r["org"] == tid and r["judged"]), None)
         per_org[tid] = None if best is None else {k: best[k] for k in
                                                   ("role_id", "title", "fit", "interview_band", "offer_band")}
     if outlook:

@@ -16,6 +16,7 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 - Chance of reaching the goal within 12 months if the campaign is followed: Low
 - An offer at one of the three organisations within 12 months is possible but not likely yet. The best path is Initech Robotics in Australia, where Alex's work rights and warehouse background fit. It moves to Moderate if a warm path into Initech opens and the overstated LinkedIn claim is fixed.
 - Best match (the best fit across your open roles, a fit score, not a probability): 57 of 100
+- Roles judged: 11 of 12 open. A role not judged yet has no real fit score and is left out of the best roles below.
 - Average fit of the 5 best open roles: 46.4 / 100 (previous run 45.6)
 
 ## Best role at each organisation
@@ -81,16 +82,16 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
   link, a file or an email reference; without one, ask for it. Any other agent appends the message to campaign/inbox.md.
 
 ## Biggest gaps
-- Turn a warm contact into a referral: +144.0 fit points across 12 roles. An agreed referral (D3 = 4) also moves the interview band up one step.
-- Get a warm introduction at each target organisation: +96.0 fit points across 12 roles. A named insider who knows your work (D3 = 3) is the strongest single lift for a non-traditional candidate.
-- Publish one verifiable proof-of-work piece for your target role family: +60.0 fit points across 9 roles. Shipped, checkable work relevant to the role (D2 = 3) is what screeners look for when the résumé is non-traditional.
-- Build one thing each target organisation specifically values: +36.0 fit points across 10 roles. An org-specific edge (D4 = 3) separates you from the general applicant pool.
-- Open a second-degree path into Initech Robotics: +32.0 fit points across 4 roles. Initech has the best-fit roles and Alex knows nobody there yet (D3 0 to 2).
-- Tailor your résumé and story for each best-fit role: +28.0 fit points across 12 roles. A tailored application (D7 = 4) is cheap and lifts every role you apply for.
-- Make your work findable: +24.0 fit points across 12 roles. A hiring manager who searches for you should find your work (D5 = 3).
+- Turn a warm contact into a referral: +128.0 fit points across 11 roles. An agreed referral (D3 = 4) also moves the interview band up one step.
+- Get a warm introduction at each target organisation: +84.0 fit points across 11 roles. A named insider who knows your work (D3 = 3) is the strongest single lift for a non-traditional candidate.
+- Publish one verifiable proof-of-work piece for your target role family: +48.0 fit points across 8 roles. Shipped, checkable work relevant to the role (D2 = 3) is what screeners look for when the résumé is non-traditional.
+- Build one thing each target organisation specifically values: +30.0 fit points across 9 roles. An org-specific edge (D4 = 3) separates you from the general applicant pool.
+- Tailor your résumé and story for each best-fit role: +27.0 fit points across 11 roles. A tailored application (D7 = 4) is cheap and lifts every role you apply for.
+- Open a second-degree path into Initech Robotics: +24.0 fit points across 3 roles. Initech has the best-fit roles and Alex knows nobody there yet (D3 0 to 2).
+- Make your work findable: +22.0 fit points across 11 roles. A hiring manager who searches for you should find your work (D5 = 3).
 - Confirm your work rights or visa route for the role locations: +10.0 fit points across 5 roles. Logistics (D6) often decide whether you are considered at all.
 
-## Top 10 open roles
+## Top 10 judged open roles
 - 57  Initech Robotics: Program Manager, Robot Fleet Deployments (interview Moderate, offer Low) https://example.com/jobs/initech/i-0001
 - 46  Acme AI: Technical Program Manager, Model Launches (interview Low, offer Very low) https://example.com/jobs/acme/4100001
 - 45  Acme AI: Applied AI Deployment Lead, Asia Pacific (interview Low, offer Very low) https://example.com/jobs/acme/4100002

@@ -103,8 +103,8 @@ check the climb. A level down shows as plainly as a level up.
 ### 9. Biggest unlocks
 
 The kinds of moves that would lift the most roles. These numbers are added up
-across your top roles, so +144 across 12 roles is about 12 points on each
-role, not 144 on one.
+across your top roles, so +128 across 11 roles is about 12 points on each
+role, not 128 on one.
 
 ## Further down the page
 

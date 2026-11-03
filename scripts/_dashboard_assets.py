@@ -225,6 +225,7 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
 .heat .name{padding:6px 8px 6px 0;cursor:pointer;min-width:180px}
 .heat .name:hover .row-title{color:var(--accent)}
 .cell{display:grid;place-items:center;height:30px;min-width:34px;border-radius:6px;font-weight:650;font-variant-numeric:tabular-nums;cursor:default}
+.cell.nj{background:transparent;color:var(--sub);border:1px dashed var(--line);font-weight:500;white-space:nowrap;padding:0 6px}
 .heat-wrap{overflow-x:auto}
 .tag{display:inline-block;font-size:12px;font-weight:650;padding:1px 8px;border-radius:7px;background:var(--card2);color:var(--sub);white-space:nowrap}
 .t-verified,.t-corroborated,.t-supported{background:var(--tv-bg);color:var(--tv-t)}
@@ -936,11 +937,11 @@ function onChartMove(e){
 JS_HOME = r"""
 // ---------- scoreboard tiles, Do next and Biggest unlocks ----------
 function renderTiles4(){
-  const fits = D.roles.map(r => fitM(r)).sort((a, b) => b - a);
-  const top5 = fits.slice(0, 5).reduce((a, b) => a + b, 0) / Math.min(5, fits.length);
-  const lowPlus = D.roles.filter(r => BANDS.indexOf(ibM(r)) >= 1).length;
-  const open = D.roles.filter(r => !r.blocked).length;
-  const tiles = [["Best role fit", fits[0]], ["Average of your top 5", top5], ["Roles at a low interview chance or better", lowPlus], ["Roles open to you", open]];
+  const J = D.roles.filter(r => r.judged), fits = J.map(r => fitM(r)).sort((a, b) => b - a);   // a role not judged yet has no real fit
+  const top5 = fits.length ? fits.slice(0, 5).reduce((a, b) => a + b, 0) / Math.min(5, fits.length) : 0;
+  const lowPlus = J.filter(r => BANDS.indexOf(ibM(r)) >= 1).length;
+  const open = J.filter(r => !r.blocked).length, of = D.roles.length > J.length ? `, of ${J.length} judged` : "";
+  const tiles = [["Best role fit", fits[0] || 0], ["Average of your top 5", top5], ["Roles at a low interview chance or better" + of, lowPlus], ["Roles open to you" + of, open]];
   $("#tiles4").innerHTML = tiles.map(t => `<div class="tile"><div class="v num" data-to="${t[1]}">${Math.round(t[1])}</div><div class="l">${esc(t[0])}</div></div>`).join("");
   $("#tiles4").querySelectorAll("[data-to]").forEach(n => countTo(n, +n.dataset.to));
 }
@@ -993,7 +994,7 @@ function renderHome(){
   const card = $("#detailCard"), warm = warmHTML();
   card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h2 class="pane-h" style="margin:0">Do next</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div><div>${doNextHTML()}</div>
     ${warm ? `<h2 class="pane-h" style="margin:18px 0 0">Warm paths</h2><div class="tiny sub" style="margin-bottom:4px">${esc(warmSub())}</div>${warm}` : ""}
-    <h2 class="pane-h" style="margin:18px 0 0">Biggest unlocks</h2><div class="tiny sub" style="margin-bottom:4px">Fit points gained, added up across your top roles.</div><div>${unlocksHTML()}</div>
+    <h2 class="pane-h" style="margin:18px 0 0">Biggest unlocks</h2><div class="tiny sub" style="margin-bottom:4px">Fit points gained, added up across your top judged roles.</div><div>${unlocksHTML()}</div>
     <div class="tiny sub" style="margin-top:18px;padding-top:12px;border-top:1px solid var(--rule)">Tap any organisation, role, factor, action or piece of evidence to drill in here.</div></div>`;
   bindHome(card);
 }
@@ -1108,6 +1109,12 @@ function trail(g, r){
 function renderOrgs(){
   $("#v-orgs").innerHTML = `<div class="grid2">${D.orgOrder.map(g => {
     const L = D.orgs[g], r = roleById[L.best]; if (!r) return "";
+    if (!L.judged) return `<div class="card org-card" tabindex="0" data-org="${esc(g)}">
+      <div class="org-name"><i class="org-key" style="background:${orgColour(g)}"></i>${esc(L.name)}</div>
+      <h3 style="margin:10px 0 4px">No role judged yet at ${esc(L.name)}</h3>
+      <div class="small sub">${esc(plural(L.count, "matching role"))} open, none judged, so there is no fit or interview chance to show yet. The next run can judge them.</div>
+      <div class="kv" style="margin-top:8px"><span>Roles with an eligibility blocker</span><b class="num">${L.blocked} of ${L.count}</b></div>
+    </div>`;
     const J = jp(g), exp = J.exp, m = J[state.mode], ib = m ? interviewBand(m.end, m.scores, m.r.hrl) : r.ib, sr = m ? m.r : r;   // the organisation's journey and the role holding its number
     return `<div class="card org-card" tabindex="0" data-org="${esc(g)}">
       <div class="org-head">${ring(g, m ? m.end : r.fit, exp.end)}<div style="min-width:0"><div class="org-name"><i class="org-key" style="background:${orgColour(g)}"></i>${esc(L.name)}</div>
@@ -1200,17 +1207,19 @@ function renderRoles(){
   ["fOrg","fFam","fLoc","fElig"].forEach((id, i) => $("#" + id).addEventListener("change", e => { roleFilter[["org","fam","loc","elig"][i]] = e.target.value; fillHeat(); }));
   fillHeat();
 }
+const JUDGED_DIMS = ["D1", "D2", "D4"];   // judged per role; until then they are "not judged", not 0
 function cellStyle(v){ const k = Math.max(0, Math.min(5, Math.round(v))); return `background:var(--h${k});color:${k >= 3 ? "var(--hdt)" : "var(--hlt)"}`; }
 function fillHeat(){
   const list = D.roles.filter(r => (!roleFilter.org || r.org === roleFilter.org) && (!roleFilter.fam || r.family === roleFilter.fam) && (!roleFilter.loc || r.lc === roleFilter.loc) && (!roleFilter.elig || (roleFilter.elig === "blocked") === r.blocked))
-    .sort((a, b) => fitM(b) - fitM(a));
-  $("#fCount").textContent = plural(list.length, "role");
+    .sort((a, b) => (b.judged - a.judged) || (fitM(b) - fitM(a)));   // judged first: an unjudged role has no real fit
+  const nj = list.filter(r => !r.judged).length;
+  $("#fCount").textContent = plural(list.length, "role") + (nj ? `, ${nj} not judged yet` : "");
   const shown = list.slice(0, 80);
   const short = ["Match","Proof","Warm path","Edge","Signal","Eligible","Ready"];
   $("#heatWrap").innerHTML = list.length ? `<table class="heat"><thead><tr><th>Role</th>${DIMS.map((d, k) => `<th title="${esc(D.dimNames[d])}">${short[k]}<div class="tiny sub">${W[k]}</div></th>`).join("")}<th>Fit</th></tr></thead><tbody>${shown.map(r => { const s = scoresM(r);
-    return `<tr><td class="name" data-role-open="${esc(r.id)}"><div class="row-title small"><i class="org-key" style="background:${orgColour(r.g)};margin-right:6px"></i>${esc(r.title)}</div><div class="tiny sub">${esc(r.on)} · ${esc(r.loc.slice(0, 1).join(""))}${r.blocked ? " · eligibility blocker" : ""}</div></td>
-    ${s.map((v, k) => `<td><div class="cell" style="${cellStyle(v)}" data-tip="${esc(D.dimNames[DIMS[k]])}: ${r1(v)} of 5. ${esc(r.n[k])}">${Number.isInteger(v) ? v : v.toFixed(1)}</div></td>`).join("")}
-    <td><div class="cell" style="background:var(--card2);color:var(--ink)">${Math.round(fitM(r))}</div></td></tr>`; }).join("")}</tbody></table>
+    return `<tr${r.judged ? "" : ' class="nj"'}><td class="name" data-role-open="${esc(r.id)}"><div class="row-title small"><i class="org-key" style="background:${orgColour(r.g)};margin-right:6px"></i>${esc(r.title)}</div><div class="tiny sub">${esc(r.on)} · ${esc(r.loc.slice(0, 1).join(""))}${r.blocked ? " · eligibility blocker" : ""}${r.judged ? "" : " · not judged yet"}</div></td>
+    ${s.map((v, k) => !r.judged && JUDGED_DIMS.includes(DIMS[k]) ? `<td><div class="cell nj" data-tip="${esc(D.dimNames[DIMS[k]])}: not judged yet.">?</div></td>` : `<td><div class="cell" style="${cellStyle(v)}" data-tip="${esc(D.dimNames[DIMS[k]])}: ${r1(v)} of 5. ${esc(r.n[k])}">${Number.isInteger(v) ? v : v.toFixed(1)}</div></td>`).join("")}
+    <td>${r.judged ? `<div class="cell" style="background:var(--card2);color:var(--ink)">${Math.round(fitM(r))}</div>` : '<div class="cell nj tiny" data-tip="Not judged yet, so no fit score.">Not judged</div>'}</td></tr>`; }).join("")}</tbody></table>
     ${list.length > shown.length ? `<div class="small sub" style="margin-top:8px">Showing the top ${shown.length} of ${list.length}. Narrow the filters to see more.</div>` : ""}` : '<div class="small sub">No roles match these filters.</div>';
   bindTips($("#heatWrap"));
   $("#heatWrap").querySelectorAll("[data-role-open]").forEach(n => n.addEventListener("click", () => openDetail({type: "role", id: n.dataset.roleOpen}, true)));
@@ -1296,7 +1305,8 @@ function renderMarket(){
      <div class="card"><div class="eyebrow">Where the roles are</div>${Object.keys(D.locations).filter(k => m.byLocation[k]).map(k => `<div class="gbar" tabindex="0" data-tip="${esc(D.locations[k])}: ${plural(m.byLocation[k] || 0, "role")}"><div class="small">${esc(D.locations[k])}</div><div class="gtrack"><div class="gfill" style="width:${Math.max(3, (m.byLocation[k] || 0) / maxLoc * 100)}%"></div><span class="small num">${m.byLocation[k] || 0}</span></div></div>`).join("")}</div></div>
     <div class="card" style="margin-top:16px"><div class="eyebrow">Role types by organisation</div><div class="tscroll"><table><tr><th>Organisation</th>${Object.values(D.families).map(f => `<th>${esc(f)}</th>`).join("")}</tr>${Object.keys(m.byOrgFamily).map(o => `<tr><td>${esc(D.orgNames[o] || o)}</td>${Object.keys(D.families).map(f => `<td class="num">${m.byOrgFamily[o][f] || 0}</td>`).join("")}</tr>`).join("")}</table></div>${m.fetchedOn ? `<div class="tiny sub" style="margin-top:6px">Postings fetched ${esc(fmtDate(m.fetchedOn))}.</div>` : ""}</div>
     <div class="eyebrow" style="margin-top:20px">Roles in ${esc(home)}</div>
-    <div class="list">${D.roles.filter(r => r.lc === m.home).slice(0, 40).map(r => `<div class="row" data-role-row="${esc(r.id)}"><i class="org-key" style="background:${orgColour(r.g)}"></i><div class="row-main"><div class="row-title">${esc(r.title)}</div><div class="row-sub">${esc(r.on)} · ${esc(r.loc.join(", "))}</div></div><div class="row-side"><b>${Math.round(fitM(r))}</b></div><span class="chev">›</span></div>`).join("") || '<div class="row"><span class="small sub">None open right now.</span></div>'}</div>`;
+    <div class="list">${D.roles.filter(r => r.lc === m.home && r.judged).slice(0, 40).map(r => `<div class="row" data-role-row="${esc(r.id)}"><i class="org-key" style="background:${orgColour(r.g)}"></i><div class="row-main"><div class="row-title">${esc(r.title)}</div><div class="row-sub">${esc(r.on)} · ${esc(r.loc.join(", "))}</div></div><div class="row-side"><b>${Math.round(fitM(r))}</b></div><span class="chev">›</span></div>`).join("") || `<div class="row"><span class="small sub">${m.homeCount ? "None judged yet." : "None open right now."}</span></div>`}</div>
+    ${D.roles.some(r => r.lc === m.home && !r.judged) ? `<div class="tiny sub" style="margin-top:6px">${esc(plural(D.roles.filter(r => r.lc === m.home && !r.judged).length, "more role"))} here not judged yet, so not scored.</div>` : ""}`;
   bindTips($("#v-market"));
   $("#v-market").querySelectorAll("[data-role-row]").forEach(n => n.addEventListener("click", () => openDetail({type: "role", id: n.dataset.roleRow}, true)));
 }
@@ -1602,19 +1612,21 @@ function renderDetail(){
   bindChips(card); enter(card, 700); detail.scrollTop = 0;
 }
 function detailOrg(g){
-  const L = D.orgs[g], r = roleById[L.best], exp = P[r.id].exp, best = P[r.id].best;
+  const L = D.orgs[g], r = roleById[L.best], exp = P[r.id].exp, best = P[r.id].best, nj = L.count - L.judged;
   const net = L.members.length > 1 ? "Several organisations share this colour; open one of its roles for its warm path." :
     [L.network || "No known contact yet.", L.first != null ? plural(L.first, "first-degree contact") + " from your network map." : ""].filter(Boolean).join(" ");
   return `<h2><i class="org-key" style="background:${orgColour(g)};margin-right:8px"></i>${esc(L.name)}</h2>
-    <div class="journey-mini"><b>${Math.round(r.fit)}</b><span class="arrow">→</span><b>${Math.round(exp.end)}</b><span class="arrow">→</span><b>${Math.round(best.end)}</b></div>
-    <div class="tiny sub">best role today, expected, best case</div>
+    ${L.judged ? `<div class="journey-mini"><b>${Math.round(r.fit)}</b><span class="arrow">→</span><b>${Math.round(exp.end)}</b><span class="arrow">→</span><b>${Math.round(best.end)}</b></div>
+    <div class="tiny sub">best role today, expected, best case</div>` : `<div class="small warnline">No role judged yet at ${esc(L.name)}, so there is no best role or fit to show. The next run can judge them.</div>`}
     <div class="kv" style="margin-top:10px"><span>Roles matching your types</span><b class="num">${L.count}</b></div>
     <div class="kv"><span>With an eligibility blocker</span><b class="num">${L.blocked}</b></div>
+    <div class="kv"><span>Judged so far</span><b class="num">${L.judged} of ${L.count}</b></div>
     <div class="eyebrow" style="margin-top:16px">Who knows you here</div><div class="small">${esc(net)}</div>
     ${L.paths.map(p => `<div class="small sub" style="margin-top:6px"><span class="tag">${esc(cap1(p.status))}</span> ${esc(p.note)}</div>`).join("")}
     ${warmDetail(L)}
-    <div class="eyebrow" style="margin-top:16px">Best roles</div>
-    ${D.roles.filter(x => x.g === g).slice(0, 10).map(x => `<div class="row" style="padding:10px 0" data-role-open="${esc(x.id)}"><div class="row-main"><div class="small" style="font-weight:600">${esc(x.title)}</div><div class="tiny sub">${esc(x.loc.slice(0, 2).join(", "))}${x.blocked ? " · eligibility blocker" : ""}</div></div><div class="row-side"><b>${Math.round(fitM(x))}</b></div><span class="chev">›</span></div>`).join("")}`;
+    ${L.judged ? `<div class="eyebrow" style="margin-top:16px">Best roles</div>` : ""}
+    ${D.roles.filter(x => x.g === g && x.judged).slice(0, 10).map(x => `<div class="row" style="padding:10px 0" data-role-open="${esc(x.id)}"><div class="row-main"><div class="small" style="font-weight:600">${esc(x.title)}</div><div class="tiny sub">${esc(x.loc.slice(0, 2).join(", "))}${x.blocked ? " · eligibility blocker" : ""}</div></div><div class="row-side"><b>${Math.round(fitM(x))}</b></div><span class="chev">›</span></div>`).join("")}
+    ${nj ? `<div class="tiny sub" style="margin-top:8px">${esc(plural(nj, "role"))} not judged yet: see them in Roles.</div>` : ""}`;
 }
 function raisingActions(r, k){ if (CAPS[k] === 0 || hardBlock(r, k)) return []; return D.actions.filter(a => enabled.has(a.id) && switchable(a) && a.effects.some(e => e.dimension === DIMS[k] && inScope(r, e.scope || {}))); }
 function dotRow(score, proj){ let s = ""; for (let i = 1; i <= 5; i++){ const on = i <= Math.round(score), pj = !on && i <= Math.round(proj); s += `<i class="${on ? "on" : pj ? "proj" : ""}"></i>`; } return `<span class="dots" aria-label="${score} of 5">${s}</span>`; }
@@ -1738,7 +1750,7 @@ function saveImage(){
 function renderSegs(){
   $("#modeSeg").innerHTML = MODES.map(m => `<button aria-pressed="${state.mode === m[0]}" data-m="${m[0]}">${m[1]}</button>`).join("");
   $("#modeSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { state.mode = b.dataset.m; renderSegs(); refreshNumbers(); }));
-  const opts = [["best", "Best overall"]].concat(D.orgOrder.map(g => [g, D.orgs[g].name]));
+  const opts = [["best", "Best overall"]].concat(D.orgOrder.filter(g => D.orgs[g].judged).map(g => [g, D.orgs[g].name]));   // no journey where nothing is judged
   $("#orgSeg").innerHTML = opts.map(o => `<button aria-pressed="${state.org === o[0]}" data-org="${esc(o[0])}">${esc(o[1])}</button>`).join("");
   // The level, Do next, the quests and the plan list all follow the selected journey.
   $("#orgSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { state.org = b.dataset.org; LV = null; renderSegs(); renderTopline(); drawChart(); renderHistory(); renderDoNext();

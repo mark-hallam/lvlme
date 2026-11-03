@@ -89,6 +89,19 @@ Work on top of 0.3.0 that is not in a released version yet.
 
 ### Fixed
 
+- **A role nobody has judged is no longer shown as measured.** Such a role
+  kept a fit worked out from the profile-wide factors alone, and it showed up
+  as an organisation's best role, in the home region list, in the tile counts
+  and in the Biggest unlocks role counts, on the dashboard and in
+  `report/for-agents/SUMMARY.md`. Now it is "not judged yet": an organisation
+  with nothing judged says "No role judged yet", the counts say "of N judged",
+  the gap leaderboard counts only judged roles, and the Roles table marks the
+  factors nobody has judged instead of showing them as 0. This changes the
+  gap numbers in a run, not any role's fit.
+- **LVLme quick says when a missing hard requirement holds the odds down.**
+  The chat summary and the fixes card now say in one line that both chances
+  drop a step and that no listed fix changes it, and why the requirements
+  match fix is not listed.
 - **Hybrid roles are no longer called remote.** Ashby boards mark most
   office based roles with both a remote flag and the label Hybrid, and
   LVLme believed the flag. A London role three days a week in the office

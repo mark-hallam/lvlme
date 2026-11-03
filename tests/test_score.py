@@ -237,6 +237,22 @@ class RuleTests(Base):
         self.assertEqual(qs[1]["id"], "E05")
         self.assertEqual(run["outlook"]["band"], "Not yet judged")
 
+    def test_an_unjudged_role_is_never_a_best_role_or_a_gap(self):
+        self.roles = [role("acme:1"), role("globex:1", org="globex"), role("globex:2", org="globex")]
+        self.judge("acme:1", e(1, ["E02"]), e(1, ["E01"]), e(1, ["E01"]))
+        self.gaps = [{"id": "intro", "title": "Warm intro", "dimension": "D3", "target_score": 3}]
+        run = self.run_score()
+        unjudged = next(r for r in run["roles"] if r["role_id"] == "globex:1")
+        self.assertFalse(unjudged["judged"])
+        self.assertGreater(unjudged["fit"], 0)            # it keeps a fit in the list, from the profile-wide factors
+        self.assertEqual(run["per_org"]["acme"]["role_id"], "acme:1")
+        self.assertIsNone(run["per_org"]["globex"])       # but it is never the best role at its organisation
+        self.assertEqual(run["gaps"][0]["roles_affected"], 1)   # and never counted in a gap
+        self.cfg["scoring"] = dict(self.cfg.get("scoring") or {}, gap_pool="per_org")
+        run = self.run_score()
+        self.assertEqual(run["gaps"][0]["roles_affected"], 1)
+        self.assertNotIn("globex", run["gaps"][0]["by_org"])
+
     def test_deterministic_and_valid(self):
         self.roles = [role("acme:1"), role("acme:2", classes=("us",))]
         self.judge("acme:1", e(3, ["E02"]), e(2, ["E01"]), e(1, ["E01"]))
