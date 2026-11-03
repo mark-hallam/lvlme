@@ -28,6 +28,10 @@ Field notes
                 control and clearance questions only when their count is
                 above 0 (method/INTERVIEW.md, "Work rights").
   requires_heavy_coding  heuristic; coding_signals lists the phrases found.
+                When candidate.writes_production_code is false, an engineering
+                title (ending in Engineer or Developer, or starting with
+                Engineering Manager) counts too, unless the posting says the
+                role needs no production code.
 """
 import argparse
 import datetime as dt
@@ -256,6 +260,15 @@ CODE_STRONG = CODE_CORE + [
 ]
 NEGATION = re.compile(r"(?:n't|\bnot|\bnever|\bwithout|\bno need to|\bno)\s+(?:\w+\s+){0,3}$", re.I)
 ENGINEER_TITLE = re.compile(r"\b(engineer|developer)\b", re.I)
+# An engineering job by its title: the main part (before a comma, a dash or a bracket) ends in Engineer or
+# Developer ("Android Engineer, Plugin Platform"), or the title starts with Engineering Manager.
+ENGINEERING_JOB = re.compile(r"(?:\b(?:engineer|developer)(?:\s+(?:i{1,3}|iv|v|\d))?\s*$|^\s*(?:senior\s+|sr\.?\s+)?engineering\s+manager\b)", re.I)
+
+
+def engineering_title(title):
+    """True when the title alone names an engineering job (see ENGINEERING_JOB)."""
+    main = re.split(r"\s*(?:,|\(|\||\s[-\u2013\u2014]\s)", title or "", maxsplit=1)[0]
+    return bool(ENGINEERING_JOB.search(main))
 
 
 def coding_check(title, text):
@@ -577,6 +590,11 @@ def build_role(target, base, config):
     heavy, signals = parsed["coding"]
     if not (config.get("heavy_coding") or {}).get("detect", True):
         heavy, signals = False, []
+    elif (not heavy and "candidate" in config and not (config["candidate"] or {}).get("writes_production_code", False)
+          and engineering_title(base["title"]) and not any(s.startswith("NOT required") for s in signals)):
+        # Someone who doesn't write production code: an engineering title counts as heavy coding
+        # unless the posting itself says the role doesn't need it.
+        heavy, signals = True, signals + ["title names an engineering job: " + base["title"][:70]]
     fam_cfg = next(f for f in config["families"] if f["id"] == fam)
     if heavy and fam_cfg.get("drop_if_heavy_coding"):
         return None, "the %s family drops postings that expect production coding" % fam

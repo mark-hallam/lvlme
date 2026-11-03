@@ -163,6 +163,10 @@ def new(args):
     if source.get("fallback"):
         print("lvlme: note: %s" % source["fallback"], file=sys.stderr)
     org_name = args.org or source.get("org_name") or role["org"]
+    guessed = bool(source.get("org_name_guessed")) and not args.org
+    if guessed:
+        print("lvlme: note: the board gives no employer name, so %r is a guess from the link. Check the name with "
+              "the person; if it is wrong, run this again with --org \"<name>\"." % org_name, file=sys.stderr)
     folder = rel_folder(args.folder) if args.folder else unique(
         os.path.join(rel_folder(args.parent or default_parent()), folder_name(date, org_name, role["title"])))
     config = {"quick": True, "fictional": bool(args.fictional),
@@ -199,6 +203,7 @@ def new(args):
         "eligibility_blockers": role.get("eligibility_blockers"), "requires_heavy_coding": role.get("requires_heavy_coding"),
         "posting": os.path.join(folder, "posting.md"), "cv": cv,
         **({"warning": source["fallback"]} if source.get("fallback") else {}),
+        **({"org_name_guessed": True} if guessed else {}),
         "next": "Read posting.md and the CV, write profile/evidence.json and eval/quick.json, then run review-items."},
         indent=2, ensure_ascii=False))
     return 0

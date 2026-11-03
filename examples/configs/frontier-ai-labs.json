@@ -26,7 +26,7 @@
       "name": "Technical program manager",
       "title_keywords": ["technical program manag", "tpm", "program manag", "programme manag", "project manag", "chief of staff"],
       "department_keywords": ["Technical Program Management"],
-      "exclude_title_keywords": ["finance", "legal", "sox"]
+      "exclude_title_keywords": ["finance", "legal", "sox", "construction", "electrical", "buildout", "build-out"]
     },
     {
       "id": "product",
@@ -40,7 +40,7 @@
       "name": "Applied and forward-deployed AI",
       "title_keywords": ["applied ai", "forward deployed", "forward-deployed", "fde", "deployment lead", "deployment manager", "deployment strategist", "solutions architect", "solution architect", "ai success", "technical success", "customer success", "partner enablement", "enablement lead"],
       "department_keywords": ["Applied AI", "Forward Deployed Engineering", "Technical Success"],
-      "exclude_title_keywords": ["ads"],
+      "exclude_title_keywords": ["ads", "android engineer", "ios engineer", "full-stack", "full stack", "machine learning engineer", "ml engineer", "performance engineer", "engineering manager", "data engineer"],
       "drop_if_heavy_coding": true
     },
     {

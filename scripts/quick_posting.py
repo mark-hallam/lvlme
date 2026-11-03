@@ -232,6 +232,9 @@ def base_from_api(link, data):
     if base is None:
         raise PostingError("The %s board %r has no open posting %s. It may have closed. "
                            "Paste the posting text instead." % (BOARD_NAMES[ats], link["board"], job_id))
+    if not org_name:
+        org_name = spelled_name(link["board"], base.get("title"), base.get("raw_html"))
+        base["org_name_guessed"] = not org_name     # only the link's slug in capitals: the agent should confirm it
     base["org_name"] = org_name or nice_name(link["board"])
     return base
 
@@ -344,16 +347,26 @@ def workable_org_name(account, *texts):
     or a full stop between its letters. Written in lower case does not count
     (that is a web address); with no match, the account in capitals.
     """
+    return spelled_name(account, *texts) or nice_name(account)
+
+
+def spelled_name(account, *texts):
+    """How the posting itself writes a board's run-together name ("openai" as "OpenAI"), or None.
+
+    Used for every board whose API gives no employer name (Ashby, Lever, and
+    Greenhouse when company_name is missing): the link's slug in capitals is
+    only a guess ("Openai"), so the posting's own spelling wins.
+    """
     letters = re.sub(r"[^a-z0-9]", "", (account or "").lower())
     if len(letters) < 3:
-        return nice_name(account)
+        return None
     word = re.compile(r"(?<![A-Za-z0-9])%s(?![A-Za-z0-9])" % r"[ .-]?".join(re.escape(ch) for ch in letters), re.I)
     seen = {}
     for text in texts:
         for m in word.finditer(FR.clean(re.sub(r"<[^>]+>", " ", text)) if text else ""):
             if m.group(0) != m.group(0).lower() and not m.group(0).endswith((" ", "-", ".")):
                 seen[m.group(0)] = seen.get(m.group(0), 0) + 1
-    return max(seen, key=seen.get) if seen else nice_name(account)
+    return max(seen, key=seen.get) if seen else None
 
 
 def workable_account_name(account):
@@ -566,8 +579,10 @@ def fetch(url, saved=None):
             base = base_from_api(link, data)
             if link["ats"] == "workable" and not saved:
                 base["org_name"] = workable_account_name(link["board"]) or base["org_name"]
+            guessed = base.pop("org_name_guessed", False)
             return check_text(role_from_base(base, slug(link["board"]))), {
-                "kind": link["ats"], "link": url, "endpoint": where, "org_name": base["org_name"]}
+                "kind": link["ats"], "link": url, "endpoint": where, "org_name": base["org_name"],
+                **({"org_name_guessed": True} if guessed else {})}
         except urllib.error.HTTPError as exc:
             if exc.code in (404, 410):
                 raise PostingError("This posting is no longer open on the %s board %r. "

@@ -89,6 +89,22 @@ Work on top of 0.3.0 that is not in a released version yet.
 
 ### Fixed
 
+- **One answer for "where will I be if I follow the plan".** When roles
+  tied for today's best fit, the journey chart, its tiles, the phone bar,
+  the share card and What if followed whichever role was listed first,
+  while Level up followed the role the plan lifts most. They now all use
+  the best fit across your roles under the switches, the same number Level
+  up gives. Organisation cards do the same within each organisation.
+- **LVLme quick names the employer properly from a board link.** An Ashby
+  or Lever link gives no employer name, so `openai` came out as "Openai".
+  The name is now read from how the posting writes it ("OpenAI"), and when
+  nothing confirms it the output says it is a guess, so your agent checks
+  it with you and passes `--org`.
+- **Engineering and construction jobs stay out of the example market.** With
+  the frontier AI labs example (you don't write production code), titles
+  such as Android Engineer or Engineering Manager, and construction project
+  manager jobs, no longer count as roles open to you. An engineering title
+  now counts as heavy coding unless the posting says otherwise.
 - **The share card no longer claims an offer.** Its headline said "From
   Low to an offer" even when no offer had come. It now states only what was
   measured, in the dashboard's own words, for example "Level 2, Low to

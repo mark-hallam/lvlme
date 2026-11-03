@@ -88,6 +88,35 @@ class FetchTests(unittest.TestCase):
             Q.fetch(closed, saved=fx("ashby-board.json"))
         self.assertIn("no open posting", str(cm.exception))
 
+    def test_board_name_comes_from_how_the_posting_writes_it(self):
+        # Ashby gives no employer name. A run-together slug in capitals is only a guess ("Globexlabs"),
+        # so the posting's own spelling wins, and a name nothing confirms is flagged for the agent.
+        import json
+        import tempfile
+        d = tempfile.mkdtemp(prefix="lvlme-quick-posting-")
+        self.addCleanup(__import__("shutil").rmtree, d, True)
+        data = Q.C.load_json(fx("ashby-board.json"))
+        saved = os.path.join(d, "board.json")
+        with open(saved, "w", encoding="utf-8") as fh:
+            json.dump(data, fh)
+        link = ASHBY.replace("/globex/", "/globexlabs/")
+        role, source = Q.fetch(link, saved=saved)
+        self.assertEqual(source["org_name"], "Globex Labs")          # as the posting writes it
+        self.assertNotIn("org_name_guessed", source)
+        self.assertEqual(role["org"], "globexlabs")
+        for job in data["jobs"]:                                       # a posting that never names its employer
+            for k in ("descriptionHtml", "descriptionPlain"):
+                if isinstance(job.get(k), str):
+                    job[k] = job[k].replace("Globex Labs", "the team").replace("Globex", "the team")
+        with open(saved, "w", encoding="utf-8") as fh:
+            json.dump(data, fh)
+        role, source = Q.fetch(link, saved=saved)
+        self.assertEqual(source["org_name"], "Globexlabs")
+        self.assertIs(source["org_name_guessed"], True)
+        self.assertEqual(Q.spelled_name("openai", "<p>About OpenAI. Apply at openai.com</p>"), "OpenAI")
+        self.assertEqual(Q.spelled_name("huggingface", "Join Hugging Face"), "Hugging Face")
+        self.assertIsNone(Q.spelled_name("scaleai", "visit scaleai.example"))   # lower case is a web address
+
     def test_lever_single_posting(self):
         role, source = Q.fetch(LEVER, saved=fx("lever-posting.json"))
         self.assertEqual(role["id"], "initech:7c1d2e3f-4a5b-4c6d-9e8f-000000000101")

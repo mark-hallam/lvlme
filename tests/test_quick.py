@@ -300,6 +300,22 @@ class NewFolderTests(unittest.TestCase):
                             "--parent", os.path.join(parent, "quick")])
         self.assertTrue(json.loads(out)["folder"].endswith("-2"))     # never overwrites an earlier answer
 
+    def test_a_guessed_employer_name_is_flagged_and_org_corrects_it(self):
+        # The demo board slug "globex-labs-example" is never written that way in the posting, so its name is a guess.
+        parent = tmpdir(self)
+        code, out, err = run(["new", "--posting", LINK, "--saved-response", BOARD, "--date", "2026-11-02",
+                              "--parent", os.path.join(parent, "quick")])
+        self.assertEqual(code, 0, err)
+        info = json.loads(out)
+        self.assertEqual((info["org_name"], info["org_name_guessed"]), ("Globex Labs Example", True))
+        self.assertIn("is a guess from the link", err)
+        code, out, err = run(["new", "--posting", LINK, "--saved-response", BOARD, "--date", "2026-11-02",
+                              "--org", "Globex Labs", "--parent", os.path.join(parent, "quick")])
+        info = json.loads(out)
+        self.assertNotIn("org_name_guessed", info)
+        self.assertEqual(info["org_name"], "Globex Labs")
+        self.assertNotIn("is a guess", err)
+
     def test_new_refuses_unsafe_places(self):
         inside = os.path.join(H.ENGINE, "examples", "quick-demo", "not-fictional")
         code, _, err = run(["new", "--posting", LINK, "--saved-response", BOARD, "--folder", inside])

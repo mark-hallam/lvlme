@@ -51,7 +51,13 @@ would raise it most. Aim for a couple of minutes and at most two questions.
    page. If it prints that the page gave too little text, ask for the pasted
    text. If its output has a `warning` (the job board API could not be read,
    so the posting came from the public web page), tell the person in one
-   line. It prints the folder; everything below happens there.
+   line. Some boards (Ashby, Lever) give no employer name, so the name is
+   read from how the posting writes it, or else guessed from the link
+   (`openai` becomes "Openai"). If you already know the employer's name,
+   pass `--org "<organisation>"` for a link too. If the output has
+   `org_name_guessed`, confirm the name with the person and, if it is
+   wrong, run this step again with `--org`. It prints the folder;
+   everything below happens there.
 3. **Read `posting.md` and the CV.** Write 4 to 8 evidence items to
    `profile/evidence.json` (`schemas/evidence.schema.json`), one fact each,
    ids `E01`, `E02` and so on, with the verification ladder level from

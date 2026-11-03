@@ -53,6 +53,48 @@ class KeywordTests(unittest.TestCase):
         self.assertTrue(F.coding_check("Lead", "You will write production code daily.")[0])
 
 
+def gh_job(jid, title, dept, body="<p>You will plan launches with research and product teams across the company.</p>"):
+    import html as _html
+    return {"id": jid, "title": title, "updated_at": "2026-10-20T10:00:00-04:00", "location": {"name": "Sydney, Australia"},
+            "absolute_url": "https://example.com/jobs/acme/%s" % jid, "content": _html.escape(body),
+            "departments": [{"id": 1, "name": dept}], "offices": [], "first_published": "2026-09-29T09:00:00-04:00",
+            "company_name": "Acme AI"}
+
+
+class EngineeringTitles(unittest.TestCase):
+    """With the example config (writes_production_code false), engineering jobs and construction projects stay out."""
+
+    def test_engineering_and_construction_titles_stay_out_of_the_market(self):
+        jobs = [gh_job(1, "Android Engineer, Plugin Developer Platform", "Applied AI"),
+                gh_job(2, "Full-Stack Engineer, ChatGPT Education & Learning", "Applied AI"),
+                gh_job(3, "Machine Learning Engineer, Monetization AI/ML", "Applied AI"),
+                gh_job(4, "ChatGPT Performance Engineer", "Applied AI"),
+                gh_job(5, "Engineering Manager, Agent Platform", "Applied AI"),
+                gh_job(6, "Sr. Construction Project Manager, Electrical Infrastructure - Memphis", "Data Centers"),
+                gh_job(7, "Project Manager, Design and Construction, R&D/Lab Buildouts", "Workplace"),
+                gh_job(8, "Deployment Engineer, Public Sector", "Applied AI"),
+                gh_job(9, "Deployment Lead, Applied AI", "Applied AI"),
+                gh_job(10, "Technical Program Manager, Model Launches", "Technical Program Management"),
+                gh_job(11, "Technical Success Engineer", "Technical Success",
+                       "<h3>Responsibilities</h3><ul><li>You will not write production code; you guide customers through launches.</li></ul>")]
+        roles = built(F.greenhouse_postings({"jobs": jobs}))
+        for title in [j["title"] for j in jobs[:8]]:
+            role, why = roles[title]
+            self.assertIsNone(role, title)
+        self.assertIn("production coding", roles["Deployment Engineer, Public Sector"][1])  # dropped by its title
+        for title in ("Deployment Lead, Applied AI", "Technical Program Manager, Model Launches"):
+            self.assertFalse(roles[title][0]["requires_heavy_coding"], title)
+        kept = roles["Technical Success Engineer"][0]                 # the posting says no production code
+        self.assertFalse(kept["requires_heavy_coding"])
+        coder = dict(CFG, candidate=dict(CFG["candidate"], writes_production_code=True))
+        role, _ = F.build_role(TARGET, next(F.greenhouse_postings({"jobs": [jobs[7]]})), coder)
+        self.assertIsNotNone(role)                                     # someone who codes keeps engineering roles
+        self.assertFalse(role["requires_heavy_coding"])
+        self.assertTrue(F.engineering_title("Software Engineer II"))
+        self.assertFalse(F.engineering_title("Engineer Relations Lead"))
+        self.assertFalse(F.engineering_title("Technical Program Manager, Engineering"))
+
+
 class AdapterTests(unittest.TestCase):
     def test_greenhouse(self):
         roles = built(F.greenhouse_postings(GH))

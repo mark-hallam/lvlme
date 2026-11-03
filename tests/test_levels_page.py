@@ -127,5 +127,45 @@ class PageAgreesWithPython(unittest.TestCase):
         self.assertEqual(js["journeys"]["globex"]["up"][0], "A02")             # the one action that gets Globex there
 
 
+TIE_DRIVER = r"""
+const out = {};
+["best"].concat(D.orgOrder).forEach(org => { state.org = org; const J = jp(org), rs = journeyRoles(), nl = nextLevel(rs);
+  out[org] = {lead: headlineRole().id, exp: [J.exp.r.id, J.exp.end], best: [J.best.r.id, J.best.end],
+              start: J.exp.pts[0].v, plan: nl.plan ? [nl.plan.exp, nl.plan.best] : null}; });
+const on = new Set(enabled), off = new Set(enabled); off.delete("A01");
+out.lift = r1(planProj(D.roles, on).exp.end - planProj(D.roles, off).exp.end);
+console.log(JSON.stringify(out));
+"""
+
+
+@unittest.skipUnless(NODE, "Node.js is not installed")
+class TiedBestRoles(unittest.TestCase):
+    """Two roles tie for today's best, and the second one gains more from the plan: everything labelled "best"
+    (the chart, its tiles, the phone bar, the share card, What if and Level up) follows the one projection."""
+
+    def test_the_projection_follows_the_role_the_plan_lifts_most(self):
+        page = TL.lifted_fixture()
+        globex = page["roles"][1]
+        globex.update(s=list(page["roles"][0]["s"]), fit=page["roles"][0]["fit"])   # a tie at 39, Acme AI listed first
+        prog = "const D = %s;\n%s\n%s" % (json.dumps(page), page_script(), TIE_DRIVER)
+        res = subprocess.run([NODE, "-"], input=prog, capture_output=True, text=True, timeout=120)
+        self.assertEqual(res.returncode, 0, res.stderr[-2000:])
+        out = json.loads(res.stdout)
+        best = out["best"]
+        self.assertEqual(best["lead"], "acme:1")                       # today's best (the tie) still leads the strip
+        self.assertEqual(best["start"], 39)                            # the lines start from today's best fit
+        self.assertEqual(best["exp"][0], "globex:7")                   # but the projection follows the role A01 lifts
+        self.assertGreater(best["exp"][1], 44)
+        self.assertEqual([best["exp"][1], best["best"][1]], best["plan"])   # the same numbers as Level up
+        self.assertEqual(out["lift"], L.r1(best["exp"][1] - 39.8))     # What if: A01 is what lifts the best fit
+        self.assertEqual(out["acme"]["exp"][0], "acme:1")              # an organisation's journey keeps to its roles
+        for name in ("function drawChart", "function renderBottomBar", "function shareNumbers"):
+            for block in (A.JS_CHART, A.JS_HOME, A.JS_DETAIL):
+                if name in block:
+                    body = block[block.index(name):block.index("\n}\n", block.index(name))]
+                    self.assertIn("jp(", body, name)
+                    self.assertNotIn("P[r.id]", body, name)
+
+
 if __name__ == "__main__":
     unittest.main()
