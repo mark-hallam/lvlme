@@ -349,7 +349,7 @@ def fixes(result):
     c = result["if_all_fixes"]
     n = len(result["fixes"])
     all_line = ('<div class="all">If %s land: fit <b class="num">%s</b> (up %s), %s.</div>' % (
-        "all %s" % ("three" if n == 3 else "two") if n > 1 else "it", num(c["fit"]), num(c["gain"]),
+        "all three" if n == 3 else "both" if n == 2 else "all %d" % n if n > 1 else "it", num(c["fit"]), num(c["gain"]),
         esc(headline(c, start=False))))
     return ('<section class="card" aria-labelledby="fixH"><p class="eyebrow">What would raise your odds</p>'
             '<h2 id="fixH">The top %s</h2><p class="small sub">Ranked by the fit points each adds, with the same '
