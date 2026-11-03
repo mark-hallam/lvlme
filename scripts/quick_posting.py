@@ -51,7 +51,7 @@ import fetch_roles as FR  # noqa: E402
 from _boards import (BOARD_NAMES, LANG, LISTED, WORKDAY_HOST, _base, detail_url, nice_name, smartrecruiters_base, spelled_name,  # noqa: E402,F401
                      workable_base, workable_org_name, workday_base, workday_org_name)
 
-UA = "lvlme/0.4 (LVLme quick: one job posting the person asked about; read only)"
+UA = "lvlme/0.5 (LVLme quick: one job posting the person asked about; read only)"
 MAX_BYTES = 3_000_000  # a web page
 API_MAX_BYTES = 60_000_000  # a job board API answer: Ashby sends the employer's whole board, about 3 MB for a big employer
 MIN_TEXT = 400  # fewer characters than this and the page did not give a usable posting

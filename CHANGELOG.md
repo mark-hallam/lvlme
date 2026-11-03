@@ -8,7 +8,15 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
-## Unreleased
+## 0.5.0 (3 November 2026)
+
+Autopilot for your career: a check-in that runs itself each week, an
+applications tracker with timed follow-ups, a check on whether each job is
+still a real opening, all six job boards in the full campaign, and a way to
+turn a LVLme quick result into a full campaign with nothing redone. The full
+notes are in [LVLme 0.5.0](docs/RELEASE-0.5.0.md).
+
+Tests: 434 pass.
 
 ### Added
 
@@ -26,7 +34,6 @@ before. Nothing here changes how a score is worked out unless it says so.
 - **LVLme quick names Anthropic's AI guidance** on an Anthropic posting:
   "Anthropic asks for your own first draft. Write it, then I'll review it.",
   with a link to the page.
-
 - **Climb from here.** `python3 scripts/quick.py promote` turns a LVLme
   quick result into a full campaign with nothing redone: the same evidence
   and levels, the posting as the first role, its employer as the first

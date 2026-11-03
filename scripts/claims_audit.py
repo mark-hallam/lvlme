@@ -27,7 +27,7 @@ from html.parser import HTMLParser
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 
-UA = "lvlme/0.4 (claims audit of the user's own pages; read only)"
+UA = "lvlme/0.5 (claims audit of the user's own pages; read only)"
 MAX_BYTES = 2_000_000
 CLAIM_RX = re.compile(
     r"\b(led|lead|leading|managed|managing|built|building|founded|co-?founded|launched|shipped|delivered|"
