@@ -27,8 +27,14 @@ before. Nothing here changes how a score is worked out unless it says so.
   "Anthropic asks for your own first draft. Write it, then I'll review it.",
   with a link to the page.
 
+- **Install in Claude chat**, tried for real: `docs/INSTALL.md` has the
+  steps (Customize, Plugins, add the `mark-hallam/lvlme` marketplace) and
+  says what works in chat and what needs Claude Code.
+
 ### Fixed
 
+- In Claude chat, LVLme quick shares the result page as a file rather than
+  an open command, which cannot work there.
 - Three method files told the agent to give the blind reviewer the scores.
   Every file now says the reviewer never sees them, and a test keeps it so.
 

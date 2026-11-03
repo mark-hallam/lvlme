@@ -119,6 +119,8 @@ would raise it most (any fix left out is named, with the reason). Aim for a coup
    `result.json` and `message.md`. Fix any error it prints and run it again.
 9. **Tell the person**: paste `message.md` as it is. It holds the odds in
    plain English, the fit as a range, the top fixes, the command to open the page, and the way to
-   go deeper: say "run LVLme" for the full campaign. If they want to go deeper,
+   go deeper: say "run LVLme" for the full campaign. In Claude chat, where
+   the folder is in Claude's sandbox rather than on the person's computer,
+   share `index.html` as a file in place of the open command. If they want to go deeper,
    start the full run (the engine's `SKILL.md`), and offer the CV they already
    gave as the first document for the interview.

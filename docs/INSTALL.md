@@ -103,6 +103,41 @@ own by default. Turn on auto-update for the LVLme marketplace in `/plugin`
 claude plugin update lvlme@lvlme
 ```
 
+## Claude chat (the Claude app and claude.ai)
+
+Tried on 3 November 2026, on claude.ai with LVLme 0.4.0. The Claude desktop
+app shows the same Customize page.
+
+1. Open **Customize**, then **Plugins**.
+2. Choose **Add**, then **Add marketplace**, then **Add from repository**.
+   Type `mark-hallam/lvlme`, choose it, and press **Sync**. Anthropic's
+   notice says to add only marketplaces you trust.
+3. LVLme appears in the list. Press **Add**. It shows 6 skills: `/lvlme`,
+   `/lvlme-quick`, `/lvlme-audit`, `/lvlme-dashboard`, `/lvlme-interview` and
+   `/lvlme-screen`.
+4. In a new chat, type `/lvlme-quick`, choose it, then paste the posting
+   link and your CV text, and send.
+
+Claude asks before each command it runs in its sandbox (choose **Allow
+once**). A run took about three minutes, and the result page opened beside
+the chat.
+
+What to expect in chat:
+
+- **LVLme quick works.** It reads the posting, scores it with the same maths
+  and shares the result page.
+- **The blind reviewer**, when a score is above 2, is a helper agent, and
+  chat does not load helper agents. Start it in a new chat, as the quick
+  steps say. Until it has run, those scores count as 2, so a missing review
+  only ever lowers the odds.
+- **The full campaign belongs in Claude Code.** Chat runs LVLme in Claude's
+  sandbox, not on your computer, so there is no private workspace to come
+  back to next week.
+- A plugin added here is saved to your Claude account and also appears in
+  Claude Code from its next session
+  ([Anthropic's platform table](https://claude.com/docs/plugins/platform-support.md)).
+  To turn it off: **Customize**, **Plugins**, LVLme, then its switch.
+
 ## Codex
 
 Codex reads personal skills from `~/.agents/skills/`, and `AGENTS.md` from the
