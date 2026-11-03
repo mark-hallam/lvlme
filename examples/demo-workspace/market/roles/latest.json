@@ -67,6 +67,7 @@
         "australia_nz"
       ],
       "remote": false,
+      "workplace": null,
       "url": "https://example.com/jobs/acme/4100002",
       "updated_at": "2026-10-20T10:00:00-04:00",
       "published_at": "2026-09-29T09:00:00-04:00",
@@ -106,6 +107,7 @@
         "uk_eu"
       ],
       "remote": false,
+      "workplace": null,
       "url": "https://example.com/jobs/acme/4100004",
       "updated_at": "2026-10-20T10:00:00-04:00",
       "published_at": "2026-09-29T09:00:00-04:00",
@@ -144,6 +146,7 @@
         "us"
       ],
       "remote": false,
+      "workplace": null,
       "url": "https://example.com/jobs/acme/4100006",
       "updated_at": "2026-10-20T10:00:00-04:00",
       "published_at": "2026-09-29T09:00:00-04:00",
@@ -193,6 +196,7 @@
         "us"
       ],
       "remote": false,
+      "workplace": null,
       "url": "https://example.com/jobs/acme/4100001",
       "updated_at": "2026-10-20T10:00:00-04:00",
       "published_at": "2026-09-29T09:00:00-04:00",
@@ -234,6 +238,7 @@
         "apac_other"
       ],
       "remote": false,
+      "workplace": "Hybrid",
       "url": "https://example.com/jobs/globex/g-0003",
       "updated_at": "2026-10-01T00:00:00.000+00:00",
       "published_at": "2026-10-01T00:00:00.000+00:00",
@@ -272,6 +277,7 @@
         "uk_eu"
       ],
       "remote": false,
+      "workplace": "Hybrid",
       "url": "https://example.com/jobs/globex/g-0004",
       "updated_at": "2026-10-01T00:00:00.000+00:00",
       "published_at": "2026-10-01T00:00:00.000+00:00",
@@ -309,6 +315,7 @@
         "remote"
       ],
       "remote": true,
+      "workplace": "Remote",
       "url": "https://example.com/jobs/globex/g-0001",
       "updated_at": "2026-10-01T00:00:00.000+00:00",
       "published_at": "2026-10-01T00:00:00.000+00:00",
@@ -349,6 +356,7 @@
         "canada"
       ],
       "remote": false,
+      "workplace": "Onsite",
       "url": "https://example.com/jobs/globex/g-0002",
       "updated_at": "2026-10-01T00:00:00.000+00:00",
       "published_at": "2026-10-01T00:00:00.000+00:00",
@@ -389,6 +397,7 @@
         "australia_nz"
       ],
       "remote": false,
+      "workplace": null,
       "url": "https://example.com/jobs/initech/i-0004",
       "updated_at": "2025-11-01T00:00:00Z",
       "published_at": "2025-11-01T00:00:00Z",
@@ -426,6 +435,7 @@
         "us"
       ],
       "remote": false,
+      "workplace": "Onsite",
       "url": "https://example.com/jobs/initech/i-0003",
       "updated_at": "2025-10-05T00:00:00Z",
       "published_at": "2025-10-05T00:00:00Z",
@@ -463,6 +473,7 @@
         "australia_nz"
       ],
       "remote": false,
+      "workplace": "Hybrid",
       "url": "https://example.com/jobs/initech/i-0002",
       "updated_at": "2025-10-05T00:00:00Z",
       "published_at": "2025-10-05T00:00:00Z",
@@ -506,6 +517,7 @@
         "australia_nz"
       ],
       "remote": false,
+      "workplace": "Onsite",
       "url": "https://example.com/jobs/initech/i-0001",
       "updated_at": "2025-10-19T00:00:00Z",
       "published_at": "2025-10-19T00:00:00Z",

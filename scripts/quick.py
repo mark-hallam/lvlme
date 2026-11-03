@@ -118,7 +118,8 @@ def answers_md(date, org_name, role):
 def posting_md(role, org_name, source, date, fictional=False):
     head = ["# %s" % role["title"], "",
             " · ".join(x for x in [org_name, ", ".join(role.get("locations") or []),
-                                   "remote" if role.get("remote") is True else ""] if x)]
+                                   "remote" if role.get("remote") is True else
+                                   "hybrid" if role.get("workplace") == "Hybrid" else ""] if x)]
     if source.get("link"):
         head.append("Link: %s%s" % (source["link"], " (a fictional posting: this address has no real page)"
                                     if fictional else ""))
@@ -199,7 +200,7 @@ def new(args):
         C.write_text(cv, cv_text)
     print(json.dumps({
         "folder": folder, "role_id": role["id"], "org": role["org"], "org_name": org_name, "title": role["title"],
-        "locations": role.get("locations"), "remote": role.get("remote"),
+        "locations": role.get("locations"), "remote": role.get("remote"), "workplace": role.get("workplace"),
         "eligibility_blockers": role.get("eligibility_blockers"), "requires_heavy_coding": role.get("requires_heavy_coding"),
         "posting": os.path.join(folder, "posting.md"), "cv": cv,
         **({"warning": source["fallback"]} if source.get("fallback") else {}),
@@ -509,7 +510,8 @@ def build_result(docs):
     return {
         "quick_version": 1, "date": quick["judged_on"], "fictional": bool(config.get("fictional")),
         "role": {"id": role["id"], "title": role["title"], "org": role["org"], "org_name": target.get("name", role["org"]),
-                 "locations": role.get("locations") or [], "remote": role.get("remote"), "url": role.get("url"),
+                 "locations": role.get("locations") or [], "remote": role.get("remote"),
+                 "workplace": role.get("workplace"), "url": role.get("url"),
                  "eligibility_blockers": role.get("eligibility_blockers") or [],
                  "requires_heavy_coding": bool(role.get("requires_heavy_coding"))},
         "fit": scored["fit"], "interview_band": scored["interview_band"], "offer_band": scored["offer_band"],

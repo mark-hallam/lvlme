@@ -89,6 +89,19 @@ Work on top of 0.3.0 that is not in a released version yet.
 
 ### Fixed
 
+- **Hybrid roles are no longer called remote.** Ashby boards mark most
+  office based roles with both a remote flag and the label Hybrid, and
+  LVLme believed the flag. A London role three days a week in the office
+  showed as "Remote" in LVLme quick and counted as remote in
+  `market/roles/latest.json`. The board's own label (Remote, Hybrid or
+  Onsite) now wins, is kept on each role as `workplace`, and the LVLme quick
+  header says "Hybrid" when the board does. A role that lists a remote
+  location as one of its options still counts as remote.
+- **The roles heat map reads the same in dark mode.** Its caption said
+  "darker is stronger", which was the wrong way round in dark mode, where a
+  5 is the lightest cell. It now says a stronger score stands out more from
+  the page, which holds in both themes, and the dark 1 and 2 cells are
+  easier to tell apart.
 - **One answer for "where will I be if I follow the plan".** When roles
   tied for today's best fit, the journey chart, its tiles, the phone bar,
   the share card and What if followed whichever role was listed first,

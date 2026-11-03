@@ -142,6 +142,24 @@ class AdapterTests(unittest.TestCase):
         self.assertIsNone(sa)
         self.assertIn("production coding", why)
 
+    def test_ashby_hybrid_with_is_remote_true_is_not_remote(self):
+        # Ashby sends isRemote true with workplaceType Hybrid for office based roles (514 such jobs on
+        # one live board). The workplace label wins, so a hybrid London role is never called remote.
+        job = json.loads(json.dumps(AB["jobs"][1]))
+        job.update({"id": "g-hyb", "location": "London, UK", "secondaryLocations": [],
+                    "isRemote": True, "workplaceType": "Hybrid"})
+        base = next(F.ashby_postings({"jobs": [job]}))
+        role, _ = F.build_role(TARGET, base, CFG)
+        self.assertIs(role["remote"], False)
+        self.assertEqual(role["workplace"], "Hybrid")
+        self.assertNotIn("remote", role["location_classes"])
+        job.update({"workplaceType": "OnSite"})
+        role, _ = F.build_role(TARGET, next(F.ashby_postings({"jobs": [job]})), CFG)
+        self.assertEqual((role["remote"], role["workplace"]), (False, "Onsite"))
+        job.update({"workplaceType": None})  # no label: the flag decides
+        role, _ = F.build_role(TARGET, next(F.ashby_postings({"jobs": [job]})), CFG)
+        self.assertEqual((role["remote"], role["workplace"]), (True, None))
+
     def test_lever(self):
         roles = built(F.lever_postings(LV))
         fleet, _ = roles["Program Manager, Robot Fleet Deployments"]

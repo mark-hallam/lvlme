@@ -301,6 +301,29 @@ class ParkedAndStaticTests(unittest.TestCase):
             for bg in ("z0", "z1", "card"):
                 self.assertGreaterEqual(ratio(tok["stop"], tok[bg]), 3.0, (tok, bg))
 
+    def test_heatmap_ramp_reads_the_same_in_both_themes(self):
+        # The caption must hold in light and dark: a higher score always stands out more from the card,
+        # each step from 1 to 5 is visibly apart, and the number in the cell stays readable.
+        def lum(hexc):
+            rgb = [int(hexc[i:i + 2], 16) / 255.0 for i in (1, 3, 5)]
+            lin = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in rgb]
+            return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
+
+        def ratio(a, b):
+            hi, lo = sorted((lum(a), lum(b)), reverse=True)
+            return (hi + 0.05) / (lo + 0.05)
+        self.assertNotIn("darker is stronger", A.JS_VIEWS)
+        self.assertIn("the more the cell stands out from the page", A.JS_VIEWS)
+        light, dark = A.CSS.split(":root[data-theme=dark]")[0], A.CSS.split(":root[data-theme=dark]")[1].split("}")[0]
+        for theme in (light, dark):
+            tok = dict(re.findall(r"--(h[0-5]|hlt|hdt|card):(#[0-9a-f]{6})", theme))
+            vs_card = [ratio(tok["h%d" % k], tok["card"]) for k in range(6)]
+            self.assertEqual(vs_card, sorted(vs_card), tok)
+            for k in range(1, 5):
+                self.assertGreaterEqual(ratio(tok["h%d" % k], tok["h%d" % (k + 1)]), 1.25, (k, tok))
+            for k in range(6):
+                self.assertGreaterEqual(ratio(tok["h%d" % k], tok["hdt" if k >= 3 else "hlt"]), 4.5, (k, tok))
+
     def test_extension_fields_pass_through(self):
         for rel, fn in (("profile/evidence.json", lambda d: d["items"][0].update(x_original_id="G01")),
                         ("eval/judgements.json", lambda d: next(iter(d["roles"].values())).update(x_old="kept")),

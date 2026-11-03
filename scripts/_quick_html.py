@@ -216,6 +216,8 @@ def hero(result):
     r = result["role"]
     locs = ", ".join(r["locations"])
     remote = "Remote" if r.get("remote") is True and "remote" not in locs.lower() else ""
+    if r.get("remote") is not True and r.get("workplace") == "Hybrid":
+        remote = "Hybrid"
     where = " · ".join(x for x in [esc(r["org_name"]), esc(locs), remote] if x)
     real_link = str(r.get("url") or "").startswith(("http://", "https://"))
     if result.get("fictional"):  # a made-up posting has no page: never send a visitor to a real job board

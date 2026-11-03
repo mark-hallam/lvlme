@@ -12,6 +12,7 @@
       "Remote (Australia)"
     ],
     "remote": true,
+    "workplace": "Hybrid",
     "url": "https://jobs.ashbyhq.com/globex-labs-example/0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
     "eligibility_blockers": [],
     "requires_heavy_coding": false
@@ -312,6 +313,6 @@
       }
     ]
   },
-  "inputs_digest": "sha256:6689ba5866e2bbfc85b72e4e31308e4ba554ccab2885a9ca6f62f6d04b8ba0b4",
+  "inputs_digest": "sha256:dc769cd4632fa15585c62059c7be5aa02cfecfef6848060f49d2d23ab2969060",
   "warnings": []
 }

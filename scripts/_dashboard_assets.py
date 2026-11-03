@@ -29,7 +29,7 @@ CSS = r"""
  --accent:#64b0ff;--on-accent:#0b1a2b;--accent-soft:#172c45;--ok:#4cd964;--warn:#ffb340;--warn-bg:#3a2e0b;
  --z0:#1f1f22;--z1:#252529;--grid:#323236;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.4);
  --p0:#3a3a3e;--p0t:#f2f2f7;--p1:#1b54a0;--p1t:#ffffff;--p2:#78aeee;--p2t:#0b1a2b;--p3:#9cc4f3;--p3t:#0b1a2b;--p4:#cfe2fa;--p4t:#0b1a2b;
- --h0:#2c2c30;--h1:#163f75;--h2:#1b54a0;--h3:#78aeee;--h4:#9cc4f3;--h5:#cfe2fa;--hlt:#ffffff;--hdt:#0b1a2b;
+ --h0:#2c2c30;--h1:#163f75;--h2:#2a6bc4;--h3:#78aeee;--h4:#9cc4f3;--h5:#cfe2fa;--hlt:#ffffff;--hdt:#0b1a2b;
  --tv-bg:#1e3a24;--tv-t:#a6efb0;--tc-bg:#3d1714;--tc-t:#ffc2ba;--tp-bg:#3a2a10;--tp-t:#ffd99a;--link-soft:#8cc4ff;--stop:#9a9aa0}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -1196,7 +1196,7 @@ function renderRoles(){
     <select id="fLoc" aria-label="Location"><option value="">All locations</option>${opt(D.locations, roleFilter.loc)}</select>
     <select id="fElig" aria-label="Eligibility"><option value="">Open and blocked</option><option value="open" ${roleFilter.elig === "open" ? "selected" : ""}>Open to you</option><option value="blocked" ${roleFilter.elig === "blocked" ? "selected" : ""}>Has an eligibility blocker</option></select>
     <span class="small sub" id="fCount"></span></div>
-    <div class="card"><div class="eyebrow">Roles by factor, ${esc(modeName())}</div><div class="tiny sub" style="margin-bottom:8px">Each cell is a factor score out of 5, darker is stronger. Tap a role to drill in.</div><div class="heat-wrap" id="heatWrap"></div></div>`;
+    <div class="card"><div class="eyebrow">Roles by factor, ${esc(modeName())}</div><div class="tiny sub" style="margin-bottom:8px">Each cell is a factor score out of 5. The stronger the score, the more the cell stands out from the page. Tap a role to drill in.</div><div class="heat-wrap" id="heatWrap"></div></div>`;
   ["fOrg","fFam","fLoc","fElig"].forEach((id, i) => $("#" + id).addEventListener("change", e => { roleFilter[["org","fam","loc","elig"][i]] = e.target.value; fillHeat(); }));
   fillHeat();
 }

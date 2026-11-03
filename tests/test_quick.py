@@ -208,6 +208,15 @@ class NotCheckedTests(Base):
         del r["if_unchecked_strong"]                    # a result.json from before the range still renders
         self.assertIn("Not checked", QH.render(r))
 
+    def test_header_says_hybrid_not_remote(self):
+        import _quick_html as QH
+        r = self.load("result.json")
+        r["role"] = dict(r["role"], locations=["London, UK"], remote=False, workplace="Hybrid")
+        self.assertIn("London, UK · Hybrid", QH.hero(r))
+        self.assertNotIn("Remote", QH.hero(r))
+        r["role"] = dict(r["role"], remote=True, workplace="Remote")
+        self.assertIn("London, UK · Remote", QH.hero(r))
+
 
 class ReviewTests(Base):
     def test_review_items_hide_the_scores(self):

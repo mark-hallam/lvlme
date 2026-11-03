@@ -148,7 +148,7 @@ more than gaps, so these become top-priority actions.
 `config.json` lists target orgs with their applicant-tracking system and slug
 (Greenhouse, Ashby, Lever, Workable, SmartRecruiters, or `manual`). For each
 open role, `fetch_roles.py` extracts: family (keyword taxonomy per goal),
-locations and location class, remote flag, years required, degree requirement,
+locations and location class, remote flag and the board's workplace label (remote, hybrid or onsite), years required, degree requirement,
 hard requirements, nice-to-haves, compensation, heavy-coding flag, and
 **eligibility blockers** (US-person / ITAR / export control, security
 clearance, citizenship, licence). Daily snapshots give hiring velocity (new and

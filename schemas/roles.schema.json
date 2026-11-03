@@ -64,6 +64,8 @@
         "locations": {"type": "array", "items": {"type": "string"}},
         "location_classes": {"type": "array", "items": {"type": "string"}},
         "remote": {"enum": [true, false, "unknown"]},
+        "workplace": {"enum": ["Remote", "Hybrid", "Onsite", null],
+                      "description": "The job board's own workplace label, when it gives one. Hybrid and Onsite roles count as not remote even when the board also sets a remote flag."},
         "url": {"type": ["string", "null"]},
         "updated_at": {"type": ["string", "null"]},
         "published_at": {"type": ["string", "null"]},

@@ -426,14 +426,24 @@ def visa_note(full_text):
     return None
 
 
+def workplace(base):
+    """The board's own workplace label as Remote, Hybrid or Onsite, or None when it gives none."""
+    wt = (base.get("workplace_type") or "").lower().replace("-", "").replace(" ", "").replace("_", "")
+    return {"remote": "Remote", "hybrid": "Hybrid", "onsite": "Onsite"}.get(wt)
+
+
 def remote_status(base, text):
+    # The board's workplace label wins over its is_remote flag: Ashby sends isRemote true with
+    # workplaceType Hybrid for roles based in an office three days a week.
+    wt = workplace(base)
+    if wt == "Remote":
+        return True
     if any(re.search(r"\bremote\b", s, re.I) for s in base["locations"]):
         return True
-    wt = (base.get("workplace_type") or "").lower().replace("-", "").replace(" ", "")
-    if wt == "remote" or base.get("is_remote") is True:
-        return True
-    if wt in ("hybrid", "onsite"):
+    if wt in ("Hybrid", "Onsite"):
         return False
+    if base.get("is_remote") is True:
+        return True
     work_rx = (r"\bremote(?:ly)?[- ](?:work|role|position|option|friendly|eligible|first|opportunit|employ|candidate)|"
                r"\b(?:fully|100%)\s+remote|\bwork(?:ing)?\s+(?:from\s+home|remotely)|\bremote\s+(?:is|considered)")
     sents = [x for x in re.split(r"(?<=[.!?])\s+|\n", text) if re.search(work_rx, x, re.I)]
@@ -604,7 +614,7 @@ def build_role(target, base, config):
         "family": fam, "team_or_department": base["team_or_department"], "locations": base["locations"],
         "location_classes": location_classes(base["locations"] + [s for s in base["extra_location_text"] if s],
                                              remote, config),
-        "remote": remote, "url": base["url"], "updated_at": base["updated_at"],
+        "remote": remote, "workplace": workplace(base), "url": base["url"], "updated_at": base["updated_at"],
         "published_at": base["published_at"], "compensation": base["compensation"],
         "years_experience": parsed["years"], "years_experience_basis": parsed["years_basis"],
         "degree_requirement": parsed["degree"], "hard_requirements": parsed["hard"],
