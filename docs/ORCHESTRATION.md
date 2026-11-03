@@ -128,6 +128,12 @@ Never scrape LinkedIn; use the official export.
 
 ### Fan-out 2: assess (stage 4)
 
+First run `python3 scripts/run_plan.py` and show the person its lines: how
+many roles need judging and about how many helpers a full run and a light
+run (the top 30 by fit, plus new roles) would start. They choose; with
+nobody present, run light. Judge only the roles in the chosen run
+(`--json` lists them); every other role keeps its last judgement.
+
 Start these at the same time, once join 1 is written:
 
 | Subagent | One per | Gets | Returns |

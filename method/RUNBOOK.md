@@ -121,7 +121,9 @@ rounds while roles and evidence are gathered.
    (`RECRUITER_SCREEN.md`). Draft the resulting edits with
    `PROFILE_FIXES.md`.
 
-6. **Judge.** Judgements live in files; the maths lives in a script.
+6. **Judge.** Judgements live in files; the maths lives in a script. Run
+   `python3 scripts/run_plan.py` first and let the person choose a full or
+   a light run; it counts roles and helpers, never tokens or cost.
    - `eval/judgements.json`: D1, D2 and D4 for every new role id, and any role
      whose evidence changed. Set `judged_on` to today. Flag
      `hard_requirement_lacking` and, where the detector was wrong,

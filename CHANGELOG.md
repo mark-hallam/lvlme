@@ -27,6 +27,12 @@ before. Nothing here changes how a score is worked out unless it says so.
   "Anthropic asks for your own first draft. Write it, then I'll review it.",
   with a link to the page.
 
+- **Know the size of a run before it starts.** `scripts/run_plan.py` says
+  how many roles need judging (new, changed posting, or new evidence) and
+  about how many helpers a full run and a light run (your top 30, plus new
+  roles) would start, so you choose. Unchanged roles keep their last
+  judgement, so a run with nothing new starts no judging helpers. It counts
+  helpers only, never tokens or cost.
 - **Applications and follow-ups.** `scripts/applications.py` tracks each
   application in `campaign/applications.json` with career-ops' ten stage
   names, and keeps every change in an append-only log. Follow-ups are timed
