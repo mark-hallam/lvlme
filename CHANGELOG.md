@@ -8,9 +8,13 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
-## Unreleased
+## 0.4.0 (3 November 2026)
 
-Work on top of 0.3.0 that is not in a released version yet.
+Warm paths, a reading guide, six job boards for LVLme quick, and a round of
+honesty fixes found by testing the public version end to end. The full notes
+are in [LVLme 0.4.0](docs/RELEASE-0.4.0.md).
+
+Tests: 374 pass.
 
 ### Added
 
@@ -89,6 +93,25 @@ Work on top of 0.3.0 that is not in a released version yet.
 
 ### Fixed
 
+- **Scoring again with nothing changed no longer breaks your streak.** A
+  later day with the same inputs and no plan action finished since was saved
+  as a day with no progress, which reset "Progress you can trust" to 0.
+  `scripts/score.py` now says nothing changed and saves no new day;
+  `--force` saves it anyway.
+- **LVLme quick names a fix it leaves out, and why.** A fix that cannot move
+  in a few months, adds nothing or is already met used to vanish, so the
+  page said "The top 2 fixes" with no word about the third. It now gets a
+  "Not listed" line on the page, and in the chat message when fewer than
+  three fixes show.
+- **Biggest unlocks reads as fit points on one role.** On a phone it showed
+  totals such as "+144" beside scores out of 100, with no explanation. Each
+  row now shows what a role gains on average and how many roles it lifts
+  ("+12 each, lifts 11 roles"), with the same one-line explanation on every
+  screen.
+- **Warm paths count your LinkedIn connections.** After
+  `scripts/network_map.py` found a connection at an organisation with no
+  warm path yet, the card still said "No one yet". It now says "1
+  connection, not asked yet" and how to start a warm path.
 - **A role nobody has judged is no longer shown as measured.** Such a role
   kept a fit worked out from the profile-wide factors alone, and it showed up
   as an organisation's best role, in the home region list, in the tile counts

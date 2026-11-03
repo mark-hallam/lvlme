@@ -49,7 +49,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 import fetch_roles as FR  # noqa: E402
 
-UA = "lvlme/0.3 (LVLme quick: one job posting the person asked about; read only)"
+UA = "lvlme/0.4 (LVLme quick: one job posting the person asked about; read only)"
 MAX_BYTES = 3_000_000  # a web page
 API_MAX_BYTES = 60_000_000  # a job board API answer: Ashby sends the employer's whole board, about 3 MB for a big employer
 MIN_TEXT = 400  # fewer characters than this and the page did not give a usable posting

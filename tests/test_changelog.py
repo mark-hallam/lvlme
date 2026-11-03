@@ -18,7 +18,7 @@ import helpers as H
 PATH = os.path.join(H.ENGINE, "CHANGELOG.md")
 HEADING = re.compile(r"^## (?:(Unreleased)|(\d+)\.(\d+)\.(\d+) \((\d{1,2} [A-Z][a-z]+ \d{4})\))$")
 SUBHEADINGS = {"Added", "Changed", "Fixed", "Removed", "Still works"}
-REQUIRED = ["0.3.0", "0.2.0", "0.1.1", "0.1.0"]
+REQUIRED = ["0.4.0", "0.3.0", "0.2.0", "0.1.1", "0.1.0"]
 BANNED = re.compile(r"(?i)revolutioni[sz]e|\btransform(s|ed|ing)?\b|game-changer|next-generation|AI-powered")
 
 

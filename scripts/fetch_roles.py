@@ -49,7 +49,7 @@ from html.parser import HTMLParser
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 
-UA = "lvlme/0.3 (personal job-search research script; read only)"
+UA = "lvlme/0.4 (personal job-search research script; read only)"
 MAX_REQ_LEN = 160
 DASHES = "\u2013\u2014"
 

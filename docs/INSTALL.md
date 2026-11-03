@@ -197,7 +197,7 @@ See "By hand, in a terminal" in
   marketplace entry.
 - **Changelog.** In the same change, turn the Unreleased section of
   [`CHANGELOG.md`](../CHANGELOG.md) into a heading for the new version, with
-  its date and its test count, and tag the release commit (`v0.3.0` and so
+  its date and its test count, and tag the release commit (`v0.4.0` and so
   on). `tests/test_changelog.py` fails if the newest heading is not the
   version in `plugin.json`.
 - **Validate** before every release:
