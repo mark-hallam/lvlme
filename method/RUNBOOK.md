@@ -77,7 +77,10 @@ rounds while roles and evidence are gathered.
    person cares about, saying what was seen ("posted 14 months ago",
    "reposted 2 times in 90 days"), never that a posting is fake. It never
    changes a score. Add sourced
-   organisation facts to `market/orgs.json`.
+   organisation facts to `market/orgs.json` (a news item's publication date
+   goes in `published_on`). Set `verified: true` only on a fact you opened
+   the source for yourself; the research packs show every other line as not
+   yet checked.
 
 3. **Evidence.** Look for anything new since the last run date (the newest
    file in `eval/runs/`) and add it to `profile/evidence.json`. Keep ids

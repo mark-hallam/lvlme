@@ -25,6 +25,7 @@ import build_demo_site as S  # noqa: E402
 
 COMMITTED = os.path.join(H.ENGINE, "docs", "demo")
 FILES = ["index.html", os.path.join("quick", "index.html"), os.path.join("dashboard", "index.html")]
+FILES += [os.path.join("dashboard", "research", "%s.html" % o) for o in ("acme", "globex", "initech")]
 
 
 def read(path):

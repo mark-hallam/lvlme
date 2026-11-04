@@ -1698,6 +1698,7 @@ function detailOrg(g){
     <div class="kv" style="margin-top:10px"><span>Roles matching your types</span><b class="num">${L.count}</b></div>
     <div class="kv"><span>With an eligibility blocker</span><b class="num">${L.blocked}</b></div>
     <div class="kv"><span>Judged so far</span><b class="num">${L.judged} of ${L.count}</b></div>
+    ${L.members.length === 1 && (D.packs || {})[L.members[0]] ? `<a class="small" style="display:inline-block;padding:10px 0;margin-top:4px" href="${esc(D.packs[L.members[0]].path)}" target="_blank" rel="noopener">Research pack: what ${esc(L.name)} is building, who is hiring, events, its AI rules ›</a>` : ""}
     <div class="eyebrow" style="margin-top:16px">Who knows you here</div><div class="small">${esc(net)}</div>
     ${L.paths.map(p => `<div class="small sub" style="margin-top:6px"><span class="tag">${esc(cap1(p.status))}</span> ${esc(p.note)}</div>`).join("")}
     ${warmDetail(L)}

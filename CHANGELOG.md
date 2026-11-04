@@ -35,6 +35,14 @@ before. Nothing here changes how a score is worked out unless it says so.
   hidden until it has 5 results, and a ranking check (did the higher-rated
   applications do better?) until 10. Advisory only: a test proves scores are
   identical with or without outcomes. The demo now has made-up applications.
+- **Research packs.** One page per target organisation, in
+  `report/research/`, linked from the organisation's detail on the
+  dashboard: what it is building, recent news, offices, the teams hiring,
+  its events and programmes, and its rules on AI for candidates. Built from
+  facts LVLme already holds, so it fetches nothing; every line has its source
+  and date, and a fact nobody opened the source for says "Not yet checked".
+  `market/orgs.json` facts gain the kinds `building` and `news`, and the
+  fields `published_on` and `verified`.
 - `scripts/build_dashboard.py --today` builds the page for a given day, so
   the demo is the same whenever it is rebuilt.
 

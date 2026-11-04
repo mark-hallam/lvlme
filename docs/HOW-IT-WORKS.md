@@ -266,6 +266,11 @@ For a plain-English tour of each number and what to do first, see
 - **Doors**: the next events, programmes and communities where people from
   your targets will be, soonest first, with why each one matters. Ask your
   agent to add one to your plan.
+- **Research packs**: one page per target organisation (report/research/),
+  opened from the organisation's detail: what it is building, recent news,
+  offices, the teams hiring, its events and programmes, and its rules on AI
+  for candidates. Every line has its source and date, and a line nobody has
+  checked yet says so.
 - **How right has LVLme been?**: for each band, the applications you sent,
   how many have a result, and how many led to an interview or an offer,
   beside public figures (Ashby, 2025) and a blend of the two. A band's rate

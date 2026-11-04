@@ -27,10 +27,13 @@
       "required": ["kind", "text", "source"],
       "additionalProperties": false,
       "properties": {
-        "kind": {"enum": ["office", "team_growth", "event", "partner_programme", "eligibility", "hiring_signal", "other"]},
+        "kind": {"enum": ["building", "news", "office", "team_growth", "event", "partner_programme", "eligibility", "hiring_signal", "other"],
+                 "description": "building: what the organisation is building or launching. news: a dated news item (give published_on)."},
         "text": {"type": "string", "minLength": 1},
         "source": {"type": "string", "minLength": 1},
-        "seen_on": {"$ref": "#/definitions/date"}
+        "seen_on": {"$ref": "#/definitions/date"},
+        "published_on": {"$ref": "#/definitions/date", "description": "For news: the date it was published."},
+        "verified": {"type": "boolean", "description": "The lead opened the source itself and it says this. Without it, research packs show the line as not yet checked."}
       }
     }
   }

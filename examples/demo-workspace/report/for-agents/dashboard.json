@@ -2104,6 +2104,23 @@
       "ranking": null
     }
   },
+  "research_packs": {
+    "acme": {
+      "path": "report/research/acme.html",
+      "unchecked": 2,
+      "lines": 12
+    },
+    "globex": {
+      "path": "report/research/globex.html",
+      "unchecked": 2,
+      "lines": 10
+    },
+    "initech": {
+      "path": "report/research/initech.html",
+      "unchecked": 3,
+      "lines": 13
+    }
+  },
   "doors": {
     "rows": [
       {

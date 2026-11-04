@@ -29,6 +29,9 @@ Rules:
   `date:` (the day it happens, or when applications close). Never use
   Meetup, Eventbrite or LinkedIn pages: say what you would have looked for
   under `NOT REACHED:` instead.
+- Also one or two facts on what the organisation is building (kind
+  `building`), and recent news from the last six months (kind `news`, with
+  `date:` the day it was published). These fill its research pack.
 - At most 15 facts and 10 manual roles, most useful first.
 
 Tag every item `VERIFIED` (you opened the primary source in this task and it
@@ -40,7 +43,7 @@ Return exactly this:
 FACT <n>
 org: <organisation id>
 fact: <one plain sentence>
-kind: office | team | event | programme | signal | eligibility
+kind: building | news | office | team | event | programme | signal | eligibility
 source: <link>
 date: <date on the source, or unknown>
 tag: VERIFIED | UNVERIFIED

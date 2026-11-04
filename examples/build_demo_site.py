@@ -7,6 +7,7 @@ and writes an index page that introduces them:
   docs/demo/index.html            the index page
   docs/demo/quick/index.html      LVLme quick's answer for one made-up posting
   docs/demo/dashboard/index.html  the full campaign's dashboard (five weekly runs)
+  docs/demo/dashboard/research/   its research pack for each fictional organisation
 
 Every page is self-contained (inline styles, no fonts, images or scripts
 loaded from anywhere), so the folder works opened from disk or served as
@@ -157,6 +158,12 @@ def build(out=OUT):
         dest = os.path.join(out, name, "index.html")
         os.makedirs(os.path.dirname(dest), exist_ok=True)
         shutil.copyfile(os.path.join(workspace, page), dest)
+        written.append(dest)
+    research = os.path.join(DEMO, "report", "research")     # the dashboard links to its research packs
+    for name in sorted(os.listdir(research)) if os.path.isdir(research) else []:
+        dest = os.path.join(out, "dashboard", "research", name)
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        shutil.copyfile(os.path.join(research, name), dest)
         written.append(dest)
     result = load(os.path.join(QD.folder_for(), "result.json"))
     dash = load(os.path.join(DEMO, "report", "for-agents", "dashboard.json"))

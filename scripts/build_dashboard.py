@@ -80,6 +80,7 @@ import _levels_html as LH  # noqa: E402
 import _posting_checks as PC  # noqa: E402
 import _applications as AP  # noqa: E402
 import _calibration as CAL  # noqa: E402
+import _research as RS  # noqa: E402
 import _doors as DR  # noqa: E402
 import _autopilot as APL  # noqa: E402
 import _static_html as ST  # noqa: E402
@@ -206,6 +207,8 @@ class Data:
         self.week = APL.newest_note(ws)                      # Autopilot's latest This week note, if any
         self.today = today or C.today_in(config)            # follow-ups fall due, and doors pass, by the calendar
         self.calib = CAL.summary(ws, self.apps, self.today) if self.apps else None   # advisory: never scored
+        self.orgs_doc = load("market", "orgs.json")
+        self.packs = {}                                      # research packs, written by main() before the page
         self.claims = (load("profile", "claims-audit.json") or {}).get("claims", [])
         self.swot = load("eval", "swot.json")
         self.ceilings = load("eval", "ceilings.json")
@@ -618,6 +621,7 @@ def build_data(data):
         "apps": AP.page_data(data.apps, data.today, data.org_names, clean),
         "doors": DR.page_data(data.doors, data.today, data.org_names),
         "calib": data.calib,
+        "packs": data.packs,
         "week": APL.page_data(data.week, clean),
     }
     out["orgOrder"] = [g for g in groups if g in out["orgs"]]
@@ -864,6 +868,8 @@ def agent_payload(data, page):
         payload["applications"] = AP.agent_data(data.apps, data.today, data.org_names)
     if data.calib:
         payload["calibration"] = data.calib
+    if data.packs:
+        payload["research_packs"] = {o: dict(p, path="report/" + p["path"]) for o, p in data.packs.items()}
     if data.doors is not None:
         payload["doors"] = DR.page_data(data.doors, data.today, data.org_names, limit=20)
     if sensitive or not share_names:
@@ -1030,6 +1036,7 @@ def summary_md(data, p):
         lines += AP.summary_lines(p["applications"])
     lines += DR.summary_lines(p.get("doors"))
     lines += CAL.summary_lines(p.get("calibration"))
+    lines += RS.summary_lines(data.packs, data.org_names)
     return "\n".join(lines) + "\n"
 
 
@@ -1041,6 +1048,7 @@ def main(argv=None):
     ws, config = C.open_workspace(args.workspace)
     data = Data(ws, config, C.check_date(args.today) if args.today else None)
     update_metrics_history(data)
+    data.packs = RS.write_all(ws, config, data.orgs_doc, data.roles_doc, data.doors, data.today)
     page_html, page = render_page(data)
     C.write_text(C.wpath(ws, "report", "index.html"), page_html)
     payload = agent_payload(data, page)

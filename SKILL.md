@@ -213,6 +213,9 @@ rights question when `fetch_roles.py` first finds an open role that needs it.
   to send (`method/CAMPAIGN.md`, "Applications and follow-ups"). Give
   `--role-id` for a scored role, so "How right has LVLme been" can check the
   odds it gave that day against what happened.
+- Before a coffee chat, an event or an application, point the person to that
+  organisation's research pack (`report/research/<org>.html`, rebuilt with
+  the dashboard) and offer to check any line marked not yet checked.
 - Process `campaign/inbox.md`: verify each "New" note against its source,
   then move it to "Processed" with a one-line outcome.
 

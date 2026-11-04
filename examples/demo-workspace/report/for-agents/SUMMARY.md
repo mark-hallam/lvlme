@@ -154,3 +154,8 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
   - Low: 1 sent, 0 with a result. Your rate shows after 5 results.
   - Ranking check: shows after 10 results, with at least one that led to an offer and one that didn't.
 - Public figures: Ashby Talent Trends: referrals (16 May 2025, https://www.ashbyhq.com/talent-trends-report/reports/referrals).
+
+## Research packs (one page per target, every line sourced)
+- Acme AI: report/research/acme.html (12 lines, 2 not yet checked).
+- Globex Labs: report/research/globex.html (10 lines, 2 not yet checked).
+- Initech Robotics: report/research/initech.html (13 lines, 3 not yet checked).
