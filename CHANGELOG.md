@@ -10,13 +10,13 @@ before. Nothing here changes how a score is worked out unless it says so.
 
 ## 0.6.2 (5 November 2026)
 
-A first-run polish release after a second new-user test and three rounds of
+A first-run polish release after a second new-user test and five rounds of
 independent design review (Claude, Codex and Grok, each blind). It makes the
 first answer a stranger gets agree with itself everywhere: in the chat, on
 the result page and on the dashboard. How a score is worked out did not
 change. The full notes are in [LVLme 0.6.2](docs/RELEASE-0.6.2.md).
 
-Tests: 538 pass.
+Tests: 546 pass.
 
 ### Fixed
 
@@ -32,42 +32,59 @@ Tests: 538 pass.
   refresh after promoting dropped the campaign's only role. The keyword now
   matches the title's own words in order. The dashboard's market table also
   counts the promoted role before any job-board summary exists.
-- **Every fix the agent suggested is accounted for.** The result page now
-  names every left-out fix with its reason (including "it is not in the top
-  3"), and names the factor that cannot move in a few
-  months, so an agent cannot tell the person the page lists something it
-  does not.
+- **A promoted campaign keeps the blind review's disagreement.** It is
+  written to `eval/reviews/<date>.json`, waiting for a tie-break, so the
+  dashboard says the reviewer disagreed (first score 3, reviewer 2) instead
+  of "Waiting for the reviewer".
+- **The saved posting keeps the visa and pay lines** that the job board
+  gives apart from the description. Agents read `posting.md`; one told the
+  person the posting did not say whether the role sponsors visas.
+- **Every fix the agent suggested is accounted for.** The result page names
+  every left-out fix with its reason (including "it is not in the top 3"),
+  and names the factor that cannot move in a few months, so an agent cannot
+  tell the person the page lists something it does not.
+- **The dashboard's no-script page** shows the date it was scored.
 
 ### Changed
 
-- **One status per factor on the result page**, for example "First score 3,
-  blind reviewer 2: counts as 2". The page says who did the blind review
-  when the agent records it (new optional `reviewed_by` in
-  `eval/quick.json`), how a factor's fit points are worked out, what E01 and
-  the other evidence ids are, and that the fixes total and the "up to" range
-  are two different what ifs. It says what the AI provider sees, and folds
-  the inputs fingerprint into Technical details.
+- **The result page's top card** says why in short (the three factors with
+  the most points still to win), what to do first, and who judged. The fit
+  bar says the fixes total and the "up to" range are two different cases,
+  and the fixes card says where the next band starts when the fixes do not
+  reach it.
+- **One status per factor**, for example "First score 3, blind reviewer 2:
+  counts as 2", and a plain review summary. The page says who did the blind
+  review when the agent records it (new optional `reviewed_by` in
+  `eval/quick.json`), and when it was the same model as the first judge, in
+  a fresh session. It also explains how a factor's fit points are worked
+  out, what E01 and the other evidence ids are, what the AI provider sees,
+  and folds the inputs fingerprint into Technical details.
 - **Honest about run to run differences.** The result page, the dashboard
   and the docs say that another AI agent, or another run of the same one,
   can judge the same evidence differently, often by a few fit points; the
   maths after the judging is the same.
-- **Dashboard words.** Altitude (fit) and Flight level (chance) say what
-  they are; Do next and the promote message explain that expected points
-  are a fix's gain times its chance of working, so they are smaller than the
-  gains on a quick result; Biggest unlocks says its numbers have no time
-  limit; the version history, outlook and empty SWOT text are plain and
-  point at the next step (the career interview); "What is missing" explains
-  its rows. The theme switch has Auto, the new default, which follows the
-  device like the website and the result page.
+- **Dashboard.** Altitude (fit) and Flight level (chance) say what they are.
+  Do next keeps one number per action and explains it with a worked example
+  ("8 points if it works, at about a 30% chance, is 2.4 expected") and a
+  tooltip; the promote message says so too. Do next ends with the career
+  interview while the campaign has no outlook, and the outlook and the empty
+  strengths and risks point there, so there is one list of next steps.
+  Biggest unlocks says its numbers have no time limit; What is missing
+  explains its rows; summary tiles say when they show a plan mode; Campaign
+  progress says its targets can be changed. The theme switch has Auto, the
+  new default, which follows the device. On a phone the title wraps and the
+  pending tick is a full-size tap target.
 - **The quick skill.** Agents never write or edit the blind review
   themselves (if they cannot start a separate reviewer, the scores wait for
-  one), write notes in plain words with no file paths, paste the result as
-  it is, and record who reviewed.
+  one), record who reviewed, write notes in plain words with no file paths,
+  paste the result as it is, ask about work rights as yes or no, and open no
+  page beyond the posting and up to three links in the CV.
 - **Docs.** LVLme quick asks at most two short questions (not one), and the
-  first message can carry the job link and where the CV is. If
-  the `/lvlme-quick` command is not found right after installing, start a
-  new Claude Code session. Cursor, other agents, Linux and Windows are
-  described as not tested yet, without predicting that they work.
+  first message can carry the job link and where the CV is. If the
+  `/lvlme-quick` command is not found right after installing, start a new
+  Claude Code session. Cursor, other agents, Linux and Windows are described
+  as not tested yet, without predicting that they work. Codex users say "run
+  LVLme quick".
 
 ## 0.6.1 (5 November 2026)
 
