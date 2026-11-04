@@ -387,3 +387,14 @@ class ParkedAndStaticTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ChanceExampleTests(unittest.TestCase):
+    """Do next's worked example reads the action's chance from the field the page data really has (a.p)."""
+
+    def test_the_example_uses_the_data_field(self):
+        import _dashboard_assets as AA
+        js = AA.JS_HOME + AA.JS_VIEWS + AA.JS_LEVELS + AA.JS_DETAIL + AA.JS_CORE + AA.JS_CHART
+        body = js[js.index("function chanceExample"):js.index("const doNextSub")]
+        self.assertIn("q.a.p * 100", body)
+        self.assertNotIn(".chance", body)

@@ -1532,8 +1532,8 @@ function doNextRows(list, nl, limit){
 }
 // One worked example from the first action, so the expected points never look like a different answer from the quick result.
 function chanceExample(){
-  const q = (lv().up || []).find(x => x.a.effects.length && x.works > x.exp + 0.05 && x.a.chance > 0);
-  return q ? ` For example, ${fmtP(q.works)} points if "${q.a.title}" works, at about a ${Math.round(q.a.chance * 100)}% chance, is ${fmtP(q.exp)} expected.` : "";
+  const q = (lv().up || []).find(x => x.a.effects.length && x.works > x.exp + 0.05 && x.a.p > 0);
+  return q ? ` For example, ${fmtP(q.works)} points if "${q.a.title}" works, at about a ${Math.round(q.a.p * 100)}% chance, is ${fmtP(q.exp)} expected.` : "";
 }
 const doNextSub = nl => (nl.top ? "Expected points each action adds to your best fit on its own: its full gain times its chance of working, so smaller than the gain on a LVLme quick result."
   : `Expected points toward Level ${nl.nextLevel}, each action on its own: its full gain times its chance of working, so smaller than the gain on a LVLme quick result. The path to Level ${nl.nextLevel} comes first.`) + chanceExample();
