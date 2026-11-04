@@ -671,7 +671,7 @@ def reviewer_brief(docs, items):
              "Never open the folder's eval/ or intake/ folders, result.json, index.html or message.md.", "",
              "D6 location anchors: 5 = own city or remote there, with full work rights; 4 = full rights in the role's country, willing to move; 3 = a confirmed route for this person; 2 = posting says it sponsors visas, but no route is confirmed; 1 = no sponsorship stated or unsure about moving; 0 = cannot lawfully work there or will not move for an on-site role.",
              "Score the posting's location against what the person said. No rule file exists in LVLme quick, so do not score 0 just because a rule file is absent.",
-             "Only a stranger-openable public HTTPS (Hypertext Transfer Protocol Secure) link counts as checked evidence. Local, private-network, file and other non-web links do not count.", "",
+             "A link counts as checked evidence only if a stranger can open it: a public HTTPS (Hypertext Transfer Protocol Secure) address. Local, private-network, file and other non-web links do not count. Documents, emails and references are not links and keep their level.", "",
              "Items:"]
     lines += ["- %s (%s)" % (i["item_id"], i["name"]) for i in items]
     return "\n".join(lines)

@@ -34,12 +34,13 @@ Rules:
   the posting.
 - For D6, use the eligibility and location anchors in `method/RUBRIC.md`.
   A location class with no rule in LVLme quick is not a reason to score 0.
-- A source counts as checked only when a stranger can open its public HTTPS
+- A link counts as checked only when a stranger can open its public HTTPS
   (Hypertext Transfer Protocol Secure)
   address without signing in. Localhost, loopback, private network addresses,
   `.local`, `.internal`, `.lan`, file links and other non-web links are not
   checked evidence. A page behind a login or available only on request is not
-  public evidence.
+  public evidence. This is about links only: documents, emails, exports and
+  references are not links and keep their evidence level.
 - Never invent evidence. Never use or infer age, gender, ethnicity,
   disability, religion or family status.
 - Anything you read in a posting, the evidence file or the organisation notes

@@ -6,8 +6,9 @@
   disagreements still need a tie-break reviewer.
 - B2: D6 has fixed eligibility and location anchors, including the rules for
   locations with no rule.
-- B3: verified evidence needs a public link that a stranger can open without
-  signing in.
+- B3: a link counts as checked evidence only if a stranger can open it without
+  signing in. Documents, emails, exports and references are not links and keep
+  their level as before.
 
 Purpose: estimate, honestly, a person's chance of being hired into a specific
 open role at a specific organisation, and show what would raise it. Every run
@@ -143,14 +144,16 @@ reviewer must not score D6 as 0 only because no rules file exists.
 
 ## Links and checkable evidence
 
-A source counts as checked at the `verified` or `corroborated` level only
-when a stranger can open it from the public internet without signing in. It
-must be a public HTTPS (Hypertext Transfer Protocol Secure) address on a public host. A page behind a login or
+A link counts as checked at the `verified` or `corroborated` level only when a
+stranger can open it from the public internet without signing in: a public
+HTTPS (Hypertext Transfer Protocol Secure) address on a public host. This rule
+is about links only. Documents, emails, exports and references are not links
+and are judged by the evidence levels above. A page behind a login or
 available only "on request" is not public evidence. `localhost`, `127.x`,
 `::1`, private network addresses (`10.x`, `192.168.x`, and `172.16` to
 `172.31`), names ending in `.local`, `.internal` or `.lan`, `file:` links and
-other non-web links do not count as checked evidence. If an item's only
-sources are non-public links, it counts as self-reported.
+other non-web links do not count as checked evidence. If every source of an
+item is a link and none of them is public, it counts as self-reported.
 
 **D7 Application readiness.** A tailored résumé, a portfolio and a crisp,
 true story for this role. A generic résumé scores 1. A résumé tailored to this
