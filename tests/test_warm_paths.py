@@ -161,7 +161,7 @@ class DashboardTests(unittest.TestCase):
         self.assertLess(body.index('id="warmCard"'), body.index('id="unlocksCard"'))
         self.assertIn('<div class="card pair" id="warmCard" hidden>', body)
         self.assertIn("<h2 class=\"pane-h\" style=\"margin:18px 0 0\">Warm paths</h2>", page)
-        self.assertLess(page.index("${doNextHTML()}</div>\n    ${warm ?"), page.index(">Biggest unlocks</h2>"))
+        self.assertLess(page.index("${doNextHTML()}${interviewLine()}</div>\n    ${warm ?"), page.index(">Biggest unlocks</h2>"))
         self.assertIn('<span class="sr-only">furthest stage: </span>', page)        # the words carry it, not colour alone
         self.assertIn('<span class="wp-bar" aria-hidden="true">', page)
         self.assertIn("Progress only: it changes no score.", page)

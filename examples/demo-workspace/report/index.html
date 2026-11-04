@@ -1104,7 +1104,7 @@ function renderDoNext(){
 }
 function renderHome(){
   const card = $("#detailCard"), warm = warmHTML(), apps = appsHTML(), doors = doorsHTML(), calib = calibHTML(), stories = storiesHTML(), pub = publicHTML();
-  card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h2 class="pane-h" style="margin:0">Do next</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div><div>${doNextHTML()}</div>
+  card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h2 class="pane-h" style="margin:0">Do next</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div><div>${doNextHTML()}${interviewLine()}</div>
     ${warm ? `<h2 class="pane-h" style="margin:18px 0 0">Warm paths</h2><div class="tiny sub" style="margin-bottom:4px">${esc(warmSub())}</div>${warm}` : ""}
     ${doors ? `<h2 class="pane-h" style="margin:18px 0 0">Doors</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doorsSub())}</div>${doors}` : ""}
     ${apps ? `<h2 class="pane-h" style="margin:18px 0 0">Applications</h2><div class="tiny sub" style="margin-bottom:4px">${esc(appsSub())}</div>${apps}` : ""}
