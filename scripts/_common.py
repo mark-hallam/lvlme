@@ -39,7 +39,8 @@ DIMENSION_NAMES = {
     "D7": "Application readiness",
 }
 DEFAULT_WEIGHTS = {"D1": 25, "D2": 20, "D3": 20, "D4": 10, "D5": 10, "D6": 10, "D7": 5}
-BANDS = ["Very low", "Low", "Moderate", "Good", "Strong"]
+BANDS = ["Very low", "Low", "Moderate", "Good", "Strong"]   # the five fit levels
+CHANCE_BANDS = ["Almost none"] + BANDS                       # chance of an interview or an offer (rubric 1.1)
 BLOCKER_TYPES = ["us_person_export_control", "security_clearance", "citizenship", "licence"]
 # Evidence ids: 1 to 3 capital letters, then digits. E is the default for new items (E01, E02, ...);
 # other prefixes keep a source's own numbering (for example G01 for email findings).

@@ -404,8 +404,8 @@
         }
       },
       "fit": 28.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "adjustments": [
         "Hard requirement lacking (4+ years of product management): D1 capped at 1 and both bands down one step"
       ],
@@ -483,8 +483,8 @@
         }
       },
       "fit": 24.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "adjustments": [
         "Hard requirement lacking (5+ years of product management): D1 capped at 1 and both bands down one step"
       ],
@@ -566,7 +566,7 @@
       },
       "fit": 23.0,
       "interview_band": "Very low",
-      "offer_band": "Very low",
+      "offer_band": "Almost none",
       "adjustments": [
         "D2 2 counted as 1: best cited evidence is self-reported achievement, which supports at most 1"
       ],
@@ -644,8 +644,8 @@
         }
       },
       "fit": 20.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "adjustments": [
         "Hard requirement lacking (5+ years in safety policy or standards): D1 capped at 1 and both bands down one step"
       ],
@@ -723,8 +723,8 @@
         }
       },
       "fit": 18.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "adjustments": [
         "Hard requirement lacking (3+ years in trust and safety or policy operations): D1 capped at 1 and both bands down one step"
       ],
@@ -802,8 +802,8 @@
         }
       },
       "fit": 12.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "adjustments": [
         "Eligibility blocker (Security clearance, US person or export control (ITAR)): D6 = 0",
         "Hard requirement lacking (US citizenship and a security clearance): D1 capped at 1 and both bands down one step"

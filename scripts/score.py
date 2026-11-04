@@ -55,8 +55,9 @@ import _public_link as PL  # noqa: E402
 
 RUBRIC_VERSION = "1.1"
 BANDS = C.BANDS
-INTERVIEW_TABLE = [(85, "Strong"), (70, "Good"), (55, "Moderate"), (40, "Low"), (0, "Very low")]
-OFFER_TABLE = [(85, "Good"), (70, "Moderate"), (55, "Low"), (40, "Very low"), (0, "Very low")]
+CHANCE_BANDS = C.CHANCE_BANDS
+INTERVIEW_TABLE = [(85, "Strong"), (70, "Good"), (55, "Moderate"), (40, "Low"), (15, "Very low"), (0, "Almost none")]
+OFFER_TABLE = [(85, "Good"), (70, "Moderate"), (55, "Low"), (25, "Very low"), (0, "Almost none")]
 LEVEL_CAPS = {"verified": 5, "corroborated": 4, "unverified": 0, "contradicted": 0}
 DEFAULT_SELF_CAPS = {"job_history": 3, "education": 3, "eligibility": 5, "preference": 5, "default": 1}
 DEFAULT_PARTIAL_CAP = 2
@@ -69,11 +70,11 @@ def band_for(table, fit):
     for threshold, band in table:
         if fit >= threshold:
             return band
-    return "Very low"
+    return "Almost none"
 
 
 def shift(band, steps):
-    return BANDS[min(max(BANDS.index(band) + steps, 0), len(BANDS) - 1)]
+    return CHANCE_BANDS[min(max(CHANCE_BANDS.index(band) + steps, 0), len(CHANCE_BANDS) - 1)]
 
 
 class Ctx:
@@ -265,7 +266,7 @@ def score_role(ctx, role, judgement):
         interview, offer = shift(interview, -1), shift(offer, -1)
         why = lacking_note or ("an eligibility blocker" if blocked else "hard requirement lacking")
         adjustments.append("Hard requirement lacking (%s): D1 capped at 1 and both bands down one step" % why)
-    if scores["D3"]["score"] <= 1 and BANDS.index(offer) > BANDS.index("Low"):
+    if scores["D3"]["score"] <= 1 and CHANCE_BANDS.index(offer) > CHANCE_BANDS.index("Low"):
         offer = "Low"
         adjustments.append("Cold application only (D3 at most 1): offer band capped at Low")
     return {
@@ -280,7 +281,7 @@ def score_role(ctx, role, judgement):
 
 
 def sort_key(r):
-    return (-r["fit"], -BANDS.index(r["interview_band"]), r["role_id"])
+    return (-r["fit"], -CHANCE_BANDS.index(r["interview_band"]), r["role_id"])
 
 
 def gap_pools(ctx, scored):

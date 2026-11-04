@@ -419,8 +419,8 @@
         }
       },
       "fit": 34.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "adjustments": [
         "Hard requirement lacking (4+ years of product management): D1 capped at 1 and both bands down one step"
       ],
@@ -501,8 +501,8 @@
         }
       },
       "fit": 30.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "adjustments": [
         "Hard requirement lacking (5+ years of product management): D1 capped at 1 and both bands down one step"
       ],
@@ -668,8 +668,8 @@
         }
       },
       "fit": 24.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "adjustments": [
         "Hard requirement lacking (3+ years in trust and safety or policy operations): D1 capped at 1 and both bands down one step"
       ],
@@ -750,8 +750,8 @@
         }
       },
       "fit": 22.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "adjustments": [
         "Hard requirement lacking (5+ years in safety policy or standards): D1 capped at 1 and both bands down one step"
       ],
@@ -832,8 +832,8 @@
         }
       },
       "fit": 18.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "adjustments": [
         "Eligibility blocker (Security clearance, US person or export control (ITAR)): D6 = 0",
         "Hard requirement lacking (US citizenship and a security clearance): D1 capped at 1 and both bands down one step"
@@ -910,7 +910,7 @@
       },
       "fit": 15.0,
       "interview_band": "Very low",
-      "offer_band": "Very low",
+      "offer_band": "Almost none",
       "adjustments": [
         "Not yet judged: D1, D2 and D4 count as 0 until the scorer judges this role"
       ],

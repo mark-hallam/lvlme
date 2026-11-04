@@ -18,7 +18,7 @@ follow along: `examples/demo-workspace/report/index.html`.
 2. Read your level card (2): the points to the next level, and whether your
    plan gets you there.
 3. Do the first action in **Do next** (3; on a phone it sits under the level
-   card). That is enough for today.
+   card). That is enough.
 
 ## What each part means
 
@@ -31,7 +31,7 @@ knows your work, each from 0 to 5, and weights them into this one number. A
 separate, sceptical reviewer checks every factor scored above 2. One point
 apart, the reviewer's score counts; further apart, a tie-break decides.
 
-Your chances are the words under it: **Interview** Moderate and **Offer** Low in the demo. They run Very low, Low, Moderate, Good, Strong. They are
+Your chances are the words under it: **Interview** Moderate and **Offer** Low in the demo. They run Almost none, Very low, Low, Moderate, Good, Strong. They are
 careful judgements, not statistics.
 
 ### 2. The level card

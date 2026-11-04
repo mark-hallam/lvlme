@@ -99,10 +99,10 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 - 45  Initech Robotics: Product Manager, Warehouse Autonomy (interview Low, offer Very low) https://example.com/jobs/initech/i-0002
 - 39  Globex Labs: AI Success Manager, Asia (interview Very low, offer Very low) https://example.com/jobs/globex/g-0003
 - 37  Globex Labs: Technical Program Manager, Infrastructure (interview Very low, offer Very low) https://example.com/jobs/globex/g-0002
-- 34  Globex Labs: Product Manager, Developer Platform (interview Very low, offer Very low) https://example.com/jobs/globex/g-0001
-- 28  Globex Labs: Trust and Safety Operations Lead (interview Very low, offer Very low) https://example.com/jobs/globex/g-0004
-- 24  Acme AI: Policy Manager, Safeguards Operations (interview Very low, offer Very low) https://example.com/jobs/acme/4100004
-- 24  Initech Robotics: Policy Lead, Robotics Safety Standards (interview Very low, offer Very low) https://example.com/jobs/initech/i-0003
+- 34  Globex Labs: Product Manager, Developer Platform (interview Almost none, offer Almost none) https://example.com/jobs/globex/g-0001
+- 28  Globex Labs: Trust and Safety Operations Lead (interview Almost none, offer Almost none) https://example.com/jobs/globex/g-0004
+- 24  Acme AI: Policy Manager, Safeguards Operations (interview Almost none, offer Almost none) https://example.com/jobs/acme/4100004
+- 24  Initech Robotics: Policy Lead, Robotics Safety Standards (interview Almost none, offer Almost none) https://example.com/jobs/initech/i-0003
 
 ## Questions only the person can answer
 - What is your notice period at your current employer, and do you have any non-compete terms? (Sets the earliest start date and whether some roles are off limits (D6, D7).)
@@ -146,12 +146,14 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 
 ## How right has LVLme been (advisory: changes no score)
 - Chance of an interview, by the band LVLme gave on the day:
-  - Very low: 6 sent, 5 with a result. 0 led to an interview: 0%. Public figures for applications like these: 3%. Blended: 2%.
+  - Almost none: 2 sent, 2 with a result. Your rate shows after 5 results.
+  - Very low: 4 sent, 3 with a result. Your rate shows after 5 results.
   - Low: 1 sent, 1 with a result. Your rate shows after 5 results.
   - Moderate: 1 sent, 0 with a result. Your rate shows after 5 results.
   - Ranking check: shows after 10 results, with at least one that led to an interview and one that didn't.
 - Chance of an offer, by the band LVLme gave on the day:
-  - Very low: 7 sent, 6 with a result. 0 led to an offer: 0%. Public figures for applications like these: under 1%. Blended: under 1%.
+  - Almost none: 2 sent, 2 with a result. Your rate shows after 5 results.
+  - Very low: 5 sent, 4 with a result. Your rate shows after 5 results.
   - Low: 1 sent, 0 with a result. Your rate shows after 5 results.
   - Ranking check: shows after 10 results, with at least one that led to an offer and one that didn't.
 - Public figures: Ashby Talent Trends: referrals (16 May 2025, https://www.ashbyhq.com/talent-trends-report/reports/referrals).

@@ -43,8 +43,8 @@
           "properties": {
             "run_date": {"$ref": "#/definitions/date"},
             "fit": {"type": "number"},
-            "interview_band": {"enum": ["Very low", "Low", "Moderate", "Good", "Strong"]},
-            "offer_band": {"enum": ["Very low", "Low", "Moderate", "Good", "Strong"]},
+            "interview_band": {"enum": ["Almost none", "Very low", "Low", "Moderate", "Good", "Strong"]},
+            "offer_band": {"enum": ["Almost none", "Very low", "Low", "Moderate", "Good", "Strong"]},
             "warm": {"type": "boolean", "description": "A warm referral (D3 at least 4) on that day."}
           }
         }

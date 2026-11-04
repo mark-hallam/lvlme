@@ -68,7 +68,7 @@
       "required": ["band", "text"],
       "additionalProperties": false,
       "properties": {
-        "band": {"enum": ["Very low", "Low", "Moderate", "Good", "Strong", "Not yet judged"]},
+        "band": {"enum": ["Almost none", "Very low", "Low", "Moderate", "Good", "Strong", "Not yet judged"]},
         "text": {"type": "string"},
         "reasons": {"type": "array", "items": {"type": "string"}},
         "judged_on": {"$ref": "#/definitions/date"}
@@ -95,7 +95,7 @@
     "extension": {"description": "Extension field: any key starting x_ holds data the engine never reads (for example a field from an older system). Kept as is."},
     "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
     "dimension": {"enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]},
-    "band": {"enum": ["Very low", "Low", "Moderate", "Good", "Strong"]},
+    "band": {"enum": ["Almost none", "Very low", "Low", "Moderate", "Good", "Strong"]},
     "score": {
       "type": "object",
       "required": ["score", "raw", "evidence", "note"],

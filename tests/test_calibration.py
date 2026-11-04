@@ -72,6 +72,11 @@ class DemoTests(unittest.TestCase):
         self.apps = H.load(os.path.join(self.ws, "campaign", "applications.json"))
 
     def test_the_panel_counts_and_hides_bands_under_five(self):
+        # Two applications were sent under rubric 1.0, before "Almost none" existed: their recorded bands
+        # stay as they were, and the panel still reads them.
+        for app in self.apps["applications"]:
+            if (app.get("predicted") or {}).get("interview_band") == "Almost none":
+                app["predicted"].update(interview_band="Very low", offer_band="Very low")
         s = CAL.summary(self.ws, self.apps, TODAY)
         bands = {b["band"]: b for b in s["interview"]["bands"]}
         self.assertEqual((bands["Very low"]["sent"], bands["Very low"]["results"], bands["Very low"]["hits"]), (6, 5, 0))
@@ -81,6 +86,11 @@ class DemoTests(unittest.TestCase):
         self.assertEqual((bands["Moderate"]["waiting"], bands["Moderate"]["shown"]), (1, False))
         self.assertAlmostEqual(bands["Very low"]["blended"], round(10 * 0.03 / 15, 3))
         self.assertIsNone(s["interview"]["ranking"])                                       # 7 results, under 10
+
+    def test_almost_none_is_its_own_band(self):
+        s = CAL.summary(self.ws, self.apps, TODAY)
+        bands = {b["band"]: b for b in s["interview"]["bands"]}
+        self.assertEqual((bands["Almost none"]["sent"], bands["Almost none"]["shown"]), (2, False))
 
     def test_scores_are_identical_with_or_without_outcomes(self):
         def run():

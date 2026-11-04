@@ -452,7 +452,7 @@ def rank_fixes(docs, flags, agreed, scored):
         rows.append({"id": fx["id"], "dimension": d, "name": NAMES[d], "title": fx["title"],
                      "next_step": fx["next_step"], "from": cur, "to": to, "gain": gain, "fit_after": after["fit"],
                      "interview_after": after["interview_band"], "offer_after": after["offer_band"]})
-    rows.sort(key=lambda r: (-r["gain"], -C.BANDS.index(r["interview_after"]), -C.BANDS.index(r["offer_after"]),
+    rows.sort(key=lambda r: (-r["gain"], -C.CHANCE_BANDS.index(r["interview_after"]), -C.CHANCE_BANDS.index(r["offer_after"]),
                              r["id"]))
     ranked, seen = [], set()
     for r in rows:

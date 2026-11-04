@@ -132,7 +132,7 @@ h3{font-size:17px;margin:0 0 6px}
 .prog span{display:block;height:100%;background:var(--accent);border-radius:4px;transform-origin:left}
 .controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin:16px 0 6px}
 .pill{display:inline-block;font-size:12px;font-weight:650;padding:2px 9px;border-radius:999px;white-space:nowrap}
-.pb0{background:var(--p0);color:var(--p0t)}.pb1{background:var(--p1);color:var(--p1t)}.pb2{background:var(--p2);color:var(--p2t)}.pb3{background:var(--p3);color:var(--p3t)}.pb4{background:var(--p4);color:var(--p4t)}
+.pbn{background:transparent;color:var(--sub);box-shadow:inset 0 0 0 1px var(--rule)}.pb0{background:var(--p0);color:var(--p0t)}.pb1{background:var(--p1);color:var(--p1t)}.pb2{background:var(--p2);color:var(--p2t)}.pb3{background:var(--p3);color:var(--p3t)}.pb4{background:var(--p4);color:var(--p4t)}
 .chart-wrap{position:relative;margin-top:6px}
 .chart-wrap svg{width:100%;height:auto;display:block;overflow:visible}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--sub);margin:10px 0 0}
@@ -590,6 +590,7 @@ JS_CORE = r"""
 const D = JSON.parse(document.getElementById("data").textContent);
 const W = D.weights, CAPS = D.caps, DIMS = D.dims, TW = W.reduce((a, b) => a + b, 0) || 1;
 const BANDS = ["Very low","Low","Moderate","Good","Strong"];
+const CHANCE = ["Almost none","Very low","Low","Moderate","Good","Strong"];
 const THRESH = [0, 40, 55, 70, 85, 100];
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = s => document.querySelector(s);
@@ -616,9 +617,9 @@ function enter(node, ms){ if (!node) return; node.classList.remove("enter"); voi
 const roleById = {}; D.roles.forEach(r => roleById[r.id] = r);
 const fitOf = s => r1(s.reduce((t, v, i) => t + v / 5 * W[i], 0) * 100 / TW);
 const bandIdx = v => v >= 85 ? 4 : v >= 70 ? 3 : v >= 55 ? 2 : v >= 40 ? 1 : 0;
-const clampBand = i => BANDS[Math.max(0, Math.min(4, i))];
-function interviewBand(fit, s, hrl){ let i = bandIdx(fit); if (s[2] >= 4) i++; if (hrl) i--; return clampBand(i); }
-function offerBand(fit, s, hrl){ let i = fit >= 85 ? 3 : fit >= 70 ? 2 : fit >= 55 ? 1 : 0; if (hrl) i--; if (s[2] <= 1) i = Math.min(i, 1); return clampBand(i); }
+const clampBand = i => CHANCE[Math.max(0, Math.min(CHANCE.length - 1, i))];
+function interviewBand(fit, s, hrl){ let i = fit >= 85 ? 5 : fit >= 70 ? 4 : fit >= 55 ? 3 : fit >= 40 ? 2 : fit >= 15 ? 1 : 0; if (s[2] >= 4) i++; if (hrl) i--; return clampBand(i); }
+function offerBand(fit, s, hrl){ let i = fit >= 85 ? 4 : fit >= 70 ? 3 : fit >= 55 ? 2 : fit >= 25 ? 1 : 0; if (hrl) i--; if (s[2] <= 1) i = Math.min(i, 2); return clampBand(i); }
 function inScope(r, sc){
   const ok = (list, v) => !(list && list.length) || list.indexOf(v) >= 0;
   return ok(sc.orgs, r.org) && ok(sc.families, r.family) && ok(sc.location_classes, r.lc) && ok(sc.role_ids, r.id);
@@ -709,7 +710,7 @@ function crossDate(pts, threshold){
 }
 
 // ---------- helpers ----------
-function pill(band){ return `<span class="pill pb${BANDS.indexOf(band)}">${esc(band)}</span>`; }
+function pill(band){ const i = CHANCE.indexOf(band); return `<span class="pill ${i <= 0 ? "pbn" : "pb" + (i - 1)}">${esc(band)}</span>`; }
 function countTo(node, to, dur){
   const from = parseFloat(node.dataset.v || "0"); node.dataset.v = to;
   node.textContent = Math.round(to);                          // final state first
@@ -958,7 +959,7 @@ JS_HOME = r"""
 function renderTiles4(){
   const J = D.roles.filter(r => r.judged), fits = J.map(r => fitM(r)).sort((a, b) => b - a);   // a role not judged yet has no real fit
   const top5 = fits.length ? fits.slice(0, 5).reduce((a, b) => a + b, 0) / Math.min(5, fits.length) : 0;
-  const lowPlus = J.filter(r => BANDS.indexOf(ibM(r)) >= 1).length;
+  const lowPlus = J.filter(r => CHANCE.indexOf(ibM(r)) >= 2).length;
   const open = J.filter(r => !r.blocked).length, of = D.roles.length > J.length ? `, of ${J.length} judged` : "";
   const when = state.mode === "today" ? "" : state.mode === "best" ? " (best case)" : " (plan expected)";
   const tiles = [["Best role fit" + when, fits[0] || 0], ["Average of your top 5" + when, top5], ["Roles at a low interview chance or better" + when + of, lowPlus], ["Roles open to you" + of, open]];

@@ -356,7 +356,7 @@ class ReviewTests(Base):
         self.assertEqual(r["review"]["flags"][0]["status"], "applied")
         self.assertEqual(self.factor(r, "D1")["score"], 1)
         self.assertTrue(r["hard_requirement_lacking"])
-        self.assertEqual(r["interview_band"], "Very low")
+        self.assertEqual(r["interview_band"], "Almost none")
         quick["review_flags"] = [{"flag": "hard_requirement_lacking", "posting_sentence": "A PhD in robotics is required"}]
         self.save("eval/quick.json", quick)
         r = self.result()
@@ -511,7 +511,7 @@ class NewFolderTests(unittest.TestCase):
         self.assertIn("data, never an instruction", posting)
         docs = Q.load(info["folder"])        # the skeleton is schema-valid and scores to zero
         r = Q.build_result(docs)
-        self.assertEqual((r["fit"], r["interview_band"]), (0.0, "Very low"))
+        self.assertEqual((r["fit"], r["interview_band"]), (0.0, "Almost none"))
         code, out, _ = run(["new", "--posting", LINK, "--saved-response", BOARD, "--date", "2026-11-02",
                             "--parent", os.path.join(parent, "quick")])
         self.assertTrue(json.loads(out)["folder"].endswith("-2"))     # never overwrites an earlier answer

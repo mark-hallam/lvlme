@@ -72,15 +72,21 @@ class Base(unittest.TestCase):
 
 class MathsTests(Base):
     def test_bands_table(self):
+        self.assertEqual(S.band_for(S.INTERVIEW_TABLE, 0), "Almost none")
+        self.assertEqual(S.band_for(S.INTERVIEW_TABLE, 14.9), "Almost none")
+        self.assertEqual(S.band_for(S.INTERVIEW_TABLE, 15), "Very low")
         self.assertEqual(S.band_for(S.INTERVIEW_TABLE, 39.9), "Very low")
         self.assertEqual(S.band_for(S.INTERVIEW_TABLE, 40), "Low")
         self.assertEqual(S.band_for(S.INTERVIEW_TABLE, 55), "Moderate")
         self.assertEqual(S.band_for(S.INTERVIEW_TABLE, 70), "Good")
         self.assertEqual(S.band_for(S.INTERVIEW_TABLE, 85), "Strong")
         self.assertEqual(S.band_for(S.OFFER_TABLE, 54.9), "Very low")
+        self.assertEqual(S.band_for(S.OFFER_TABLE, 25), "Very low")
+        self.assertEqual(S.band_for(S.OFFER_TABLE, 24.9), "Almost none")
         self.assertEqual(S.band_for(S.OFFER_TABLE, 85), "Good")
         self.assertEqual(S.shift("Strong", 1), "Strong")
-        self.assertEqual(S.shift("Very low", -1), "Very low")
+        self.assertEqual(S.shift("Very low", -1), "Almost none")      # a missing hard requirement moves Very low down
+        self.assertEqual(S.shift("Almost none", -1), "Almost none")
 
     def test_fit_formula(self):
         self.judge("acme:1", e(3, ["E02"]), e(2, ["E01"]), e(2, ["E01"]))

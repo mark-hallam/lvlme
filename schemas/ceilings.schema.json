@@ -55,7 +55,7 @@
                 "phase": {"type": "string"},
                 "fit_likely": {"type": "number", "minimum": 0, "maximum": 100},
                 "fit_if_every_step_lands": {"type": "number", "minimum": 0, "maximum": 100},
-                "band_if_every_step_lands": {"enum": ["Very low", "Low", "Moderate", "Good", "Strong"]}
+                "band_if_every_step_lands": {"enum": ["Almost none", "Very low", "Low", "Moderate", "Good", "Strong"]}
               }
             }
           }

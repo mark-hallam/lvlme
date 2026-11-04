@@ -165,7 +165,7 @@ offices in the user's region, teams growing, events, partner programmes.
 Seven dimensions, 0 to 5, weights configurable per goal (defaults below):
 D1 requirements match 25 · D2 proof of work 20 · D3 warm path 20 · D4 org-specific
 edge 10 · D5 public signal 10 · D6 eligibility and logistics 10 · D7 application
-readiness 5. Fit = Σ score/5 × weight. Bands (Very low → Strong) for interview
+readiness 5. Fit = Σ score/5 × weight. Bands (Almost none → Strong) for interview
 and offer, with three adjustments (referral up, hard requirement lacking down,
 cold-only caps offer at Low). Full rules: `method/RUBRIC.md`. Review protocol:
 `method/REVIEW.md` (the review is blind: the reviewer gets the rubric, the

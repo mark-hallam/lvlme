@@ -113,8 +113,8 @@ def results(ws, doc, today, runs=None):
 def ranking(rows, kind):
     """How often LVLme rated an application that got the result above one that didn't (ties count half), or None."""
     key = kind + "_band"
-    done = [(C.BANDS.index(r["pred"][key]), r["out"][kind]) for r in rows
-            if r["out"][kind] is not None and r["pred"].get(key) in C.BANDS]
+    done = [(C.CHANCE_BANDS.index(r["pred"][key]), r["out"][kind]) for r in rows
+            if r["out"][kind] is not None and r["pred"].get(key) in C.CHANCE_BANDS]
     yes, no = [b for b, o in done if o], [b for b, o in done if not o]
     if len(done) < MIN_RANK or not yes or not no:
         return None
@@ -131,7 +131,7 @@ def summary(ws, doc, today, runs=None):
            "min_band": MIN_BAND, "min_rank": MIN_RANK}
     for kind in KINDS:
         bands = []
-        for band in C.BANDS:
+        for band in C.CHANCE_BANDS:
             mine = [r for r in rows if r["pred"].get(kind + "_band") == band]
             if not mine:
                 continue

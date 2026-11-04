@@ -85,8 +85,8 @@
       "predicted": {
         "run_date": "2026-10-11",
         "fit": 28.0,
-        "interview_band": "Very low",
-        "offer_band": "Very low",
+        "interview_band": "Almost none",
+        "offer_band": "Almost none",
         "warm": false
       },
       "thanked": false
@@ -103,8 +103,8 @@
       "predicted": {
         "run_date": "2026-10-18",
         "fit": 34.0,
-        "interview_band": "Very low",
-        "offer_band": "Very low",
+        "interview_band": "Almost none",
+        "offer_band": "Almost none",
         "warm": false
       },
       "thanked": false

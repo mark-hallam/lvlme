@@ -1433,8 +1433,8 @@
       ],
       "url": "https://example.com/jobs/globex/g-0001",
       "fit": 34.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "scores": {
         "D1": 1,
         "D2": 2,
@@ -1460,8 +1460,8 @@
       ],
       "url": "https://example.com/jobs/globex/g-0004",
       "fit": 28.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "scores": {
         "D1": 1,
         "D2": 1,
@@ -1487,8 +1487,8 @@
       ],
       "url": "https://example.com/jobs/acme/4100004",
       "fit": 24.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "scores": {
         "D1": 1,
         "D2": 1,
@@ -1514,8 +1514,8 @@
       ],
       "url": "https://example.com/jobs/initech/i-0003",
       "fit": 24.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "scores": {
         "D1": 1,
         "D2": 1,
@@ -1541,8 +1541,8 @@
       ],
       "url": "https://example.com/jobs/acme/4100006",
       "fit": 18.0,
-      "interview_band": "Very low",
-      "offer_band": "Very low",
+      "interview_band": "Almost none",
+      "offer_band": "Almost none",
       "scores": {
         "D1": 1,
         "D2": 1,
@@ -1570,7 +1570,7 @@
       "url": "https://example.com/jobs/initech/i-0004",
       "fit": 17.0,
       "interview_band": "Very low",
-      "offer_band": "Very low",
+      "offer_band": "Almost none",
       "scores": {
         "D1": 0,
         "D2": 0,
@@ -2070,15 +2070,20 @@
     "interview": {
       "bands": [
         {
+          "band": "Almost none",
+          "sent": 2,
+          "results": 2,
+          "hits": 0,
+          "waiting": 0,
+          "shown": false
+        },
+        {
           "band": "Very low",
-          "sent": 6,
-          "results": 5,
+          "sent": 4,
+          "results": 3,
           "hits": 0,
           "waiting": 1,
-          "shown": true,
-          "rate": 0.0,
-          "public": 0.03,
-          "blended": 0.02
+          "shown": false
         },
         {
           "band": "Low",
@@ -2102,15 +2107,20 @@
     "offer": {
       "bands": [
         {
+          "band": "Almost none",
+          "sent": 2,
+          "results": 2,
+          "hits": 0,
+          "waiting": 0,
+          "shown": false
+        },
+        {
           "band": "Very low",
-          "sent": 7,
-          "results": 6,
+          "sent": 5,
+          "results": 4,
           "hits": 0,
           "waiting": 1,
-          "shown": true,
-          "rate": 0.0,
-          "public": 0.0018,
-          "blended": 0.001
+          "shown": false
         },
         {
           "band": "Low",

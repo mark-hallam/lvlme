@@ -96,7 +96,7 @@ these organisations, and what would raise my odds? Then it runs the campaign
 with you.
 
 1. **Your honest odds**, for every open role that fits your goal, from
-   evidence, not vibes. Most people start "Very low". That is the point: you
+   evidence, not vibes. You may well start at "Very low" or "Almost none". That is the point: you
    see the real starting line.
 2. **Why**, factor by factor, with every point traced to a source.
 3. **A campaign** that turns the gaps into a short, prioritised list of
@@ -166,7 +166,7 @@ Each open role is scored 0 to 5 on seven factors: requirements match, proof of
 work, warm path (someone inside who vouches for you), organisation-specific
 edge, public signal, eligibility and logistics, and application readiness.
 Weighted together they give a fit score out of 100, which maps to a chance
-band for an interview and for an offer (Very low, Low, Moderate, Good, Strong).
+band for an interview and for an offer (Almost none, Very low, Low, Moderate, Good, Strong).
 A referral moves the interview band up; a missing hard requirement moves both
 down; a cold application caps the offer band at Low. The full rules are in
 [`method/RUBRIC.md`](../method/RUBRIC.md).

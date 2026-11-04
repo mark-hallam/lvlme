@@ -17,7 +17,7 @@ import html
 import _ai_policies as AP
 import _common as C
 
-BANDS = ["Very low", "Low", "Moderate", "Good", "Strong"]
+BANDS = C.CHANCE_BANDS
 LEVELS = {"verified": ("Verified", "v"), "corroborated": ("Corroborated", "v"),
           "partially_verified": ("Partly checked", "p"), "self_reported": ("Self-reported", "s"),
           "unverified": ("No source", "c"), "contradicted": ("Contradicted", "c")}
@@ -27,6 +27,7 @@ SOURCES = {"resume": "CV", "interview": "your answer", "linkedin_export": "Linke
            "talk": "talk", "web_search": "web search", "email": "email", "reference": "referee",
            "document": "document", "other": "other"}
 EXPLAIN = {
+    "Almost none": "As things stand, this application would almost certainly be screened out.",
     "Very low": "As things stand, this application would most likely be screened out.",
     "Low": "An interview is possible, but unlikely as things stand.",
     "Moderate": "You are in the running for an interview, but not yet a strong pick.",
@@ -72,7 +73,7 @@ p{margin:6px 0}
 .tile{background:var(--card2);border-radius:14px;padding:14px 16px}
 .tile .k{font-size:13px;color:var(--sub);font-weight:600}
 .tile .b{font-size:24px;font-weight:700;letter-spacing:-.015em;margin:2px 0 8px}
-.meter{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.meter{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
 .meter i{height:6px;border-radius:3px;background:var(--pip)}
 .meter i.on{background:var(--accent)}
 .meter-l{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:4px}
@@ -188,10 +189,10 @@ def long_date(iso):
 
 def meter(band, label):
     i = BANDS.index(band)
-    pips = "".join('<i class="on"></i>' if k <= i else "<i></i>" for k in range(5))
+    pips = "".join('<i class="on"></i>' if k <= i else "<i></i>" for k in range(len(BANDS)))
     return ('<div class="tile"><div class="k">%s</div><div class="b">%s</div>'
-            '<div class="meter" role="img" aria-label="Step %d of 5, from Very low to Strong">%s</div>'
-            '<div class="meter-l" aria-hidden="true"><span>Very low</span><span>Strong</span></div></div>'
+            '<div class="meter" role="img" aria-label="Step %d of 6, from Almost none to Strong">%s</div>'
+            '<div class="meter-l" aria-hidden="true"><span>Almost none</span><span>Strong</span></div></div>'
             % (label, esc(band), i + 1, pips))
 
 

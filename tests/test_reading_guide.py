@@ -120,7 +120,7 @@ class ReadingGuideTests(unittest.TestCase):
         self.assertEqual([int(hi) for _, _, _, hi in rows], [t - 1 for t in LV.THRESH[1:]] + [100])
         self.assertIn("%s factors" % NUMBER_WORDS[len(H.C.DIMENSIONS)], self.flat)
         self.assertIn("Your fit, put into %s levels" % NUMBER_WORDS[len(LV.BANDS)], self.flat)
-        self.assertIn("They run %s." % ", ".join(H.C.BANDS), self.flat)
+        self.assertIn("They run %s." % ", ".join(H.C.CHANCE_BANDS), self.flat)
 
     def test_numbered_parts_match_the_picture(self):
         parts = re.findall(r"^### (\d+)\. (.+)$", self.guide, flags=re.M)

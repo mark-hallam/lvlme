@@ -194,8 +194,8 @@ class StructureTests(unittest.TestCase):
         self.assertEqual([a.get("class") for a in o.links], ["guide"])
 
     def test_meters_say_where_on_the_scale_without_repeating_the_band(self):
-        self.assertIn('role="img" aria-label="Step 2 of 5, from Very low to Strong"', self.page)
-        self.assertIn('role="img" aria-label="Step 1 of 5, from Very low to Strong"', self.page)
+        self.assertIn('role="img" aria-label="Step 3 of 6, from Almost none to Strong"', self.page)
+        self.assertIn('role="img" aria-label="Step 2 of 6, from Almost none to Strong"', self.page)
 
     def test_the_go_deeper_line_is_words_to_say_not_a_button(self):
         """A static page cannot run anything, so the line is a quote to say to the agent, not a filled button."""

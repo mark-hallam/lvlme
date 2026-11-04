@@ -508,7 +508,7 @@ def build_runs(data, group_of):
     out = []
     for f, rr in zip(data.run_files, data.runs):
         roles = [x for x in rr.get("roles") or [] if x.get("judged", True)]   # an unjudged role is not a measurement
-        top = max(roles, key=lambda x: x["fit"]) if roles else {"fit": 0, "interview_band": "Very low", "title": ""}
+        top = max(roles, key=lambda x: x["fit"]) if roles else {"fit": 0, "interview_band": "Almost none", "title": ""}
         by_group = {}
         for x in roles:
             g = group_of.get(x["org"], OTHER_KEY)

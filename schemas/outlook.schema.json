@@ -7,7 +7,7 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {"const": 1},
-    "band": {"enum": ["Very low", "Low", "Moderate", "Good", "Strong", "Not yet judged"]},
+    "band": {"enum": ["Almost none", "Very low", "Low", "Moderate", "Good", "Strong", "Not yet judged"]},
     "text": {"type": "string"},
     "reasons": {"type": "array", "items": {"type": "string"}},
     "judged_on": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}

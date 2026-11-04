@@ -9,6 +9,11 @@
 - B3: a link counts as checked evidence only if a stranger can open it without
   signing in. Documents, emails, exports and references are not links and keep
   their level as before.
+- B4: a new lowest chance band, Almost none, for an interview below 15 and an
+  offer below 25, so a weak fit and an unrelated one no longer read the same.
+  A missing hard requirement can move Very low down to Almost none. The five
+  fit levels are unchanged. Applications already recorded keep the bands they
+  were given on the day.
 
 Purpose: estimate, honestly, a person's chance of being hired into a specific
 open role at a specific organisation, and show what would raise it. Every run
@@ -271,7 +276,9 @@ Two estimates per role, shown as bands, not false-precision percentages:
 
 | Fit score | Chance of an interview | Chance of an offer (if applied now) |
 |---|---|---|
-| 0 to 39 | Very low | Very low |
+| 0 to 14 | Almost none | Almost none |
+| 15 to 24 | Very low | Almost none |
+| 25 to 39 | Very low | Very low |
 | 40 to 54 | Low | Very low |
 | 55 to 69 | Moderate | Low |
 | 70 to 84 | Good | Moderate |
