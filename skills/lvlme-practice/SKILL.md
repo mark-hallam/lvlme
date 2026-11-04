@@ -1,8 +1,7 @@
 ---
 name: lvlme-practice
-description: Practise for an interview with LVLme. A mock interview for one role, built from the posting's requirements and the person's own stories, with feedback on structure and evidence. Before an interview only, never during one.
+description: Use when the person says "run LVLme practice" or asks to practise for an interview. Builds questions from one role and the person’s own stories. Before an interview only, never during one.
 argument-hint: "[role id or organisation]"
-disable-model-invocation: true
 ---
 
 # LVLme: practise before an interview

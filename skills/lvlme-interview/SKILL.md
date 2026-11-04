@@ -1,8 +1,7 @@
 ---
 name: lvlme-interview
-description: Run or update the LVLme career interview. Reads the documents the person supplies first, then asks only what the documents cannot answer.
+description: Use when the person says "run the LVLme interview" or asks to start or update their career interview. Reads supplied documents first and asks only what they cannot answer.
 argument-hint: "[first | update]"
-disable-model-invocation: true
 ---
 
 # LVLme: the interview

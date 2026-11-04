@@ -1,8 +1,7 @@
 ---
 name: lvlme-quick
-description: LVLme quick. Honest odds for one job in a couple of minutes, from one posting link (or pasted text) and a CV, with a blind second scorer, the campaign's own scoring maths, and the top 3 fixes. Never writes application answers.
+description: Use when the person says "run LVLme quick", "quick odds", or gives a job link and a curriculum vitae (CV) and wants honest odds for that one job. Uses a second scorer and the campaign scoring rules, then suggests up to three evidence-based fixes. Never writes application answers.
 argument-hint: "[posting link]"
-disable-model-invocation: true
 ---
 
 # LVLme quick: honest odds for one job

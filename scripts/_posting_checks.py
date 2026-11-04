@@ -37,6 +37,11 @@ def title_key(org, title):
     return org, " ".join(re.findall(r"[a-z0-9]+", (title or "").lower()))
 
 
+def location_key(location):
+    """Normalise punctuation and spacing while preserving the location words."""
+    return " ".join(re.findall(r"[a-z0-9]+", (location or "").lower()))
+
+
 def age_days(published, today):
     """Whole days since an ISO date or timestamp, or None when there is no usable date."""
     try:
@@ -51,7 +56,7 @@ def months(days):
 
 
 def repost_counts(history, today):
-    """{(org, title words): (distinct role ids, distinct scan dates)} over the last 90 days of snapshots.
+    """{(org, title words, location): (distinct role ids, distinct scan dates)} over the last 90 days.
 
     history: [(date, {role id: {"org", "title", ...}})], today's included.
     """
@@ -61,7 +66,8 @@ def repost_counts(history, today):
         if d is None or d < 0 or d > WINDOW_DAYS:
             continue
         for rid, r in roles.items():
-            ids, dates = seen.setdefault(title_key(r.get("org"), r.get("title")), (set(), set()))
+            key = title_key(r.get("org"), r.get("title")) + (location_key(r.get("location")),)
+            ids, dates = seen.setdefault(key, (set(), set()))
             ids.add(rid)
             dates.add(date)
     return seen
@@ -70,7 +76,9 @@ def repost_counts(history, today):
 def check(role, seen, today, ats=None):
     """The posting_check for one role."""
     age = age_days(role.get("published_at"), today)
-    ids, dates = seen.get(title_key(role.get("org"), role.get("title")), (set(), set()))
+    location = role.get("location") or ", ".join(role.get("locations") or [])
+    key = title_key(role.get("org"), role.get("title")) + (location_key(location),)
+    ids, dates = seen.get(key, (set(), set()))
     reposts = len(ids) - 1 if len(ids) >= 2 and len(dates) >= 2 else 0
     when = "last published" if ats in LAST_PUBLISHED else "posted"
     if reposts >= REPOSTS_SUSPICIOUS or (age is not None and age >= STALE_DAYS):

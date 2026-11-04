@@ -1,8 +1,7 @@
 ---
 name: lvlme-screen
-description: Run the LVLme recruiter screen. An independent recruiter persona, in fresh context, reviews the person's CV, LinkedIn and website against real open postings, without seeing any LVLme scores.
+description: Use when the person says "run LVLme screen" or asks for an independent recruiter review of their profile against open roles.
 argument-hint: "[organisation or role id]"
-disable-model-invocation: true
 ---
 
 # LVLme: the recruiter screen

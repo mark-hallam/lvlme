@@ -57,6 +57,22 @@ class LabelTests(unittest.TestCase):
         other_org = [("2026-10-01", {"ab:0": role("ab:0", org="ab")})]
         self.assertEqual(self.label(role(), other_org)["reposts"], 0)
 
+    def test_same_title_in_different_cities_is_not_a_repost(self):
+        cities = {"id%d" % i: dict(role("id%d" % i), location=city)
+                  for i, city in enumerate(("London", "Seoul", "Munich", "Tokyo"))}
+        history = [("2026-11-01", {"id0": cities["id0"], "id1": cities["id1"]}),
+                   ("2026-11-02", {"id2": cities["id2"], "id3": cities["id3"]})]
+        seen = P.repost_counts(history, TODAY)
+        self.assertEqual([P.check(r, seen, TODAY)["reposts"] for r in cities.values()], [0, 0, 0, 0])
+
+    def test_same_title_and_location_relisted_after_closure_is_a_repost(self):
+        old = role("gh:old")
+        old["location"] = "London, United Kingdom"
+        new = role("gh:new")
+        new["location"] = " london, united kingdom "
+        seen = P.repost_counts([("2026-10-20", {"gh:old": old}), (TODAY, {"gh:new": new})], TODAY)
+        self.assertEqual(P.check(new, seen, TODAY)["reposts"], 1)
+
     def test_an_action_ranks_lower_only_when_every_role_it_names_is_suspicious(self):
         a = {"effects": [{"dimension": "D1", "scope": {"role_ids": ["gh:1", "gh:2"]}}]}
         self.assertTrue(P.only_suspicious(a, {"gh:1", "gh:2"}))
@@ -96,7 +112,7 @@ class FetchTests(unittest.TestCase):
         gh = next(r for r in latest["roles"] if r["org"] == "gh")
         self.assertEqual(gh["posting_check"], {"label": "likely_real", "note": "Open", "age_days": 33, "reposts": 0})
         snap = H.load(os.path.join(self.ws, "market", "roles", "snapshots", "2026-11-01.json"))
-        self.assertEqual(set(snap["roles"][gh["id"]]), {"org", "title", "family", "url", "published_at"})
+        self.assertEqual(set(snap["roles"][gh["id"]]), {"org", "title", "family", "url", "published_at", "location"})
 
     def test_a_relisted_title_on_a_new_link_is_counted_as_a_repost(self):
         first = self.run_main("2026-11-01")

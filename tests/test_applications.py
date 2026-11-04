@@ -10,7 +10,12 @@ import helpers as H
 import _applications as AP
 import _first_draft as FD
 import applications as CLI
+import autopilot as AUTO
 import build_dashboard as B
+import doors as DOORS
+import practice as PRACTICE
+import public as PUBLIC
+import stories as STORIES
 import validate as V
 
 
@@ -78,6 +83,14 @@ class CommandTests(unittest.TestCase):
         self.assertEqual(V.check(self.doc(), H.schema("applications.schema.json")), [])
         errors, warnings, _ = V.validate_workspace(self.ws)
         self.assertEqual(errors, [])
+
+    def test_workspace_is_accepted_before_or_after_subcommand(self):
+        cases = ((CLI, "list"), (DOORS, "list"), (PRACTICE, "list"), (STORIES, "list"),
+                 (PUBLIC, "list"), (AUTO, "status"))
+        for module, command in cases:
+            for args in (("--workspace", self.ws, command), (command, "--workspace", self.ws)):
+                with self.subTest(script=module.__name__, args=args), mock.patch("sys.stdout", io.StringIO()):
+                    self.assertEqual(module.main(list(args)), 0)
 
     def test_no_third_follow_up_and_no_thank_you_without_an_interview(self):
         self.run_cli("add", "--org", "acme", "--title", "Analyst", "--date", "2026-11-01")

@@ -696,7 +696,8 @@ def main(argv=None):
 
     snap_dir = os.path.join(roles_dir, "snapshots")
     snap_roles = {r["id"]: {"org": r["org"], "title": r["title"], "family": r["family"], "url": r.get("url"),
-                            "published_at": r.get("published_at")} for r in roles}
+                            "published_at": r.get("published_at"),
+                            "location": ", ".join(r.get("locations") or [])} for r in roles}
     checks = P.apply_checks(roles, snapshot_history(snap_dir, date) + [(date, snap_roles)], date,
                             {t["id"]: t.get("ats") for t in config["targets"]})
     prev_date, prev_snap = previous_snapshot(snap_dir, date)

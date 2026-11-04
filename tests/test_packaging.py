@@ -142,6 +142,7 @@ class ComponentTests(unittest.TestCase):
 
     def test_command_skills(self):
         names = {"lvlme"}
+        locked = {"lvlme-autopilot", "lvlme-public"}
         for path in glob.glob(os.path.join(ROOT, "skills", "*")):
             rel = os.path.relpath(os.path.join(path, "SKILL.md"), ROOT)
             data, body = frontmatter(rel)
@@ -149,7 +150,12 @@ class ComponentTests(unittest.TestCase):
             self.assertEqual(data["name"], os.path.basename(path), rel)
             self.assertTrue(NAME_RE.match(data["name"]) and len(data["name"]) <= 64, rel)
             self.assertTrue(0 < len(data["description"]) <= 1024, rel)
-            self.assertIs(data.get("disable-model-invocation"), True, rel)
+            if data["name"] in locked:
+                self.assertIs(data.get("disable-model-invocation"), True, rel)
+            else:
+                self.assertNotIn("disable-model-invocation", data, rel)
+            if data["name"] == "lvlme-quick":
+                self.assertIn("run LVLme quick", data["description"])
             self.assertIn("${CLAUDE_PLUGIN_ROOT}", body, rel)
             names.add(data["name"])
         self.assertEqual(names, COMMANDS)

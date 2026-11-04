@@ -1,8 +1,7 @@
 ---
 name: lvlme-debrief
-description: Debrief a real interview with LVLme. Records what was asked and how each answer went, updates the application to Interview, and turns hard questions into story bank work. After an interview only, never during one.
+description: Use when the person says "run LVLme debrief" or asks to review a completed interview. Records questions and answers and identifies story bank work. After an interview only, never during one.
 argument-hint: "[application id]"
-disable-model-invocation: true
 ---
 
 # LVLme: debrief after an interview

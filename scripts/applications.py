@@ -165,6 +165,8 @@ def main(argv=None):
     for p in (a, sub.choices["move"]):
         p.add_argument("--note", default="")
     sub.add_parser("list").add_argument("--json", action="store_true")
+    for p in sub.choices.values():
+        p.add_argument("--workspace", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)
     date = C.check_date(args.date) if getattr(args, "date", None) else C.today_in(config)

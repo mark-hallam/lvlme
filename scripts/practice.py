@@ -90,6 +90,7 @@ def main(argv=None):
     ls.add_argument("--json", action="store_true")
     for p in (q, r, ls):
         p.add_argument("--date", help="YYYY-MM-DD (default: today in the person's time zone)")
+        p.add_argument("--workspace", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)
     today = C.check_date(args.date) if args.date else C.today_in(config)

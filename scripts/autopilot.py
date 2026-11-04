@@ -70,6 +70,8 @@ def main(argv=None):
     wk = sub.add_parser("week")
     wk.add_argument("--date")
     wk.add_argument("--no-dashboard", action="store_true", help="write the note only")
+    for p in sub.choices.values():
+        p.add_argument("--workspace", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)
     today = C.check_date(args.date) if getattr(args, "date", None) else C.today_in(config)

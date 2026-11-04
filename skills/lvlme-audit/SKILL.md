@@ -1,8 +1,7 @@
 ---
 name: lvlme-audit
-description: Run the LVLme consistency audit and public claims audit. Compares the CV, LinkedIn, website and any official forms for mismatched dates, titles and claims, and checks public claims against evidence.
+description: Use when the person says "run LVLme audit" or asks to check their career documents for mismatches and public claims against evidence.
 argument-hint: "[consistency | claims | both]"
-disable-model-invocation: true
 ---
 
 # LVLme: the audits

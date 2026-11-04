@@ -1,7 +1,6 @@
 ---
 name: lvlme-dashboard
-description: Rebuild the LVLme dashboard from the current workspace files, check it validates, and give the person the command to open it.
-disable-model-invocation: true
+description: Use when the person says "run LVLme dashboard" or asks to rebuild their dashboard from the current workspace files.
 ---
 
 # LVLme: the dashboard
