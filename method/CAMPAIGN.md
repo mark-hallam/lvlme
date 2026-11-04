@@ -289,6 +289,27 @@ interview, offer, rejected, discarded, skip, hired), so the two tools can talk.
   gave that role that day (`predicted`: the latest run on or before
   `applied_on`), so the check below compares against what was actually said.
 
+## Build in public
+
+Showing work in public is how people who could hire or refer someone get to
+know it, and it moves the public signal factor (D5) once it can be checked.
+LVLme plans and drafts; the person posts, under their own name, every time
+(`scripts/public.py`, `/lvlme-public`).
+
+- **Ideas** come from what the person finished: plan actions done on proof,
+  organisation edge or public signal (D2, D4, D5) in the last 21 days, checked
+  artefacts with a public link, and events they went to. Private work (a
+  tailored CV, a network map) is never suggested, and no one is named without
+  that person's yes.
+- **Drafts** start from the person's own rough notes and follow their voice
+  (`config.json` `public.voice`), using only the facts in the brief. Offer two
+  or three short options when they want choices.
+- **Rhythm.** The dashboard counts posts a week against the person's own
+  target (`public.per_week`, default 1) and the run of weeks on target.
+- **Proof.** A post counts once you have opened its link and it shows the
+  post (`public.py checked`): it becomes a verified public_signal evidence
+  item. Until then it is the person's word.
+
 ## How right has LVLme been
 
 Without proof, "honest odds" is only a claim. The dashboard's "How right has

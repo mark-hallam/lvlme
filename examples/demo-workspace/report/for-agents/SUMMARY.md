@@ -167,6 +167,10 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 - Questions saved: 2 from practice, 2 from real interviews (1 rated gap).
 - Never write a story for the person. Ask for theirs, then record it with `scripts/stories.py add`.
 
+## Build in public (drafts only: the person posts)
+- This week: 1 of 1 post. Weeks in a row on target: 1.
+- Draft one with `scripts/public.py draft <idea ref>`; never post for the person.
+
 ## Research packs (one page per target, every line sourced)
 - Acme AI: report/research/acme.html (12 lines, 2 not yet checked).
 - Globex Labs: report/research/globex.html (10 lines, 2 not yet checked).

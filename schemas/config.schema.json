@@ -106,6 +106,17 @@
         "horizon_days": {"type": "integer", "minimum": 7, "maximum": 365, "description": "How far ahead to keep events. Default 120."}
       }
     },
+    "public": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Build in public (scripts/public.py): LVLme drafts, the person posts.",
+      "properties": {
+        "per_week": {"type": "integer", "minimum": 0, "maximum": 14, "description": "Posts a week to aim for. Default 1."},
+        "channels": {"type": "array", "items": {"enum": ["x", "linkedin", "blog", "github", "newsletter", "talk", "other"]},
+                     "description": "Where the person posts; the first is the default for a draft."},
+        "voice": {"type": "string", "description": "How the person writes, in their own words: drafts follow it."}
+      }
+    },
     "stories": {
       "type": "object",
       "additionalProperties": false,

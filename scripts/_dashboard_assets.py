@@ -186,6 +186,10 @@ th{font-size:13px;color:var(--sub);font-weight:650}
 .wp-s{font-size:13px;font-weight:650;color:var(--accent);white-space:nowrap}
 .wp-s.none{color:var(--sub);font-weight:500}
 .ap-s.due,.ap-s.overdue{color:var(--warn)}
+.pub-weeks{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0 4px}
+.pub-w{background:var(--card2);border-radius:10px;padding:8px 6px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.pub-w b{font-size:18px;font-variant-numeric:tabular-nums}.pub-w i{font-style:normal;font-size:12px;color:var(--sub)}
+.pub-w.on{background:var(--accent-soft)}.pub-w.on b{color:var(--accent)}
 a.dr-l{color:var(--ink);text-decoration:none}a.dr-l:hover,a.dr-l:focus{color:var(--accent);text-decoration:underline}
 .week{margin-bottom:16px}.week-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .week-pill{background:var(--accent-soft);color:var(--accent)}.week-pill.off{background:var(--rule);color:var(--sub)}
@@ -544,6 +548,7 @@ BODY = r"""
   <div class="card pair" id="warmCard" hidden><div class="eyebrow">Warm paths</div><div class="tiny sub" id="warmSub" style="margin-bottom:4px"></div><div id="warm"></div></div>
   <div class="card pair" id="doorsCard" hidden><div class="eyebrow">Doors</div><div class="tiny sub" id="doorsSub" style="margin-bottom:4px"></div><div id="doors"></div></div>
   <div class="card pair" id="appsCard" hidden><div class="eyebrow">Applications</div><div class="tiny sub" id="appsSub" style="margin-bottom:4px"></div><div id="apps"></div></div>
+  <div class="card pair" id="publicCard" hidden><div class="eyebrow">Build in public</div><div class="tiny sub" id="publicSub" style="margin-bottom:4px"></div><div id="public"></div></div>
   <div class="card pair" id="storiesCard" hidden><div class="eyebrow">Story bank</div><div class="tiny sub" id="storiesSub" style="margin-bottom:4px"></div><div id="stories"></div></div>
   <div class="card pair" id="calibCard" hidden><div class="eyebrow">How right has LVLme been?</div><div class="tiny sub" id="calibSub" style="margin-bottom:4px"></div><div id="calib"></div></div>
   <div class="card pair" id="unlocksCard"><div class="eyebrow">Biggest unlocks</div><div class="tiny sub" id="unlocksSub" style="margin-bottom:4px"></div><div id="unlocks"></div></div>
@@ -1014,6 +1019,17 @@ function doorsHTML(){
     <div class="tiny sub">${esc(r.why)}${r.action ? ` Plan action ${esc(r.action)}.` : ""}${r.verified ? "" : " Not yet checked."}</div></div>`).join("")}</div>` +
     `<div class="tiny sub" style="margin-top:6px">${R.more ? plural(R.more, "more door") + " in market/doors.json. " : ""}Ask your agent to add one to your plan, for example "add ${esc(R.rows[0].id)} to my plan".</div>`;
 }
+// Build in public (campaign/public.json, scripts/public.py): this week's posts against the person's own target,
+// ideas from what they finished, drafts waiting, and what they posted. LVLme drafts; the person posts.
+const publicSub = () => { const c = D.public.cadence; return `${c.this_week} of ${plural(c.per_week, "post")} this week${c.streak ? `, ${plural(c.streak, "week")} in a row on target` : ""}. LVLme drafts; you post.`; };
+function publicHTML(){
+  const P = D.public; if (!P) return "";
+  const weeks = `<div class="pub-weeks" role="img" aria-label="Posts in each of the last ${P.cadence.weeks.length} weeks: ${P.cadence.weeks.map(w => w.posted).join(", ")}">${P.cadence.weeks.map((w, i) => `<span class="pub-w${w.posted >= P.cadence.per_week && P.cadence.per_week ? " on" : ""}"><b>${w.posted}</b><i>${i === P.cadence.weeks.length - 1 ? "This week" : esc(shortDate(w.start))}</i></span>`).join("")}</div>`;
+  const ideas = P.ideas.map(i => `<div class="wp"><div class="wp-h"><span class="wp-n">${esc(i.title)}</span><span class="wp-s none">Idea</span></div><div class="tiny sub">${esc(i.why)}</div></div>`).join("");
+  const drafts = P.drafts.map(d => `<div class="wp"><div class="wp-h"><span class="wp-n">${esc(d.title)}</span><span class="wp-s">Draft waiting</span></div><div class="tiny sub">${esc(d.channel)} · ${esc(d.file)}</div></div>`).join("");
+  const posts = P.posts.map(p => `<div class="wp"><div class="wp-h">${p.url ? `<a class="wp-n dr-l" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">${esc(p.title)}</a>` : `<span class="wp-n">${esc(p.title)}</span>`}<span class="wp-s${p.checked ? "" : " none"}">${p.checked ? "Counted" : "Not checked yet"}</span></div><div class="tiny sub">${esc(p.channel)} · posted ${esc(shortDate(p.on))}${p.result ? " · " + esc(p.result) : ""}</div></div>`).join("");
+  return weeks + ideas + drafts + posts + `<div class="tiny sub" style="margin-top:6px">${P.ideas.length ? `Say "draft a post about ${esc(P.ideas[0].ref)}" to your agent. ` : ""}${P.more_ideas ? plural(P.more_ideas, "more idea") + ". " : ""}A post counts as proof once its link is checked.</div>`;
+}
 // Story bank (profile/stories.json, scripts/stories.py): which interview themes have a true story ready, and how
 // well it is backed. Progress only. The person's stories, in their words; LVLme never writes one.
 const storiesSub = () => { const S = D.stories; return S.gaps ? `${plural(S.gaps, "theme")} still need a story backed by evidence.` : "Every theme has a story backed by evidence."; };
@@ -1047,6 +1063,7 @@ function renderWeek(){
   if (r.new || r.closed) facts.push(`${plural(r.new || 0, "new role")}, ${r.closed || 0} closed`);
   if (r.suspicious) facts.push(`${plural(r.suspicious, "posting")} to check`);
   if ((W.follow_ups || []).length) facts.push(plural(W.follow_ups.length, "follow-up") + " due");
+  if (W.public) facts.push(`${W.public.posted} of ${plural(W.public.per_week, "post")} this week`);
   if (W.review_waiting) facts.push(`${plural(W.review_waiting, "role")} waiting for review`);
   card.innerHTML = `<div class="week-top"><div class="eyebrow" style="margin:0">This week · ${esc(shortDate(W.date))}</div>
     <span class="pill week-pill${ap.enabled ? "" : " off"}">${ap.enabled ? "Autopilot on · next " + esc(shortDate(ap.next)) : "Autopilot off"}</span></div>
@@ -1073,6 +1090,8 @@ function renderDoNext(){
   if (doors) $("#doorsSub").textContent = doorsSub();
   const apps = appsHTML(); $("#apps").innerHTML = apps; $("#appsCard").hidden = !apps;
   if (apps) $("#appsSub").textContent = appsSub();
+  const pub = publicHTML(); $("#public").innerHTML = pub; $("#publicCard").hidden = !pub;
+  if (pub) $("#publicSub").textContent = publicSub();
   const stories = storiesHTML(); $("#stories").innerHTML = stories; $("#storiesCard").hidden = !stories;
   if (stories) $("#storiesSub").textContent = storiesSub();
   const calib = calibHTML(); $("#calib").innerHTML = calib; $("#calibCard").hidden = !calib;
@@ -1080,11 +1099,12 @@ function renderDoNext(){
   if (!narrow() && !state.stack.length) renderHome();
 }
 function renderHome(){
-  const card = $("#detailCard"), warm = warmHTML(), apps = appsHTML(), doors = doorsHTML(), calib = calibHTML(), stories = storiesHTML();
+  const card = $("#detailCard"), warm = warmHTML(), apps = appsHTML(), doors = doorsHTML(), calib = calibHTML(), stories = storiesHTML(), pub = publicHTML();
   card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h2 class="pane-h" style="margin:0">Do next</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div><div>${doNextHTML()}</div>
     ${warm ? `<h2 class="pane-h" style="margin:18px 0 0">Warm paths</h2><div class="tiny sub" style="margin-bottom:4px">${esc(warmSub())}</div>${warm}` : ""}
     ${doors ? `<h2 class="pane-h" style="margin:18px 0 0">Doors</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doorsSub())}</div>${doors}` : ""}
     ${apps ? `<h2 class="pane-h" style="margin:18px 0 0">Applications</h2><div class="tiny sub" style="margin-bottom:4px">${esc(appsSub())}</div>${apps}` : ""}
+    ${pub ? `<h2 class="pane-h" style="margin:18px 0 0">Build in public</h2><div class="tiny sub" style="margin-bottom:4px">${esc(publicSub())}</div>${pub}` : ""}
     ${stories ? `<h2 class="pane-h" style="margin:18px 0 0">Story bank</h2><div class="tiny sub" style="margin-bottom:4px">${esc(storiesSub())}</div>${stories}` : ""}
     ${calib ? `<h2 class="pane-h" style="margin:18px 0 0">How right has LVLme been?</h2><div class="tiny sub" style="margin-bottom:4px">${esc(calibSub())}</div>${calib}` : ""}
     <h2 class="pane-h" style="margin:18px 0 0">Biggest unlocks</h2><div class="tiny sub" style="margin-bottom:4px">${UNLOCKS_SUB}</div><div>${unlocksHTML()}</div>

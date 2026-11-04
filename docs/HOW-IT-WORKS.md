@@ -266,6 +266,10 @@ For a plain-English tour of each number and what to do first, see
 - **Doors**: the next events, programmes and communities where people from
   your targets will be, soonest first, with why each one matters. Ask your
   agent to add one to your plan.
+- **Build in public**: posts a week against your own target for the last
+  four weeks, ideas from what you finished that are worth sharing, drafts
+  waiting, and what you posted and what it led to. LVLme drafts; you post. A
+  post counts as proof once its link is checked.
 - **Story bank**: your best true stories for interviews, in your words, in
   the STAR shape (situation, task, action, result), each linked to its
   evidence. The card shows which common interview themes have a story backed
@@ -407,7 +411,7 @@ agents/     subagent briefs: evidence-scout, market-scout, role-judge, reviewer,
 .cursor/rules/  Cursor rules
 method/     the rules for each stage (rubric, interview, intake, audits, review, campaign, privacy, runbook)
 schemas/    JSON Schema files (rules for every workspace file)
-scripts/    init, fetch_roles, fetch_doors, doors, applications, stories, import_career_ops, network_map,
+scripts/    init, fetch_roles, fetch_doors, doors, applications, stories, practice, public, import_career_ops, network_map,
             claims_audit, consistency_audit, score, build_dashboard, validate, quick, quick_posting
 templates/  the workspace skeleton that init.py copies, and agent prompts
 docs/       INSTALL.md, HOW-IT-WORKS.md, ORCHESTRATION.md, LEVELS.md, DESIGN.md,

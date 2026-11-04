@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "posts": [
+    {
+      "id": "P01",
+      "about": "A03",
+      "title": "Publish the scheduling rollout case study with numbers your former manager has checked",
+      "channel": "x",
+      "status": "posted",
+      "drafted_on": "2026-10-26",
+      "draft_file": "campaign/drafts/public-P01-2026-10-26.md",
+      "posted_on": "2026-10-27",
+      "url": "https://example.com/alex/posts/scheduling-case-study",
+      "result": "4 replies, and a warehouse operator asked for the checklist"
+    }
+  ],
+  "updated_on": "2026-10-30"
+}

@@ -15,7 +15,8 @@ import helpers as H
 
 ROOT = H.ENGINE
 COMMANDS = {"lvlme", "lvlme-quick", "lvlme-interview", "lvlme-screen", "lvlme-audit", "lvlme-dashboard",
-            "lvlme-autopilot", "lvlme-practice", "lvlme-debrief"}
+            "lvlme-autopilot", "lvlme-practice", "lvlme-debrief",
+            "lvlme-public"}
 AGENTS = {"evidence-scout", "market-scout", "role-judge", "reviewer", "recruiter-screen"}
 INDEPENDENT = {"reviewer", "recruiter-screen"}
 AFTER_MERGE = {"method/INTERVIEW.md", "method/CONSISTENCY.md", "scripts/consistency_audit.py",

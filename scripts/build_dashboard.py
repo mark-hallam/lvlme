@@ -83,6 +83,7 @@ import _calibration as CAL  # noqa: E402
 import _research as RS  # noqa: E402
 import _stories as STY  # noqa: E402
 import _practice as PR  # noqa: E402
+import _public as PB  # noqa: E402
 import _doors as DR  # noqa: E402
 import _autopilot as APL  # noqa: E402
 import _static_html as ST  # noqa: E402
@@ -213,6 +214,8 @@ class Data:
         self.stories = load("profile", "stories.json")       # progress only: never scored
         bank = load("campaign", "questions.json")
         self.asked = PR.summary(bank) if bank else None      # interview practice and debriefs
+        self.public = PB.page_data(load("campaign", "public.json"), config, self.plan, self.evidence, self.doors,
+                                   self.today)               # build in public: drafts only, never scored
         self.packs = {}                                      # research packs, written by main() before the page
         self.claims = (load("profile", "claims-audit.json") or {}).get("claims", [])
         self.swot = load("eval", "swot.json")
@@ -627,6 +630,7 @@ def build_data(data):
         "doors": DR.page_data(data.doors, data.today, data.org_names),
         "calib": data.calib,
         "packs": data.packs,
+        "public": data.public,
         "stories": STY.page_data(data.stories, data.config, data.evidence, data.asked),
         "week": APL.page_data(data.week, clean),
     }
@@ -876,6 +880,8 @@ def agent_payload(data, page):
         payload["calibration"] = data.calib
     if data.stories is not None:
         payload["stories"] = STY.page_data(data.stories, data.config, data.evidence, data.asked)
+    if data.public:
+        payload["build_in_public"] = data.public
     if data.packs:
         payload["research_packs"] = {o: dict(p, path="report/" + p["path"]) for o, p in data.packs.items()}
     if data.doors is not None:
@@ -1045,6 +1051,7 @@ def summary_md(data, p):
     lines += DR.summary_lines(p.get("doors"))
     lines += CAL.summary_lines(p.get("calibration"))
     lines += STY.summary_lines(p.get("stories"))
+    lines += PB.summary_lines(p.get("build_in_public"))
     lines += RS.summary_lines(data.packs, data.org_names)
     return "\n".join(lines) + "\n"
 

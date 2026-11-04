@@ -2227,6 +2227,47 @@
     },
     "gaps": 4
   },
+  "build_in_public": {
+    "note": "LVLme drafts; you post, under your name. A post counts as proof once its public link is checked.",
+    "cadence": {
+      "per_week": 1,
+      "this_week": 1,
+      "weeks": [
+        {
+          "start": "2026-10-05",
+          "posted": 0
+        },
+        {
+          "start": "2026-10-12",
+          "posted": 0
+        },
+        {
+          "start": "2026-10-19",
+          "posted": 0
+        },
+        {
+          "start": "2026-10-26",
+          "posted": 1
+        }
+      ],
+      "streak": 1,
+      "due": 0
+    },
+    "ideas": [],
+    "more_ideas": 0,
+    "drafts": [],
+    "posts": [
+      {
+        "id": "P01",
+        "title": "Publish the scheduling rollout case study with numbers your former manager has checked",
+        "channel": "X",
+        "on": "2026-10-27",
+        "url": "https://example.com/alex/posts/scheduling-case-study",
+        "checked": false,
+        "result": "4 replies, and a warehouse operator asked for the checklist"
+      }
+    ]
+  },
   "research_packs": {
     "acme": {
       "path": "report/research/acme.html",

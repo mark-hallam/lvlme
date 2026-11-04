@@ -103,6 +103,7 @@ Every agent, step by step: [`docs/INSTALL.md`](docs/INSTALL.md).
 | `/lvlme-dashboard` | Rebuild the dashboard. |
 | `/lvlme-practice` | Practise for an interview: questions from the posting and your own stories, with feedback. Before an interview, never during. |
 | `/lvlme-debrief` | After an interview: what was asked and how it went, into your tracker and story bank. |
+| `/lvlme-public` | Build in public: what you finished that is worth sharing, a draft in your voice from your notes, and a record of what you posted. You post. |
 | `/lvlme-autopilot` | Turn Autopilot on or off: the campaign runs itself on your schedule and leaves a "This week" note. It asks for every permission first. |
 
 With the cloned folder, use the prefixed name (`/lvlme:lvlme-quick`) or the

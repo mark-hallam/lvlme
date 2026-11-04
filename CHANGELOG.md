@@ -35,6 +35,15 @@ before. Nothing here changes how a score is worked out unless it says so.
   hidden until it has 5 results, and a ranking check (did the higher-rated
   applications do better?) until 10. Advisory only: a test proves scores are
   identical with or without outcomes. The demo now has made-up applications.
+- **Build in public.** `/lvlme-public` and `scripts/public.py` help you show
+  your work steadily: ideas from what you finished that is worth sharing
+  (never private work, and no one named without their yes), a draft brief
+  with only checked facts and your own voice rules (`config.json`
+  `public.voice`), and a record of what you posted and what it led to. A new
+  card counts posts a week against your own target over the last four weeks,
+  and the weekly note says how this week is going. A post counts as proof
+  only once its link is opened and checked: then it becomes a verified public
+  signal. LVLme drafts; you post. It never posts.
 - **Practise before an interview, debrief after.** `/lvlme-practice` builds
   a question set for one role from its posting's hard requirements, the story
   themes and questions already asked there, suggests which of your stories

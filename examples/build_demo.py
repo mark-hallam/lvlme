@@ -38,6 +38,7 @@ import fetch_doors  # noqa: E402
 import fetch_roles  # noqa: E402
 import network_map  # noqa: E402
 import practice  # noqa: E402
+import public  # noqa: E402
 import score  # noqa: E402
 
 WEEKS = ["2026-10-04", "2026-10-11", "2026-10-18", "2026-10-25", "2026-11-01"]
@@ -81,8 +82,14 @@ QUESTIONS = [["2026-10-20", "--question", "Why Acme AI, and why this role now?",
               "--rating", "strong", "--theme", "impact", "--story", "S01"],
              ["2026-10-22", "--real", "--app", "ap4", "--question", "How have you led people who did not report to "
               "you?", "--rating", "gap", "--theme", "lead", "--story", "S01"]]
+# A made-up build in public post (scripts/public.py): drafted, posted, and what it led to. Its link is left
+# unchecked, so the demo shows a post that does not count as proof yet.
+PUBLIC = [["2026-10-26", "draft", "A03", "--channel", "x"],
+          ["2026-10-27", "posted", "P01", "--url", "https://example.com/alex/posts/scheduling-case-study"],
+          ["2026-10-30", "result", "P01", "--note", "4 replies, and a warehouse operator asked for the checklist"]]
 OUTPUTS = ["eval/runs", "market/roles", "market/doors.json", "report", "campaign/metrics-history.json",
-           "campaign/applications.json", "campaign/applications-log.tsv", "campaign/questions.json"]
+           "campaign/applications.json", "campaign/applications-log.tsv", "campaign/questions.json",
+           "campaign/public.json", "campaign/drafts/public-P01-2026-10-26.md"]
 
 
 def load(rel, root=DEMO):
@@ -256,6 +263,8 @@ def main():
             run(applications.main, ["--workspace", DEMO, cmd] + rest + ["--date", date])
         for date, *rest in QUESTIONS:
             run(practice.main, ["--workspace", DEMO, "record"] + rest + ["--date", date])
+        for date, *rest in PUBLIC:
+            run(public.main, ["--workspace", DEMO] + rest + ["--date", date])
         run(score.main, ["--workspace", DEMO, "--date", today])
         run(build_dashboard.main, ["--workspace", DEMO, "--today", today])
     finally:

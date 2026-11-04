@@ -73,6 +73,7 @@ claude --plugin-dir /path/to/lvlme
 | `/lvlme-dashboard` | Rebuild the dashboard and print the command to open it. |
 | `/lvlme-practice` | Practise for an interview with questions from the posting and your own stories. Before an interview, never during. |
 | `/lvlme-debrief` | After an interview: record what was asked and how it went. |
+| `/lvlme-public` | Build in public: ideas worth sharing, a draft in your voice, and a record. LVLme drafts; you post. |
 | `/lvlme-autopilot` | Turn Autopilot on or off: a check-in that runs itself on your schedule, after asking for each permission. Needs a scheduler: the Claude desktop app's scheduled tasks, or your computer's own. |
 
 Plugin commands also have a full name with the plugin prefix:

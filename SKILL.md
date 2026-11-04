@@ -219,6 +219,9 @@ rights question when `fetch_roles.py` first finds an open role that needs it.
   to send (`method/CAMPAIGN.md`, "Applications and follow-ups"). Give
   `--role-id` for a scored role, so "How right has LVLme been" can check the
   odds it gave that day against what happened.
+- Build in public: when the person finishes something shareable, offer
+  `/lvlme-public` (`method/CAMPAIGN.md`, "Build in public"). Draft from their
+  notes in their voice; they post. Never post or open LinkedIn yourself.
 - Story bank: record each true story the person tells, in their words, with
   `python3 scripts/stories.py add` (themes, STAR parts, evidence ids). Never
   write a story or a number for them. `stories.py gaps` shows the themes with

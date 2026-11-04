@@ -20,6 +20,7 @@ import os
 import _common as C
 import _doors as DR
 import _applications as AP
+import _public as PB
 
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 DAY_NAMES = dict(zip(DAYS, ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]))
@@ -177,10 +178,23 @@ def week_note(ws, config, today):
         "event": (DR.next_door(_load(ws, "market", "doors.json"), today, names)
                   or best_event(_load(ws, "market", "orgs.json"), C.target_ids(config), names)),
         "review_waiting": awaiting,
+        "public": public_line(ws, config, today),
         "action": {"id": top["id"], "title": top.get("title"), "why": top.get("why", "")} if top else None,
         "autopilot": {"enabled": bool(settings(config).get("enabled")), "when": when_text(settings(config)),
                       "next": next_run(settings(config), (dt.date.fromisoformat(today) + dt.timedelta(days=1)).isoformat())},
     }
+
+
+def public_line(ws, config, today):
+    """Build in public this week: posts against the person's target, and the newest idea worth sharing."""
+    doc = _load(ws, *PB.REL.split("/"))
+    found = PB.ideas(_load(ws, "campaign", "plan.json"), _load(ws, "profile", "evidence.json"),
+                     _load(ws, "market", "doors.json"), doc, today)
+    if doc is None and not found:
+        return None
+    c = PB.cadence(doc, config, today)
+    return {"posted": c["this_week"], "per_week": c["per_week"], "idea": found[0]["title"] if found else None,
+            "ref": found[0]["ref"] if found else None}
 
 
 def num(x):
@@ -210,6 +224,11 @@ def note_md(n):
     if n["event"]:
         e = n["event"]
         lines += ["", "One event worth a look: %s (%s, %s)." % (e["text"].rstrip("."), e["org"], e["source"])]
+    if n.get("public"):
+        p = n["public"]
+        lines += ["", "Build in public: %d of %d post%s this week.%s" % (
+            p["posted"], p["per_week"], "" if p["per_week"] == 1 else "s",
+            " Worth sharing: %s (%s); I can draft it, you post it." % (p["idea"].rstrip("."), p["ref"]) if p["idea"] else "")]
     if n["action"]:
         lines += ["", "The one thing to do this week: %s." % n["action"]["title"].rstrip(".")]
     return "\n".join(lines) + "\n"

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Build in public (campaign/public.json)",
+  "description": "Posts the person drafted with LVLme and posted themselves: what each was about, where and when it went out, whether its link was checked, and what it led to. Written by scripts/public.py. LVLme never posts. Progress only: score.py never reads this file; a checked post becomes a public_signal evidence item instead.",
+  "type": "object",
+  "required": ["schema_version", "posts"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "updated_on": {"$ref": "#/definitions/date"},
+    "posts": {"type": "array", "items": {
+      "type": "object",
+      "required": ["id", "about", "title", "channel", "status", "drafted_on"],
+      "additionalProperties": false,
+      "patternProperties": {"^x_": {}},
+      "properties": {
+        "id": {"type": "string", "pattern": "^P[0-9]{2,}$"},
+        "about": {"type": "string", "description": "The idea's ref: a plan action, an evidence id or a door id."},
+        "title": {"type": "string", "minLength": 1},
+        "channel": {"enum": ["x", "linkedin", "blog", "github", "newsletter", "talk", "other"]},
+        "status": {"enum": ["drafted", "posted", "skipped"]},
+        "drafted_on": {"$ref": "#/definitions/date"},
+        "draft_file": {"type": "string"},
+        "posted_on": {"$ref": "#/definitions/date"},
+        "url": {"type": "string", "pattern": "^https://"},
+        "evidence": {"type": "string", "description": "The public_signal evidence item made once the link was checked."},
+        "result": {"type": "string", "description": "What it led to, in the person's words."}
+      }}}
+  },
+  "definitions": {"date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}}
+}
