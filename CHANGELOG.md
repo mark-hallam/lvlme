@@ -8,6 +8,66 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## 0.6.3 (5 November 2026)
+
+Fixes from four end-to-end tests with real AI agents (a stranger installing
+from GitHub, three simulated weeks of a campaign, and the same CV scored
+again and again to measure how steady the score is), and the scoring rules
+version 1.1. **This release changes how a score is worked out**: the rules
+are listed under Changed. The full notes are in
+[LVLme 0.6.3](docs/RELEASE-0.6.3.md).
+
+Tests: 591 pass.
+
+### Changed
+
+These are the scoring rules version 1.1.
+
+- **A one-point disagreement uses the reviewer's score.** When the first
+  judge and the blind reviewer differ by one point, the reviewer's score
+  counts, within the evidence and other caps. A bigger difference still
+  waits for a tie-break, as before. The old rule counted it as 2, lower than
+  either of them gave.
+- **Eligibility has written anchors.** D6 now has a table, including "the
+  employer says it sponsors visas" (a possible route, scored 2, never a
+  confirmed one) and what to do in LVLme quick when there is no location rule.
+- **Which links count as checked.** A link counts at the verified or
+  corroborated level only if a stranger can open it on the public web without
+  signing in. Local, private network and file links count as self-reported.
+  Documents, emails, exports and references are not links and keep their level.
+- **A new lowest chance band, Almost none,** for an interview below 15 and
+  an offer below 25, so a weak fit and an unrelated one no longer read the
+  same. The five fit levels did not change, and applications already
+  recorded keep the bands they were given.
+- **Show it or Build it.** Every gap and every LVLme quick fix says whether
+  the proof is missing (Show it, usually days) or the skill is (Build it,
+  usually weeks or months). LVLme quick lists Show it fixes first; which
+  fixes are shown, and their points, are worked out as before.
+- **A score holds when only the judging AI changed.** If a different AI
+  agent judges a role again and the evidence it cites is unchanged, the
+  previous score stands and the run says so. New evidence means the new
+  score counts.
+
+### Fixed
+
+- **Plain words start LVLme quick and the other skills** in Claude Code
+  ("run LVLme quick"), not only a typed slash command. Autopilot and public
+  still need the typed command, because they set up schedules and publish.
+- **The autopilot timer line can run.** It names the full path to Claude
+  Code and Python and the commands the morning run may use.
+- **`--workspace` works before or after the sub-command** in every script.
+- **The same job title in different cities is not a repost.**
+- **A morning when the job boards cannot be reached says so,** and keeps
+  the date of the last real data instead of looking like a normal day.
+- **Progress made after the morning note is reported** in the next note.
+- **The morning run refreshes events** as well as roles.
+- **Small fixes:** clone commands are pinned to the release; the hard
+  requirement line reads properly; the weekly note rebuilds the dashboard for
+  the date it was given; the applications list takes a date and shows the
+  organisation's name; a thank-you draft is named thankyou; autopilot and
+  doors status can print JSON; late plan actions are marked late; the open
+  command is the full path; run_plan prints both the full and the light run.
+
 ## 0.6.2 (5 November 2026)
 
 A first-run polish release after a second new-user test and five rounds of

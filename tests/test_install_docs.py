@@ -136,8 +136,8 @@ class ReleaseNotes(unittest.TestCase):
         with open(os.path.join(ROOT, ".claude-plugin", "plugin.json"), encoding="utf-8") as fh:
             version = re.search(r'"version":\s*"([^"]+)"', fh.read()).group(1)
         path = os.path.join("docs", "RELEASE-%s.md" % version)
-        if os.path.isfile(os.path.join(ROOT, path)):
-            self.assertIn("https://github.com/mark-hallam/lvlme/blob/v%s/CHANGELOG.md" % version, read(path))
+        self.assertTrue(os.path.isfile(os.path.join(ROOT, path)), path)
+        self.assertIn("https://github.com/mark-hallam/lvlme/blob/v%s/CHANGELOG.md" % version, read(path))
 
 
 if __name__ == "__main__":

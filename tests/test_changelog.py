@@ -81,13 +81,8 @@ class ChangelogTests(unittest.TestCase):
     def test_newest_release_is_the_manifest_version(self):
         with open(os.path.join(H.ENGINE, ".claude-plugin", "plugin.json"), encoding="utf-8") as fh:
             manifest = json.load(fh)["version"]
-        self.assertLessEqual(key(self.released[0][0]), key(manifest))
-        if self.released[0][0] != manifest:
-            released = key(self.released[0][0])
-            current = key(manifest)
-            self.assertEqual(current[:2], released[:2])
-            self.assertEqual(current[2], released[2] + 1,
-                             "a pending release may be one patch ahead while release notes are prepared")
+        self.assertEqual(self.released[0][0], manifest,
+                         "bump plugin.json and add its CHANGELOG.md heading in the same change")
 
     def test_sections_use_the_known_subheadings(self):
         for name, _, body in self.sections:
