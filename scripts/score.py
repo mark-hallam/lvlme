@@ -51,6 +51,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
+import _judge_change as JC  # noqa: E402
 import _public_link as PL  # noqa: E402
 
 RUBRIC_VERSION = "1.1"
@@ -99,6 +100,7 @@ class Ctx:
         self.class_order = [c["id"] for c in (config.get("locations") or {}).get("classes", [])]
         self.default_class = (config.get("locations") or {}).get("default_class") or "other"
         self.warnings = set()
+        self.previous, self.judge_label = {}, ""   # for keeping a score when only the judge changed (B6)
         for original in (evidence or {}).get("items", []):
             item = dict(original)
             sources = item.get("sources") or []
@@ -227,6 +229,8 @@ def score_role(ctx, role, judgement):
     else:
         for d in ("D1", "D2", "D4"):
             s, adj, aw = score_entry(ctx, d, judgement[d], judgement, "%s %s" % (rid, d))
+            if JC.apply(ctx, rid, d, s):
+                aw = []
             scores[d] = s
             adjustments += adj
             awaiting += aw
@@ -376,6 +380,7 @@ def build_run(ws, config, run_date):
     outlook = C.load_json(C.wpath(ws, "eval", "outlook.json"), None)
     evidence = C.load_json(C.wpath(ws, "profile", "evidence.json"), {"items": []}) or {"items": []}
     ctx = Ctx(config, evidence, profile)
+    ctx.previous, ctx.judge_label = JC.previous_scores(ws, run_date), JC.label(judgements_doc.get("judged_by"))
     judgements = judgements_doc.get("roles") or {}
     roles = roles_doc.get("roles") or []
 

@@ -276,7 +276,9 @@ they give. Never register, RSVP, apply or pay (`method/CAMPAIGN.md`).
   Set `judged_by` at the top of `eval/judgements.json` to the agent you are
   and your model when you know it (for example `{"agent": "Claude Code",
   "model": "claude-opus-5-5"}`): another agent can judge the same evidence
-  differently, and the dashboard says which one judged.
+  differently, and the dashboard says which one judged. When only the agent
+  changed and a factor's cited evidence did not, scoring keeps that factor's
+  previous score and says so (rubric 1.1, B6).
 - **Claims audit.** `python3 scripts/claims_audit.py <their site> <other pages>`.
   Judge each `pending` claim as `supported`, `overstated`, `unsupported` or
   `contradicted`, with evidence ids and suggested honest wording.

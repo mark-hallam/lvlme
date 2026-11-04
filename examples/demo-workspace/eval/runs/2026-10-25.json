@@ -41,7 +41,8 @@
             "E01",
             "E02"
           ],
-          "note": "Warehouse and transport programs map closely to fleet rollouts at customer sites."
+          "note": "Warehouse and transport programs map closely to fleet rollouts at customer sites.",
+          "evidence_fingerprint": "sha256:2ab8707efbd36580"
         },
         "D2": {
           "score": 3,
@@ -50,7 +51,8 @@
             "E04",
             "E15"
           ],
-          "note": "Corroborated multi-site rollout case study."
+          "note": "Corroborated multi-site rollout case study.",
+          "evidence_fingerprint": "sha256:569e3e435ae333c5"
         },
         "D3": {
           "score": 0,
@@ -67,7 +69,8 @@
             "E01",
             "E15"
           ],
-          "note": "Warehouse operations is exactly the domain Initech sells into."
+          "note": "Warehouse operations is exactly the domain Initech sells into.",
+          "evidence_fingerprint": "sha256:b31fe58774fc3fc8"
         },
         "D5": {
           "score": 2,
@@ -125,7 +128,8 @@
             "E01",
             "E02"
           ],
-          "note": "Ten years of operations and programs; launches were physical, not model launches."
+          "note": "Ten years of operations and programs; launches were physical, not model launches.",
+          "evidence_fingerprint": "sha256:2ab8707efbd36580"
         },
         "D2": {
           "score": 2,
@@ -134,7 +138,8 @@
             "E04",
             "E05"
           ],
-          "note": "route-eval is relevant to evaluation sign-off; no launch case study yet."
+          "note": "route-eval is relevant to evaluation sign-off; no launch case study yet.",
+          "evidence_fingerprint": "sha256:d5121dcd09dc56db"
         },
         "D3": {
           "score": 1,
@@ -150,7 +155,8 @@
           "evidence": [
             "E04"
           ],
-          "note": "Acme AI cares about evaluation, and route-eval is an evaluation tool."
+          "note": "Acme AI cares about evaluation, and route-eval is an evaluation tool.",
+          "evidence_fingerprint": "sha256:885c5aeed616040d"
         },
         "D5": {
           "score": 2,
@@ -206,7 +212,8 @@
           "evidence": [
             "E01"
           ],
-          "note": "Customer-facing delivery is partial: internal operations, not customer deployments."
+          "note": "Customer-facing delivery is partial: internal operations, not customer deployments.",
+          "evidence_fingerprint": "sha256:a47ff635d37b7533"
         },
         "D2": {
           "score": 3,
@@ -214,7 +221,8 @@
           "evidence": [
             "E04"
           ],
-          "note": "Verified tool used by outside contributors; close to what deployment leads show."
+          "note": "Verified tool used by outside contributors; close to what deployment leads show.",
+          "evidence_fingerprint": "sha256:885c5aeed616040d"
         },
         "D3": {
           "score": 1,
@@ -231,7 +239,8 @@
             "E01",
             "E04"
           ],
-          "note": "Logistics customers are named as a plus in the posting."
+          "note": "Logistics customers are named as a plus in the posting.",
+          "evidence_fingerprint": "sha256:c07056bd3ae0d072"
         },
         "D5": {
           "score": 2,
@@ -287,7 +296,8 @@
           "evidence": [
             "E01"
           ],
-          "note": "Operations close to product, but no product title."
+          "note": "Operations close to product, but no product title.",
+          "evidence_fingerprint": "sha256:a47ff635d37b7533"
         },
         "D2": {
           "score": 3,
@@ -295,7 +305,8 @@
           "evidence": [
             "E15"
           ],
-          "note": "The rollout case study shows product-like work with users."
+          "note": "The rollout case study shows product-like work with users.",
+          "evidence_fingerprint": "sha256:c9b856d51ff3d36b"
         },
         "D3": {
           "score": 0,
@@ -312,7 +323,8 @@
             "E01",
             "E15"
           ],
-          "note": "Deep warehouse workflow knowledge."
+          "note": "Deep warehouse workflow knowledge.",
+          "evidence_fingerprint": "sha256:b31fe58774fc3fc8"
         },
         "D5": {
           "score": 2,
@@ -370,7 +382,8 @@
             "E02"
           ],
           "note": "Operations roles close to implementation work; customer success is a step across.",
-          "capped": "awaiting review"
+          "capped": "awaiting review",
+          "evidence_fingerprint": "sha256:2ab8707efbd36580"
         },
         "D2": {
           "score": 2,
@@ -380,7 +393,8 @@
             "E15"
           ],
           "note": "Verified tool plus a corroborated case study.",
-          "capped": "awaiting review"
+          "capped": "awaiting review",
+          "evidence_fingerprint": "sha256:569e3e435ae333c5"
         },
         "D3": {
           "score": 2,
@@ -396,7 +410,8 @@
           "evidence": [
             "E01"
           ],
-          "note": "Logistics customers are named as a plus."
+          "note": "Logistics customers are named as a plus.",
+          "evidence_fingerprint": "sha256:a47ff635d37b7533"
         },
         "D5": {
           "score": 2,
@@ -460,7 +475,8 @@
             "E01",
             "E02"
           ],
-          "note": "Programs were operations, not data-centre infrastructure."
+          "note": "Programs were operations, not data-centre infrastructure.",
+          "evidence_fingerprint": "sha256:2ab8707efbd36580"
         },
         "D2": {
           "score": 2,
@@ -469,7 +485,8 @@
             "E05",
             "E15"
           ],
-          "note": "The scheduling rollout shows multi-site program delivery."
+          "note": "The scheduling rollout shows multi-site program delivery.",
+          "evidence_fingerprint": "sha256:59ed22850d29a50f"
         },
         "D3": {
           "score": 2,
@@ -485,7 +502,8 @@
           "evidence": [
             "E01"
           ],
-          "note": "Hardware delivery tracking is adjacent."
+          "note": "Hardware delivery tracking is adjacent.",
+          "evidence_fingerprint": "sha256:a47ff635d37b7533"
         },
         "D5": {
           "score": 2,
@@ -541,7 +559,8 @@
           "evidence": [
             "E02"
           ],
-          "note": "No product management title; the posting asks for 5+ years of it."
+          "note": "No product management title; the posting asks for 5+ years of it.",
+          "evidence_fingerprint": "sha256:f3e8e5dcb00ae022"
         },
         "D2": {
           "score": 2,
@@ -549,7 +568,8 @@
           "evidence": [
             "E04"
           ],
-          "note": "route-eval is a developer tool, which helps a little."
+          "note": "route-eval is a developer tool, which helps a little.",
+          "evidence_fingerprint": "sha256:885c5aeed616040d"
         },
         "D3": {
           "score": 2,
@@ -565,7 +585,8 @@
           "evidence": [
             "E04"
           ],
-          "note": "Small overlap with the developer platform."
+          "note": "Small overlap with the developer platform.",
+          "evidence_fingerprint": "sha256:885c5aeed616040d"
         },
         "D5": {
           "score": 2,
@@ -623,7 +644,8 @@
           "evidence": [
             "E02"
           ],
-          "note": "No trust and safety leadership."
+          "note": "No trust and safety leadership.",
+          "evidence_fingerprint": "sha256:f3e8e5dcb00ae022"
         },
         "D2": {
           "score": 1,
@@ -631,7 +653,8 @@
           "evidence": [
             "E07"
           ],
-          "note": "None relevant."
+          "note": "None relevant.",
+          "evidence_fingerprint": "sha256:ef0f9b98e761954d"
         },
         "D3": {
           "score": 2,
@@ -647,7 +670,8 @@
           "evidence": [
             "E07"
           ],
-          "note": "None."
+          "note": "None.",
+          "evidence_fingerprint": "sha256:ef0f9b98e761954d"
         },
         "D5": {
           "score": 2,
@@ -705,7 +729,8 @@
           "evidence": [
             "E02"
           ],
-          "note": "No trust and safety or policy operations experience."
+          "note": "No trust and safety or policy operations experience.",
+          "evidence_fingerprint": "sha256:f3e8e5dcb00ae022"
         },
         "D2": {
           "score": 1,
@@ -713,7 +738,8 @@
           "evidence": [
             "E07"
           ],
-          "note": "Essays touch on AI risk but are not policy work."
+          "note": "Essays touch on AI risk but are not policy work.",
+          "evidence_fingerprint": "sha256:ef0f9b98e761954d"
         },
         "D3": {
           "score": 1,
@@ -729,7 +755,8 @@
           "evidence": [
             "E07"
           ],
-          "note": "Nothing specific to Acme's safeguards work."
+          "note": "Nothing specific to Acme's safeguards work.",
+          "evidence_fingerprint": "sha256:ef0f9b98e761954d"
         },
         "D5": {
           "score": 2,
@@ -787,7 +814,8 @@
           "evidence": [
             "E02"
           ],
-          "note": "No standards or regulatory work."
+          "note": "No standards or regulatory work.",
+          "evidence_fingerprint": "sha256:f3e8e5dcb00ae022"
         },
         "D2": {
           "score": 1,
@@ -795,7 +823,8 @@
           "evidence": [
             "E05"
           ],
-          "note": "None relevant."
+          "note": "None relevant.",
+          "evidence_fingerprint": "sha256:e3b1826151781fd0"
         },
         "D3": {
           "score": 0,
@@ -811,7 +840,8 @@
           "evidence": [
             "E01"
           ],
-          "note": "Knows warehouse safety practice from operations."
+          "note": "Knows warehouse safety practice from operations.",
+          "evidence_fingerprint": "sha256:a47ff635d37b7533"
         },
         "D5": {
           "score": 2,
@@ -870,6 +900,7 @@
             "E01"
           ],
           "note": "Program years fit; no government customers.",
+          "evidence_fingerprint": "sha256:a47ff635d37b7533",
           "capped": "hard requirement lacking"
         },
         "D2": {
@@ -878,7 +909,8 @@
           "evidence": [
             "E05"
           ],
-          "note": "No public-sector proof."
+          "note": "No public-sector proof.",
+          "evidence_fingerprint": "sha256:e3b1826151781fd0"
         },
         "D3": {
           "score": 1,
@@ -892,7 +924,8 @@
           "score": 0,
           "raw": 0,
           "evidence": [],
-          "note": "None."
+          "note": "None.",
+          "evidence_fingerprint": "sha256:4f53cda18c2baa0c"
         },
         "D5": {
           "score": 2,

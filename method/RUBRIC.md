@@ -20,6 +20,11 @@
   quick, the shown fixes list Show it first; which fixes are shown, and the
   points, are worked out as before. The campaign shows the label next to each
   gap; its plan order is unchanged.
+- B6: when a role's requirements match, proof of work or organisation edge is
+  judged again by a different AI agent (from `judged_by`) and the evidence it
+  cites is unchanged (same ids, levels and claims), the previous score stands,
+  up or down, and the run says so. New evidence means the new score counts.
+  Judgements with no recorded agent work as before.
 
 Purpose: estimate, honestly, a person's chance of being hired into a specific
 open role at a specific organisation, and show what would raise it. Every run

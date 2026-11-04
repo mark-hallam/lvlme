@@ -56,8 +56,10 @@ class Base(unittest.TestCase):
         H.save(os.path.join(self.ws, "market", "roles", "latest.json"),
                {"schema_version": 1, "fetched_on": date, "summary": {"matched_total": len(self.roles)},
                 "roles": self.roles})
-        H.save(os.path.join(self.ws, "eval", "judgements.json"),
-               {"schema_version": 1, "rubric_version": "1.0", "roles": self.judgements})
+        doc = {"schema_version": 1, "rubric_version": "1.0", "roles": self.judgements}
+        if getattr(self, "judged_by", None):
+            doc["judged_by"] = self.judged_by
+        H.save(os.path.join(self.ws, "eval", "judgements.json"), doc)
         H.save(os.path.join(self.ws, "eval", "profile-dimensions.json"), self.profile)
         H.save(os.path.join(self.ws, "profile", "evidence.json"), EVIDENCE)
         H.save(os.path.join(self.ws, "eval", "gap-templates.json"), {"schema_version": 1, "gaps": self.gaps})
@@ -68,6 +70,55 @@ class Base(unittest.TestCase):
         j = {"D1": d1, "D2": d2, "D4": d4, "judged_on": "2026-10-01", "reviewed_on": TODAY}
         j.update(kw)
         self.judgements[rid] = j
+
+
+class JudgeChangeTests(Base):
+    """B6: when only the judging AI changed and the cited evidence did not, the previous score stands."""
+
+    def go(self, date, agent, d2, d2_evidence=("E02",)):
+        self.judged_by = {"agent": agent} if agent else None
+        self.judge("acme:1", e(2, ["E01"]), e(d2, list(d2_evidence)), e(2, ["E01"]))
+        run = self.run_score(date)
+        H.save(os.path.join(self.ws, "eval", "runs", date + ".json"), run)
+        return run, run["roles"][0]["scores"]["D2"]
+
+    def test_a_new_judge_on_the_same_evidence_keeps_the_previous_score_down_and_up(self):
+        self.go("2026-11-01", "Claude Code", 2)
+        run, d2 = self.go("2026-11-02", "Codex", 1)
+        self.assertEqual(d2["score"], 2)
+        self.assertEqual(d2["judge_changed"], {"previous_score": 2, "new_score": 1, "previous_judge": "Claude Code",
+                                               "new_judge": "Codex", "kept": "previous"})
+        self.assertIn("The score for acme:1 D2 was kept at 2: only the judge changed (Claude Code to Codex), "
+                      "the evidence did not.", run["warnings"])
+        self.go("2026-11-03", "Claude Code", 1)          # a third judge reading lower again: still kept
+        run, d2 = self.go("2026-11-04", "Codex", 2)       # Codex now scores higher than the kept score, also kept
+        self.assertEqual(d2["score"], 2)
+
+    def test_upward_change_by_a_new_judge_is_also_kept(self):
+        self.go("2026-11-01", "Claude Code", 1)
+        _, d2 = self.go("2026-11-02", "Codex", 2)
+        self.assertEqual((d2["score"], d2["judge_changed"]["new_score"]), (1, 2))
+
+    def test_new_evidence_means_the_new_score_counts(self):
+        self.go("2026-11-01", "Claude Code", 2)
+        _, d2 = self.go("2026-11-02", "Codex", 1, d2_evidence=("E02", "E01"))
+        self.assertEqual(d2["score"], 1)
+        self.assertNotIn("judge_changed", d2)
+
+    def test_the_same_judge_or_no_recorded_judge_works_as_before(self):
+        self.go("2026-11-01", "Claude Code", 2)
+        _, d2 = self.go("2026-11-02", "Claude Code", 1)
+        self.assertEqual(d2["score"], 1)
+        self.go("2026-11-03", None, 2)
+        _, d2 = self.go("2026-11-04", None, 1)
+        self.assertEqual(d2["score"], 1)
+        self.assertNotIn("judged_by", d2)
+
+    def test_the_fingerprint_is_stable(self):
+        a, _ = self.go("2026-11-01", "Codex", 2)
+        b = self.run_score("2026-11-01")
+        self.assertEqual(json.dumps(a, sort_keys=True), json.dumps(b, sort_keys=True))
+        self.assertTrue(a["roles"][0]["scores"]["D2"]["evidence_fingerprint"].startswith("sha256:"))
 
 
 class MathsTests(Base):

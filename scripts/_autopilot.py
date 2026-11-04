@@ -81,7 +81,8 @@ def task_prompt(engine, ws, ap):
         "2. python3 scripts/fetch_roles.py --workspace %s (it also checks each posting's age and reposts)." % ws,
         "3. python3 scripts/fetch_doors.py --workspace %s. If it fails, skip it like any other source." % ws,
         "4. Evidence since the last run, from these approved read-only sources only: %s." % sources,
-        "5. python3 scripts/run_plan.py --workspace %s, then judge the roles of a %s run (--json lists them)." % (ws, ap["run"]),
+        "5. python3 scripts/run_plan.py --workspace %s, then judge the roles of a %s run (--json lists them). "
+        "Set judged_by at the top of eval/judgements.json to the agent you are and your model." % (ws, ap["run"]),
         ("6. The blind review gate, with fresh helper agents, as method/REVIEW.md says."
          if ap["helpers"] else
          "6. Start no helper agents: leave new scores above 2 waiting for review (they count as 2) and say so."),

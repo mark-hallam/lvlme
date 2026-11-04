@@ -106,7 +106,17 @@
         "raw": {"type": "integer", "minimum": 0, "maximum": 5},
         "evidence": {"type": "array", "items": {"type": "string"}},
         "note": {"type": "string"},
-        "capped": {"type": "string"}
+        "capped": {"type": "string"},
+        "evidence_fingerprint": {"type": "string", "description": "D1, D2 and D4: a short hash of the cited evidence (each id, its level and claim), to tell whether only the judge changed."},
+        "judged_by": {"type": "string", "description": "The AI agent (and model) that judged this factor, when recorded."},
+        "judge_changed": {
+          "type": "object", "required": ["previous_score", "new_score", "previous_judge", "new_judge", "kept"],
+          "additionalProperties": false,
+          "description": "Only the judge changed and the evidence did not, so the previous score was kept.",
+          "properties": {"previous_score": {"type": "integer", "minimum": 0, "maximum": 5},
+                         "new_score": {"type": "integer", "minimum": 0, "maximum": 5},
+                         "previous_judge": {"type": "string"}, "new_judge": {"type": "string"}, "kept": {"const": "previous"}}
+        }
       }
     },
     "role": {
