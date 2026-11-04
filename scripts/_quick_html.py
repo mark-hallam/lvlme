@@ -278,9 +278,18 @@ def fit_range(result):
             'today, up to <b class="num">%s</b></span></div>'
             '<div class="track" aria-hidden="true">%s<i class="maybe" style="width:%s%%"></i></div>'
             '<p class="tiny sub">The striped part is %s. LVLme quick cannot check %s from one posting and a CV, '
-            'so today %s 0.</p></div>' % (
+            'so today %s 0.%s</p></div>' % (
                 num(result["fit"]), num(top["fit"]), now, num(top["gain"]), esc(unchecked_names(result)),
-                "them" if many else "it", "they count" if many else "it counts"))
+                "them" if many else "it", "they count" if many else "it counts", esc(two_cases(result, top))))
+
+
+def two_cases(result, top):
+    """' The fixes below reach 34; 35 is a different case.' so the two numbers never read as one promise."""
+    c = result.get("if_all_fixes")
+    if not c or not result.get("fixes"):
+        return ""
+    return (" The fixes below reach %s on their own; %s is the different case where %s turn out strong."
+            % (num(c["fit"]), num(top["fit"]), "those two" if len(result["not_checked"]) > 1 else "that one"))
 
 
 def evidence_list(rows):

@@ -421,6 +421,12 @@ class JudgedByTests(Base):
             result, _ = Q.build(self.folder)
         self.assertIn("(the same model as the first judge, in a fresh session)", QH.render(result))
 
+    def test_the_fit_bar_says_the_fixes_total_and_the_range_are_two_cases(self):
+        result = self.result()
+        top = QH.top_of_range(result)
+        self.assertIn("The fixes below reach %s on their own; %s is the different case" % (
+            QH.num(result["if_all_fixes"]["fit"]), QH.num(top["fit"])), QH.render(result))
+
     def test_not_recorded_is_said_plainly(self):
         result = self.result()
         self.assertIsNone(result["judged_by"])
