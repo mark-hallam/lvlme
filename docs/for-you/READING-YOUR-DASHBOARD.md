@@ -64,8 +64,8 @@ overstated claim, without changing a score.
 ### 4. The flight strip
 
 **Departed** is the day LVLme first measured you, Day 1. **Day** counts from
-there. **Altitude** is your fit today on the role the chart follows, and
-**Flight level** is the name of its level. **Next level** gives the date your
+there. **Altitude (fit)** is your fit today on the role the chart follows, and
+**Flight level (chance)** is the name of its level. **Next level** gives the date your
 plan is expected to get you there, or says "not on the current plan".
 
 ### 5. The flight path

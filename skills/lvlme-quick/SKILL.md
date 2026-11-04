@@ -92,7 +92,9 @@ would raise it most (any fix left out is named, with the reason). Aim for a coup
    turned out strong). Set `judged_by` to the agent you are and your model
    when you know it (for example `{"agent": "Codex", "model": "gpt-5-codex"}`):
    another agent can judge the same evidence differently, so the result page
-   says which one judged.
+   says which one judged. Write every note in plain words for the person:
+   the page shows them, so no file paths or field names (say "the posting
+   says Anthropic sponsors visas", not the file it came from).
 6. **The blind reviewer**, for any score above 2:
 
    ```bash
@@ -100,13 +102,23 @@ would raise it most (any fix left out is named, with the reason). Aim for a coup
    ```
 
    If it lists items, start ONE fresh reviewer: in Claude Code the
-   `lvlme:reviewer` subagent, elsewhere a new session. Give it only the
+   `lvlme:reviewer` subagent; in Codex or another agent, a helper agent or a
+   new session that sees nothing of this conversation (for example a separate
+   `codex exec` run given only the brief). Give it only the
    `reviewer_brief` the command prints (the rubric, the evidence file, the
    posting and the item list). Never give it a score, a note or this
-   conversation. Save its reply, as it came, to `eval/review-reply.md`. If it
+   conversation. Save its reply, as it came, to `eval/review-reply.md`; the
+   build reads a factor written as `D1`, as `D1 Requirements match` or by its
+   name. If it
    names a flag, copy it to `review_flags` in `eval/quick.json` with the exact
    posting sentence it quotes. There is no tie-break in the quick answer: a
    disagreement is logged and the score counts as 2.
+
+   **Never write or edit `eval/review-reply.md` yourself**, not even to fix
+   its format, and never call your own second look a blind review. If you
+   cannot start a separate reviewer, skip this step: the build counts those
+   scores as 2 and the result says they wait for the reviewer, which is the
+   honest answer.
 7. **Candidate fixes.** In `eval/quick.json` under `fixes`, add one fix for
    each factor that could realistically rise (ids `F1`, `F2` and so on), each
    with a target score, a short title and one concrete next step the person
@@ -121,7 +133,9 @@ would raise it most (any fix left out is named, with the reason). Aim for a coup
    three fixes that add the most fit points (naming any it leaves out, and
    why), and writes `index.html`,
    `result.json` and `message.md`. Fix any error it prints and run it again.
-9. **Tell the person**: paste `message.md` as it is. It holds the odds in
+9. **Tell the person**: paste `message.md` as it is. Add at most three short
+   notes after it, and never restate a score, a fix or the review in other
+   words: the message, the page and the dashboard must say the same thing. It holds the odds in
    plain English, the fit as a range, the top fixes, the command to open the page, and the way to
    go deeper: say "run LVLme" for the full campaign. In Claude chat, where
    the folder is in Claude's sandbox rather than on the person's computer,

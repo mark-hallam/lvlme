@@ -260,22 +260,42 @@ def load(folder):
 # ------------------------------------------------------------ the review
 
 
+def _reply_dimension(cells):
+    """The factor a reply line scores: a D-code in the dimension cell (alone or with its name, as in
+    "D1 Requirements match"), else the factor's name alone, else a D-code at the end of the item id."""
+    m = re.search(r"\bD([1-7])\b", cells[1])
+    if m:
+        return "D" + m.group(1)
+    name = re.sub(r"[^a-z ]+", " ", cells[1].lower()).split()
+    for d, full in NAMES.items():
+        if name and name == re.sub(r"[^a-z ]+", " ", full.lower()).split():
+            return d
+    m = re.search(r"/(D[1-7])\s*$", cells[0])
+    return m.group(1) if m else None
+
+
 def parse_reply(text):
     """The blind reviewer's score lines: {dimension: {"score", "anchor", "evidence"}}, and warnings.
 
     Each line is `<id> | <dimension> | <score> | <anchor met> | <evidence ids>`, as agents/reviewer.md
-    asks; table pipes and backticks around it are ignored."""
+    asks; table pipes and backticks around it are ignored. The dimension may be written as its code (D1),
+    its code and name ("D1 Requirements match") or its name, so a reviewer's wording never loses a score."""
     out, warnings = {}, []
     for line in (text or "").splitlines():
         cells = [c.strip() for c in line.strip().strip("`").strip().strip("|").split("|")]
-        if len(cells) != 5 or not re.match(r"^D[1-7]$", cells[1]) or not re.match(r"^[0-5]$", cells[2]):
+        if len(cells) < 5:
             continue
-        dim = cells[1]
+        dim, score = _reply_dimension(cells), re.match(r"^\**([0-5])\**(?![0-9])", cells[2])
+        if not dim or not score:
+            continue
         if dim in out:
             warnings.append("The reviewer's reply scores %s twice; the first line counts." % dim)
             continue
-        out[dim] = {"score": int(cells[2]), "anchor": cells[3],
-                    "evidence": re.findall(r"\b[A-Z]{1,3}[0-9]+\b", cells[4])}
+        out[dim] = {"score": int(score.group(1)), "anchor": cells[3],
+                    "evidence": re.findall(r"\b[A-Z]{1,3}[0-9]+\b", " ".join(cells[4:]))}
+    if text and text.strip() and not out:
+        warnings.append("eval/review-reply.md has no score line LVLme can read. Each line must be "
+                        "<id> | <factor, for example D1> | <score 0 to 5> | <anchor> | <evidence ids>.")
     return out, warnings
 
 
@@ -370,6 +390,10 @@ def review(docs, flags):
         theirs = reply.get(d)
         if d not in need:
             rows[d] = {"status": "not_needed"}
+        elif theirs is None and docs.get("reply") is not None:
+            rows[d] = {"status": "unreadable"}
+            warnings.append("eval/review-reply.md has no readable score for %s, so it counts as 2. Ask the "
+                            "reviewer for its line again; never write it yourself." % NAMES[d])
         elif theirs is None:
             rows[d] = {"status": "awaiting"}
         elif theirs["score"] == mine:
@@ -553,9 +577,13 @@ def review_sentence(result):
     statuses = [f["review"]["status"] for f in result["factors"]]
     needed = [x for x in statuses if x != "not_needed"]
     waiting = statuses.count("awaiting")
+    unread = statuses.count("unreadable")
     n = len(result["review"]["disputes"])
     if not needed:
         return "No score was above 2, so the blind reviewer had nothing to check."
+    if unread:
+        return "The blind reviewer's reply had no readable score for %d factor%s, so %s as 2." % (
+            unread, "" if unread == 1 else "s", "it counts" if unread == 1 else "they count")
     if waiting:
         return "%d score%s above 2 still wait%s for the blind reviewer and count%s as 2 until then." % (
             waiting, "" if waiting == 1 else "s", "s" if waiting == 1 else "", "s" if waiting == 1 else "")
@@ -651,6 +679,8 @@ def promote(args):
         print("Its plan starts with %s from your quick result: %s." % (
             "the fix" if len(summary["actions"]) == 1 else "the %d fixes" % len(summary["actions"]),
             "; ".join(a["title"] for a in summary["actions"])))
+        print("The dashboard shows each as expected points: its gain on the quick result times its chance of "
+              "working, so the numbers are smaller.")
     print("Next: say \"run the LVLme interview\" to add more targets and the factors quick cannot check. "
           "The LinkedIn export can come later.")
     print("```bash\nopen %s\n```" % display_path(os.path.join(dest, "report", "index.html")))

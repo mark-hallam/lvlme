@@ -121,6 +121,34 @@ class PromoteTests(unittest.TestCase):
             summary = f.read()
         self.assertEqual(summary.count("Deployment program roles"), 1)
 
+    def test_the_role_family_finds_its_own_title_on_the_next_refresh(self):
+        # A comma in the title ("Customer Success Manager, Commercial") once made the family match nothing,
+        # so the first job-board refresh after promote dropped the campaign's only role.
+        import _common as C
+        import _promote as P
+        for title in ("Customer Success Manager, Commercial", "Program Manager - Robot Fleet",
+                      "Engineer (Applied AI)", "Deployment Program Manager, AI Agents"):
+            fam = P.family_for(title)
+            self.assertTrue(C.matches_any(fam["title_keywords"], title), title)
+        self.assertFalse(C.matches_any(P.family_for("Customer Success Manager, Commercial")["title_keywords"],
+                                       "Solutions Engineer, Commercial"))
+        code, _ = self.promote()
+        self.assertEqual(code, 0)
+        role = self.load("market", "roles", "latest.json")["roles"][0]
+        fams = self.load("config.json")["families"]
+        self.assertTrue(C.matches_any(fams[0]["title_keywords"], role["title"]))
+
+    def test_the_market_counts_the_promoted_role_without_a_job_board_summary(self):
+        import json
+        import re
+        code, _ = self.promote()
+        self.assertEqual(code, 0)
+        with open(os.path.join(self.ws, "report", "index.html"), encoding="utf-8") as fh:
+            page = fh.read()
+        data = json.loads(re.search(r'<script type="application/json"[^>]*>(.*?)</script>', page, re.S).group(1))
+        counts = data["market"]["byOrgFamily"]
+        self.assertEqual(sum(sum(v.values()) for v in counts.values()), 1)
+
     def test_an_unfinished_quick_folder_is_refused(self):
         os.remove(os.path.join(self.quick, "eval", "quick.json"))
         with mock.patch("sys.stdout", io.StringIO()), self.assertRaises(SystemExit) as caught:

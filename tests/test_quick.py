@@ -273,6 +273,24 @@ class ReviewTests(Base):
         self.assertEqual(parsed, {"D1": {"score": 3, "anchor": "anchor 3", "evidence": ["E01", "E04"]}})
         self.assertEqual(len(warnings), 1)
 
+    def test_reply_parser_takes_the_factor_by_code_name_or_item_id(self):
+        # Real reviewers wrote "D1 Requirements match" or the name alone; each must still count.
+        for line in ("x | D1 Requirements match | 2 | 2, Partial | E01, E02 (E04 at most 1)",
+                     "x | Requirements match | 2 | Partial | E01, E02",
+                     "x/D1 | the first factor | **2** | Partial | E01, E02"):
+            parsed, warnings = Q.parse_reply(line)
+            self.assertEqual(parsed["D1"]["score"], 2, line)
+            self.assertEqual(warnings, [], line)
+
+    def test_an_unreadable_reply_is_said_plainly_never_as_waiting(self):
+        self.write("eval/review-reply.md", "The reviewer thought D1 deserved a 2.\n")
+        r = self.result()
+        self.assertEqual(self.factor(r, "D1")["review"]["status"], "unreadable")
+        self.assertEqual(self.factor(r, "D1")["score"], 2)
+        self.assertTrue(any("no score line LVLme can read" in w for w in r["warnings"]))
+        self.assertIn("no readable score", Q.review_sentence(r))
+        self.assertNotIn("still wait", Q.review_sentence(r))
+
     def test_reviewer_flag_applies_only_with_a_real_posting_sentence(self):
         quick = self.load("eval/quick.json")
         quick["review_flags"] = [{"flag": "hard_requirement_lacking",

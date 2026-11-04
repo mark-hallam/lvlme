@@ -745,7 +745,7 @@ function renderTopline(){
   const nextT = bi < 4 ? THRESH[bi + 1] : null;
   const nextDate = nextT != null ? crossDate(exp.pts, nextT) : null;
   $("#strip").innerHTML = `<span>Departed<b>${esc(fmtDate(D.meta.baseline))}</b></span><span>Day<b class="num">${day}</b></span>
-    <span>Altitude<b class="num">${Math.round(last.v)}</b></span><span>Flight level<b>${esc(BANDS[bi])}</b></span>
+    <span title="Your best fit, out of 100">Altitude (fit)<b class="num">${Math.round(last.v)}</b></span><span title="The chance band your fit is in">Flight level (chance)<b>${esc(BANDS[bi])}</b></span>
     <span>Next level (${esc(nextT != null ? BANDS[bi + 1] : "top")})<b>${nextDate ? esc(fmtDate(nextDate)) : "not on the current plan"}</b></span>`;
   // best chance (mode aware)
   const focus = journeyRoles().reduce((a, b) => fitM(b) > fitM(a) ? b : a);   // the role the journey's projection follows
@@ -970,7 +970,7 @@ const DO_NEXT = 4;
 function doNextHTML(){ const L = lv(); return doNextRows(L.up, L.nl, DO_NEXT); }
 // A gap's points are summed across roles, so the total can pass 100 beside fits out of 100. Show the
 // average a role gains, with how many roles, so every number reads as fit points on one role.
-const UNLOCKS_SUB = "Fit points each role gains on average, and how many of your top judged roles it lifts.";
+const UNLOCKS_SUB = "Fit points each role gains on average if the gap closes completely, with no time limit (so bigger than a plan action's expected points), and how many of your top judged roles it lifts.";
 const perRole = x => { const v = x.roles ? x.points / x.roles : x.points; return v >= 10 ? Math.round(v) : Math.round(v * 10) / 10; };
 function unlocksHTML(){
   return D.gaps.slice(0, 4).map(x => `<div class="dn" tabindex="0" data-moves="1"><div style="flex:1;min-width:0"><div class="dn-t">${esc(x.title)}</div><div class="tiny sub">lifts ${plural(x.roles, "role")}</div></div><div class="dn-p">+${perRole(x)}<span class="tiny sub"> each</span></div></div>`).join("") +
@@ -1343,7 +1343,7 @@ function bindChips(root){
   root.querySelectorAll(".chip[data-act]").forEach(c => c.addEventListener("click", e => { e.stopPropagation(); openDetail({type: "action", id: c.dataset.act}, false); }));
 }
 function swotGrid(G){
-  const q = (k, name) => `<div class="card swot-q"><h3>${name}</h3>${G[k].length ? `<ul>${G[k].map(i => `<li class="small">${esc(i.t)}<div>${i.ev.map(evChip).join("")}${i.src ? `<div class="tiny sub">Source: ${esc(i.src)}</div>` : ""}</div></li>`).join("")}</ul>` : '<div class="small sub">None recorded.</div>'}</div>`;
+  const q = (k, name) => `<div class="card swot-q"><h3>${name}</h3>${G[k].length ? `<ul>${G[k].map(i => `<li class="small">${esc(i.t)}<div>${i.ev.map(evChip).join("")}${i.src ? `<div class="tiny sub">Source: ${esc(i.src)}</div>` : ""}</div></li>`).join("")}</ul>` : '<div class="small sub">None recorded yet. Your agent fills this in during the full campaign (say "run LVLme").</div>'}</div>`;
   return `<div class="grid2">${q("S","Strengths")}${q("W","Weaknesses")}${q("O","Opportunities")}${q("T","Threats")}</div>`;
 }
 function renderSwot(){
@@ -1529,8 +1529,8 @@ function doNextRows(list, nl, limit){
   return (limit ? list.slice(0, limit) : list).map(q => { const a = q.a, tag = pathTag(q, nl);
     return `<div class="dn" tabindex="0" data-act="${esc(a.id)}"><span class="status-dot ${esc(a.status)}"></span><div style="flex:1;min-width:0"><div class="dn-t">${esc(a.title)}</div><div class="tiny sub">${stName(a.status)}${q.on ? "" : ", switched off"} · ${esc(a.owner)} · ${a.dated ? "by " + esc(shortDate(a.date)) : "no target date yet"}${tag ? ` · <span class="dn-tag">${esc(tag)}</span>` : ""}</div></div><div class="dn-p">${points(q) || "credibility"}</div></div>`; }).join("");
 }
-const doNextSub = nl => nl.top ? "Expected points each action adds to your best fit on its own, counting its chance."
-  : `Expected points toward Level ${nl.nextLevel}, each action on its own. The path to Level ${nl.nextLevel} comes first.`;
+const doNextSub = nl => nl.top ? "Expected points each action adds to your best fit on its own: its full gain times its chance of working, so smaller than the gain on a LVLme quick result."
+  : `Expected points toward Level ${nl.nextLevel}, each action on its own: its full gain times its chance of working, so smaller than the gain on a LVLme quick result. The path to Level ${nl.nextLevel} comes first.`;
 
 // Each scored day's level for the journey the organisation selector follows.
 function levelHist(){
@@ -1914,7 +1914,7 @@ if (D.meta.fictional){ $("#banner").hidden = false; $("#bannerText").textContent
 $("#builtAt").textContent = D.meta.built;
 $("#recordNote").textContent = D.meta.git
   ? "Every scored day is saved in your workspace's history. Each chip shows the saved version that first recorded that day, so the climb is a record anyone can check."
-  : "Every scored day is kept as a dated file in eval/runs. Make your workspace its own git repository (with no remote) and each chip will also show the saved version that first recorded that day.";
+  : "Every scored day is saved with its date in your workspace. Ask your agent to turn on version history for it (a private git repository with no online copy), and each chip will also show the saved version that first recorded that day.";
 syncTop();
 if (!D.roles.length){
   $("#centre").innerHTML = '<div class="card"><h3>No open roles matched yet</h3><p class="small sub">Fetch roles and score a run, then build the dashboard again.</p></div>';

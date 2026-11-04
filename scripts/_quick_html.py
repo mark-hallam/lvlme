@@ -34,7 +34,9 @@ EXPLAIN = {
     "Strong": "You stand out against most shortlisted applicants for this role.",
 }
 REVIEW = {"agreed": ("Reviewer agreed", "v"), "disputed": ("Reviewers disagreed", "p"),
-          "awaiting": ("Waiting for the reviewer", "p"), "not_needed": ("2 or under: no review needed", "s")}
+          "awaiting": ("Waiting for the reviewer", "p"),
+          "unreadable": ("Reviewer's score unreadable: counts as 2", "p"),
+          "not_needed": ("2 or under: no review needed", "s")}
 
 CSS = """
 :root{color-scheme:light;--bg:#f2f2f5;--card:#fff;--card2:#f6f6f8;--ink:#1d1d1f;--sub:#56565b;--rule:#e2e2e7;
@@ -118,6 +120,7 @@ th{font-weight:600;color:var(--sub)}
 .say .k{display:block;font-size:12px;font-weight:600;color:var(--sub)}
 .say b{font-size:17px;font-weight:650}
 footer{margin-top:20px;font-size:13px;color:var(--sub);padding:0 4px}
+footer details{margin-top:6px}footer summary{cursor:pointer}
 @media (max-width:560px){h1{font-size:24px}.tile{padding:12px}.tile .b{font-size:21px}
 .deeper{flex-direction:column;align-items:flex-start}.card{padding:18px 16px}.top .nw{display:block}.top .sep{display:none}}
 @media (max-width:340px){.odds{grid-template-columns:1fr}th,td{padding:7px 4px}}
@@ -275,7 +278,8 @@ def factors(result):
     for f in result["factors"]:
         label, cls = REVIEW[f["review"]["status"]]
         if f["review"]["status"] == "disputed":
-            label = "Reviewers disagreed (%d and %d)" % (f["review"]["judge_score"], f["review"]["reviewer_score"])
+            label = "First score %d, blind reviewer %d: counts as %d" % (
+                f["review"]["judge_score"], f["review"]["reviewer_score"], f["score"])
         why = "".join('<p class="why">%s</p>' % esc(w) for w in f["why_counted"])
         rows.append('<li><div class="row-h"><h3>%s</h3><span class="score num">%s %d of 5</span></div>'
                     '<p class="tiny sub">%s of %s fit points · %s</p>%s%s%s</li>' % (
@@ -289,7 +293,8 @@ def factors(result):
     note = unchecked_note(result)
     return ('<section class="card" aria-labelledby="whyH"><p class="eyebrow">Why</p><h2 id="whyH">Factor by factor</h2>'
             '<p class="small sub">Every point cites evidence, and a score can be no higher than its best evidence '
-            'supports. A line on a CV alone is self-reported.</p><ul class="rows">%s</ul>%s</section>' % (
+            'supports. A line on a CV alone is self-reported. E01, E02 and so on are your evidence items, each '
+            'marked with how far it can be trusted.</p><ul class="rows">%s</ul>%s</section>' % (
                 "".join(rows), note))
 
 
@@ -374,6 +379,10 @@ def fixes(result):
         "all three land" if n == 3 else "both land" if n == 2 else "all %d land" % n if n > 1 else "it lands",
         num(c["fit"]), num(c["gain"]),
         esc(headline(c, start=False))))
+    top = top_of_range(result)
+    if top:
+        all_line += ('<p class="tiny sub">This counts only the fixes above. The "up to %s" at the top is a '
+                     'different what if: the two factors this page cannot check turning out strong.</p>' % num(top["fit"]))
     return ('<section class="card" aria-labelledby="fixH"><p class="eyebrow">What would raise your odds</p>'
             '<h2 id="fixH">The top %s</h2><p class="small sub">Ranked by the fit points each adds, with the same '
             'maths as the score. Each one is capped at what can realistically change in a few months.</p>%s'
@@ -395,7 +404,8 @@ def brief(result):
     return ('<section class="card" aria-labelledby="briefH"><p class="eyebrow">Your brief</p>'
             '<h2 id="briefH">Before you apply</h2>%s<p class="small sub" style="margin-top:12px">LVLme gives fixes and a '
             'brief, never application answers: you write those in your own words. %s</p></section>'
-            % ("".join(parts), ai_guidance(result["role"])))
+            % ("".join(parts), ai_guidance(result["role"]).replace(
+                "then I'll review it", "then ask your agent to review it")))
 
 
 def ai_guidance(role):
@@ -425,10 +435,12 @@ def checked(result):
                                      "not_in_posting": chip("Not in the posting, ignored", "s")}[f["status"]])
         for f in rv["flags"])
     agreed = len(rv["agreed"])
-    need = agreed + len(rv["disputes"]) + sum(1 for f in result["factors"] if f["review"]["status"] == "awaiting")
+    need = agreed + len(rv["disputes"]) + sum(1 for f in result["factors"] if f["review"]["status"] in ("awaiting", "unreadable"))
     lead = ("No score was above 2, so no review was needed." if need == 0 else
             "A second agent, given only the rubric, your evidence and the posting, scored every factor above 2 "
-            "without seeing the first scores. It agreed on %d of %d." % (agreed, need))
+            "without seeing the first scores. It agreed on %d of %d%s." % (
+                agreed, need, "; where it disagreed, the score counts as 2 until a third reviewer settles it"
+                if rv["disputes"] else ""))
     return ('<section class="card" aria-labelledby="chkH"><p class="eyebrow">How this was checked</p>'
             '<h2 id="chkH">A blind second opinion</h2><p class="small">%s</p>%s%s'
             '<p class="small sub" style="margin-top:12px">%s</p></section>' % (
@@ -447,8 +459,10 @@ def deeper():
 def render(result):
     r = result["role"]
     demo = '<span class="sep"> · </span><span class="nw">fictional demo</span>' if result.get("fictional") else ""
-    foot = ("Drafts only: LVLme never applies, sends or posts for you. Your CV and this page stay on your computer. "
-            "Inputs fingerprint %s." % esc(result["inputs_digest"][:19]))
+    foot = ("Drafts only: LVLme never applies, sends or posts for you. Your CV and this page stay on your computer; "
+            "like anything your AI agent reads, they were also processed by its provider. "
+            "<details class=\"tech\"><summary>Technical details</summary>Inputs fingerprint %s.</details>"
+            % esc(result["inputs_digest"][:19]))
     body = "".join([hero(result), factors(result), fixes(result), brief(result), checked(result), deeper()])
     return ("<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">"
             "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"

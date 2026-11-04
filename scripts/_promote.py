@@ -75,11 +75,17 @@ def target_for(role, org_name, quick_config):
 
 
 def family_for(title):
-    """One role family from the posting's title words, for the interview to widen."""
-    words = re.sub(r"[^a-z0-9 ]+", " ", (title or "").lower()).split()
-    core = " ".join(words[:4]) or "role"
-    return {"id": re.sub(r"[^a-z0-9]+", "_", core).strip("_")[:40] or "role", "name": title or "The target role",
-            "title_keywords": [core]}
+    """One role family from the posting's title words, for the interview to widen.
+
+    The keyword is the title's first four words in order, with any punctuation between them, so the next
+    job-board refresh finds the same role again: "Customer Success Manager, Commercial" matches itself
+    (a plain phrase would not, because of the comma)."""
+    words = re.sub(r"[^a-z0-9 ]+", " ", (title or "").lower()).split()[:4]
+    if not words:
+        return {"id": "role", "name": title or "The target role", "title_keywords": ["role"]}
+    keyword = "re:(?<![a-z0-9])" + r"[^a-z0-9]+".join(re.escape(w) for w in words)
+    return {"id": re.sub(r"[^a-z0-9]+", "_", " ".join(words)).strip("_")[:40] or "role",
+            "name": title or "The target role", "title_keywords": [keyword]}
 
 
 def promote(folder, ws, today):

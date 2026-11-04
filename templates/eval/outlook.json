@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
   "band": "Not yet judged",
-  "text": "The agent writes this after the first scored run.",
+  "text": "Your agent writes this when it runs the full campaign (say \"run LVLme\").",
   "reasons": []
 }
