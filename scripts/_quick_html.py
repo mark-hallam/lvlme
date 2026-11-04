@@ -361,7 +361,7 @@ def hard_requirement_line(result):
     return line
 
 
-SHOWN_REASONS = ("does not move in a few months", "adds no fit points", "already at or above", "it adds fewer fit points",
+SHOWN_REASONS = ("does not move in a few months", "adds no fit points", "already at or above", "it is not in the top",
                  "another fix to the same factor")
 
 

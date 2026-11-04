@@ -450,7 +450,7 @@ def rank_fixes(docs, flags, agreed, scored):
         ranked.append(r)
     top = ranked[:TOP_FIXES]
     dropped += [{"id": r["id"], "dimension": r["dimension"], "title": r["title"],
-                 "why": "it adds fewer fit points (+%s) than the top %d" % (QH.num(r["gain"]), TOP_FIXES)}
+                 "why": "it is not in the top %d (+%s fit points)" % (TOP_FIXES, QH.num(r["gain"]))}
                 for r in ranked[TOP_FIXES:]]
     combined = None
     if top:

@@ -33,8 +33,8 @@ Tests: 538 pass.
   matches the title's own words in order. The dashboard's market table also
   counts the promoted role before any job-board summary exists.
 - **Every fix the agent suggested is accounted for.** The result page now
-  names every left-out fix with its reason (including "it adds fewer fit
-  points than the top 3"), and names the factor that cannot move in a few
+  names every left-out fix with its reason (including "it is not in the top
+  3"), and names the factor that cannot move in a few
   months, so an agent cannot tell the person the page lists something it
   does not.
 

@@ -125,10 +125,10 @@ class DemoTests(Base):
         # An agent once told the person the page listed a left-out fix it did not; now every one is named.
         r = self.load("result.json")
         r["fixes_not_shown"] = [{"id": "F9", "dimension": "D2", "title": "Smaller",
-                                 "why": "it adds fewer fit points (+1) than the top 3"},
+                                 "why": "it is not in the top 3 (+1 fit points)"},
                                 {"id": "F8", "dimension": "D2", "title": "Same", "why": "another fix to the same factor adds more"}]
         self.assertEqual(QH.not_shown_lines(r), [
-            'Not listed: "Smaller", because it adds fewer fit points (+1) than the top 3.',
+            'Not listed: "Smaller", because it is not in the top 3 (+1 fit points).',
             'Not listed: "Same", because another fix to the same factor adds more.'])
 
     def test_brief_never_holds_application_answers(self):
