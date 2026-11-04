@@ -398,3 +398,14 @@ class ChanceExampleTests(unittest.TestCase):
         body = js[js.index("function chanceExample"):js.index("const doNextSub")]
         self.assertIn("q.a.p * 100", body)
         self.assertNotIn(".chance", body)
+
+
+class InterviewLineTests(unittest.TestCase):
+    """Do next ends with the career interview while the campaign has no outlook, so there is one list of next steps."""
+
+    def test_it_reads_the_outlook_from_the_page_data(self):
+        import _dashboard_assets as AA
+        js = AA.JS_HOME + AA.JS_VIEWS + AA.JS_LEVELS + AA.JS_DETAIL + AA.JS_CORE + AA.JS_CHART
+        line = next(x for x in js.splitlines() if x.startswith("const interviewLine"))
+        self.assertIn('D.meta.outlook.band === "Not yet judged"', line)
+        self.assertIn("${interviewLine()}", js)

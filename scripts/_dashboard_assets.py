@@ -512,6 +512,7 @@ BODY = r"""
   <div class="card">
    <h2 class="eyebrow">Campaign progress</h2>
    <div id="metrics"></div>
+   <p class="tiny sub" style="margin:8px 0 0">Targets you can change: tell your agent what you are aiming for.</p>
   </div>
  </aside>
 
@@ -1085,7 +1086,7 @@ function bindHome(root){
   root.querySelectorAll("[data-org-open]").forEach(n => onEnter(n, () => openDetail({type: "org", id: n.dataset.orgOpen}, true)));
 }
 function renderDoNext(){
-  $("#doNext").innerHTML = `<div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div>${doNextHTML()}`; $("#nextIn").hidden = false;
+  $("#doNext").innerHTML = `<div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div>${doNextHTML()}${interviewLine()}`; $("#nextIn").hidden = false;
   $("#unlocksSub").textContent = UNLOCKS_SUB; $("#unlocks").innerHTML = unlocksHTML(); bindHome($("#nextIn")); bindHome($("#unlocksCard"));
   const warm = warmHTML(); $("#warm").innerHTML = warm; $("#warmCard").hidden = !warm;
   if (warm){ $("#warmSub").textContent = warmSub(); bindHome($("#warmCard")); }
@@ -1147,7 +1148,7 @@ function renderSwitches(){
       row.innerHTML = `<div class="sw-main"><div class="sw-title">${esc(a.title)}</div>
         <div class="sw-lift">${lift > 0 ? `<b>+${lift.toFixed(1)}</b> with everything else on${lifted ? `, lifts <b>${lifted}</b> ${lifted === 1 ? "role" : "roles"}` : ""}` : !a.effects.length ? "Protects credibility, no score change" : `Little extra with everything else on${lifted ? `, but lifts <b>${lifted}</b> ${lifted === 1 ? "role" : "roles"}` : ""}`}</div>
         <div class="sw-meta"><span class="status-dot ${esc(a.status)}"></span>${a.status === "doing" ? "In progress" : a.status === "later" ? "Parked for later" : "To do"} · ${esc(byWhen(a))}${a.stale ? ` · <span class="stale">No movement in ${a.stale} runs</span>` : ""}</div></div>
-        <button class="tog" role="switch" aria-checked="${on}" aria-label="${esc(a.title)}"></button>`;
+        <button class="tog" role="switch" aria-checked="${on}" aria-label="${esc(`Count "${a.title}" in the what if`)}"></button>`;
       row.querySelector(".tog").addEventListener("click", () => { if (enabled.has(a.id)) enabled.delete(a.id); else enabled.add(a.id); refresh(); });
     }
     row.querySelector(".sw-title").addEventListener("click", () => openDetail({type: "action", id: a.id}, true));
@@ -1347,7 +1348,7 @@ function bindChips(root){
   root.querySelectorAll(".chip[data-act]").forEach(c => c.addEventListener("click", e => { e.stopPropagation(); openDetail({type: "action", id: c.dataset.act}, false); }));
 }
 function swotGrid(G){
-  const q = (k, name) => `<div class="card swot-q"><h3>${name}</h3>${G[k].length ? `<ul>${G[k].map(i => `<li class="small">${esc(i.t)}<div>${i.ev.map(evChip).join("")}${i.src ? `<div class="tiny sub">Source: ${esc(i.src)}</div>` : ""}</div></li>`).join("")}</ul>` : '<div class="small sub">None recorded yet. Your agent fills this in after your career interview, the next step: say "run the LVLme interview".</div>'}</div>`;
+  const q = (k, name) => `<div class="card swot-q"><h3>${name}</h3>${G[k].length ? `<ul>${G[k].map(i => `<li class="small">${esc(i.t)}<div>${i.ev.map(evChip).join("")}${i.src ? `<div class="tiny sub">Source: ${esc(i.src)}</div>` : ""}</div></li>`).join("")}</ul>` : '<div class="small sub">None recorded yet. Filled in by your career interview (see the end of Do next).</div>'}</div>`;
   return `<div class="grid2">${q("S","Strengths")}${q("W","Weaknesses")}${q("O","Opportunities")}${q("T","Threats")}</div>`;
 }
 function renderSwot(){
@@ -1537,6 +1538,8 @@ function doNextRows(list, nl, limit){
 }
 // Mirrors gain_title() in _levels_html.py: the full gain and chance behind the one number, as a tooltip.
 const gainTitle = q => q.a.effects.length && q.works > q.exp + 0.05 ? ` title="${esc(`${fmtP(q.works)} points if it works, about ${Math.round(q.a.p * 100)}% chance: ${fmtP(q.exp)} expected`)}"` : "";
+// After Do next: the career interview, when the campaign has not had one (no outlook yet), so there is one list of next steps.
+const interviewLine = () => D.meta.outlook && D.meta.outlook.band === "Not yet judged" ? '<div class="tiny sub" style="margin-top:8px">After these, when you are ready: say "run the LVLme interview". It adds more roles and the factors a quick result cannot check, and fills in the outlook and the strengths and risks.</div>' : "";
 // One worked example from the first action, so the expected points never look like a different answer from the quick result.
 function chanceExample(){
   const q = (lv().up || []).find(x => x.a.effects.length && x.works > x.exp + 0.05 && x.a.p > 0);

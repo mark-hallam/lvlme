@@ -63,7 +63,8 @@ Tests: 538 pass.
   themselves (if they cannot start a separate reviewer, the scores wait for
   one), write notes in plain words with no file paths, paste the result as
   it is, and record who reviewed.
-- **Docs.** LVLme quick asks at most two yes or no questions (not one). If
+- **Docs.** LVLme quick asks at most two short questions (not one), and the
+  first message can carry the job link and where the CV is. If
   the `/lvlme-quick` command is not found right after installing, start a
   new Claude Code session. Cursor, other agents, Linux and Windows are
   described as not tested yet, without predicting that they work.

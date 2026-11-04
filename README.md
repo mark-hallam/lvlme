@@ -10,8 +10,9 @@ Install in Claude Code:
 /plugin install lvlme --marketplace mark-hallam/lvlme
 ```
 
-Then say: **run LVLme quick**, and paste a job link. (If the command is not
-found, start a new Claude Code session.)
+Then say: **run LVLme quick**, paste a job link and say where your CV is (for
+example `~/Documents/cv.pdf`). If the command is not found, start a new
+Claude Code session.
 
 In a couple of minutes you get honest odds for that one job. Codex works too
 (see [Install](#install)).
@@ -34,9 +35,9 @@ the posting text) and your CV. It:
 
 - reads the posting, and turns your CV into a few facts, each marked with how
   far it can be trusted (a CV line alone is "self-reported");
-- asks at most two yes or no questions: do you know someone there who has
-  seen your work, and, if the posting and your CV do not settle it, can you
-  work where the job is?
+- asks at most two short questions: do you know someone there who has seen
+  your work, and, if the posting and your CV do not settle it, can you work
+  where the job is?
 - scores five factors with the same rules and maths as the full campaign,
   and shows the two it cannot check from one posting and a CV (public signal
   and application readiness) as not checked, so your fit is a range: for

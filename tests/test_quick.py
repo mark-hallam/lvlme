@@ -412,6 +412,15 @@ class JudgedByTests(Base):
         self.assertNotIn("Visa or relocation, from the job board",
                          Q.posting_md(role, "Acme", {"kind": "greenhouse", "link": "https://x"}, "2026-11-05"))
 
+    def test_a_same_model_reviewer_is_said_so(self):
+        q = self.load("eval/quick.json")
+        q["judged_by"] = {"agent": "Claude Code", "model": "m1"}
+        q["reviewed_by"] = {"agent": "Claude Code helper agent", "model": "m1"}
+        self.save("eval/quick.json", q)
+        with mock.patch("sys.stdout", io.StringIO()):
+            result, _ = Q.build(self.folder)
+        self.assertIn("(the same model as the first judge, in a fresh session)", QH.render(result))
+
     def test_not_recorded_is_said_plainly(self):
         result = self.result()
         self.assertIsNone(result["judged_by"])

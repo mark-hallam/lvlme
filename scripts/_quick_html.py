@@ -479,8 +479,10 @@ def checked(result):
     agreed = len(rv["agreed"])
     need = agreed + len(rv["disputes"]) + sum(1 for f in result["factors"] if f["review"]["status"] in ("awaiting", "unreadable"))
     rb = result.get("reviewed_by") or {}
-    who = ("The blind reviewer was %s%s, a separate agent that saw none of the first scores. " % (
-        rb["agent"], ", using the model %s" % rb["model"] if rb.get("model") else "")) if rb.get("agent") else ""
+    same = rb.get("model") and rb.get("model") == (result.get("judged_by") or {}).get("model")
+    who = ("The blind reviewer was %s%s, a separate agent that saw none of the first scores%s. " % (
+        rb["agent"], ", using the model %s" % rb["model"] if rb.get("model") else "",
+        " (the same model as the first judge, in a fresh session)" if same else "")) if rb.get("agent") else ""
     n_dis = len(rv["disputes"])
     lead = ("No score was above 2, so no review was needed." if need == 0 else
             "%s scored above 2, so a second agent, given only the rubric, your evidence and the posting, scored %s "
