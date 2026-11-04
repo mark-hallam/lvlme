@@ -149,6 +149,7 @@ def main(argv=None):
     s = sub.add_parser("status")
     s.add_argument("id")
     s.add_argument("status", choices=DR.STATUSES)
+    s.add_argument("--json", action="store_true")
     p = sub.add_parser("plan")
     p.add_argument("id")
     p.add_argument("--later", action="store_true", help="park it: off the active list until switched on")
@@ -178,7 +179,8 @@ def main(argv=None):
     door = find(doc, args.id)
     if args.cmd == "status":
         door["status"] = args.status
-        print("%s is now %s." % (door["id"], DR.STATUS_NAMES[args.status]))
+        message = {"id": door["id"], "status": args.status, "status_name": DR.STATUS_NAMES[args.status]}
+        print(json.dumps(message, indent=2) if args.json else "%s is now %s." % (door["id"], DR.STATUS_NAMES[args.status]))
     elif args.cmd == "plan":
         action = to_plan(ws, config, door, args.later, today)
         print("Added plan action %s: %s (%s, about %s fit points per role on %d role%s if it works)." % (

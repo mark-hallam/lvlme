@@ -108,6 +108,7 @@ def say(p):
                                "%d keep their last judgement: nothing they depend on has changed" % kept)]
     if not f["roles"]:
         lines.append("Nothing needs judging: this run starts no judging helpers.")
+        lines.append("Full run: 0 roles, 0 helpers. Light run: 0 roles, 0 helpers.")
         return lines
     why = ", ".join("%d %s" % (n, k) for k, n in p["reasons"].items() if n)
     lines.append("Full run: judges %s (%s) with about %s: %s, about %s and %s." % (
@@ -116,6 +117,9 @@ def say(p):
     if lt["roles"] < f["roles"]:
         lines.append("Light run: judges your top %d by fit, plus any new roles: %s with about %s. "
                      "The rest keep their last judgement." % (lt["top"], n_of(lt["roles"], "role"), n_of(lt["helpers"], "helper")))
+    else:
+        lines.append("Light run: judges %s with about %s; all roles that need judging fit in this run." % (
+            n_of(lt["roles"], "role"), n_of(lt["helpers"], "helper")))
     lines.append("Helper counts only: LVLme never guesses tokens or cost. You choose.")
     return lines
 

@@ -619,7 +619,7 @@ def message(result, folder):
         lines += ["", "%s Their guidance: %s" % (AP.first_draft_line(r["org_name"], r["ai_policy"]),
                                                  r["ai_policy"]["source"])]
     lines += ["", "Why, factor by factor%s:" % (", with each fix's next step" if result["fixes"] else ""),
-              "", "```bash", "open %s" % display_path(os.path.join(folder, "index.html")),
+              "", "```bash", "open %s" % os.path.abspath(os.path.join(folder, "index.html")),
               "```", "",
               "Go deeper: say \"run LVLme\" for the full campaign."]
     return "\n".join(lines) + "\n"
@@ -691,7 +691,7 @@ def promote(args):
               "working, so the numbers are smaller.")
     print("Next: say \"run the LVLme interview\" to add more targets and the factors quick cannot check. "
           "The LinkedIn export can come later.")
-    print("```bash\nopen %s\n```" % display_path(os.path.join(dest, "report", "index.html")))
+    print("```bash\nopen %s\n```" % os.path.abspath(os.path.join(dest, "report", "index.html")))
     for e in errors:
         print("ERROR " + e, file=sys.stderr)
     return 1 if errors else 0

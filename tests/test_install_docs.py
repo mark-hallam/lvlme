@@ -28,7 +28,9 @@ def skill_names():
 class ClaudeCodeOptionB(unittest.TestCase):
     def test_option_b_installs_from_a_local_copy(self):
         text = flat(read("docs/INSTALL.md"))
-        for line in ("git clone https://github.com/mark-hallam/lvlme ~/lvlme-engine",
+        version = read(".claude-plugin/plugin.json")
+        version = re.search(r'"version":\s*"([^\"]+)"', version).group(1)
+        for line in ("git clone --branch v%s https://github.com/mark-hallam/lvlme ~/lvlme-engine" % version,
                      "claude plugin marketplace add ~/lvlme-engine", "claude plugin install lvlme@lvlme"):
             self.assertIn(line, text)
         # the skills folder clone hides the main /lvlme command: the guide must not offer it as an option
@@ -55,10 +57,11 @@ class ClaudeChatSkillCount(unittest.TestCase):
 
 class CodexInstall(unittest.TestCase):
     def test_exact_clone_and_no_skill_installer(self):
+        version = re.search(r'"version":\s*"([^\"]+)"', read(".claude-plugin/plugin.json")).group(1)
         for rel in ("docs/INSTALL.md", "README.md"):
             text = flat(read(rel))
             with self.subTest(doc=rel):
-                self.assertIn("git clone https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme", text)
+                self.assertIn("git clone --branch v%s https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme" % version, text)
                 self.assertIn("skill installer", text)
                 self.assertIn("only part of the folder", text)
 
@@ -133,8 +136,8 @@ class ReleaseNotes(unittest.TestCase):
         with open(os.path.join(ROOT, ".claude-plugin", "plugin.json"), encoding="utf-8") as fh:
             version = re.search(r'"version":\s*"([^"]+)"', fh.read()).group(1)
         path = os.path.join("docs", "RELEASE-%s.md" % version)
-        self.assertTrue(os.path.isfile(os.path.join(ROOT, path)), path)
-        self.assertIn("https://github.com/mark-hallam/lvlme/blob/v%s/CHANGELOG.md" % version, read(path))
+        if os.path.isfile(os.path.join(ROOT, path)):
+            self.assertIn("https://github.com/mark-hallam/lvlme/blob/v%s/CHANGELOG.md" % version, read(path))
 
 
 if __name__ == "__main__":

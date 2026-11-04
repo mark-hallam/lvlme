@@ -15,7 +15,7 @@ Usage
   python3 scripts/applications.py followup ap1 [--date YYYY-MM-DD]   # the person sent a follow-up
   python3 scripts/applications.py thanks ap1 [--date YYYY-MM-DD]     # the person sent a thank-you note
   python3 scripts/applications.py draft ap1                          # write the due note to campaign/drafts/
-  python3 scripts/applications.py list [--json]
+  python3 scripts/applications.py list [--date YYYY-MM-DD] [--json]
 Every command takes --workspace PATH.
 """
 import argparse
@@ -124,13 +124,15 @@ def draft(ws, config, app, date):
                               "keener" if thanks else "say you are still keen, and add one new thing since you "
                               "applied, if there is one"), "",
         "[Your name]", ""]
-    path = C.wpath(ws, "campaign", "drafts", "followup-%s-%s-%s.md" % (app["id"], app["org"], date))
+    prefix = "thankyou" if thanks else "followup"
+    path = C.wpath(ws, "campaign", "drafts", "%s-%s-%s-%s.md" % (prefix, app["id"], app["org"], date))
     C.write_text(path, "\n".join(body))
     return path
 
 
-def show(doc, date, as_json):
-    rows = [dict(a, follow_up=AP.follow_up(a, date)) for a in AP.ordered(doc, date)]
+def show(doc, date, as_json, names):
+    rows = [dict(a, org=names.get(a.get("org"), str(a.get("org", "")).replace("_", " ").title()), follow_up=AP.follow_up(a, date))
+            for a in AP.ordered(doc, date)]
     if as_json:
         print(json.dumps(rows, indent=2, ensure_ascii=False))
         return
@@ -164,7 +166,9 @@ def main(argv=None):
         p.add_argument("--date", help="YYYY-MM-DD (default: today in the person's time zone)")
     for p in (a, sub.choices["move"]):
         p.add_argument("--note", default="")
-    sub.add_parser("list").add_argument("--json", action="store_true")
+    ls = sub.add_parser("list")
+    ls.add_argument("--date", help="YYYY-MM-DD (default: today in the person's time zone)")
+    ls.add_argument("--json", action="store_true")
     for p in sub.choices.values():
         p.add_argument("--workspace", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
@@ -186,7 +190,7 @@ def main(argv=None):
         path = draft(ws, config, find(doc, args.id), date)
         print("Draft written: %s. The person finishes and sends it." % os.path.relpath(path, ws))
     else:
-        show(doc, date, args.json)
+        show(doc, date, args.json, C.target_names(config))
     return 0
 
 

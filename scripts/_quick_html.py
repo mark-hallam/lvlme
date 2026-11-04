@@ -210,6 +210,9 @@ def adjustments(result):
             out.append("Someone inside has agreed to refer you, so the interview chance moves up one step.")
         elif a.startswith("Hard requirement lacking"):
             note = result.get("hard_requirement_note")
+            if note:
+                note = note[:1].lower() + note[1:]
+                note = note.rstrip().removesuffix(".")
             out.append("A hard requirement is missing%s, so both chances move down one step." % (
                 " (%s)" % note if note else ""))
         elif a.startswith("Cold application only"):

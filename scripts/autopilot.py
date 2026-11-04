@@ -15,6 +15,7 @@ Usage
 Every command takes --workspace PATH.
 """
 import argparse
+import json
 import os
 import re
 import sys
@@ -65,6 +66,7 @@ def main(argv=None):
     on.add_argument("--scheduler", choices=["desktop_task", "cron", "launchd", "other"], default="desktop_task")
     for name in ("off", "status", "prompt", "schedule-line"):
         sub.add_parser(name)
+    sub.choices["status"].add_argument("--json", action="store_true")
     for name in ("on", "off", "status"):
         sub.choices[name].add_argument("--date", help="YYYY-MM-DD (default: today in the person's time zone)")
     wk = sub.add_parser("week")
@@ -88,7 +90,7 @@ def main(argv=None):
         save_config(ws, config)
         print("Autopilot is off. Also turn off the scheduled task itself (skills/lvlme-autopilot says how).")
     elif args.cmd == "status":
-        print(describe(A.settings(config), today))
+        status_lines = [describe(A.settings(config), today)]
         current = os.environ.get("LVLME_NOW")
         if not current:
             current = __import__("datetime").datetime.now().isoformat(timespec="minutes")
@@ -103,9 +105,10 @@ def main(argv=None):
                 log = C.wpath(ws, "campaign", "autopilot.log")
                 stamp = expected.strftime("%Y-%m-%d %H:%M")
                 if not os.path.exists(log) or os.path.getmtime(log) < expected.timestamp():
-                    print("The timer has not run yet: nothing was written to campaign/autopilot.log since %s. Check that cron is installed and that the line was added." % stamp)
+                    status_lines.append("The timer has not run yet: nothing was written to campaign/autopilot.log since %s. Check that cron is installed and that the line was added." % stamp)
         note = A.newest_note(ws)
-        print("Latest note: %s." % note["date"] if note else "No weekly note yet.")
+        status_lines.append("Latest note: %s." % note["date"] if note else "No weekly note yet.")
+        print(json.dumps({"status": status_lines}, indent=2) if args.json else "\n".join(status_lines))
     elif args.cmd == "prompt":
         text = A.task_prompt(ENGINE, ws, A.settings(config))
         C.write_text(C.wpath(ws, *PROMPT_REL), text)
@@ -124,7 +127,7 @@ def main(argv=None):
             with open(os.devnull, "w") as quiet:
                 old, sys.stdout = sys.stdout, quiet
                 try:
-                    B.main(["--workspace", ws])
+                    B.main(["--workspace", ws, "--today", today])
                 finally:
                     sys.stdout = old
         print("Wrote campaign/weekly/%s.json. The one thing to do this week: %s" % (

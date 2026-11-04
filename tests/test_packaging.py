@@ -114,6 +114,7 @@ class ManifestTests(unittest.TestCase):
         entry = market["plugins"][0]
         self.assertLessEqual(set(entry), ENTRY_KEYS)
         self.assertEqual(entry["name"], plugin["name"])
+        self.assertEqual(market["version"], plugin["version"])
         self.assertNotIn("version", entry, "plugin.json carries the version; a second copy drifts")
         self.assertEqual(entry["source"], "./")
         self.assertTrue(os.path.isfile(os.path.join(ROOT, entry["source"], ".claude-plugin", "plugin.json")))

@@ -237,9 +237,10 @@ def do_next_rows(nl, ordered, limit=None):
     for q in ordered[:limit] if limit else ordered:
         a, tag = q["a"], path_tag(q, nl)
         rows.append('<div class="dn" tabindex="0" data-act="%s"><span class="status-dot %s"></span><div style="flex:1;min-width:0">'
-                    '<div class="dn-t">%s</div><div class="tiny sub">%s%s · %s · %s%s</div></div><div class="dn-p"%s>%s</div></div>' % (
+                    '<div class="dn-t">%s</div><div class="tiny sub">%s%s · %s · %s%s%s</div></div><div class="dn-p"%s>%s</div></div>' % (
                         esc(a["id"]), esc(a["status"]), esc(a["title"]), status_name(a["status"]),
                         "" if q["on"] else ", switched off", esc(a["owner"]), "by " + short(a["date"]) if a.get("dated") else "no target date yet",
+                        " · late" if a.get("late") else "",
                         ' · <span class="dn-tag">%s</span>' % tag if tag else "", gain_title(q), points(q) or "credibility"))
     return "".join(rows)
 

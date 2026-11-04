@@ -1535,7 +1535,7 @@ const points = q => q.a.effects.length ? "+" + fmtP(Math.max(0, q.exp)) : null;
 function doNextRows(list, nl, limit){
   if (!list.length) return '<div class="small sub">No open actions. The next run adds some from the biggest gaps.</div>';
   return (limit ? list.slice(0, limit) : list).map(q => { const a = q.a, tag = pathTag(q, nl);
-    return `<div class="dn" tabindex="0" data-act="${esc(a.id)}"><span class="status-dot ${esc(a.status)}"></span><div style="flex:1;min-width:0"><div class="dn-t">${esc(a.title)}</div><div class="tiny sub">${stName(a.status)}${q.on ? "" : ", switched off"} · ${esc(a.owner)} · ${a.dated ? "by " + esc(shortDate(a.date)) : "no target date yet"}${tag ? ` · <span class="dn-tag">${esc(tag)}</span>` : ""}</div></div><div class="dn-p"${gainTitle(q)}>${points(q) || "credibility"}</div></div>`; }).join("");
+    return `<div class="dn" tabindex="0" data-act="${esc(a.id)}"><span class="status-dot ${esc(a.status)}"></span><div style="flex:1;min-width:0"><div class="dn-t">${esc(a.title)}</div><div class="tiny sub">${stName(a.status)}${q.on ? "" : ", switched off"} · ${esc(a.owner)} · ${a.dated ? "by " + esc(shortDate(a.date)) : "no target date yet"}${a.late ? " · late" : ""}${tag ? ` · <span class="dn-tag">${esc(tag)}</span>` : ""}</div></div><div class="dn-p"${gainTitle(q)}>${points(q) || "credibility"}</div></div>`; }).join("");
 }
 // Mirrors gain_title() in _levels_html.py: the full gain and chance behind the one number, as a tooltip.
 const gainTitle = q => q.a.effects.length && q.works > q.exp + 0.05 ? ` title="${esc(`${fmtP(q.works)} points if it works, about ${Math.round(q.a.p * 100)}% chance: ${fmtP(q.exp)} expected`)}"` : "";

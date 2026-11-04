@@ -426,6 +426,7 @@ def build_actions(data, end):
             "owner": OWNERS.get(a.get("owner", "you"), "You"), "effort": hours(a.get("effort_hours")),
             "hours": _num(a.get("effort_hours")),
             "status": st, "date": when(a), "dated": bool(a.get("target_date")), "p": float(a.get("chance", 0)),
+            "late": bool(st in ("todo", "doing") and a.get("target_date") and a["target_date"] < data.today),
             "effects": effects, "derived": derived, "done_when": clean(a.get("done_when")),
             "dim": a.get("dimension"), "priority": priority(a), "stale": stale.get(a["id"]),
             **({"susp": True, "why": clean(((a.get("why") or "") + " Every role it names looks stale or reposted, "
@@ -869,7 +870,9 @@ def agent_payload(data, page):
         "projection": projection_summary(page),
         "gaps": cur.get("gaps", []),
         "verify_to_unlock": cur.get("verify_to_unlock", []),
-        "actions_active": [dict(a, priority=priority(a)) for a in up_next_order(data.active, levels)],
+        "actions_active": [dict(a, priority=priority(a), late=bool(
+            a.get("status", "todo") in ("todo", "doing") and a.get("target_date") and
+            a["target_date"] < data.today)) for a in up_next_order(data.active, levels)],
         "actions_later": [dict(a, priority=priority(a)) for a in data.parked],
         "levels": levels,
         "actions_done": [a for a in data.actions if a.get("status") == "done"],
