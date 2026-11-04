@@ -143,7 +143,7 @@ def checks(doc, targets, role_ids, errors, warnings):
         if aid in seen:
             errors.append(where + " is a duplicate id")
         seen.add(aid)
-        if a.get("role_id") and role_ids and a["role_id"] not in role_ids:
+        if a.get("role_id") and role_ids and a["role_id"] not in role_ids and a.get("stage") in CHASED | {"evaluated"}:
             warnings.append(where + " names role %s, which is not open in market/roles/latest.json (it may have closed)"
                             % a["role_id"])
         if a.get("applied_on") and a.get("last_step_on") and a["applied_on"] > a["last_step_on"]:

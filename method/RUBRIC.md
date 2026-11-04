@@ -251,7 +251,10 @@ Adjustments, applied after the table, in this order (enforced):
 3. **Cold application only** (D3 at most 1): the offer band is capped at Low.
 
 These are judgement estimates, not statistics. The point is the direction and
-the size of each gap, so effort goes where it moves the number most.
+the size of each gap, so effort goes where it moves the number most. The
+dashboard checks them against what happened to the person's own applications
+("How right has LVLme been", method/CAMPAIGN.md); that check never changes a
+band. A change to this table is a new rubric version.
 
 ## Headline numbers in each report
 

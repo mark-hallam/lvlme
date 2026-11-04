@@ -19,6 +19,7 @@ import html
 import _levels_html as LH
 import _warm_paths as W
 import _applications as AP
+import _calibration as CAL
 import _doors as DR
 
 TOP_ACTIONS = 4          # as many as the live page's Do next card
@@ -79,4 +80,5 @@ def render(page, per_org):
     return (head + note + _key_numbers(page, nl)
             + '<h3>Do next</h3><div class="static-dn">%s</div>' % LH.do_next_rows(nl, up, TOP_ACTIONS)
             + '<h3 id="staticOrgsH">Best role at each organisation</h3>' + _per_org(page, per_org)
-            + W.static_html(page.get("warm")) + DR.static_html(page.get("doors")) + AP.static_html(page.get("apps")))
+            + W.static_html(page.get("warm")) + DR.static_html(page.get("doors")) + AP.static_html(page.get("apps"))
+            + CAL.static_html(page.get("calib")))

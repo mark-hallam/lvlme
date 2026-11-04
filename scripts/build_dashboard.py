@@ -79,6 +79,7 @@ import _levels as L  # noqa: E402
 import _levels_html as LH  # noqa: E402
 import _posting_checks as PC  # noqa: E402
 import _applications as AP  # noqa: E402
+import _calibration as CAL  # noqa: E402
 import _doors as DR  # noqa: E402
 import _autopilot as APL  # noqa: E402
 import _static_html as ST  # noqa: E402
@@ -204,6 +205,7 @@ class Data:
         self.doors = load("market", "doors.json")            # progress only: never scored
         self.week = APL.newest_note(ws)                      # Autopilot's latest This week note, if any
         self.today = today or C.today_in(config)            # follow-ups fall due, and doors pass, by the calendar
+        self.calib = CAL.summary(ws, self.apps, self.today) if self.apps else None   # advisory: never scored
         self.claims = (load("profile", "claims-audit.json") or {}).get("claims", [])
         self.swot = load("eval", "swot.json")
         self.ceilings = load("eval", "ceilings.json")
@@ -615,6 +617,7 @@ def build_data(data):
                             W.connection_counts(data.network)),
         "apps": AP.page_data(data.apps, data.today, data.org_names, clean),
         "doors": DR.page_data(data.doors, data.today, data.org_names),
+        "calib": data.calib,
         "week": APL.page_data(data.week, clean),
     }
     out["orgOrder"] = [g for g in groups if g in out["orgs"]]
@@ -859,6 +862,8 @@ def agent_payload(data, page):
     payload["warm_paths"] = W.agent_data(data.warm, data.targets, data.org_names, include_contacts=not sensitive)
     if data.apps is not None:
         payload["applications"] = AP.agent_data(data.apps, data.today, data.org_names)
+    if data.calib:
+        payload["calibration"] = data.calib
     if data.doors is not None:
         payload["doors"] = DR.page_data(data.doors, data.today, data.org_names, limit=20)
     if sensitive or not share_names:
@@ -1024,6 +1029,7 @@ def summary_md(data, p):
     if p.get("applications"):
         lines += AP.summary_lines(p["applications"])
     lines += DR.summary_lines(p.get("doors"))
+    lines += CAL.summary_lines(p.get("calibration"))
     return "\n".join(lines) + "\n"
 
 

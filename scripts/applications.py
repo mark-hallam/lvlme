@@ -27,6 +27,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 import _applications as AP  # noqa: E402
+import _calibration as CAL  # noqa: E402
 import _first_draft as FD  # noqa: E402
 
 
@@ -52,6 +53,13 @@ def find(doc, aid):
     return app
 
 
+def freeze(ws, app):
+    """Record LVLme's odds for the role on the day it was sent, so a later run never rewrites the prediction."""
+    pred = CAL.predicted(CAL.load_runs(ws), app["role_id"], app["applied_on"]) if app.get("role_id") else None
+    if pred:
+        app["predicted"] = pred
+
+
 def add(ws, doc, args, date):
     n = max([int(a["id"][2:]) for a in doc["applications"] if re.match(r"^ap\d+$", a.get("id", ""))] or [0]) + 1
     app = {"id": "ap%d" % n, "org": args.org, "title": args.title, "stage": args.stage, "last_step_on": date, "nudges": 0}
@@ -60,6 +68,7 @@ def add(ws, doc, args, date):
             app[key] = getattr(args, key)
     if args.stage == "applied":
         app["applied_on"] = date
+        freeze(ws, app)
     if args.note:
         app["notes"] = args.note
     doc["applications"].append(app)
@@ -72,6 +81,7 @@ def move(ws, doc, app, stage, date, note):
     app.update(stage=stage, last_step_on=date, nudges=0, thanked=False)
     if stage == "applied" and not app.get("applied_on"):
         app["applied_on"] = date
+        freeze(ws, app)
     save(ws, doc, date, app, "stage", before, stage, note)
 
 

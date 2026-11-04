@@ -26,6 +26,15 @@ before. Nothing here changes how a score is worked out unless it says so.
   Meetup, Eventbrite and LinkedIn are never fetched, and a test keeps it so.
   You register, RSVP or apply yourself. The weekly note's "event worth a
   look" is now the next door.
+- **How right has LVLme been?** A new dashboard card checks LVLme's odds
+  against what happened. Each application recorded as sent keeps the bands
+  its role had that day (`predicted` in `campaign/applications.json`), and the
+  card shows, for each band, how many led to an interview or an offer,
+  beside public figures (Ashby, 16 May 2025: 3% of inbound and 40% of referred
+  applications reach interview) and a blend of the two. A band's rate stays
+  hidden until it has 5 results, and a ranking check (did the higher-rated
+  applications do better?) until 10. Advisory only: a test proves scores are
+  identical with or without outcomes. The demo now has made-up applications.
 - `scripts/build_dashboard.py --today` builds the page for a given day, so
   the demo is the same whenever it is rebuilt.
 

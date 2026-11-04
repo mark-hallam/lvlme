@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "applications": [
+    {
+      "id": "ap1",
+      "org": "acme",
+      "title": "Applied AI Deployment Lead, Asia Pacific",
+      "stage": "rejected",
+      "last_step_on": "2026-10-20",
+      "nudges": 0,
+      "role_id": "acme:4100002",
+      "applied_on": "2026-10-04",
+      "predicted": {
+        "run_date": "2026-10-04",
+        "fit": 39.0,
+        "interview_band": "Very low",
+        "offer_band": "Very low",
+        "warm": false
+      },
+      "thanked": false
+    },
+    {
+      "id": "ap2",
+      "org": "globex",
+      "title": "AI Success Manager, Asia",
+      "stage": "rejected",
+      "last_step_on": "2026-10-15",
+      "nudges": 0,
+      "role_id": "globex:g-0003",
+      "applied_on": "2026-10-04",
+      "predicted": {
+        "run_date": "2026-10-04",
+        "fit": 38.0,
+        "interview_band": "Very low",
+        "offer_band": "Very low",
+        "warm": false
+      },
+      "thanked": false
+    },
+    {
+      "id": "ap3",
+      "org": "initech",
+      "title": "Product Manager, Warehouse Autonomy",
+      "stage": "rejected",
+      "last_step_on": "2026-10-28",
+      "nudges": 0,
+      "role_id": "initech:i-0002",
+      "applied_on": "2026-10-05",
+      "predicted": {
+        "run_date": "2026-10-04",
+        "fit": 37.0,
+        "interview_band": "Very low",
+        "offer_band": "Very low",
+        "warm": false
+      },
+      "thanked": false
+    },
+    {
+      "id": "ap4",
+      "org": "acme",
+      "title": "Technical Program Manager, Model Launches",
+      "stage": "rejected",
+      "last_step_on": "2026-10-30",
+      "nudges": 0,
+      "role_id": "acme:4100001",
+      "applied_on": "2026-10-11",
+      "predicted": {
+        "run_date": "2026-10-11",
+        "fit": 44.0,
+        "interview_band": "Low",
+        "offer_band": "Very low",
+        "warm": false
+      },
+      "thanked": false
+    },
+    {
+      "id": "ap5",
+      "org": "globex",
+      "title": "Product Manager, Developer Platform",
+      "stage": "rejected",
+      "last_step_on": "2026-10-26",
+      "nudges": 0,
+      "role_id": "globex:g-0001",
+      "applied_on": "2026-10-12",
+      "predicted": {
+        "run_date": "2026-10-11",
+        "fit": 28.0,
+        "interview_band": "Very low",
+        "offer_band": "Very low",
+        "warm": false
+      },
+      "thanked": false
+    },
+    {
+      "id": "ap6",
+      "org": "acme",
+      "title": "Product Manager, Safety Tooling",
+      "stage": "rejected",
+      "last_step_on": "2026-10-25",
+      "nudges": 0,
+      "role_id": "acme:4100007",
+      "applied_on": "2026-10-18",
+      "predicted": {
+        "run_date": "2026-10-18",
+        "fit": 34.0,
+        "interview_band": "Very low",
+        "offer_band": "Very low",
+        "warm": false
+      },
+      "thanked": false
+    },
+    {
+      "id": "ap7",
+      "org": "globex",
+      "title": "Technical Program Manager, Infrastructure",
+      "stage": "applied",
+      "last_step_on": "2026-10-26",
+      "nudges": 1,
+      "role_id": "globex:g-0002",
+      "applied_on": "2026-10-19",
+      "predicted": {
+        "run_date": "2026-10-18",
+        "fit": 29.0,
+        "interview_band": "Very low",
+        "offer_band": "Very low",
+        "warm": false
+      }
+    },
+    {
+      "id": "ap8",
+      "org": "initech",
+      "title": "Program Manager, Robot Fleet Deployments",
+      "stage": "applied",
+      "last_step_on": "2026-10-26",
+      "nudges": 0,
+      "role_id": "initech:i-0001",
+      "applied_on": "2026-10-26",
+      "predicted": {
+        "run_date": "2026-10-25",
+        "fit": 55.0,
+        "interview_band": "Moderate",
+        "offer_band": "Low",
+        "warm": false
+      }
+    }
+  ],
+  "updated_on": "2026-10-30"
+}

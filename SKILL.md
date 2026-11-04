@@ -210,7 +210,9 @@ rights question when `fetch_roles.py` first finds an open role that needs it.
   score (`method/CAMPAIGN.md`).
 - Applications: record each one the person confirms, and each stage change,
   with `python3 scripts/applications.py`; draft any due follow-up for them
-  to send (`method/CAMPAIGN.md`, "Applications and follow-ups").
+  to send (`method/CAMPAIGN.md`, "Applications and follow-ups"). Give
+  `--role-id` for a scored role, so "How right has LVLme been" can check the
+  odds it gave that day against what happened.
 - Process `campaign/inbox.md`: verify each "New" note against its source,
   then move it to "Processed" with a one-line outcome.
 

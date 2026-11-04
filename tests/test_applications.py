@@ -47,6 +47,8 @@ class TimingTests(unittest.TestCase):
 class CommandTests(unittest.TestCase):
     def setUp(self):
         self.ws = H.copy_demo(self)
+        for rel in (AP.REL, AP.LOG):   # start from an empty tracker, not the demo's made-up applications
+            os.remove(os.path.join(self.ws, rel))
 
     def run_cli(self, *args):
         out = io.StringIO()

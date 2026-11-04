@@ -121,6 +121,17 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 - When the person says a contact has moved on, the agent running the campaign sets stage and updated_on and
   adds a history entry in campaign/warm-paths.json. Any other agent appends the message to campaign/inbox.md.
 
+## Applications (progress only: changes no score)
+- Technical Program Manager, Infrastructure, Globex Labs: Applied since 2026-10-26; waiting follow-up 2 of 2 2026-11-02.
+- Program Manager, Robot Fleet Deployments, Initech Robotics: Applied since 2026-10-26; waiting follow-up 1 of 2 2026-11-02.
+- Technical Program Manager, Model Launches, Acme AI: Rejected since 2026-10-30.
+- Product Manager, Warehouse Autonomy, Initech Robotics: Rejected since 2026-10-28.
+- Product Manager, Developer Platform, Globex Labs: Rejected since 2026-10-26.
+- Product Manager, Safety Tooling, Acme AI: Rejected since 2026-10-25.
+- Applied AI Deployment Lead, Asia Pacific, Acme AI: Rejected since 2026-10-20.
+- AI Success Manager, Asia, Globex Labs: Rejected since 2026-10-15.
+- Draft a due note with `python3 scripts/applications.py draft <id>`; the person sends it.
+
 ## Doors (market/doors.json)
 
 6 upcoming. Progress only: score.py never reads doors. Turn one into a plan action with `python3 scripts/doors.py plan <id>` on the person's yes.
@@ -131,3 +142,15 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 - DR04 Conference: Warehouse Automation Summit, Thu 3 Dec, Convention Centre, Melbourne VIC (Initech Robotics). Meet people from Initech Robotics in person: the start of a warm path. Source: https://example.com/events/warehouse-automation-summit
 - DR05 Programme: Acme AI Fellows programme, Closes Tue 15 Dec, Sydney or remote (Acme AI). A programme run by Acme AI: an edge there, and people who know your work. Source: https://example.com/acme/fellows
 - DR06 Community: Initech Robotics partner community, Open now, Melbourne (Initech Robotics). A community where people from Initech Robotics take part: a slow, steady warm path. Source: https://example.com/initech/partners
+
+## How right has LVLme been (advisory: changes no score)
+- Chance of an interview, by the band LVLme gave on the day:
+  - Very low: 6 sent, 5 with a result. 0 led to an interview: 0%. Public figures for applications like these: 3%. Blended: 2%.
+  - Low: 1 sent, 1 with a result. Your rate shows after 5 results.
+  - Moderate: 1 sent, 0 with a result. Your rate shows after 5 results.
+  - Ranking check: shows after 10 results, with at least one that led to an interview and one that didn't.
+- Chance of an offer, by the band LVLme gave on the day:
+  - Very low: 7 sent, 6 with a result. 0 led to an offer: 0%. Public figures for applications like these: under 1%. Blended: under 1%.
+  - Low: 1 sent, 0 with a result. Your rate shows after 5 results.
+  - Ranking check: shows after 10 results, with at least one that led to an offer and one that didn't.
+- Public figures: Ashby Talent Trends: referrals (16 May 2025, https://www.ashbyhq.com/talent-trends-report/reports/referrals).

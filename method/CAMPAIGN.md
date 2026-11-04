@@ -284,6 +284,34 @@ interview, offer, rejected, discarded, skip, hired), so the two tools can talk.
   `LVLme outreach` line. When the person says it is sent, run `followup`
   (or `thanks`).
 - Progress only: no score reads this file.
+- **Record the role.** Give `--role-id` when the job is one LVLme scored.
+  When an application is recorded as sent, the tracker keeps the odds LVLme
+  gave that role that day (`predicted`: the latest run on or before
+  `applied_on`), so the check below compares against what was actually said.
+
+## How right has LVLme been
+
+Without proof, "honest odds" is only a claim. The dashboard's "How right has
+LVLme been?" card sets the bands each application had on the day it was sent
+against what happened (`scripts/_calibration.py`):
+
+- **What counts.** An interview is reaching interview, offer or hired; a
+  rejection before that, or no step for 60 days, is no interview. An offer is
+  reaching offer or hired. An application the person withdrew (discarded) is
+  left out: it says nothing about the odds.
+- **Small numbers stay hidden.** A band's rate shows only once it has 5
+  results, and the ranking check (when one application led to an interview
+  and another didn't, how often LVLme had rated the one that did higher; half
+  is a coin toss) only after 10.
+- **Public figures beside your own.** Ashby's study of over 38 million
+  applications (Talent Trends: referrals, 16 May 2025): an inbound application
+  reached interview 3% of the time and a referred one 40%; of those
+  interviewed, 6% and 16% reached an offer. The blended rate mixes these with
+  the person's own results as if they were 10 earlier results (a Beta prior),
+  so a few results move it a little and many move it a lot.
+- **Advisory only.** It never changes a score or a band. If the bands look
+  wrong over many results, that is a case for a new rubric version, decided in
+  the open, never a silent adjustment.
 
 ## When an organisation asks for your own first draft
 

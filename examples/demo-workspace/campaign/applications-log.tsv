@@ -1,0 +1,19 @@
+date	id	event	from	to	note
+2026-10-04	ap1	added		applied	
+2026-10-04	ap2	added		applied	
+2026-10-05	ap3	added		applied	
+2026-10-11	ap4	added		applied	
+2026-10-12	ap5	added		applied	
+2026-10-15	ap2	stage	applied	rejected	
+2026-10-16	ap4	stage	applied	responded	
+2026-10-18	ap6	added		applied	
+2026-10-19	ap7	added		applied	
+2026-10-20	ap1	stage	applied	rejected	
+2026-10-22	ap4	stage	responded	interview	
+2026-10-23	ap4	thanks	due	sent	
+2026-10-25	ap6	stage	applied	rejected	The posting closed.
+2026-10-26	ap8	added		applied	
+2026-10-26	ap5	stage	applied	rejected	
+2026-10-26	ap7	followup	due	sent	
+2026-10-28	ap3	stage	applied	rejected	
+2026-10-30	ap4	stage	interview	rejected	After the first interview.

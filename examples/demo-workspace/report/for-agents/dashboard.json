@@ -1941,6 +1941,169 @@
       }
     }
   },
+  "applications": {
+    "about": "Progress only: it changes no score. You send every note yourself. Stages are career-ops' names. Record a change with scripts/applications.py, only after the person confirms it.",
+    "applications": [
+      {
+        "id": "ap7",
+        "org": "globex",
+        "org_name": "Globex Labs",
+        "title": "Technical Program Manager, Infrastructure",
+        "stage": "applied",
+        "last_step_on": "2026-10-26",
+        "follow_up": "waiting",
+        "next": "Follow-up 2 of 2",
+        "due_on": "2026-11-02"
+      },
+      {
+        "id": "ap8",
+        "org": "initech",
+        "org_name": "Initech Robotics",
+        "title": "Program Manager, Robot Fleet Deployments",
+        "stage": "applied",
+        "last_step_on": "2026-10-26",
+        "follow_up": "waiting",
+        "next": "Follow-up 1 of 2",
+        "due_on": "2026-11-02"
+      },
+      {
+        "id": "ap4",
+        "org": "acme",
+        "org_name": "Acme AI",
+        "title": "Technical Program Manager, Model Launches",
+        "stage": "rejected",
+        "last_step_on": "2026-10-30",
+        "follow_up": "none",
+        "next": "",
+        "due_on": null
+      },
+      {
+        "id": "ap3",
+        "org": "initech",
+        "org_name": "Initech Robotics",
+        "title": "Product Manager, Warehouse Autonomy",
+        "stage": "rejected",
+        "last_step_on": "2026-10-28",
+        "follow_up": "none",
+        "next": "",
+        "due_on": null
+      },
+      {
+        "id": "ap5",
+        "org": "globex",
+        "org_name": "Globex Labs",
+        "title": "Product Manager, Developer Platform",
+        "stage": "rejected",
+        "last_step_on": "2026-10-26",
+        "follow_up": "none",
+        "next": "",
+        "due_on": null
+      },
+      {
+        "id": "ap6",
+        "org": "acme",
+        "org_name": "Acme AI",
+        "title": "Product Manager, Safety Tooling",
+        "stage": "rejected",
+        "last_step_on": "2026-10-25",
+        "follow_up": "none",
+        "next": "",
+        "due_on": null
+      },
+      {
+        "id": "ap1",
+        "org": "acme",
+        "org_name": "Acme AI",
+        "title": "Applied AI Deployment Lead, Asia Pacific",
+        "stage": "rejected",
+        "last_step_on": "2026-10-20",
+        "follow_up": "none",
+        "next": "",
+        "due_on": null
+      },
+      {
+        "id": "ap2",
+        "org": "globex",
+        "org_name": "Globex Labs",
+        "title": "AI Success Manager, Asia",
+        "stage": "rejected",
+        "last_step_on": "2026-10-15",
+        "follow_up": "none",
+        "next": "",
+        "due_on": null
+      }
+    ]
+  },
+  "calibration": {
+    "note": "Advisory only: this checks LVLme's odds against what happened. It never changes a score; a change to the bands would be a new rubric version.",
+    "source": {
+      "name": "Ashby Talent Trends: referrals",
+      "date": "16 May 2025",
+      "url": "https://www.ashbyhq.com/talent-trends-report/reports/referrals",
+      "about": "over 38 million applications across 93,000 jobs, 2021 to 2024"
+    },
+    "sent": 8,
+    "unmatched": 0,
+    "quiet_days": 60,
+    "min_band": 5,
+    "min_rank": 10,
+    "interview": {
+      "bands": [
+        {
+          "band": "Very low",
+          "sent": 6,
+          "results": 5,
+          "hits": 0,
+          "waiting": 1,
+          "shown": true,
+          "rate": 0.0,
+          "public": 0.03,
+          "blended": 0.02
+        },
+        {
+          "band": "Low",
+          "sent": 1,
+          "results": 1,
+          "hits": 1,
+          "waiting": 0,
+          "shown": false
+        },
+        {
+          "band": "Moderate",
+          "sent": 1,
+          "results": 0,
+          "hits": 0,
+          "waiting": 1,
+          "shown": false
+        }
+      ],
+      "ranking": null
+    },
+    "offer": {
+      "bands": [
+        {
+          "band": "Very low",
+          "sent": 7,
+          "results": 6,
+          "hits": 0,
+          "waiting": 1,
+          "shown": true,
+          "rate": 0.0,
+          "public": 0.0018,
+          "blended": 0.001
+        },
+        {
+          "band": "Low",
+          "sent": 1,
+          "results": 0,
+          "hits": 0,
+          "waiting": 1,
+          "shown": false
+        }
+      ],
+      "ranking": null
+    }
+  },
   "doors": {
     "rows": [
       {

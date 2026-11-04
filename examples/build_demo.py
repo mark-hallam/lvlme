@@ -11,7 +11,8 @@ Hand-written inputs: config.json, intake/, profile/evidence.json,
 profile/claims-audit.json, profile/network.json (second_degree only),
 eval/judgements.json, eval/profile-dimensions.json, eval/gap-templates.json,
 eval/outlook.json, eval/swot.json, eval/reviews/ (a dispute settled by the middle of
-three), campaign/ (including a parked action, status later), market/orgs.json,
+three), campaign/ (including a parked action, status later; applications.json and its log are
+generated from APPS), market/orgs.json,
 market/fixtures/. profile/evidence.json has a partially verified item and an
 extension field (x_...).
 Generated: market/roles/, profile/network.json (orgs), eval/runs/,
@@ -30,6 +31,7 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEMO = os.path.join(HERE, "demo-workspace")
 sys.path.insert(0, os.path.join(os.path.dirname(HERE), "scripts"))
+import applications  # noqa: E402
 import build_dashboard  # noqa: E402
 import doors  # noqa: E402
 import fetch_doors  # noqa: E402
@@ -49,7 +51,28 @@ DOORS = [["--kind", "programme", "--title", "Acme AI Fellows programme", "--org"
          ["--kind", "community", "--title", "Initech Robotics partner community", "--org", "initech",
           "--place", "Melbourne", "--link", "https://example.com/initech/partners", "--source-kind", "employer_page",
           "--verified"]]
-OUTPUTS = ["eval/runs", "market/roles", "market/doors.json", "report", "campaign/metrics-history.json"]
+# Made-up applications and what happened to them (scripts/applications.py), so the tracker and the "How right has
+# LVLme been" panel have something to show: [date, command, arguments]. Each records the odds the role had that day.
+APPS = [["2026-10-04", "add", "--org", "acme", "--title", "Applied AI Deployment Lead, Asia Pacific", "--role-id", "acme:4100002"],
+        ["2026-10-04", "add", "--org", "globex", "--title", "AI Success Manager, Asia", "--role-id", "globex:g-0003"],
+        ["2026-10-05", "add", "--org", "initech", "--title", "Product Manager, Warehouse Autonomy", "--role-id", "initech:i-0002"],
+        ["2026-10-11", "add", "--org", "acme", "--title", "Technical Program Manager, Model Launches", "--role-id", "acme:4100001"],
+        ["2026-10-12", "add", "--org", "globex", "--title", "Product Manager, Developer Platform", "--role-id", "globex:g-0001"],
+        ["2026-10-15", "move", "ap2", "rejected"],
+        ["2026-10-16", "move", "ap4", "responded"],
+        ["2026-10-18", "add", "--org", "acme", "--title", "Product Manager, Safety Tooling", "--role-id", "acme:4100007"],
+        ["2026-10-19", "add", "--org", "globex", "--title", "Technical Program Manager, Infrastructure", "--role-id", "globex:g-0002"],
+        ["2026-10-20", "move", "ap1", "rejected"],
+        ["2026-10-22", "move", "ap4", "interview"],
+        ["2026-10-23", "thanks", "ap4"],
+        ["2026-10-25", "move", "ap6", "rejected", "--note", "The posting closed."],
+        ["2026-10-26", "add", "--org", "initech", "--title", "Program Manager, Robot Fleet Deployments", "--role-id", "initech:i-0001"],
+        ["2026-10-26", "move", "ap5", "rejected"],
+        ["2026-10-26", "followup", "ap7"],
+        ["2026-10-28", "move", "ap3", "rejected"],
+        ["2026-10-30", "move", "ap4", "rejected", "--note", "After the first interview."]]
+OUTPUTS = ["eval/runs", "market/roles", "market/doors.json", "report", "campaign/metrics-history.json",
+           "campaign/applications.json", "campaign/applications-log.tsv"]
 
 
 def load(rel, root=DEMO):
@@ -219,6 +242,8 @@ def main():
                                "--date", today])
         for door in DOORS:
             run(doors.main, ["--workspace", DEMO, "add", "--date", today] + door)
+        for date, cmd, *rest in APPS:
+            run(applications.main, ["--workspace", DEMO, cmd] + rest + ["--date", date])
         run(score.main, ["--workspace", DEMO, "--date", today])
         run(build_dashboard.main, ["--workspace", DEMO, "--today", today])
     finally:

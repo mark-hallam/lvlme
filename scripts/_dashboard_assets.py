@@ -544,6 +544,7 @@ BODY = r"""
   <div class="card pair" id="warmCard" hidden><div class="eyebrow">Warm paths</div><div class="tiny sub" id="warmSub" style="margin-bottom:4px"></div><div id="warm"></div></div>
   <div class="card pair" id="doorsCard" hidden><div class="eyebrow">Doors</div><div class="tiny sub" id="doorsSub" style="margin-bottom:4px"></div><div id="doors"></div></div>
   <div class="card pair" id="appsCard" hidden><div class="eyebrow">Applications</div><div class="tiny sub" id="appsSub" style="margin-bottom:4px"></div><div id="apps"></div></div>
+  <div class="card pair" id="calibCard" hidden><div class="eyebrow">How right has LVLme been?</div><div class="tiny sub" id="calibSub" style="margin-bottom:4px"></div><div id="calib"></div></div>
   <div class="card pair" id="unlocksCard"><div class="eyebrow">Biggest unlocks</div><div class="tiny sub" id="unlocksSub" style="margin-bottom:4px"></div><div id="unlocks"></div></div>
 
   <nav class="views-nav" aria-label="Views"><div class="hscroll"><div class="seg" id="viewSeg" role="tablist" aria-label="Views"></div></div></nav>
@@ -1012,6 +1013,19 @@ function doorsHTML(){
     <div class="tiny sub">${esc(r.why)}${r.action ? ` Plan action ${esc(r.action)}.` : ""}${r.verified ? "" : " Not yet checked."}</div></div>`).join("")}</div>` +
     `<div class="tiny sub" style="margin-top:6px">${R.more ? plural(R.more, "more door") + " in market/doors.json. " : ""}Ask your agent to add one to your plan, for example "add ${esc(R.rows[0].id)} to my plan".</div>`;
 }
+// How right has LVLme been (scripts/_calibration.py): the odds each application had on the day it was sent, against
+// what happened. Advisory only: it never changes a score. A band's rate stays hidden until it has enough results.
+const calibSub = () => `The odds LVLme gave on the day you applied, against what happened. Checks LVLme; changes no score.`;
+function calibHTML(){
+  const S = D.calib; if (!S || !S.sent) return "";
+  const what = k => k === "interview" ? "an interview" : "an offer";
+  const pc = x => x >= 0.01 || x === 0 ? Math.round(100 * x) + "%" : "under 1%";
+  const part = k => `<div class="small" style="margin-top:10px;font-weight:600">Chance of ${what(k)}</div>` + S[k].bands.map(b => `<div class="wp"><div class="wp-h"><span class="wp-n">${esc(b.band)}</span><span class="wp-s${b.shown ? "" : " none"}">${b.shown ? `${b.hits} of ${b.results}` : plural(b.results, "result") + " so far"}</span></div>
+    <div class="tiny sub">${plural(b.sent, "application")} sent${b.waiting ? `, ${b.waiting} still waiting` : ""}. ${b.shown ? `Led to ${what(k)}: ${pc(b.rate)}. Public figures for applications like these: ${pc(b.public)}. Blended with them: ${pc(b.blended)}.` : `Your rate shows after ${S.min_band} results.`}</div></div>`).join("") +
+    `<div class="tiny sub" style="margin-top:4px">${S[k].ranking ? `When one application led to ${what(k)} and another didn't, LVLme had rated the one that did higher ${pc(S[k].ranking.share)} of the time (half would be a coin toss).` : `Ranking check: shows after ${S.min_rank} results, with at least one that led to ${what(k)} and one that didn't.`}</div>`;
+  return part("interview") + part("offer") +
+    `<div class="tiny sub" style="margin-top:8px">No reply in ${S.quiet_days} days counts as no interview. ${S.unmatched ? plural(S.unmatched, "application") + " had no LVLme odds on the day, so left out. " : ""}Public figures: <a href="${esc(S.source.url)}" target="_blank" rel="noopener noreferrer">${esc(S.source.name)}</a>, ${esc(S.source.date)}.</div>`;
+}
 // This week (campaign/weekly/<date>.json, written by scripts/autopilot.py week): the one thing to do, what
 // changed, and whether Autopilot runs on its own. The page's first card, so progress is the first thing seen.
 function renderWeek(){
@@ -1046,14 +1060,17 @@ function renderDoNext(){
   if (doors) $("#doorsSub").textContent = doorsSub();
   const apps = appsHTML(); $("#apps").innerHTML = apps; $("#appsCard").hidden = !apps;
   if (apps) $("#appsSub").textContent = appsSub();
+  const calib = calibHTML(); $("#calib").innerHTML = calib; $("#calibCard").hidden = !calib;
+  if (calib) $("#calibSub").textContent = calibSub();
   if (!narrow() && !state.stack.length) renderHome();
 }
 function renderHome(){
-  const card = $("#detailCard"), warm = warmHTML(), apps = appsHTML(), doors = doorsHTML();
+  const card = $("#detailCard"), warm = warmHTML(), apps = appsHTML(), doors = doorsHTML(), calib = calibHTML();
   card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h2 class="pane-h" style="margin:0">Do next</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div><div>${doNextHTML()}</div>
     ${warm ? `<h2 class="pane-h" style="margin:18px 0 0">Warm paths</h2><div class="tiny sub" style="margin-bottom:4px">${esc(warmSub())}</div>${warm}` : ""}
     ${doors ? `<h2 class="pane-h" style="margin:18px 0 0">Doors</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doorsSub())}</div>${doors}` : ""}
     ${apps ? `<h2 class="pane-h" style="margin:18px 0 0">Applications</h2><div class="tiny sub" style="margin-bottom:4px">${esc(appsSub())}</div>${apps}` : ""}
+    ${calib ? `<h2 class="pane-h" style="margin:18px 0 0">How right has LVLme been?</h2><div class="tiny sub" style="margin-bottom:4px">${esc(calibSub())}</div>${calib}` : ""}
     <h2 class="pane-h" style="margin:18px 0 0">Biggest unlocks</h2><div class="tiny sub" style="margin-bottom:4px">${UNLOCKS_SUB}</div><div>${unlocksHTML()}</div>
     <div class="tiny sub" style="margin-top:18px;padding-top:12px;border-top:1px solid var(--rule)">Tap any organisation, role, factor, action or piece of evidence to drill in here.</div></div>`;
   bindHome(card);

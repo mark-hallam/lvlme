@@ -34,7 +34,20 @@
         "last_step_on": {"$ref": "#/definitions/date", "description": "The date of the last real step (a stage change or a follow-up sent)."},
         "nudges": {"type": "integer", "minimum": 0, "maximum": 2, "description": "Follow-ups sent since the last stage change; at most 2."},
         "thanked": {"type": "boolean", "description": "A thank-you note was sent after the latest interview."},
-        "notes": {"type": "string"}
+        "notes": {"type": "string"},
+        "predicted": {
+          "type": "object",
+          "description": "LVLme's odds for this role on the day it was sent: the latest scored run on or before applied_on. Written once when the application is recorded as sent; read only by the 'How right has LVLme been' panel (scripts/_calibration.py), never by score.py.",
+          "required": ["run_date", "interview_band", "offer_band"],
+          "additionalProperties": false,
+          "properties": {
+            "run_date": {"$ref": "#/definitions/date"},
+            "fit": {"type": "number"},
+            "interview_band": {"enum": ["Very low", "Low", "Moderate", "Good", "Strong"]},
+            "offer_band": {"enum": ["Very low", "Low", "Moderate", "Good", "Strong"]},
+            "warm": {"type": "boolean", "description": "A warm referral (D3 at least 4) on that day."}
+          }
+        }
       }
     }
   }
