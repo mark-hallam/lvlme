@@ -48,7 +48,7 @@ def describe(ap, today):
         return "Autopilot is off." + (" Turned off on %s." % ap["turned_off_on"] if ap.get("turned_off_on") else "")
     return ("Autopilot is on: %s, a %s run. Approved sources: %s. Helper agents: %s. Next run: %s." % (
         A.when_text(ap), ap["run"], ", ".join(ap["sources"]) or "workspace files only",
-        "yes" if ap["helpers"] else "no (new scores above 2 wait for review)", A.next_run(ap, today)))
+        "yes" if ap["helpers"] else "no (new scores above 2 wait for review)", A.next_run(ap, today, os.environ.get("LVLME_NOW"))))
 
 
 def main(argv=None):
@@ -80,6 +80,7 @@ def main(argv=None):
             raise SystemExit("lvlme: the time must be HH:MM, for example 07:00.")
         s = turn_on(ws, config, args, today)
         print(describe(s, today))
+        print("Claude Code path found: %s." % (A.claude_path() or "no, run `which claude` to find it"))
         print("Saved the scheduled task's prompt to %s. Set up the schedule now (skills/lvlme-autopilot)."
               % os.path.join(*PROMPT_REL))
     elif args.cmd == "off":
@@ -88,6 +89,21 @@ def main(argv=None):
         print("Autopilot is off. Also turn off the scheduled task itself (skills/lvlme-autopilot says how).")
     elif args.cmd == "status":
         print(describe(A.settings(config), today))
+        current = os.environ.get("LVLME_NOW")
+        if not current:
+            current = __import__("datetime").datetime.now().isoformat(timespec="minutes")
+        scheduled = A.settings(config)
+        if scheduled.get("enabled") and scheduled.get("scheduler") in ("cron", "launchd"):
+            now = __import__("datetime").datetime.fromisoformat(current)
+            scheduled_day = now.date()
+            if scheduled.get("rhythm") != "daily":
+                scheduled_day -= __import__("datetime").timedelta(days=(now.weekday() - A.DAYS.index(scheduled["day"])) % 7)
+            expected = __import__("datetime").datetime.combine(scheduled_day, __import__("datetime").time.fromisoformat(scheduled["time"]))
+            if now >= expected:
+                log = C.wpath(ws, "campaign", "autopilot.log")
+                stamp = expected.strftime("%Y-%m-%d %H:%M")
+                if not os.path.exists(log) or os.path.getmtime(log) < expected.timestamp():
+                    print("The timer has not run yet: nothing was written to campaign/autopilot.log since %s. Check that cron is installed and that the line was added." % stamp)
         note = A.newest_note(ws)
         print("Latest note: %s." % note["date"] if note else "No weekly note yet.")
     elif args.cmd == "prompt":
@@ -98,6 +114,8 @@ def main(argv=None):
         s = A.settings(config)
         prompt = C.wpath(ws, *PROMPT_REL)
         C.write_text(prompt, A.task_prompt(ENGINE, ws, s))
+        claude_path = A.claude_path()
+        print("Claude Code path found: %s." % (claude_path or "no, replace CLAUDE_PATH_HERE (run: which claude)"))
         print(A.cron_line(ENGINE, ws, s, prompt, C.wpath(ws, "campaign", "autopilot.log")))
     else:
         note = A.write_note(ws, config, today)

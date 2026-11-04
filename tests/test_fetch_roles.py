@@ -211,6 +211,16 @@ class MainTests(unittest.TestCase):
         with mock.patch("sys.stdout"):
             return F.main(["--workspace", self.ws, "--fixtures", self.fx, "--date", date])
 
+    def test_total_failure_writes_status_and_keeps_latest_data_date(self):
+        self.assertEqual(self.run_main("2026-11-01"), 0)
+        with mock.patch.object(F, "collect", return_value=([], [], 0, {"gh": "offline", "ab": "offline", "lv": "offline"}, {}, [])):
+            with mock.patch("sys.stderr"):
+                self.assertEqual(F.main(["--workspace", self.ws, "--date", "2026-11-02"]), 1)
+        status = H.load(os.path.join(self.ws, "market", "roles", "fetch-status.json"))
+        self.assertEqual(status, {"date": "2026-11-02", "ok": False,
+                                  "board_errors": {"gh": "offline", "ab": "offline", "lv": "offline"},
+                                  "data_date": "2026-11-01"})
+
     def test_offline_run_snapshots_and_velocity(self):
         self.assertEqual(self.run_main("2026-11-01"), 0)
         latest = H.load(os.path.join(self.ws, "market", "roles", "latest.json"))

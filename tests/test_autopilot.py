@@ -57,12 +57,65 @@ class AutopilotTests(unittest.TestCase):
 
     def test_the_schedule_line_and_next_run(self):
         ap = dict(A.DEFAULTS, enabled=True)
-        self.assertTrue(A.cron_line("/e", "/w", ap, "/w/p.md", "/w/l.log").startswith("0 7 * * 1 cd \"/e\""))
+        self.assertTrue(A.cron_line("/e", "/w", ap, "/w/p.md", "/w/l.log").startswith("0 7 * * 1 PATH="))
         self.assertTrue(A.cron_line("/e", "/w", dict(ap, day="sun", time="18:30"), "p", "l").startswith("30 18 * * 0 "))
         self.assertTrue(A.cron_line("/e", "/w", dict(ap, rhythm="daily"), "p", "l").startswith("0 7 * * * "))
         self.assertEqual(A.next_run(ap, "2026-11-03"), "2026-11-09")     # a Tuesday: next Monday
         self.assertEqual(A.next_run(ap, "2026-11-09"), "2026-11-09")
         self.assertIsNone(A.next_run(dict(ap, enabled=False), "2026-11-03"))
+
+    def test_next_run_accounts_for_time_and_cron_path(self):
+        ap = dict(A.DEFAULTS, enabled=True, rhythm="daily", time="07:00")
+        self.assertEqual(A.next_run(ap, "2026-11-03", now="2026-11-03T08:00:00"), "2026-11-04")
+        with mock.patch("_autopilot.shutil.which", return_value="/opt/bin/claude"), \
+             mock.patch("_autopilot.shutil.which", side_effect=["/opt/bin/claude", "/opt/bin/python3"]):
+            line = A.cron_line("/e", "/w", ap, "/w/p", "/w/l")
+        self.assertIn("/opt/bin/claude", line)
+        self.assertIn("Bash(python3 *)", line)
+
+    def test_week_note_tracks_same_day_progress_once_and_board_status(self):
+        self.run_cli("week", "--date", "2026-11-03", "--no-dashboard")
+        dash_path = os.path.join(self.ws, "report", "for-agents", "dashboard.json")
+        dash = H.load(dash_path)
+        dash.setdefault("levels", {})["progress_days"] = [{"date": "2026-11-03", "actions": ["a1"], "evidence": []}]
+        dash["actions_done"] = [{"id": "a1", "title": "Rewrite CV"}]
+        H.save(dash_path, dash)
+        H.save(os.path.join(self.ws, "campaign", "applications.json"), {"schema_version": 1, "applications": [
+            {"id": "app1", "org": "openai", "title": "Program Manager", "stage": "applied", "last_step_on": "2026-11-03"}]})
+        with open(os.path.join(self.ws, "campaign", "applications-log.tsv"), "w", encoding="utf-8") as f:
+            f.write("date\tid\tevent\tfrom\tto\tnote\n2026-11-03\tapp1\tadded\t\tapplied\t\n")
+        H.save(os.path.join(self.ws, "market", "roles", "fetch-status.json"), {"date": "2026-11-04", "ok": False,
+            "board_errors": {"OpenAI": "offline"}, "data_date": "2026-11-01"})
+        self.run_cli("week", "--date", "2026-11-04", "--no-dashboard")
+        note = H.load(os.path.join(self.ws, "campaign", "weekly", "2026-11-04.json"))
+        self.assertTrue(note["roles"]["checked"] is False)
+        self.assertTrue(any("Rewrite CV" in item for item in note["changed"]))
+        self.assertTrue(any("Applied" in item for item in note["changed"]))
+        self.assertTrue(any("numbers are from 2026-11-01" in item for item in note["changed"]))
+        self.run_cli("week", "--date", "2026-11-05", "--no-dashboard")
+        note = H.load(os.path.join(self.ws, "campaign", "weekly", "2026-11-05.json"))
+        self.assertFalse(any("Rewrite CV" in item or "Applied" in item for item in note["changed"]))
+
+    def test_prompt_runs_event_fetch_and_plain_commands(self):
+        prompt = A.task_prompt("/e", "/w", dict(A.DEFAULTS, enabled=True))
+        self.assertLess(prompt.index("fetch_roles.py"), prompt.index("fetch_doors.py"))
+        self.assertIn("Do not put variable assignments first", prompt)
+        with open(os.path.join(os.path.dirname(__file__), "..", "skills", "lvlme-autopilot", "SKILL.md"), encoding="utf-8") as f:
+            self.assertIn(A.ALLOWED_TOOLS, f.read())
+
+    def test_status_reports_missed_cron_run_but_not_desktop_task(self):
+        cfg = self.config()
+        cfg["autopilot"] = dict(A.DEFAULTS, enabled=True, rhythm="daily", time="07:00", scheduler="cron")
+        H.save(os.path.join(self.ws, "config.json"), cfg)
+        with mock.patch.dict(os.environ, {"LVLME_NOW": "2026-11-04T08:00:00"}):
+            out = self.run_cli("status", "--date", "2026-11-04")
+        self.assertIn("Next run: 2026-11-05", out)
+        self.assertIn("The timer has not run yet", out)
+        cfg["autopilot"]["scheduler"] = "desktop_task"
+        H.save(os.path.join(self.ws, "config.json"), cfg)
+        with mock.patch.dict(os.environ, {"LVLME_NOW": "2026-11-04T08:00:00"}):
+            out = self.run_cli("status", "--date", "2026-11-04")
+        self.assertNotIn("The timer has not run yet", out)
 
     def test_two_runs_a_week_apart_leave_two_dated_notes_with_one_action_each(self):
         self.run_cli("on")

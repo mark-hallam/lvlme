@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Job board fetch status",
+  "description": "Written by fetch_roles.py on every completed fetch attempt, including when every board fails.",
+  "type": "object",
+  "required": ["date", "ok", "board_errors", "data_date"],
+  "properties": {
+    "date": {"type": "string", "format": "date"},
+    "ok": {"type": "boolean"},
+    "board_errors": {"type": "object", "additionalProperties": {"type": "string"}},
+    "data_date": {"type": "string", "description": "Date of the role data currently in latest.json, or unknown when no data exists."}
+  },
+  "additionalProperties": false
+}

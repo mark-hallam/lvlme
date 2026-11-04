@@ -60,8 +60,9 @@ promoted to a campaign). If there is none, say so and offer to start one.
      their time zone. Show them the task, then confirm it is listed.
    - **Claude Code without the desktop app**: print the line from
      `python3 scripts/autopilot.py schedule-line` (a crontab entry that runs
-     Claude Code on the schedule) and tell them how to add it
-     (`crontab -e`, paste, save). They add it; never edit their crontab.
+      Claude Code on the schedule) and tell them how to add it
+      (`crontab -e`, paste, save). They add it; never edit their crontab.
+     The line grants these command permissions: `Bash(python3 *) Bash(ls *) Bash(cat *) Bash(test *) Bash(echo *) Bash(date *) Read Write Edit Glob Grep`.
    - **A cloud scheduler**: do not use one unless they choose to on purpose.
      It runs on someone else's computer and cannot see the workspace unless
      it is uploaded.

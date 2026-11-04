@@ -1064,7 +1064,8 @@ function calibHTML(){
 function renderWeek(){
   const W = D.week, card = $("#weekCard"); if (!W) return;
   const ap = W.autopilot || {}, r = W.roles || {}, facts = [];
-  if (r.new || r.closed) facts.push(`${plural(r.new || 0, "new role")}, ${r.closed || 0} closed`);
+  if (r.checked === false) facts.push(`Job boards could not be reached, so the role numbers are from ${r.data_date || "an earlier date"}.`);
+  else if (r.new || r.closed) facts.push(`${plural(r.new || 0, "new role")}, ${r.closed || 0} closed`);
   if (r.suspicious) facts.push(`${plural(r.suspicious, "posting")} to check`);
   if ((W.follow_ups || []).length) facts.push(plural(W.follow_ups.length, "follow-up") + " due");
   if (W.public) facts.push(`${W.public.posted} of ${plural(W.public.per_week, "post")} this week`);

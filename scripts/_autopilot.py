@@ -16,6 +16,7 @@ import datetime as dt
 import glob
 import json
 import os
+import shutil
 
 import _common as C
 import _doors as DR
@@ -26,17 +27,21 @@ DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 DAY_NAMES = dict(zip(DAYS, ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]))
 DEFAULTS = {"rhythm": "weekly", "day": "mon", "time": "07:00", "run": "light", "sources": [], "helpers": True}
 WEEKLY_DIR = ("campaign", "weekly")
+ALLOWED_TOOLS = 'Bash(python3 *) Bash(ls *) Bash(cat *) Bash(test *) Bash(echo *) Bash(date *) Read Write Edit Glob Grep'
 
 
 def settings(config):
     return dict(DEFAULTS, **((config or {}).get("autopilot") or {}))
 
 
-def next_run(ap, today):
+def next_run(ap, today, now=None):
     """The date of the next scheduled run on or after today (ISO), or None when Autopilot is off."""
     if not ap.get("enabled"):
         return None
     d = dt.date.fromisoformat(today)
+    current = dt.datetime.fromisoformat(now) if now else None
+    if current and current.date() == d and current.strftime("%H:%M") >= ap["time"]:
+        d += dt.timedelta(days=1)
     if ap["rhythm"] == "daily":
         return d.isoformat()
     return (d + dt.timedelta(days=(DAYS.index(ap["day"]) - d.weekday()) % 7)).isoformat()
@@ -44,6 +49,14 @@ def next_run(ap, today):
 
 def when_text(ap):
     return ("Every day at %s" % ap["time"]) if ap["rhythm"] == "daily" else ("%ss at %s" % (DAY_NAMES[ap["day"]], ap["time"]))
+
+
+def claude_path():
+    found = shutil.which("claude")
+    if found:
+        return found
+    fallback = os.path.expanduser("~/.local/bin/claude")
+    return fallback if os.path.isfile(fallback) else next((p for p in ("/opt/homebrew/bin/claude", "/usr/local/bin/claude") if os.path.isfile(p)), None)
 
 
 # ------------------------------------------------------------ the schedule
@@ -57,7 +70,7 @@ def task_prompt(engine, ws, ap):
         "",
         "Engine (read only, never edit it): %s" % engine,
         "Workspace (all of the person's data): %s" % ws,
-        "Run every engine script from the engine folder with --workspace %s." % ws,
+        "Run each script as a plain python3 scripts/<name>.py --workspace %s command. Do not put variable assignments first and do not use cd." % ws,
         "",
         "Read %s/SKILL.md, %s/method/RUNBOOK.md and \"Runs with nobody present\" in %s/docs/ORCHESTRATION.md, "
         "and follow them exactly: ask nothing, approve nothing new, take no step that needs the person's yes."
@@ -65,14 +78,15 @@ def task_prompt(engine, ws, ap):
         "",
         "This run, in order:",
         "1. Process campaign/inbox.md and actions marked done in campaign/plan.json.",
-        "2. python3 scripts/fetch_roles.py (it also checks each posting's age and reposts).",
-        "3. Evidence since the last run, from these approved read-only sources only: %s." % sources,
-        "4. python3 scripts/run_plan.py, then judge the roles of a %s run (--json lists them)." % ap["run"],
-        ("5. The blind review gate, with fresh helper agents, as method/REVIEW.md says."
+        "2. python3 scripts/fetch_roles.py --workspace %s (it also checks each posting's age and reposts)." % ws,
+        "3. python3 scripts/fetch_doors.py --workspace %s. If it fails, skip it like any other source." % ws,
+        "4. Evidence since the last run, from these approved read-only sources only: %s." % sources,
+        "5. python3 scripts/run_plan.py --workspace %s, then judge the roles of a %s run (--json lists them)." % (ws, ap["run"]),
+        ("6. The blind review gate, with fresh helper agents, as method/REVIEW.md says."
          if ap["helpers"] else
-         "5. Start no helper agents: leave new scores above 2 waiting for review (they count as 2) and say so."),
-        "6. python3 scripts/score.py, then python3 scripts/build_dashboard.py, then python3 scripts/validate.py (it must exit 0).",
-        "7. python3 scripts/autopilot.py week (writes this week's note and rebuilds the dashboard's This week card).",
+         "6. Start no helper agents: leave new scores above 2 waiting for review (they count as 2) and say so."),
+        "7. python3 scripts/score.py --workspace %s, then python3 scripts/build_dashboard.py --workspace %s, then python3 scripts/validate.py --workspace %s (it must exit 0)." % (ws, ws, ws),
+        "8. python3 scripts/autopilot.py week --workspace %s (writes this week's note and rebuilds the dashboard's This week card)." % ws,
         "",
         "Never apply for a job, send any email or message, post anything, accept anything, or change an account. "
         "Drafts go in campaign/drafts/ for the person to send. Evidence or it scores zero; never invent anything.",
@@ -87,9 +101,12 @@ def cron_line(engine, ws, ap, prompt_path, log_path):
     """A crontab line that runs Claude Code on the schedule (for a computer without the desktop app)."""
     hh, mm = ap["time"].split(":")
     days = "*" if ap["rhythm"] == "daily" else str((DAYS.index(ap["day"]) + 1) % 7)
-    return ('%d %d * * %s cd "%s" && claude -p "$(cat \'%s\')" --permission-mode acceptEdits '
-            '--allowedTools "Bash(python3 scripts/*)" Read Write Edit Glob Grep >> "%s" 2>&1'
-            % (int(mm), int(hh), days, engine, prompt_path, log_path))
+    claude = claude_path()
+    python = shutil.which("python3") or "/usr/bin/python3"
+    path = ":".join(dict.fromkeys([os.path.dirname(claude) if claude else "CLAUDE_PATH_HERE", os.path.dirname(python), "/usr/bin", "/bin"]))
+    return ('%d %d * * %s PATH="%s"; cd "%s" && %s -p "$(cat \'%s\')" --permission-mode acceptEdits '
+            '--allowedTools "%s" >> "%s" 2>&1'
+            % (int(mm), int(hh), days, path, engine, claude or "CLAUDE_PATH_HERE", prompt_path, ALLOWED_TOOLS, log_path))
 
 
 # ------------------------------------------------------------ the weekly note
@@ -143,36 +160,75 @@ def week_note(ws, config, today):
     best = (dash.get("levels") or {}).get("best_role") or {}
     prev = previous_note(ws, today) or previous_run(ws, today)   # a first note compares with the last scored run
     since = (prev or {}).get("date")
-    days = [d for d in (dash.get("levels") or {}).get("progress_days") or [] if not since or d.get("date", "") > since]
+    previous = previous_note(ws, today)
+    reported = set((previous or {}).get("reported_progress_ids") or [])
+    progress, reported_now = [], []
+    for d in (dash.get("levels") or {}).get("progress_days") or []:
+        if not since or d.get("date", "") >= since:
+            for kind in ("actions", "evidence"):
+                for item in d.get(kind) or []:
+                    ident = "%s:%s:%s" % (kind, d.get("date", ""), item)
+                    if ident not in reported:
+                        progress.append((kind, item, d.get("date", "")))
+                        reported_now.append(ident)
     changed = []
     if prev and best and prev.get("fit") is not None:
         delta = round(best["fit"] - prev["fit"], 1)
         changed.append("Best fit %s, from %s to %s." % ("up %s" % num(delta) if delta > 0 else "down %s" % num(-delta)
                                                       if delta < 0 else "unchanged", num(prev["fit"]), num(best["fit"])))
-    done = sorted({a for d in days for a in d.get("actions") or []})
-    evidence = sorted({e for d in days for e in d.get("evidence") or []})
+    done = sorted({item for kind, item, _ in progress if kind == "actions"})
+    evidence = sorted({item for kind, item, _ in progress if kind == "evidence"})
     if done:
         titles = {a.get("id"): a.get("title", a.get("id")) for a in dash.get("actions_done") or []}
         changed.append("%d plan action%s done: %s." % (len(done), "" if len(done) == 1 else "s",
                                                       "; ".join(titles.get(a, a).rstrip(".") for a in done)))
     if evidence:
         changed.append("%d new piece%s of evidence counted." % (len(evidence), "" if len(evidence) == 1 else "s"))
+    apps_doc = _load(ws, *AP.REL.split("/")) or {}
+    app_titles = {a.get("id"): a.get("title", a.get("id")) for a in apps_doc.get("applications") or []}
+    log_path = C.wpath(ws, *AP.LOG.split("/"))
+    if os.path.exists(log_path):
+        with open(log_path, encoding="utf-8") as f:
+            rows = [line.rstrip("\n").split("\t") for line in f.readlines()[1:]]
+        for row in rows:
+            if len(row) < 5:
+                continue
+            changed_on, aid, event, before, after = row[:5]
+            ident = "application:%s:%s:%s" % (changed_on, aid, event)
+            if (not since or changed_on >= since) and ident not in reported:
+                label = {"added": AP.STAGE_NAMES.get(after, after), "stage": AP.STAGE_NAMES.get(after, after),
+                         "followup": "Follow-up sent", "thanks": "Thank-you note sent"}.get(event, event)
+                changed.append("Application %s: %s (%s)." % (app_titles.get(aid, aid), label, changed_on))
+                reported_now.append(ident)
+    warm = _load(ws, "campaign", "warm-paths.json") or {}
+    for contact in warm.get("contacts") or []:
+        changed_on = contact.get("updated_on", "")
+        ident = "warm:%s:%s:%s" % (contact.get("id"), contact.get("stage"), changed_on)
+        if (not since or changed_on >= since) and ident not in reported:
+            changed.append("Warm contact %s: %s (%s)." % (contact.get("person", contact.get("id")), contact.get("stage"), changed_on))
+            reported_now.append(ident)
     if not changed:
         changed.append("Nothing moved since %s." % since if since else "This is the first scored run: the next note says what moved.")
-    apps = AP.due_now(_load(ws, *AP.REL.split("/")), today)
+    apps = AP.due_now(apps_doc, today)
     top = (dash.get("actions_active") or [None])[0]
     runs = sorted(glob.glob(os.path.join(C.wpath(ws, "eval", "runs"), "*.json")))
     run = C.load_json(runs[-1], {}) if runs else {}
     awaiting = sum(1 for r in (run or {}).get("roles") or [] if r.get("awaiting_review"))
+    fetch = _load(ws, "market", "roles", "fetch-status.json") or {}
+    data_date = fetch.get("data_date") or roles_doc.get("fetched_on") or "unknown"
+    checked = bool(fetch.get("ok", True)) and fetch.get("date", today) >= today and data_date == today
+    board_errors = fetch.get("board_errors") or sorted((summary.get("endpoint_errors") or {}).keys())
+    if not checked:
+        changed.append("Job boards could not be reached, so the role numbers are from %s." % data_date)
     return {
         "schema_version": 1, "date": today, "since": since,
         "fit": best.get("fit"), "level": best.get("level"), "band": best.get("band"),
         "role": best.get("title"), "org": names.get(best.get("org"), best.get("org")),
         "points_to_next": best.get("points_to_next"), "next_band": best.get("next_band"),
-        "changed": changed,
+        "changed": changed, "reported_progress_ids": reported_now,
         "roles": {"new": len(summary.get("new_role_ids") or []), "closed": len(summary.get("closed_role_ids") or []),
                   "suspicious": (summary.get("posting_checks") or {}).get("suspicious", 0),
-                  "board_errors": sorted((summary.get("endpoint_errors") or {}).keys())},
+                  "board_errors": board_errors, "checked": checked, "data_date": data_date},
         "follow_ups": [{"id": a["id"], "title": a.get("title"), "org": names.get(a.get("org"), a.get("org")),
                         "what": AP.follow_up(a, today)["what"], "due_on": AP.follow_up(a, today)["due_on"]} for a in apps],
         "event": (DR.next_door(_load(ws, "market", "doors.json"), today, names)
@@ -211,8 +267,11 @@ def note_md(n):
         lines.append("")
     lines += ["What changed:", ""] + ["- " + c for c in n["changed"]] + [""]
     r = n["roles"]
-    lines.append("Roles: %d new, %d closed%s." % (r["new"], r["closed"],
-                 ", %d look suspicious (check before applying)" % r["suspicious"] if r["suspicious"] else ""))
+    if r.get("checked", True):
+        lines.append("Roles: %d new, %d closed%s." % (r["new"], r["closed"],
+                     ", %d look suspicious (check before applying)" % r["suspicious"] if r["suspicious"] else ""))
+    else:
+        lines.append("Job boards could not be reached, so the role numbers are from %s." % r.get("data_date", "unknown"))
     if r["board_errors"]:
         lines.append("Job boards that failed this run: %s (their roles were kept as they were)." % ", ".join(r["board_errors"]))
     if n["follow_ups"]:

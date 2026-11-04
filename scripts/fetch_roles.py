@@ -681,8 +681,11 @@ def main(argv=None):
     prev_roles = {r["id"]: r for r in prev_latest.get("roles", [])}
 
     roles, excluded, fetched, errors, endpoints, notes = collect(config, ws, args.fixtures, args.save_raw)
+    data_date = prev_latest.get("fetched_on") or "unknown"
     remote_targets = [t["id"] for t in config["targets"] if t["ats"] != "manual"]
     if remote_targets and all(t in errors for t in remote_targets) and not roles:
+        C.write_json(os.path.join(roles_dir, "fetch-status.json"),
+                     {"date": date, "ok": False, "board_errors": errors, "data_date": data_date})
         print(json.dumps({"endpoint_errors": errors}, indent=2), file=sys.stderr)
         print("lvlme: every job board failed; latest.json left unchanged.", file=sys.stderr)
         return 1
@@ -736,6 +739,9 @@ def main(argv=None):
     if args.fixtures:  # offline runs are reproducible: no wall-clock time in the output
         out["fetched_at_utc"] = date + "T00:00:00Z"
     C.write_json(os.path.join(roles_dir, "latest.json"), out)
+    C.write_json(os.path.join(roles_dir, "fetch-status.json"),
+                 {"date": date, "ok": not bool(errors), "board_errors": errors,
+                  "data_date": date if not errors else data_date})
     snapshot = {"schema_version": 1, "date": date, "roles": snap_roles}
     C.write_json(os.path.join(snap_dir, "%s.json" % date), snapshot)
     print(json.dumps({"fetched_on": date, "total_postings_fetched": fetched, "matched_counts": counts,
