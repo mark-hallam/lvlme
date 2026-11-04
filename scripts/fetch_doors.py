@@ -24,6 +24,7 @@ import urllib.error
 import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _certs as CT  # noqa: E402
 import _common as C  # noqa: E402
 import _doors as DR  # noqa: E402
 
@@ -38,7 +39,7 @@ def fetch_text(url, timeout=45):
         raise RuntimeError("only https:// calendar addresses are read")
     req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/calendar, text/plain"})
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with CT.open_checked(urllib.request.urlopen, req, timeout) as resp:
             return resp.read().decode("utf-8", "replace")
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         raise RuntimeError("%s: %s" % (type(exc).__name__, exc))

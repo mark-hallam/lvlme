@@ -132,7 +132,7 @@ def render(result, dash):
         'the CV, the evidence and the scores. No real person\'s data is on these pages, and the odds say '
         'nothing about any real company\'s hiring.</p></section>'
         '<section class="card" aria-labelledby="getH"><h2 id="getH">Get LVLme</h2>'
-        '<p>LVLme is free and open source. It runs in Claude Code, Codex or Cursor on your own computer, keeps '
+        '<p>LVLme is free and open source. It runs in Claude Code or Codex on your own computer, keeps '
         'your files there, and drafts everything: it never applies, sends or posts for you.</p>'
         '<ul class="links"><li><a href="%s">LVLme on GitHub</a></li>'
         '<li><a href="%s/blob/HEAD/docs/INSTALL.md">How to install it</a></li>'

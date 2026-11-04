@@ -11,6 +11,10 @@ quick.py promote makes a new campaign workspace (init.py) and carries across:
   eval/profile-dimensions.json. A score the blind reviewer agreed keeps its
   review date; one still waiting for a tie-break stays unreviewed (it
   counts as 2 until reviewed), as in the quick result.
+- the fixes the quick result showed (up to three), as the plan's first open
+  actions, each raising its factor for that role to the fix's target, with
+  first estimates of effort and chance the person can change;
+- which AI agent judged (judged_by), when quick recorded it.
 The factors quick cannot check (public signal, application readiness) stay
 "not yet judged", so the campaign's first fit can be lower than quick's
 range: the interview fills them in. Nothing counts as verified on the CV's
@@ -25,6 +29,29 @@ import fetch_roles as FR
 import quick_posting as QP
 
 ROLE_DIMS = ("D1", "D2", "D4")
+# First estimates for a quick fix turned into a plan action: (effort hours, chance it works), by factor.
+# The person can change them; the campaign's method says how (method/CAMPAIGN.md).
+FIX_DEFAULTS = {"D1": (20, 0.3), "D2": (8, 0.5), "D3": (3, 0.3), "D4": (4, 0.5), "D6": (2, 0.5)}
+FIX_NOTE = "From LVLme quick fix %s. Effort and chance are first estimates: change them if you know better."
+
+
+def fix_actions(result, role, today):
+    """The quick result's ranked fixes as open plan actions (A01, A02, ...), for this one role."""
+    actions = []
+    for n, f in enumerate(result.get("fixes") or [], 1):
+        effort, chance = FIX_DEFAULTS.get(f["dimension"], (4, 0.4))
+        actions.append({
+            "id": "A%02d" % n, "title": f["title"],
+            "why": "%s from %d to %d for %s: about %s more fit points (LVLme quick, %s)." % (
+                f["name"], f["from"], f["to"], role["title"], "%g" % f["gain"], result.get("date") or today),
+            "status": "todo", "owner": "you", "dimension": f["dimension"], "orgs": [role["org"]],
+            "effort_hours": effort, "expected_points": f["gain"], "roles_affected": 1, "chance": chance,
+            "done_when": "You have done the next step and can show it (a link, a file or a name): %s" % f["next_step"],
+            "added_on": today,
+            "effects": [{"dimension": f["dimension"], "set_at_least": f["to"], "scope": {"role_ids": [role["id"]]},
+                         "note": FIX_NOTE % f["id"]}],
+            "x_from_quick_fix": f["id"]})
+    return actions
 
 
 def target_for(role, org_name, quick_config):
@@ -104,8 +131,15 @@ def promote(folder, ws, today):
             entry[d].update(reviewed_on=judged_on)
     if quick.get("eligibility_blocked") is not None:
         entry["eligibility_blocked"] = bool(quick["eligibility_blocked"])
-    C.write_json(C.wpath(ws, "eval", "judgements.json"),
-                 {"schema_version": 1, "rubric_version": "1.0", "roles": {role["id"]: entry}})
+    judgements = {"schema_version": 1, "rubric_version": "1.0", "roles": {role["id"]: entry}}
+    if quick.get("judged_by"):
+        judgements["judged_by"] = quick["judged_by"]
+    C.write_json(C.wpath(ws, "eval", "judgements.json"), judgements)
+
+    plan = C.load_json(C.wpath(ws, "campaign", "plan.json"))
+    actions = fix_actions(result, role, today)
+    plan.update(actions=actions, updated_on=today)
+    C.write_json(C.wpath(ws, "campaign", "plan.json"), plan)
 
     prof = C.load_json(C.wpath(ws, "eval", "profile-dimensions.json"))
     for d, place, keys in (("D3", prof["D3"], [role["org"]]),
@@ -115,5 +149,5 @@ def promote(folder, ws, today):
             place[k] = {"score": f.get("score", 0), "evidence": f.get("evidence") or [], "note": f.get("note", ""),
                         "judged_on": judged_on, **({"reviewed_on": judged_on} if d in agreed else {})}
     C.write_json(C.wpath(ws, "eval", "profile-dimensions.json"), prof)
-    return {"role": role["id"], "target": target, "family": family["id"], "evidence": len(evidence.get("items") or []),
+    return {"role": role["id"], "title": role["title"], "actions": actions, "target": target, "family": family["id"], "evidence": len(evidence.get("items") or []),
             "classes": role["location_classes"], "agreed": sorted(agreed)}

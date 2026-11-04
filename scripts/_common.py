@@ -11,6 +11,8 @@ import re
 import sys
 import traceback
 
+import _certs
+
 ENGINE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCHEMA_DIR = os.path.join(ENGINE_ROOT, "schemas")
 TEMPLATE_DIR = os.path.join(ENGINE_ROOT, "templates")
@@ -23,6 +25,8 @@ LEGACY_HOME_ENV = "CLIMB_HOME"
 LEGACY_PARENT = os.path.join(os.path.expanduser("~"), "climb-workspaces")
 LEGACY_NOTE = ("lvlme: using ~/climb-workspaces, the folder's name from before Climb became LVLme. "
                "It keeps working. To move to the new name, rename the folder to ~/lvlme-workspaces.")
+BOTH_NOTE = ("lvlme: note: both ~/lvlme-workspaces and ~/climb-workspaces exist; using ~/lvlme-workspaces. "
+             "To use a campaign in ~/climb-workspaces, set LVLME_HOME to it or pass --workspace.")
 
 DIMENSIONS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]
 DIMENSION_NAMES = {
@@ -158,12 +162,16 @@ _legacy_noted = []
 
 
 def default_parent(note=True):
-    """~/lvlme-workspaces, or the old ~/climb-workspaces when only that one exists (said once on stderr)."""
-    if not os.path.isdir(DEFAULT_PARENT) and os.path.isdir(LEGACY_PARENT):
+    """~/lvlme-workspaces, or the old ~/climb-workspaces when only that one exists.
+
+    When only the old folder exists, or both do, it says once on stderr which one is in use."""
+    if os.path.isdir(LEGACY_PARENT):
+        new_too = os.path.isdir(DEFAULT_PARENT)
         if note and not _legacy_noted:
             _legacy_noted.append(LEGACY_PARENT)
-            print(LEGACY_NOTE, file=sys.stderr)
-        return LEGACY_PARENT
+            print(BOTH_NOTE if new_too else LEGACY_NOTE, file=sys.stderr)
+        if not new_too:
+            return LEGACY_PARENT
     return DEFAULT_PARENT
 
 
@@ -308,7 +316,9 @@ def run_main(main, argv=None, workspace_check=True):
         print("lvlme: %s" % exc, file=sys.stderr)
         return 1
     except Exception as exc:  # noqa: BLE001 (the point is that nothing reaches the person as a traceback)
-        if isinstance(exc, OSError) and exc.filename:
+        if isinstance(exc, _certs.CertificateProblem):  # its text is already the one plain line
+            print("lvlme: %s" % exc, file=sys.stderr)
+        elif isinstance(exc, OSError) and exc.filename:
             print("lvlme: could not open or save %s (%s). Check the file is there and you can open it, "
                   "then run this again." % (show_path(exc.filename), exc.strerror or exc), file=sys.stderr)
         else:
@@ -410,3 +420,19 @@ def target_names(config):
 
 def family_names(config):
     return {f["id"]: f.get("name", f["id"]) for f in (config or {}).get("families", [])}
+
+
+def judged_by_line(judged_by):
+    """One plain line naming the AI agent (and model) that judged, because another agent can judge differently.
+
+    >>> judged_by_line({"agent": "Claude Code", "model": "claude-opus-5-5"})
+    'Judged by Claude Code (model claude-opus-5-5). Another AI agent can judge the same evidence differently; the maths after the judging is the same.'
+    >>> judged_by_line(None)
+    'Which AI agent judged was not recorded. Another AI agent can judge the same evidence differently; the maths after the judging is the same.'
+    """
+    tail = " Another AI agent can judge the same evidence differently; the maths after the judging is the same."
+    agent = ((judged_by or {}).get("agent") or "").strip()
+    if not agent:
+        return "Which AI agent judged was not recorded." + tail
+    model = ((judged_by or {}).get("model") or "").strip()
+    return "Judged by %s%s." % (agent, " (model %s)" % model if model else "") + tail

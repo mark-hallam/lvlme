@@ -1240,7 +1240,7 @@ function renderOrgs(){
       <div class="tiny sub">Trail: black measured, solid expected, dashed best case, dotted do nothing</div>
     </div>`; }).join("")}</div>
     <div class="card" style="margin-top:16px"><div class="eyebrow">Outlook</div><h3>Chance of reaching your goal within ${esc(D.meta.horizon)} months: ${pill(D.meta.outlook.band)}</h3>
-    <p class="small" style="margin:8px 0">${esc(D.meta.outlook.text)}</p><ul class="small sub">${D.meta.outlook.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
+    <p class="small" style="margin:8px 0">${esc(D.meta.outlook.text)}</p><ul class="small sub">${D.meta.outlook.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul><p class="tiny sub" style="margin-top:8px">${esc(D.meta.judged || "")}</p></div>`;
   $("#v-orgs").querySelectorAll(".org-card").forEach(c => onEnter(c, () => openDetail({type: "org", id: c.dataset.org}, true)));
 }
 // ---------- Path to the top band (from eval/ceilings.json; today's numbers from the latest run) ----------

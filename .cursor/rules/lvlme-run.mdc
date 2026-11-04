@@ -5,6 +5,9 @@ alwaysApply: false
 
 # Running LVLme in Cursor
 
+LVLme in Cursor should work but is not tested yet. If something does not
+work, say so to the person plainly.
+
 Follow `SKILL.md` in this folder exactly. It is the full procedure, and
 `AGENTS.md` is the short version. Every script takes `--workspace PATH`.
 

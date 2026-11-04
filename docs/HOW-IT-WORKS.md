@@ -5,7 +5,8 @@ step, the full campaign, the honesty rules, privacy, the dashboard, the demo,
 running the scripts by hand, and where everything lives.
 
 LVLme runs on your own computer, through an artificial intelligence (AI) agent
-such as Claude Code, Codex or Cursor. The agent does the judging; the Python
+such as Claude Code or Codex (Cursor and other agents that run commands should
+work but are not tested yet). The agent does the judging; the Python
 scripts only do the arithmetic, so without an agent every role scores zero.
 
 ## LVLme quick: one job, a couple of minutes
@@ -79,8 +80,9 @@ LVLme quick gives fixes and a brief, never application answers. Some
 employers publish guidance on how candidates may use AI when applying; check
 theirs, and write your answers in your own words.
 
-Its files live in `~/lvlme-workspaces/quick/<date>-<organisation>-<title>/`,
-never in this repository. To go deeper, say "run LVLme": the full campaign
+Its files live in `~/lvlme-workspaces/quick/<date>-<organisation>-<title>/`
+(or, when `LVLME_HOME` is set, in a `quick/` folder next to the workspace it
+names), never in this repository. To go deeper, say "run LVLme": the full campaign
 below.
 
 The demo is in `examples/quick-demo/`: the fictional Alex Example asks about a
@@ -191,8 +193,10 @@ Most career advice flatters. LVLme is built to do the opposite.
   with its source, tagged verified or unverified, and the lead agent opens the
   source of anything that matters before it counts.
 - **The maths is a script, not a mood.** Judgements live in files. A
-  deterministic script turns them into scores, so the same inputs always give
-  the same result, and every change can be traced.
+  deterministic script turns them into scores, so the same judgements always
+  give the same score, and every change can be traced. Different AI agents
+  (for example Claude and Codex) can judge the same evidence differently, so
+  the result page and the dashboard name which agent and model judged.
 - **The default answer is "unlikely".** Competitive employers reject most
   applicants. The bands start from that fact.
 - **No fabrication, no profiling.** It never invents experience, numbers,
@@ -394,10 +398,9 @@ command to see the full details, and include them when you report it.
 | `/lvlme-audit` | The consistency audit and the public claims audit. |
 | `/lvlme-dashboard` | Rebuild the dashboard. |
 
-With the plugin, these short names work. With the cloned folder, use the
-prefixed name (`/lvlme:lvlme-interview`) or the words after `/lvlme`
-(`/lvlme interview`). In Codex and Cursor, say the same words: "run the LVLme
-interview", and so on. Install details for every agent:
+With the plugin, these short names work, and each also has a full name with
+the plugin prefix (`/lvlme:lvlme-interview`). In Codex and other agents, say
+the same words: "run the LVLme interview", and so on. Install details for every agent:
 [`INSTALL.md`](INSTALL.md). LVLme is tested on macOS; the scripts should work
 on Linux, and Windows is untested.
 
@@ -408,7 +411,7 @@ SKILL.md  AGENTS.md  README.md  LICENSE  CONTRIBUTING.md
 .claude-plugin/  plugin.json and marketplace.json (Claude Code)
 skills/     the /lvlme-quick, /lvlme-interview, /lvlme-screen, /lvlme-audit, /lvlme-dashboard commands
 agents/     subagent briefs: evidence-scout, market-scout, role-judge, reviewer, recruiter-screen
-.cursor/rules/  Cursor rules
+.cursor/rules/  Cursor rules (not tested yet)
 method/     the rules for each stage (rubric, interview, intake, audits, review, campaign, privacy, runbook)
 schemas/    JSON Schema files (rules for every workspace file)
 scripts/    init, fetch_roles, fetch_doors, doors, applications, stories, practice, public, offer, import_career_ops, network_map,

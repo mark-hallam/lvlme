@@ -8,6 +8,63 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## 0.6.1 (5 November 2026)
+
+A fix release after a new-user test: we installed LVLme the way a new person
+would, followed only the public instructions, and fixed what got in the way.
+How a score is worked out did not change. The full notes are in
+[LVLme 0.6.1](docs/RELEASE-0.6.1.md).
+
+Tests: 532 pass.
+
+### Fixed
+
+- **Job links on Python from python.org.** That Python has no website
+  certificates until its "Install Certificates" step has been run, so every
+  job link failed with "Could not open the link", and the full campaign said
+  "every job board failed". Now, on a certificate error, the scripts that
+  read links try once more with the Mac's own certificate file
+  (`/etc/ssl/cert.pem`, or the certifi package if it happens to be
+  installed). If that fails too, they say in one plain line what to run
+  ("Install Certificates.command" in Python's Applications folder), and
+  LVLme quick adds that you can paste the job ad text instead. Certificate
+  checking is never turned off. The shared code is `scripts/_certs.py`.
+- **Climb from here keeps the quick fixes.** `quick.py promote` now writes
+  the fixes the quick result showed into `campaign/plan.json` as the plan's
+  first open actions, each raising its factor for that role to the fix's
+  target, so the new dashboard no longer says "No open actions yet". Effort
+  and chance are first estimates you can change.
+- **Climb from here names the role.** Its message says the role's title and
+  organisation (for example "Deployment Program Manager at Globex Labs"), not an
+  internal code, and the agent summary (`report/for-agents/SUMMARY.md`) no
+  longer repeats the goal.
+- **LVLme quick follows `LVLME_HOME`** (the setting for where your files
+  live), as the rest of LVLme does: when it is set, quick results go in a
+  `quick/` folder next to the workspace it names. When both
+  `~/lvlme-workspaces` and the older `~/climb-workspaces` exist, the scripts
+  say once which one they use, so a campaign in the old folder is never
+  dropped without a word.
+- **Which AI judged.** Different AI agents can judge the same evidence
+  differently (in the test, one gave a fit of 20 and another 12 for the
+  same CV and job). `eval/quick.json` and `eval/judgements.json` take an
+  optional `judged_by` (the agent, and the model when known), and the quick
+  result page, the dashboard and the agent summary say which one judged, or
+  that it was not recorded. The skill tells agents to fill it in.
+- **Install guide.** Claude Code's download option now installs from your
+  own copy of the folder as a local marketplace, so the main `/lvlme`
+  command is listed (a copy cloned straight into the skills folder listed
+  only the nine other commands). For Codex, run the exact `git clone`
+  command: a skill installer copies only part of the folder, and the
+  instructions now say how to repair a partial copy. The Claude chat section
+  lists all ten skills, not six. Cursor and other agents that run commands
+  should work but are not tested yet, and the docs now say so.
+- **Agents ask first.** `AGENTS.md` starts its hard rules with: stop and wait
+  for the person's yes before each install or run, even when they asked to
+  be set up.
+- **Release notes link the changelog by its full address**, so the link
+  works on the GitHub release page. The 0.4.0, 0.5.0 and 0.6.0 notes are
+  fixed too.
+
 ## 0.6.0 (4 November 2026)
 
 From plan to people: LVLme now finds the events and programmes where you can

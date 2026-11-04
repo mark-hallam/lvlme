@@ -58,7 +58,7 @@ one (a test proves it for each).
 - The dashboard ranked a plan step whose roles all look suspicious as high as
   any other, while the scoring scripts put it last. Both now put it last.
 
-The full list is in [CHANGELOG.md](../CHANGELOG.md).
+The full list is in [CHANGELOG.md](https://github.com/mark-hallam/lvlme/blob/v0.6.0/CHANGELOG.md).
 
 ## Checked by
 

@@ -29,7 +29,8 @@ targets, role families and weights are configuration.
    work, and a tailored application. The rubric weights reflect that, and the
    campaign attacks the binding constraint first.
 4. **Agent-agnostic.** Plain files in, plain files out. Works with Claude Code
-   (as a skill), Codex, Cursor / Grok Bot, or a person with a terminal.
+   (as a skill), Codex, or a person with a terminal. Cursor and other agents
+   that run commands should work but are not tested yet.
 5. **Private by default.** The engine repo never holds personal data. A user's
    data lives in a separate workspace folder on their own machine.
 6. **Drafts only.** The engine never applies, sends, posts, or changes the
@@ -223,9 +224,10 @@ reasoning, and scores each item itself with the anchor and evidence ids).
 
 ## 11. Packaging
 
-- `SKILL.md` (Agent Skills format): Claude Code users drop the repo into
-  `~/.claude/skills/lvlme/` or install it as a plugin.
-- `AGENTS.md`: instructions for Codex, Cursor / Grok Bot and other agents.
+- `SKILL.md` (Agent Skills format): Claude Code users install the repo as a
+  plugin, from GitHub or from a downloaded copy (`docs/INSTALL.md`).
+- `AGENTS.md`: instructions for Codex and other agents (Cursor and other
+  agents that run commands should work but are not tested yet).
 - Scripts: Python 3.9+, standard library only, no network calls except public
   job-board APIs and connectors the user approves. No telemetry.
 

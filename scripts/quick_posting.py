@@ -46,6 +46,7 @@ import urllib.request
 from html.parser import HTMLParser
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _certs as CT  # noqa: E402
 import _common as C  # noqa: E402
 import fetch_roles as FR  # noqa: E402
 from _boards import (BOARD_NAMES, LANG, LISTED, WORKDAY_HOST, _base, detail_url, nice_name, smartrecruiters_base, spelled_name,  # noqa: E402,F401
@@ -221,7 +222,7 @@ def follow_short_link(url):
     """The address a short apply.workable.com/j/{code} link leads to (it names the account), or None."""
     try:
         req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html"})
-        with urllib.request.urlopen(req, timeout=45) as resp:
+        with CT.open_checked(urllib.request.urlopen, req, 45, CT.PASTE_INSTEAD) as resp:
             return resp.geturl()
     except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError):
         return None
@@ -367,7 +368,7 @@ def http_get(url, accept):
     """
     cap = API_MAX_BYTES if accept == "application/json" else MAX_BYTES
     req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": accept})
-    with urllib.request.urlopen(req, timeout=45) as resp:
+    with CT.open_checked(urllib.request.urlopen, req, 45, CT.PASTE_INSTEAD) as resp:
         body = resp.read(cap + 1)
         charset = resp.headers.get_content_charset() or "utf-8"
     if len(body) > cap:

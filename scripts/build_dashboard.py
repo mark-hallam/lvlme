@@ -220,7 +220,9 @@ class Data:
         self.claims = (load("profile", "claims-audit.json") or {}).get("claims", [])
         self.swot = load("eval", "swot.json")
         self.ceilings = load("eval", "ceilings.json")
-        self.judgements = (load("eval", "judgements.json") or {}).get("roles", {})
+        judgements = load("eval", "judgements.json") or {}
+        self.judgements = judgements.get("roles", {})
+        self.judged_by = judgements.get("judged_by")         # which AI agent judged: another can judge differently
         self.profile = load("eval", "profile-dimensions.json") or {}
         self.roles_doc = load("market", "roles", "latest.json") or {}
         self.suspicious = PC.suspicious_ids(self.roles_doc)
@@ -603,7 +605,7 @@ def build_data(data):
             "outlook": {"band": run["outlook"]["band"], "text": clean(run["outlook"]["text"]),
                         "reasons": [clean(x) for x in run["outlook"].get("reasons") or []]},
             "sample_allowed": len(data.runs) < SAMPLE_UNTIL_RUNS, "git": os.path.exists(os.path.join(data.ws, ".git")),
-            "built": short_date(run_date),
+            "built": short_date(run_date), "judged": C.judged_by_line(data.judged_by),
         },
         "dims": DIMS, "dimNames": C.DIMENSION_NAMES, "dimHelp": DIM_HELP,
         "weights": [data.weights[d] for d in DIMS], "caps": [caps.get(d, 0) for d in DIMS],
@@ -841,6 +843,7 @@ def agent_payload(data, page):
         "goal": {"title": goal.get("title", ""), "description": goal.get("description", ""),
                  "horizon_months": goal.get("horizon_months", 12)},
         "outlook": cur["outlook"],
+        "judged_by": data.judged_by, "judged_by_note": C.judged_by_line(data.judged_by),
         "role_counts": {"open": len(cur["roles"]), "judged": sum(1 for r in cur["roles"] if r.get("judged", True))},
         "top5_average_fit": top5_avg(cur),
         "top5_average_fit_previous": top5_avg(data.prev) if data.prev else None,
@@ -981,6 +984,17 @@ def levels_md(data, lv):
     return lines
 
 
+def goal_line(goal):
+    """The goal's title, then its description only when it says more (init.py starts both as the same words).
+
+    >>> goal_line({"title": "Customer success at AI labs", "description": "Customer success at AI labs"})
+    'Customer success at AI labs.'
+    """
+    title, desc = (goal.get("title") or "").strip().rstrip("."), (goal.get("description") or "").strip()
+    same = desc.rstrip(".").lower() == title.lower()
+    return "%s.%s" % (title, "" if same or not desc else " " + desc)
+
+
 def summary_md(data, p):
     lines = [
         "# Career campaign: briefing for AI agents",
@@ -996,9 +1010,10 @@ def summary_md(data, p):
         "- This is private. Do not copy it anywhere public.",
         "",
         "## Goal",
-        "%s. %s" % (p["goal"]["title"], p["goal"]["description"]),
+        goal_line(p["goal"]),
         "",
         "## Outlook",
+        "- %s" % p["judged_by_note"],
         "- Chance of reaching the goal within %s months if the campaign is followed: %s" % (
             p["goal"]["horizon_months"], p["outlook"]["band"]),
         "- %s" % p["outlook"]["text"],

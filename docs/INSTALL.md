@@ -1,9 +1,10 @@
 # Install LVLme
 
 LVLme is one folder: a skill (`SKILL.md`), method files, small Python scripts
-and a demo. The same folder installs as a Claude Code plugin, as a Claude
-Code skill, as a Codex skill, and as Cursor rules. Pick the one that matches
-the agent you use.
+and a demo. The same folder installs as a Claude Code plugin and as a Codex
+skill, and it carries Cursor rules. Pick the one that matches the agent you
+use. Claude Code and Codex are tested. Cursor and other agents that run
+commands should work but are not tested yet.
 
 You need Python 3.9 or newer (the scripts use only its standard library) and
 git (a tool that copies and updates the folder). Nothing else.
@@ -39,21 +40,32 @@ Or in two steps, on any recent version:
 /plugin install lvlme@lvlme
 ```
 
-### Option B: clone into your skills folder (the simple fallback)
+### Option B: download the folder, then install from your copy
+
+Download (clone) the folder anywhere you like, then add your copy as a
+marketplace and install the plugin from it:
 
 ```bash
-git clone https://github.com/mark-hallam/lvlme ~/.claude/skills/lvlme
+git clone https://github.com/mark-hallam/lvlme ~/lvlme-engine
+claude plugin marketplace add ~/lvlme-engine
+claude plugin install lvlme@lvlme
 ```
 
-Start a new Claude Code session. Because the folder holds
-`.claude-plugin/plugin.json`, Claude Code loads it as a skills folder plugin
-named `lvlme@skills-dir`: `/lvlme` is the main skill and the other commands
-carry the plugin prefix (for example `/lvlme:lvlme-interview`). If your
-organisation's settings block skills folder plugins, `SKILL.md` still loads
-as a plain skill, so `/lvlme` works and the other entry points work as words
-after it (for example `/lvlme interview`).
+Start a new Claude Code session. You get the same ten commands as option A,
+`/lvlme` included.
 
-To update: `git -C ~/.claude/skills/lvlme pull`.
+To update:
+
+```bash
+git -C ~/lvlme-engine pull
+claude plugin marketplace update lvlme
+claude plugin update lvlme@lvlme
+```
+
+Cloning straight into your skills folder (`~/.claude/skills/lvlme`) also
+loads, as `lvlme@skills-dir`, but its list shows only the nine `/lvlme-*`
+commands, not the main `/lvlme` (checked on 5 November 2026 with Claude Code
+2.1.296). Use the steps above instead.
 
 ### Option C: try it for one session
 
@@ -94,7 +106,7 @@ and Claude loads the skill.
 claude plugin details lvlme@lvlme
 ```
 
-Use `lvlme@skills-dir` for option B. In a session, `/plugin` lists it on the
+This is the same for options A and B. In a session, `/plugin` lists it on the
 **Installed** tab, and the **Errors** tab says why if it did not load.
 
 ### Updates
@@ -109,16 +121,19 @@ claude plugin update lvlme@lvlme
 
 ## Claude chat (the Claude app and claude.ai)
 
-Tried on 3 November 2026, on claude.ai with LVLme 0.4.0. The Claude desktop
-app shows the same Customize page.
+Tried on 3 November 2026, on claude.ai with LVLme 0.4.0, when the plugin
+held fewer skills. The Claude desktop app shows the same Customize page. The
+steps are the same today; the skill list below is the current plugin's, not
+a new test in chat.
 
 1. Open **Customize**, then **Plugins**.
 2. Choose **Add**, then **Add marketplace**, then **Add from repository**.
    Type `mark-hallam/lvlme`, choose it, and press **Sync**. Anthropic's
    notice says to add only marketplaces you trust.
-3. LVLme appears in the list. Press **Add**. It shows 6 skills: `/lvlme`,
-   `/lvlme-quick`, `/lvlme-audit`, `/lvlme-dashboard`, `/lvlme-interview` and
-   `/lvlme-screen`.
+3. LVLme appears in the list. Press **Add**. The plugin holds 10 skills:
+   `/lvlme`, `/lvlme-quick`, `/lvlme-interview`, `/lvlme-screen`,
+   `/lvlme-audit`, `/lvlme-dashboard`, `/lvlme-practice`, `/lvlme-debrief`,
+   `/lvlme-public` and `/lvlme-autopilot`.
 4. In a new chat, type `/lvlme-quick`, choose it, then paste the posting
    link and your CV text, and send.
 
@@ -147,9 +162,16 @@ What to expect in chat:
 Codex reads personal skills from `~/.agents/skills/`, and `AGENTS.md` from the
 folder you work in.
 
-- **As a skill:** `git clone https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme`,
-  then in Codex type `$lvlme` (or pick it from `/skills`) and say "run
-  LVLme quick" with a job link, or "run LVLme".
+- **As a skill:** run exactly this command:
+
+  ```bash
+  git clone https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme
+  ```
+
+  Do not use a skill installer instead: it copies only part of the folder
+  (it leaves out `skills/`, which LVLme quick needs). Then in Codex type
+  `$lvlme` (or pick it from `/skills`) and say "run LVLme quick" with a job
+  link, or "run LVLme".
 - **In the engine folder:** open Codex in the cloned folder. It reads
   `AGENTS.md`, which runs the same procedure.
 
@@ -158,17 +180,18 @@ another (see "Fallback" in [`ORCHESTRATION.md`](ORCHESTRATION.md)). For the
 independent review and the recruiter screen, start a new Codex session and
 give it only the packet the lead prepares.
 
-## Cursor
+## Cursor (not tested yet)
 
-Open the cloned folder in Cursor. The rules in `.cursor/rules/` load
-automatically:
+Cursor and other agents that run commands should work but are not tested yet.
+The folder carries Cursor rules. Open the cloned folder in Cursor, and the
+rules in `.cursor/rules/` should load on their own:
 
 - `lvlme-hard-rules.mdc` applies to every chat in the folder.
 - `lvlme-run.mdc` applies when you ask to run LVLme, or when you mention it
   with `@lvlme-run`.
 
 Cursor also reads `AGENTS.md`. Say "run LVLme quick" with a job link, or
-"run LVLme".
+"run LVLme". If you try it, tell us how it went.
 
 ## Your first run
 
@@ -202,7 +225,9 @@ works:
   now called `lvlme`. In Codex, type `$lvlme`.
 - **Your workspace.** Nothing to do. When `LVLME_HOME` is not set, the scripts
   read `CLIMB_HOME`. When `~/lvlme-workspaces/` does not exist, they use
-  `~/climb-workspaces/` and say so once. To move to the new names, rename the
+  `~/climb-workspaces/` and say so once. When both exist, they use
+  `~/lvlme-workspaces/` and say so once, so a campaign in the old folder is
+  never dropped without a word. To move to the new names, rename the
   folder and change the setting at the same time.
 - **The dashboard.** The theme and the "Pending" ticks your browser saved
   under the old name still load.
@@ -237,7 +262,10 @@ See "By hand, in a terminal" in
 - **Changelog.** In the same change, turn the Unreleased section of
   [`CHANGELOG.md`](../CHANGELOG.md) into a heading for the new version, with
   its date and its test count, and tag the release commit (`v0.6.0` and so
-  on). `tests/test_changelog.py` fails if the newest heading is not the
+  on). The release notes in `docs/` (pasted as the GitHub release text)
+  link the changelog by its full address pinned to the tag (ending
+  `/blob/v0.6.1/CHANGELOG.md` and so on): a relative link breaks on the
+  release page. `tests/test_changelog.py` fails if the newest heading is not the
   version in `plugin.json`.
 - **Validate** before every release:
 

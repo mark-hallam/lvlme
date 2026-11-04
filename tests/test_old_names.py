@@ -89,8 +89,18 @@ class FolderTests(Homes):
         self.assertIn("~/climb-workspaces", C.LEGACY_NOTE)
         self.assertNotIn(self.home, C.LEGACY_NOTE)     # never spells out the person's home folder
 
-    def test_new_folder_wins_when_both_exist(self):
+    def test_new_folder_wins_when_both_exist_and_says_so_once(self):
         os.makedirs(self.old)
+        os.makedirs(self.new)
+        err = io.StringIO()
+        with mock.patch("sys.stderr", err):
+            got = [C.default_parent(), C.default_parent(), C.default_parent(note=False)]
+        self.assertEqual(got, [self.new] * 3)
+        self.assertEqual(err.getvalue(), C.BOTH_NOTE + "\n")
+        self.assertIn("using ~/lvlme-workspaces", C.BOTH_NOTE)    # names the one in use
+        self.assertNotIn(self.home, C.BOTH_NOTE)
+
+    def test_no_note_when_only_the_new_folder_exists(self):
         os.makedirs(self.new)
         parent, err = self.call(C.default_parent)
         self.assertEqual((parent, err), (self.new, ""))
@@ -145,6 +155,21 @@ class QuickFolderTests(Homes):
         self.assertEqual(len(os.listdir(os.path.join(self.old, "quick"))), 1)
         self.assertFalse(os.path.exists(self.new))
         self.assertIn(C.LEGACY_NOTE, err)
+
+    def test_quick_follows_lvlme_home(self):
+        """LVLME_HOME names a workspace: quick writes to quick/ next to it, never to the default folders."""
+        ws = os.path.join(self.home, "sandbox", "my-goal")
+        with mock.patch.dict(os.environ, {"LVLME_HOME": ws}):
+            self.assertEqual(Q.default_parent(), os.path.join(self.home, "sandbox", "quick"))
+            self.new_quick()
+        self.assertEqual(len(os.listdir(os.path.join(self.home, "sandbox", "quick"))), 1)
+        self.assertFalse(os.path.exists(self.new))
+        self.assertFalse(os.path.exists(self.old))
+
+    def test_quick_follows_climb_home_too(self):
+        ws = os.path.join(self.home, "elsewhere", "labs")
+        with mock.patch.dict(os.environ, {"CLIMB_HOME": ws}):
+            self.assertEqual(Q.default_parent(), os.path.join(self.home, "elsewhere", "quick"))
 
 
 class OldWorkspaceTests(unittest.TestCase):

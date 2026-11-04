@@ -1,4 +1,4 @@
-# For AI agents (Codex, Cursor and others)
+# For AI agents (Codex and others)
 
 This repository is **LVLme**: a method and small scripts that estimate,
 honestly, how likely a person is to land a specific kind of role at specific
@@ -8,10 +8,19 @@ The full procedure is in [`SKILL.md`](SKILL.md). The rules for each stage are
 in [`method/`](method/). How to run the work in parallel, with its gates, is
 in [`docs/ORCHESTRATION.md`](docs/ORCHESTRATION.md). This file is the short
 version, and it runs the same procedure. Install notes for every agent:
-[`docs/INSTALL.md`](docs/INSTALL.md).
+[`docs/INSTALL.md`](docs/INSTALL.md). Claude Code and Codex are tested.
+Cursor and other agents that run commands should work but are not tested yet.
+
+**First check.** If the engine folder has no `skills/` folder (for example
+`skills/lvlme-quick/SKILL.md` is missing), a skill installer copied only part
+of it. Run `git -C <engine folder> sparse-checkout disable` to restore the
+rest. If the folder is not a git clone, ask the person, then clone it again
+with `git clone https://github.com/mark-hallam/lvlme <engine folder>`.
 
 ## Hard rules
 
+- **Stop and wait for the person's yes before each install or run, even if
+  they asked you to set it up.**
 - **Nothing public without a yes for that step.** Never apply for a job, send
   an email or message, post, accept an invitation, change the person's
   accounts or spend money on your own. Draft it in `campaign/drafts/` in their
@@ -79,7 +88,8 @@ Every script takes `--workspace PATH`.
    scripts/fetch_doors.py` for events and programmes, and add dated ones
    the scouts found with `python3 scripts/doors.py add` (doors:
    `method/CAMPAIGN.md`). Never register, RSVP, apply or pay.
-4. **Judge and audit**: fill `eval/judgements.json` and
+4. **Judge and audit**: fill `eval/judgements.json` (with `judged_by`: the
+   agent you are, and your model when you know it) and
    `eval/profile-dimensions.json` using `method/RUBRIC.md`; run
    `python3 scripts/claims_audit.py <their pages>` and judge each pending
    claim; run the consistency audit (`method/CONSISTENCY.md`,
@@ -140,7 +150,7 @@ first stage not yet done today).
   subagent files, and that every engine path the packaging docs name exists.
 - Packaging: `.claude-plugin/` (Claude Code plugin and marketplace), `skills/`
   (the `/lvlme-*` commands), `agents/` (subagent briefs), `.cursor/rules/`
-  (Cursor), this file (Codex and others).
+  (Cursor, not tested yet), this file (Codex and others).
 - The demo in `examples/demo-workspace/` is fictional. Rebuild it with
   `python3 examples/build_demo.py`, then `python3 examples/build_demo_site.py`
   to refresh `docs/demo/` (the static demo folder; fictional workspaces only).

@@ -28,7 +28,7 @@ saved did: see "Scoring again" below.
   name as people know it.
 - **A demo folder.** `docs/demo/` holds both fictional demos behind one page
   that opens straight from your computer.
-- **A changelog.** [CHANGELOG.md](../CHANGELOG.md) lists what changed in
+- **A changelog.** [CHANGELOG.md](https://github.com/mark-hallam/lvlme/blob/v0.4.0/CHANGELOG.md) lists what changed in
   each version.
 
 ## Changed
@@ -57,7 +57,7 @@ saved did: see "Scoring again" below.
 - The roles heat map reads the same in dark mode.
 - Links to files in the repository open the right page.
 
-The full list is in [CHANGELOG.md](../CHANGELOG.md).
+The full list is in [CHANGELOG.md](https://github.com/mark-hallam/lvlme/blob/v0.4.0/CHANGELOG.md).
 
 ## Checked by
 

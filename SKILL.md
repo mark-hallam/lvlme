@@ -16,7 +16,17 @@ filled in, it is the folder that holds this file). Script and method paths
 below are relative to it. Workspace paths are relative to the person's
 workspace.
 
+**First check.** If the engine folder has no `skills/` folder (for example
+`skills/lvlme-quick/SKILL.md` is missing), a skill installer copied only part
+of it. Run `git -C <engine folder> sparse-checkout disable` to restore the
+rest. If the folder is not a git clone, ask the person, then clone it again
+with `git clone https://github.com/mark-hallam/lvlme <engine folder>`.
+
 ## Hard rules (read before every run)
+
+Before anything else: stop and wait for the person's yes before each install
+(Python, git, the plugin or anything else), even if they asked you to set
+LVLme up.
 
 1. **Nothing public without a yes for that step.** Never apply for a job,
    send an email or message, post, accept an invitation, change any of the
@@ -118,9 +128,10 @@ other file that describes a first run links here.
    organisations they want, and ask for the LinkedIn data export. No CV yet?
    Ask for it instead of the three facts. If they ran LVLme quick, start from
    it instead: `python3 scripts/quick.py promote --folder <quick folder>
-   --goal "<goal>"` carries its evidence, posting and judgements into the new
-   workspace, so the first score comes at once; the interview then adds
-   targets in short rounds, and the LinkedIn export can arrive later.
+   --goal "<goal>"` carries its evidence, posting, judgements and fixes (as
+   the plan's first actions) into the new workspace, so the first score
+   comes at once; the interview then adds targets in short rounds, and the
+   LinkedIn export can arrive later.
    Already use career-ops? Once the targets are in `config.json` (step 3),
    offer `python3 scripts/import_career_ops.py --from <its folder> --dry-run`,
    show the person what it would bring in, and run it without `--dry-run`
@@ -262,6 +273,10 @@ they give. Never register, RSVP, apply or pay (`method/CAMPAIGN.md`).
   anything you change. Cite evidence ids for every point. Unjudged roles score
   0 on D1, D2 and D4, so judge the best-looking roles first. Merge the
   judges' batches yourself and spot-check one role per batch for consistency.
+  Set `judged_by` at the top of `eval/judgements.json` to the agent you are
+  and your model when you know it (for example `{"agent": "Claude Code",
+  "model": "claude-opus-5-5"}`): another agent can judge the same evidence
+  differently, and the dashboard says which one judged.
 - **Claims audit.** `python3 scripts/claims_audit.py <their site> <other pages>`.
   Judge each `pending` claim as `supported`, `overstated`, `unsupported` or
   `contradicted`, with evidence ids and suggested honest wording.

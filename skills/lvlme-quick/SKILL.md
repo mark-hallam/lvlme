@@ -31,7 +31,8 @@ would raise it most (any fix left out is named, with the reason). Aim for a coup
   guidance on how candidates may use AI when applying: point the person to it.
 - **Nothing personal in the engine folder.** The quick folder lives in
   `~/lvlme-workspaces/quick/` (or `~/climb-workspaces/quick/` while only the
-  folder's old name exists); the script refuses anywhere unsafe.
+  folder's old name exists, or a `quick/` folder next to the workspace
+  `LVLME_HOME` names when it is set); the script refuses anywhere unsafe.
 
 ## Steps
 
@@ -88,7 +89,10 @@ would raise it most (any fix left out is named, with the reason). Aim for a coup
    readiness (D7) cannot be checked from one posting and a CV: do not judge
    them. The build counts them 0 in today's fit and shows them as not
    checked, with the fit as a range (today's fit, up to the fit if both
-   turned out strong).
+   turned out strong). Set `judged_by` to the agent you are and your model
+   when you know it (for example `{"agent": "Codex", "model": "gpt-5-codex"}`):
+   another agent can judge the same evidence differently, so the result page
+   says which one judged.
 6. **The blind reviewer**, for any score above 2:
 
    ```bash
@@ -125,7 +129,8 @@ would raise it most (any fix left out is named, with the reason). Aim for a coup
    climb from here, with nothing redone: ask for the campaign goal in a few
    words, then run `python3 scripts/quick.py promote --folder <quick folder>
    --goal "<goal>"`. It makes a campaign workspace with the same evidence,
-   the posting as the first role, its employer as the first target, and the
-   judgements carried across, scored and with a dashboard. Then continue
+   the posting as the first role, its employer as the first target, the
+   judgements carried across and the fixes on the page as the plan's first
+   actions, scored and with a dashboard. Then continue
    with the interview (the engine's `SKILL.md`); the LinkedIn export can come
    later.

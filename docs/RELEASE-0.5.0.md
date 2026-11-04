@@ -55,7 +55,7 @@ How a score is worked out did not change.
 - In Claude chat, LVLme quick shares the result page as a file rather than
   an open command, which cannot work there.
 
-The full list is in [CHANGELOG.md](../CHANGELOG.md).
+The full list is in [CHANGELOG.md](https://github.com/mark-hallam/lvlme/blob/v0.5.0/CHANGELOG.md).
 
 ## Checked by
 

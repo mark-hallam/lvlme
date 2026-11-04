@@ -329,6 +329,35 @@ class ReviewTests(Base):
         self.assertIn("eval/quick.json", err)
 
 
+class JudgedByTests(Base):
+    """Different AI agents can judge the same evidence differently, so the result names which one judged."""
+
+    def test_the_agent_and_model_reach_the_result_and_its_page(self):
+        q = self.load("eval/quick.json")
+        q["judged_by"] = {"agent": "Codex", "model": "gpt-5-codex"}
+        self.save("eval/quick.json", q)
+        with mock.patch("sys.stdout", io.StringIO()):
+            result, text = Q.build(self.folder)
+        self.assertEqual(result["judged_by"], {"agent": "Codex", "model": "gpt-5-codex"})
+        with open(os.path.join(self.folder, "index.html"), encoding="utf-8") as fh:
+            page = fh.read()
+        self.assertIn("Judged by Codex (model gpt-5-codex). Another AI agent can judge the same evidence differently", page)
+        self.assertLess(len(text.split()), 150)        # the chat message stays short; the page says who judged
+
+    def test_not_recorded_is_said_plainly(self):
+        result = self.result()
+        self.assertIsNone(result["judged_by"])
+        self.assertIn("Which AI agent judged was not recorded.", QH.render(result))
+
+    def test_the_schema_accepts_it(self):
+        import validate as V
+        q = self.load("eval/quick.json")
+        q["judged_by"] = {"agent": "Claude Code"}
+        self.assertEqual(V.check(q, H.schema("quick.schema.json")), [])
+        q["judged_by"] = {"model": "x"}
+        self.assertNotEqual(V.check(q, H.schema("quick.schema.json")), [])
+
+
 class NewFolderTests(unittest.TestCase):
     def test_new_makes_a_private_quick_folder(self):
         parent = tmpdir(self)

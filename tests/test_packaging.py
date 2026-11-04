@@ -272,7 +272,8 @@ class DocTests(unittest.TestCase):
         """Every GitHub address names the plugin's own repository, and file links follow its default branch.
 
         mark-hallam/lvlme is not a public repository, and the public default branch is not main,
-        so /blob/HEAD/ is the only branch path that works before and after a rename to main.
+        so /blob/HEAD/ is the only branch path that works before and after a rename to main. The one
+        exception: docs/RELEASE-<version>.md may link its own tag, v<version>, which never moves.
         """
         with open(os.path.join(ROOT, ".claude-plugin", "plugin.json"), encoding="utf-8") as fh:
             repo = json.load(fh)["repository"]
@@ -289,8 +290,9 @@ class DocTests(unittest.TestCase):
                 for m in own.finditer(read(rel)):
                     with self.subTest(file=rel, address=m.group(0)):
                         self.assertEqual("https://github.com/mark-hallam/" + m.group(1).rstrip("."), repo)
-                        if m.group(2):
-                            self.assertEqual(m.group(3), "HEAD")
+                        if m.group(2):  # release notes may pin their own tag (a relative link 404s on the release page)
+                            tag = re.match(r"RELEASE-(\d+\.\d+\.\d+)\.md$", name) if rel.startswith("docs" + os.sep) else None
+                            self.assertIn(m.group(3), ["HEAD"] + (["v" + tag.group(1)] if tag else []))
 
     def test_plain_punctuation(self):
         """No em or en dashes, and no spaced hyphen used as a dash, outside code."""

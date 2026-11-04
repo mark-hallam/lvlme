@@ -73,6 +73,54 @@ class PromoteTests(unittest.TestCase):
         self.assertEqual(len(cfg["families"]), 1)
         self.assertEqual(cfg["goal"]["title"], "Deployment program roles")
 
+    def test_the_message_names_the_role_not_its_internal_id(self):
+        code, out = self.promote()
+        self.assertEqual(code, 0, out)
+        first = out.splitlines()[0]
+        self.assertIn("Deployment Program Manager, AI Agents at Globex Labs is now a campaign", first)
+        self.assertNotIn("globex_labs_example:", out)               # the internal role id
+        self.assertNotIn("Deployment program roles", out)           # the goal is not repeated back
+
+    def test_the_quick_fixes_become_the_plan_s_first_actions(self):
+        """The three fixes the person was just shown carry over, so the dashboard never says "No open actions"."""
+        code, out = self.promote()
+        self.assertEqual(code, 0, out)
+        fixes = H.load(os.path.join(self.quick, "result.json"))["fixes"]
+        actions = self.load("campaign", "plan.json")["actions"]
+        self.assertEqual([a["title"] for a in actions], [f["title"] for f in fixes])
+        self.assertEqual([a["id"] for a in actions], ["A01", "A02", "A03"])
+        role_id = H.load(os.path.join(self.quick, "result.json"))["role"]["id"]
+        for a, f in zip(actions, fixes):
+            with self.subTest(fix=f["id"]):
+                self.assertEqual((a["status"], a["dimension"], a["expected_points"]), ("todo", f["dimension"], f["gain"]))
+                self.assertEqual(a["effects"], [{"dimension": f["dimension"], "set_at_least": f["to"],
+                                                 "scope": {"role_ids": [role_id]}, "note": a["effects"][0]["note"]}])
+                self.assertIn(f["next_step"], a["done_when"])
+                self.assertEqual(a["x_from_quick_fix"], f["id"])
+        self.assertIn("Its plan starts with the 3 fixes from your quick result", out)
+        agents = self.load("report", "for-agents", "dashboard.json")
+        self.assertEqual(len(agents["actions_active"]), 3)
+        self.assertEqual(V.validate_workspace(self.ws)[0], [])
+
+    def test_which_ai_judged_carries_over_and_shows(self):
+        q = H.load(os.path.join(self.quick, "eval", "quick.json"))
+        q["judged_by"] = {"agent": "Claude Code", "model": "claude-opus-5-5"}
+        H.save(os.path.join(self.quick, "eval", "quick.json"), q)
+        code, out = self.promote()
+        self.assertEqual(code, 0, out)
+        self.assertEqual(self.load("eval", "judgements.json")["judged_by"], q["judged_by"])
+        with open(os.path.join(self.ws, "report", "for-agents", "SUMMARY.md"), encoding="utf-8") as f:
+            summary = f.read()
+        self.assertIn("Judged by Claude Code (model claude-opus-5-5).", summary)
+        with open(os.path.join(self.ws, "report", "index.html"), encoding="utf-8") as f:
+            self.assertIn("Judged by Claude Code (model claude-opus-5-5).", f.read())
+
+    def test_the_agent_summary_says_the_goal_once(self):
+        self.promote()
+        with open(os.path.join(self.ws, "report", "for-agents", "SUMMARY.md"), encoding="utf-8") as f:
+            summary = f.read()
+        self.assertEqual(summary.count("Deployment program roles"), 1)
+
     def test_an_unfinished_quick_folder_is_refused(self):
         os.remove(os.path.join(self.quick, "eval", "quick.json"))
         with mock.patch("sys.stdout", io.StringIO()), self.assertRaises(SystemExit) as caught:

@@ -25,6 +25,7 @@ import urllib.request
 from html.parser import HTMLParser
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _certs as CT  # noqa: E402
 import _common as C  # noqa: E402
 
 UA = "lvlme/0.6 (claims audit of the user's own pages; read only)"
@@ -74,7 +75,7 @@ def read_source(src, workspace=None):
     """Return plain text for a URL or a local file (relative paths also tried inside the workspace)."""
     if re.match(r"^https?://", src, re.I):
         req = urllib.request.Request(src, headers={"User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=60) as resp:
+        with CT.open_checked(urllib.request.urlopen, req, 60) as resp:
             body = resp.read(MAX_BYTES).decode("utf-8", errors="replace")
         return html_to_text(body) if "<" in body else body
     if re.match(r"^[a-z]+://", src, re.I):

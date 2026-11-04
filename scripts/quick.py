@@ -7,8 +7,8 @@ Three steps, with the agent's judgement in between (skills/lvlme-quick/SKILL.md)
   review-items  list the factors the blind reviewer must score, with no scores shown
   build         score with scripts/score.py's own functions and write the one-page result
 
-The quick folder (default ~/lvlme-workspaces/quick/<date>-<organisation>-<title>/,
-never inside this repository) uses the campaign's file names, so the reviewer
+The quick folder (default ~/lvlme-workspaces/quick/<date>-<organisation>-<title>/, or
+quick/ next to the workspace $LVLME_HOME names when it is set, never inside this repository) uses the campaign's file names, so the reviewer
 brief (agents/reviewer.md) and the scoring code work on it unchanged:
 
   config.json                 marks it as a quick folder
@@ -81,7 +81,12 @@ class QuickError(Exception):
 
 
 def default_parent():
-    """~/lvlme-workspaces/quick, or ~/climb-workspaces/quick while only the old folder exists."""
+    """Where quick folders go: quick/ next to the workspace $LVLME_HOME (or $CLIMB_HOME) names, when set,
+    as the rest of the engine follows it; else ~/lvlme-workspaces/quick, or ~/climb-workspaces/quick while
+    only the old folder exists."""
+    env = C.home_env()
+    if env:
+        return os.path.join(os.path.dirname(os.path.abspath(os.path.expanduser(env))), "quick")
     return os.path.join(C.default_parent(), "quick")
 
 
@@ -531,6 +536,7 @@ def build_result(docs):
         "review": {"agreed": sorted(agreed), "disputes": disputes, "flags": flags},
         "fixes": top, "if_all_fixes": combined, "fixes_not_shown": dropped,
         "brief": brief(docs, factors),
+        "judged_by": quick.get("judged_by"),
         "inputs_digest": S.digest(config, role, quick, docs["evidence"], docs.get("reply") or ""),
         "warnings": sorted(set(warnings) | ctx.warnings),
     }
@@ -639,8 +645,12 @@ def promote(args):
         finally:
             sys.stdout = old
     errors = V.validate_workspace(dest)[0]
-    print("Climbing from here: %s is now a campaign with %d evidence items, one target (%s, %s) and its first scored run."
-          % (summary["role"], summary["evidence"], summary["target"]["name"], summary["target"]["ats"]))
+    print("Climbing from here: %s at %s is now a campaign with %d evidence items and its first scored run."
+          % (summary["title"], summary["target"]["name"], summary["evidence"]))
+    if summary["actions"]:
+        print("Its plan starts with %s from your quick result: %s." % (
+            "the fix" if len(summary["actions"]) == 1 else "the %d fixes" % len(summary["actions"]),
+            "; ".join(a["title"] for a in summary["actions"])))
     print("Next: say \"run the LVLme interview\" to add more targets and the factors quick cannot check. "
           "The LinkedIn export can come later.")
     print("```bash\nopen %s\n```" % display_path(os.path.join(dest, "report", "index.html")))
@@ -660,7 +670,8 @@ def main(argv=None):
     n.add_argument("--cv", help="the CV file, copied into the quick folder")
     n.add_argument("--cv-text", help="a file holding pasted CV text ('-' reads standard input)")
     n.add_argument("--date", help="the date, YYYY-MM-DD (default: today)")
-    n.add_argument("--parent", help="where quick folders go (default: ~/lvlme-workspaces/quick)")
+    n.add_argument("--parent", help="where quick folders go (default: quick/ next to $LVLME_HOME's workspace "
+                                    "when it is set, else ~/lvlme-workspaces/quick)")
     n.add_argument("--folder", help="use exactly this folder")
     n.add_argument("--saved-response", help="offline: read a saved job-board API response instead of the network")
     n.add_argument("--fictional", action="store_true", help="mark the folder as fictional (the demo only)")

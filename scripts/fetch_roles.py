@@ -50,6 +50,7 @@ import urllib.error
 import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _certs as CT  # noqa: E402
 import _common as C  # noqa: E402
 from _html_text import blocks_of, clean  # noqa: E402,F401  (FR.clean and FR.blocks_of stay in use)
 import _boards as B  # noqa: E402
@@ -89,7 +90,7 @@ def fetch_json(url, tries=3, timeout=90, body=None):
     for attempt in range(tries):
         try:
             req = urllib.request.Request(url, data=data, headers=headers)
-            with urllib.request.urlopen(req, timeout=timeout) as resp:
+            with CT.open_checked(urllib.request.urlopen, req, timeout) as resp:
                 return json.loads(resp.read().decode("utf-8"))
         except (urllib.error.URLError, TimeoutError, ValueError, OSError) as exc:
             last = exc
@@ -647,6 +648,8 @@ def collect(config, workspace, fixtures=None, save_raw=None):
                             raw["listed"], raw.get("reported") or "many")
                 if not postings and not (ats in B.LISTED and raw.get("listed")):
                     raise RuntimeError("endpoint returned zero postings")
+        except CT.CertificateProblem:  # the same for every board: stop with the one line that says the fix
+            raise
         except Exception as exc:  # record and carry on with the other targets
             errors[tid] = "%s: %s" % (endpoints.get(tid), exc)
             fetched[tid] = 0

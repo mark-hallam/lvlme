@@ -15,6 +15,7 @@ larger tap area, and nothing that is not a control looks like a button.
 import html
 
 import _ai_policies as AP
+import _common as C
 
 BANDS = ["Very low", "Low", "Moderate", "Good", "Strong"]
 LEVELS = {"verified": ("Verified", "v"), "corroborated": ("Corroborated", "v"),
@@ -429,8 +430,10 @@ def checked(result):
             "A second agent, given only the rubric, your evidence and the posting, scored every factor above 2 "
             "without seeing the first scores. It agreed on %d of %d." % (agreed, need))
     return ('<section class="card" aria-labelledby="chkH"><p class="eyebrow">How this was checked</p>'
-            '<h2 id="chkH">A blind second opinion</h2><p class="small">%s</p>%s%s</section>' % (
-                esc(lead), table, ('<ul class="ev">%s</ul>' % flags) if flags else ""))
+            '<h2 id="chkH">A blind second opinion</h2><p class="small">%s</p>%s%s'
+            '<p class="small sub" style="margin-top:12px">%s</p></section>' % (
+                esc(lead), table, ('<ul class="ev">%s</ul>' % flags) if flags else "",
+                esc(C.judged_by_line(result.get("judged_by")))))
 
 
 def deeper():

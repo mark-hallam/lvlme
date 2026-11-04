@@ -12,8 +12,8 @@ Install in Claude Code:
 
 Then say: **run LVLme quick**, and paste a job link.
 
-In a couple of minutes you get honest odds for that one job. Codex and Cursor
-work too (see [Install](#install)).
+In a couple of minutes you get honest odds for that one job. Codex works too
+(see [Install](#install)).
 
 ## Why LVLme is different
 
@@ -79,17 +79,20 @@ LVLme was called Climb until 3 November 2026. The old GitHub address and the
 CLIMB_HOME setting still work. If you installed the Climb plugin, one step
 moves it to the new name: see [Coming from Climb](docs/INSTALL.md#coming-from-climb).
 
-You need an AI agent (Claude Code, Codex or Cursor), Python 3.9 or newer
+You need an AI agent (Claude Code or Codex; Cursor and other agents that run
+commands should work but are not tested yet), Python 3.9 or newer
 (LVLme uses only its standard library) and git. LVLme is tested on macOS; the
 scripts should work on Linux, and Windows is untested.
 
-- **Claude Code** (version 2.1.275 or later): the one line above. Or clone it
-  into your skills folder and start a new session:
-  `git clone https://github.com/mark-hallam/lvlme ~/.claude/skills/lvlme`
-- **Codex:** clone it into `~/.agents/skills/lvlme` and type `$lvlme`, or open
-  Codex in the folder (it follows `AGENTS.md`).
-- **Cursor:** open the folder. The rules in `.cursor/rules/` and `AGENTS.md`
-  load on their own.
+- **Claude Code** (version 2.1.275 or later): the one line above. Or download
+  the folder and install from your copy (option B in the install guide).
+- **Codex:** run exactly
+  `git clone https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme`
+  and type `$lvlme`, or open Codex in the folder (it follows `AGENTS.md`). Do
+  not use a skill installer: it copies only part of the folder.
+- **Cursor** (not tested yet): open the folder. The rules in `.cursor/rules/`
+  and `AGENTS.md` should load on their own. Cursor and other agents that run
+  commands should work but are not tested yet.
 
 Every agent, step by step: [`docs/INSTALL.md`](docs/INSTALL.md).
 
@@ -106,9 +109,9 @@ Every agent, step by step: [`docs/INSTALL.md`](docs/INSTALL.md).
 | `/lvlme-public` | Build in public: what you finished that is worth sharing, a draft in your voice from your notes, and a record of what you posted. You post. |
 | `/lvlme-autopilot` | Turn Autopilot on or off: the campaign runs itself on your schedule and leaves a "This week" note. It asks for every permission first. |
 
-With the cloned folder, use the prefixed name (`/lvlme:lvlme-quick`) or the
-words after `/lvlme` (`/lvlme quick`). In Codex and Cursor, say the words:
-"run LVLme quick".
+Every command also has a full name with the plugin prefix
+(`/lvlme:lvlme-quick`), for when another command already uses the short
+name. In Codex and other agents, say the words: "run LVLme quick".
 
 **What a run uses.** LVLme quick starts at most one helper agent, the blind
 reviewer. A full campaign run starts many: about 40 for a goal with around 300
@@ -122,7 +125,10 @@ weekly, plus whenever something changes.
   its best evidence supports. A separate, sceptical reviewer, given only the
   evidence and the postings and told not to open the first scores, checks
   every point above 2. The maths is a script, so the
-  same inputs always give the same result. The default answer is "unlikely".
+  same judgements always give the same score. Different AI agents (for
+  example Claude and Codex) can judge the same evidence differently, so the
+  result page and the dashboard name which agent and model judged. The
+  default answer is "unlikely".
 - **Private.** Your data lives in a folder on your own computer
   (`~/lvlme-workspaces/`), never in this repository, and the scripts refuse to
   write anywhere a push could publish it. Every source is opt in and read
