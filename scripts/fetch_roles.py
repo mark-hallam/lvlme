@@ -55,7 +55,7 @@ from _html_text import blocks_of, clean  # noqa: E402,F401  (FR.clean and FR.blo
 import _boards as B  # noqa: E402
 import _posting_checks as P  # noqa: E402
 
-UA = "lvlme/0.5 (personal job-search research script; read only)"
+UA = "lvlme/0.6 (personal job-search research script; read only)"
 MAX_REQ_LEN = 160
 DASHES = "\u2013\u2014"
 

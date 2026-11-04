@@ -8,7 +8,16 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
-## Unreleased
+## 0.6.0 (4 November 2026)
+
+From plan to people: LVLme now finds the events and programmes where you can
+meet the people who hire, checks its own odds against what happened to your
+applications, and gets you ready for the conversations that follow, with a
+research pack for each target, an interview story bank, practice and
+debriefs, help building in public, an offer checklist, and an import from
+career-ops. The full notes are in [LVLme 0.6.0](docs/RELEASE-0.6.0.md).
+
+Tests: 499 pass.
 
 ### Added
 

@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 import _doors as DR  # noqa: E402
 
-UA = "lvlme/0.5 (personal job-search research script: public event calendars; read only)"
+UA = "lvlme/0.6 (personal job-search research script: public event calendars; read only)"
 
 
 def fetch_text(url, timeout=45):
