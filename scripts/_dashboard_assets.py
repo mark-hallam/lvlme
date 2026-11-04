@@ -1019,10 +1019,11 @@ function doorsHTML(){
 const storiesSub = () => { const S = D.stories; return S.gaps ? `${plural(S.gaps, "theme")} still need a story backed by evidence.` : "Every theme has a story backed by evidence."; };
 function storiesHTML(){
   const S = D.stories; if (!S) return "";
-  const word = {backed: "Backed", word: "Not backed yet", missing: "No story yet"};
+  const word = {backed: "Backed", practise: "Practise this", word: "Not backed yet", missing: "No story yet"};
   const byId = Object.fromEntries(S.stories.map(s => [s.id, s]));
   return `<div>${S.themes.map(t => `<div class="wp"><div class="wp-h"><span class="wp-n">${esc(t.name)}</span><span class="wp-s${t.status === "backed" ? "" : " none"}">${esc(word[t.status])}</span></div>
-    <div class="tiny sub">${t.stories.length ? t.stories.map(id => esc((byId[id] || {}).title || id)).join(" · ") : `Interviews ask: "${esc(t.ask)}"`}</div></div>`).join("")}</div>
+    <div class="tiny sub">${t.stories.length ? t.stories.map(id => esc((byId[id] || {}).title || id)).join(" · ") : `Interviews ask: "${esc(t.ask)}"`}${t.struggled ? ` · found hard in ${plural(t.struggled, "real interview")}` : ""}</div></div>`).join("")}</div>
+    ${S.asked ? `<div class="tiny sub" style="margin-top:6px">Questions saved: ${S.asked.practice} from practice, ${S.asked.real} from real interviews. Say "practise for" a role, or "debrief my interview", to your agent.</div>` : ""}
     <div class="tiny sub" style="margin-top:6px">${esc(S.themes_note)} ${S.gaps ? `Ask your agent to add a story, or to put a gap in your plan.` : ""}</div>`;
 }
 // How right has LVLme been (scripts/_calibration.py): the odds each application had on the day it was sent, against

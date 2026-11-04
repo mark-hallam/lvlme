@@ -33,7 +33,8 @@ THEMES_NOTE = "Inferred from common interview guidance; no employer publishes it
 SOURCES = ["intake", "person", "debrief", "career-ops"]
 STRONG = ("verified", "corroborated")
 LEVEL_ORDER = ["verified", "corroborated", "partially_verified", "self_reported", "unverified", "contradicted"]
-STATUS_NAMES = {"backed": "Backed by evidence", "word": "Not backed yet", "missing": "No story yet"}
+STATUS_NAMES = {"backed": "Backed by evidence", "practise": "Practise this", "word": "Not backed yet",
+                "missing": "No story yet"}
 NOTE = "Progress only: it changes no score. Every story is yours, in your words; LVLme never writes one for you."
 
 
@@ -60,21 +61,22 @@ def levels_of(evidence_doc):
     return {e["id"]: e.get("level") for e in (evidence_doc or {}).get("items") or [] if e.get("id")}
 
 
-def coverage(doc, config, evidence_doc):
-    """One row per theme: status backed, word or missing, and the stories that answer it."""
-    levels, stories = levels_of(evidence_doc), (doc or {}).get("stories") or []
+def coverage(doc, config, evidence_doc, struggled=None):
+    """One row per theme: status backed, practise (backed, but a real interview found it hard), word or missing,
+    and the stories that answer it. struggled: {theme: real-interview gaps} (scripts/_practice.py)."""
+    levels, stories, struggled = levels_of(evidence_doc), (doc or {}).get("stories") or [], struggled or {}
     out = []
     for t in themes(config):
         mine = [s for s in stories if t["id"] in (s.get("themes") or [])]
         strong = [s for s in mine if strength(s, levels) in STRONG]
-        status = "backed" if strong else "word" if mine else "missing"
+        status = ("practise" if struggled.get(t["id"]) else "backed") if strong else "word" if mine else "missing"
         out.append({"id": t["id"], "name": t["name"], "ask": t.get("ask", ""), "status": status,
-                    "stories": [s["id"] for s in mine]})
+                    "stories": [s["id"] for s in mine], "struggled": struggled.get(t["id"], 0)})
     return out
 
 
-def gaps(doc, config, evidence_doc):
-    return [r for r in coverage(doc, config, evidence_doc) if r["status"] != "backed"]
+def gaps(doc, config, evidence_doc, struggled=None):
+    return [r for r in coverage(doc, config, evidence_doc, struggled) if r["status"] != "backed"]
 
 
 def action_for(theme_row, plan, config, today):
@@ -99,14 +101,15 @@ def action_for(theme_row, plan, config, today):
 # ------------------------------------------------------------------ dashboard, agents, checks
 
 
-def page_data(doc, config, evidence_doc):
+def page_data(doc, config, evidence_doc, asked=None):
+    """asked: scripts/_practice.py summary() of the question bank, or None."""
     if doc is None:
         return None
     levels = levels_of(evidence_doc)
-    rows = coverage(doc, config, evidence_doc)
+    rows = coverage(doc, config, evidence_doc, (asked or {}).get("struggled"))
     stories = [{"id": s["id"], "title": s["title"], "themes": s.get("themes") or [],
                 "strength": strength(s, levels), "result": s.get("result", "")} for s in doc.get("stories") or []]
-    return {"note": NOTE, "themes_note": THEMES_NOTE, "themes": rows, "stories": stories,
+    return {"note": NOTE, "themes_note": THEMES_NOTE, "themes": rows, "stories": stories, "asked": asked,
             "gaps": sum(1 for r in rows if r["status"] != "backed")}
 
 
@@ -128,6 +131,10 @@ def summary_lines(block):
     for r in block["themes"]:
         lines.append("- %s: %s%s." % (r["name"], STATUS_NAMES[r["status"]].lower(),
                                      " (%s)" % ", ".join(r["stories"]) if r["stories"] else ""))
+    if block.get("asked"):
+        a = block["asked"]
+        lines.append("- Questions saved: %d from practice, %d from real interviews (%d rated gap)." % (
+            a["practice"], a["real"], a["gaps"]))
     lines.append("- Never write a story for the person. Ask for theirs, then record it with `scripts/stories.py add`.")
     return lines
 

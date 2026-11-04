@@ -37,6 +37,7 @@ import doors  # noqa: E402
 import fetch_doors  # noqa: E402
 import fetch_roles  # noqa: E402
 import network_map  # noqa: E402
+import practice  # noqa: E402
 import score  # noqa: E402
 
 WEEKS = ["2026-10-04", "2026-10-11", "2026-10-18", "2026-10-25", "2026-11-01"]
@@ -71,8 +72,17 @@ APPS = [["2026-10-04", "add", "--org", "acme", "--title", "Applied AI Deployment
         ["2026-10-26", "followup", "ap7"],
         ["2026-10-28", "move", "ap3", "rejected"],
         ["2026-10-30", "move", "ap4", "rejected", "--note", "After the first interview."]]
+# A made-up practice session and the debrief of ap4's interview (scripts/practice.py): [date, arguments].
+QUESTIONS = [["2026-10-20", "--question", "Why Acme AI, and why this role now?", "--rating", "solid", "--theme",
+              "why_here", "--story", "S02", "--org", "acme"],
+             ["2026-10-20", "--question", "Tell me about a time you disagreed with a decision.", "--rating", "gap",
+              "--theme", "disagree", "--org", "acme"],
+             ["2026-10-22", "--real", "--app", "ap4", "--question", "Tell me about a launch you ran end to end.",
+              "--rating", "strong", "--theme", "impact", "--story", "S01"],
+             ["2026-10-22", "--real", "--app", "ap4", "--question", "How have you led people who did not report to "
+              "you?", "--rating", "gap", "--theme", "lead", "--story", "S01"]]
 OUTPUTS = ["eval/runs", "market/roles", "market/doors.json", "report", "campaign/metrics-history.json",
-           "campaign/applications.json", "campaign/applications-log.tsv"]
+           "campaign/applications.json", "campaign/applications-log.tsv", "campaign/questions.json"]
 
 
 def load(rel, root=DEMO):
@@ -244,6 +254,8 @@ def main():
             run(doors.main, ["--workspace", DEMO, "add", "--date", today] + door)
         for date, cmd, *rest in APPS:
             run(applications.main, ["--workspace", DEMO, cmd] + rest + ["--date", date])
+        for date, *rest in QUESTIONS:
+            run(practice.main, ["--workspace", DEMO, "record"] + rest + ["--date", date])
         run(score.main, ["--workspace", DEMO, "--date", today])
         run(build_dashboard.main, ["--workspace", DEMO, "--today", today])
     finally:

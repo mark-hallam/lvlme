@@ -270,7 +270,8 @@ For a plain-English tour of each number and what to do first, see
   the STAR shape (situation, task, action, result), each linked to its
   evidence. The card shows which common interview themes have a story backed
   by evidence, which need backing and which have none yet; a gap can become a
-  plan action.
+  plan action. A theme you found hard in a real interview (from a debrief)
+  says "Practise this".
 - **Research packs**: one page per target organisation (report/research/),
   opened from the organisation's detail: what it is building, recent news,
   offices, the teams hiring, its events and programmes, and its rules on AI

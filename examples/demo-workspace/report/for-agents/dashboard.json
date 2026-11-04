@@ -2115,7 +2115,8 @@
         "status": "backed",
         "stories": [
           "S02"
-        ]
+        ],
+        "struggled": 0
       },
       {
         "id": "impact",
@@ -2124,7 +2125,8 @@
         "status": "backed",
         "stories": [
           "S01"
-        ]
+        ],
+        "struggled": 0
       },
       {
         "id": "hard_problem",
@@ -2133,7 +2135,8 @@
         "status": "backed",
         "stories": [
           "S02"
-        ]
+        ],
+        "struggled": 0
       },
       {
         "id": "mistake",
@@ -2142,7 +2145,8 @@
         "status": "word",
         "stories": [
           "S04"
-        ]
+        ],
+        "struggled": 0
       },
       {
         "id": "disagree",
@@ -2151,23 +2155,26 @@
         "status": "word",
         "stories": [
           "S03"
-        ]
+        ],
+        "struggled": 0
       },
       {
         "id": "lead",
         "name": "Leading without authority",
         "ask": "Tell me about getting people to act when they did not report to you.",
-        "status": "backed",
+        "status": "practise",
         "stories": [
           "S01"
-        ]
+        ],
+        "struggled": 1
       },
       {
         "id": "values",
         "name": "Values under pressure",
         "ask": "Tell me about a time doing the right thing cost you something.",
         "status": "missing",
-        "stories": []
+        "stories": [],
+        "struggled": 0
       }
     ],
     "stories": [
@@ -2210,7 +2217,15 @@
         "result": "Every number I use now matches across my CV, LinkedIn and site."
       }
     ],
-    "gaps": 3
+    "asked": {
+      "practice": 2,
+      "real": 2,
+      "gaps": 1,
+      "struggled": {
+        "lead": 1
+      }
+    },
+    "gaps": 4
   },
   "research_packs": {
     "acme": {

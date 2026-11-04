@@ -35,6 +35,14 @@ before. Nothing here changes how a score is worked out unless it says so.
   hidden until it has 5 results, and a ranking check (did the higher-rated
   applications do better?) until 10. Advisory only: a test proves scores are
   identical with or without outcomes. The demo now has made-up applications.
+- **Practise before an interview, debrief after.** `/lvlme-practice` builds
+  a question set for one role from its posting's hard requirements, the story
+  themes and questions already asked there, suggests which of your stories
+  fits each, and gives feedback on structure and evidence, never a script.
+  `/lvlme-debrief` records a real interview's questions, each rated strong,
+  solid or gap (`scripts/practice.py record --real`), moves the application
+  to Interview, and a theme you found hard shows as "Practise this" on the
+  Story bank card. Both refuse while an interview is happening.
 - **Import from career-ops.** `scripts/import_career_ops.py --from <folder>`
   reads a career-ops folder, read only, and brings in its applications with
   their status history, contacts at your target organisations (name, company

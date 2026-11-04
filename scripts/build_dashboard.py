@@ -82,6 +82,7 @@ import _applications as AP  # noqa: E402
 import _calibration as CAL  # noqa: E402
 import _research as RS  # noqa: E402
 import _stories as STY  # noqa: E402
+import _practice as PR  # noqa: E402
 import _doors as DR  # noqa: E402
 import _autopilot as APL  # noqa: E402
 import _static_html as ST  # noqa: E402
@@ -210,6 +211,8 @@ class Data:
         self.calib = CAL.summary(ws, self.apps, self.today) if self.apps else None   # advisory: never scored
         self.orgs_doc = load("market", "orgs.json")
         self.stories = load("profile", "stories.json")       # progress only: never scored
+        bank = load("campaign", "questions.json")
+        self.asked = PR.summary(bank) if bank else None      # interview practice and debriefs
         self.packs = {}                                      # research packs, written by main() before the page
         self.claims = (load("profile", "claims-audit.json") or {}).get("claims", [])
         self.swot = load("eval", "swot.json")
@@ -624,7 +627,7 @@ def build_data(data):
         "doors": DR.page_data(data.doors, data.today, data.org_names),
         "calib": data.calib,
         "packs": data.packs,
-        "stories": STY.page_data(data.stories, data.config, data.evidence),
+        "stories": STY.page_data(data.stories, data.config, data.evidence, data.asked),
         "week": APL.page_data(data.week, clean),
     }
     out["orgOrder"] = [g for g in groups if g in out["orgs"]]
@@ -872,7 +875,7 @@ def agent_payload(data, page):
     if data.calib:
         payload["calibration"] = data.calib
     if data.stories is not None:
-        payload["stories"] = STY.page_data(data.stories, data.config, data.evidence)
+        payload["stories"] = STY.page_data(data.stories, data.config, data.evidence, data.asked)
     if data.packs:
         payload["research_packs"] = {o: dict(p, path="report/" + p["path"]) for o, p in data.packs.items()}
     if data.doors is not None:

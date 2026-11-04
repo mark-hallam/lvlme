@@ -162,8 +162,9 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
 - A hard problem solved: backed by evidence (S02).
 - A mistake and what changed: not backed yet (S04).
 - Disagreeing well: not backed yet (S03).
-- Leading without authority: backed by evidence (S01).
+- Leading without authority: practise this (S01).
 - Values under pressure: no story yet.
+- Questions saved: 2 from practice, 2 from real interviews (1 rated gap).
 - Never write a story for the person. Ask for theirs, then record it with `scripts/stories.py add`.
 
 ## Research packs (one page per target, every line sourced)

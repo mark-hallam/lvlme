@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "questions": [
+    {
+      "id": "Q01",
+      "text": "Why Acme AI, and why this role now?",
+      "kind": "practice",
+      "rating": "solid",
+      "asked_on": "2026-10-20",
+      "stories": [
+        "S02"
+      ],
+      "theme": "why_here",
+      "org": "acme"
+    },
+    {
+      "id": "Q02",
+      "text": "Tell me about a time you disagreed with a decision.",
+      "kind": "practice",
+      "rating": "gap",
+      "asked_on": "2026-10-20",
+      "stories": [],
+      "theme": "disagree",
+      "org": "acme"
+    },
+    {
+      "id": "Q03",
+      "text": "Tell me about a launch you ran end to end.",
+      "kind": "real",
+      "rating": "strong",
+      "asked_on": "2026-10-22",
+      "stories": [
+        "S01"
+      ],
+      "theme": "impact",
+      "app": "ap4",
+      "org": "acme"
+    },
+    {
+      "id": "Q04",
+      "text": "How have you led people who did not report to you?",
+      "kind": "real",
+      "rating": "gap",
+      "asked_on": "2026-10-22",
+      "stories": [
+        "S01"
+      ],
+      "theme": "lead",
+      "app": "ap4",
+      "org": "acme"
+    }
+  ],
+  "updated_on": "2026-10-22"
+}

@@ -101,6 +101,8 @@ Every agent, step by step: [`docs/INSTALL.md`](docs/INSTALL.md).
 | `/lvlme-screen` | The independent recruiter screen. |
 | `/lvlme-audit` | The consistency audit and the public claims audit. |
 | `/lvlme-dashboard` | Rebuild the dashboard. |
+| `/lvlme-practice` | Practise for an interview: questions from the posting and your own stories, with feedback. Before an interview, never during. |
+| `/lvlme-debrief` | After an interview: what was asked and how it went, into your tracker and story bank. |
 | `/lvlme-autopilot` | Turn Autopilot on or off: the campaign runs itself on your schedule and leaves a "This week" note. It asks for every permission first. |
 
 With the cloned folder, use the prefixed name (`/lvlme:lvlme-quick`) or the

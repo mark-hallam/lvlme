@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Interview question bank (campaign/questions.json)",
+  "description": "Questions the person was asked, in practice or in a real interview (a debrief), each rated strong, solid or gap, with the stories used. Written by scripts/practice.py. Progress only: score.py never reads this file.",
+  "type": "object",
+  "required": ["schema_version", "questions"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "updated_on": {"$ref": "#/definitions/date"},
+    "questions": {"type": "array", "items": {
+      "type": "object",
+      "required": ["id", "text", "kind", "rating", "asked_on"],
+      "additionalProperties": false,
+      "patternProperties": {"^x_": {}},
+      "properties": {
+        "id": {"type": "string", "pattern": "^Q[0-9]{2,}$"},
+        "text": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["practice", "real"]},
+        "rating": {"enum": ["strong", "solid", "gap"]},
+        "asked_on": {"$ref": "#/definitions/date"},
+        "theme": {"type": "string"},
+        "stories": {"type": "array", "items": {"type": "string", "pattern": "^S[0-9]{2,}$"}},
+        "app": {"type": "string", "pattern": "^ap[0-9]+$"},
+        "org": {"type": "string"},
+        "note": {"type": "string"}
+      }}}
+  },
+  "definitions": {"date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}}
+}

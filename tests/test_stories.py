@@ -87,7 +87,7 @@ class StoryTests(unittest.TestCase):
         with open(os.path.join(H.DEMO, "report", "index.html"), encoding="utf-8") as fh:
             self.assertIn('id="storiesCard"', fh.read())
         agents = H.load(os.path.join(H.DEMO, "report", "for-agents", "dashboard.json"))
-        self.assertEqual(agents["stories"]["gaps"], 3)
+        self.assertEqual(agents["stories"]["gaps"], 4)   # 3 without a backed story, 1 found hard for real
         with open(os.path.join(H.DEMO, "report", "for-agents", "SUMMARY.md"), encoding="utf-8") as fh:
             self.assertIn("Values under pressure: no story yet.", fh.read())
 

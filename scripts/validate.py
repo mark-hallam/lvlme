@@ -35,6 +35,7 @@ import _first_draft as F  # noqa: E402
 import _applications as AP  # noqa: E402
 import _doors as DR  # noqa: E402
 import _stories as STY  # noqa: E402
+import _practice as PR  # noqa: E402
 
 FILES = [
     ("config.json", "config.schema.json", True),
@@ -45,6 +46,7 @@ FILES = [
     ("market/orgs.json", "orgs.schema.json", False),
     ("market/doors.json", "doors.schema.json", False),
     ("profile/stories.json", "stories.schema.json", False),
+    ("campaign/questions.json", "questions.schema.json", False),
     ("eval/judgements.json", "judgements.schema.json", True),
     ("eval/profile-dimensions.json", "profile-dimensions.schema.json", True),
     ("eval/gap-templates.json", "gap-templates.schema.json", False),
@@ -335,6 +337,9 @@ def cross_checks(ws, docs, errors, warnings):
     AP.checks(docs.get(AP.REL), targets, role_ids, errors, warnings)
     DR.checks(docs.get(DR.REL), targets, action_ids if "campaign/plan.json" in docs else None, errors, warnings)
     STY.checks(docs.get(STY.REL), cfg, ev_ids, action_ids if "campaign/plan.json" in docs else None, errors, warnings)
+    PR.checks(docs.get(PR.REL), cfg,
+              {s.get("id") for s in docs[STY.REL].get("stories") or []} if docs.get(STY.REL) else None,
+              {a.get("id") for a in docs[AP.REL].get("applications") or []} if docs.get(AP.REL) else None, errors)
 
 
 # Evidence id prefixes LVLme already uses for other ids, so an evidence id with one reads as something else.
