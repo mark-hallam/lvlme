@@ -84,10 +84,12 @@ The scoring agent applies the agreed changes to the judgement files:
 ## When the scorer and reviewer disagree
 
 - **Same score:** agreed.
-- **Different scores:** a second fresh reviewer scores the item blind, and the
-  **middle of the three scores** stands (scorer, reviewer, tie-break). Taking
-  the lower of two would build a downward bias into every run; the middle of
-  three is honest in both directions.
+- **One point apart:** the reviewer's score stands without a tie-break. Record
+  the dispute with `decided_by` set to `reviewer_one_point` and no tie-break
+  score. The score still cannot exceed the evidence cap or other caps.
+- **Two or more points apart:** a second fresh reviewer scores the item blind,
+  and the **middle of the three scores** stands (scorer, reviewer, tie-break).
+  Until then it counts as 2 and is not marked reviewed.
 - Every score, whichever way it moves, still needs evidence that meets its
   anchor under the verification ladder.
 - The scorer may not argue the point again in the same run. Instead, add an
@@ -125,7 +127,9 @@ scores go in it; agreed scores are recorded as `reviewed_on` and
   `eval/profile-dimensions.json`.
 - Each score names the anchor it claims to meet and the evidence ids it
   cites (an empty list means "no evidence").
-- `decided_by` is `middle_of_three` once the tie-break has run;
+- `decided_by` is `reviewer_one_point` when the scores differ by exactly one
+  and the reviewer score stands, with `tie_break` set to `{"absent": true,
+  "why": "..."}`; `middle_of_three` once the tie-break has run;
   `awaiting_tie_break` while it has not (`tie_break` is then
   `{"absent": true, "why": "..."}`, and the entry gets no `reviewed_on`, so
   a score above 2 counts as 2); or `earlier_rule` for history decided under

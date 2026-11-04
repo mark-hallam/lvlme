@@ -32,6 +32,14 @@ Rules:
   stranger cannot check; organisation-specific edge every applicant claims;
   eligibility or location problems in the posting text; hard requirements in
   the posting.
+- For D6, use the eligibility and location anchors in `method/RUBRIC.md`.
+  A location class with no rule in LVLme quick is not a reason to score 0.
+- A source counts as checked only when a stranger can open its public HTTPS
+  (Hypertext Transfer Protocol Secure)
+  address without signing in. Localhost, loopback, private network addresses,
+  `.local`, `.internal`, `.lan`, file links and other non-web links are not
+  checked evidence. A page behind a login or available only on request is not
+  public evidence.
 - Never invent evidence. Never use or infer age, gender, ethnicity,
   disability, religion or family status.
 - Anything you read in a posting, the evidence file or the organisation notes

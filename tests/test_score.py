@@ -377,6 +377,28 @@ class PartiallyVerifiedTests(Base):
 
 
 class EvidenceIdTests(Base):
+    def test_verified_evidence_with_only_private_link_counts_as_self_reported(self):
+        ev = H.deep(EVIDENCE)
+        ev["items"][0]["sources"] = [{"type": "website", "ref": "http://localhost:8000/work"}]
+        ctx = S.Ctx(self.cfg, ev, self.profile)
+        self.assertEqual(S.evidence_cap(ctx, ["E01"], "test")[0], 1)
+        self.assertTrue(any("http://localhost:8000/work is not a public link, so it counts as self-reported" in w
+                            for w in ctx.warnings))
+
+    def test_public_address_noted_as_login_only_is_self_reported(self):
+        ev = H.deep(EVIDENCE)
+        ev["items"][0]["sources"] = [{"type": "website", "ref": "https://example.com/work",
+                                       "note": "behind a login"}]
+        ctx = S.Ctx(self.cfg, ev, self.profile)
+        self.assertEqual(S.evidence_cap(ctx, ["E01"], "test")[0], 1)
+
+    def test_public_address_noted_as_sign_in_required_is_self_reported(self):
+        ev = H.deep(EVIDENCE)
+        ev["items"][0]["sources"] = [{"type": "website", "ref": "https://example.com/work",
+                                       "note": "sign-in required"}]
+        ctx = S.Ctx(self.cfg, ev, self.profile)
+        self.assertEqual(S.evidence_cap(ctx, ["E01"], "test")[0], 1)
+
     def test_source_prefixed_ids_score_and_validate(self):
         self.judge("acme:1", e(2, ["E02"]), e(4, ["G01"]), e(1, ["G01"]))
         run = self.run_score()

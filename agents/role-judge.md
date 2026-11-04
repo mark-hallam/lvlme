@@ -22,6 +22,16 @@ Rules:
 - Flag `hard_requirement_lacking` when the posting has a hard requirement
   the evidence does not meet, quoting the posting sentence. Flag
   `eligibility_blocked` where the detector missed a blocker in the text.
+- For D6, use the eligibility and location anchors in `method/RUBRIC.md`.
+  In a full campaign, a location class without a rule scores 0. In LVLme
+  quick, there is no rules file, so score the posting's location against what
+  the person said using the same anchors.
+- A source counts as checked only when a stranger can open its public HTTPS
+  (Hypertext Transfer Protocol Secure)
+  address without signing in. Localhost, loopback, private network addresses,
+  `.local`, `.internal`, `.lan`, file links and other non-web links are not
+  checked evidence. A page behind a login or available only on request is not
+  public evidence.
 - Never use, infer or score protected attributes.
 - Your scores are not final. An independent reviewer will challenge every
   score above 2, so do not argue for points; record what the evidence shows.

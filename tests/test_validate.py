@@ -62,6 +62,35 @@ class CheckTests(unittest.TestCase):
 
 
 class WorkspaceTests(unittest.TestCase):
+    def test_missing_location_rule_warns_with_class_name(self):
+        ws = H.copy_demo(self)
+        profile_path = os.path.join(ws, "eval", "profile-dimensions.json")
+        profile = H.load(profile_path)
+        classes = profile["D6_rules"]["classes"]
+        removed = next(iter(classes))
+        del classes[removed]
+        H.save(profile_path, profile)
+        _, warnings, _ = V.validate_workspace(ws)
+        self.assertTrue(any("no D6 rule for location class '%s'" % removed in w for w in warnings))
+
+    def test_one_point_reviewer_decision_validates_without_tie_break(self):
+        ws = H.copy_demo(self)
+        path = os.path.join(ws, "eval", "reviews", "2026-10-26.json")
+        doc = H.load(path)
+        dispute = doc["disputes"][0]
+        dispute["reviewer"]["score"] = dispute["scorer"]["score"] - 1
+        dispute["tie_break"] = {"absent": True, "why": "The reviewer differs by one point."}
+        dispute["stands"] = dispute["reviewer"]["score"]
+        dispute["decided_by"] = "reviewer_one_point"
+        H.save(path, doc)
+        jud = H.load(os.path.join(ws, "eval", "judgements.json"))
+        rid, dim = dispute["item_id"].rsplit("/", 1)
+        jud["roles"][rid][dim]["score"] = dispute["stands"]
+        jud["roles"][rid]["reviewed_on"] = "2026-10-26"
+        H.save(os.path.join(ws, "eval", "judgements.json"), jud)
+        errors, _, _ = V.validate_workspace(ws)
+        self.assertEqual(errors, [])
+
     def test_demo_in_place_is_valid(self):
         errors, _, checked = V.validate_workspace(H.DEMO)
         self.assertEqual(errors, [])

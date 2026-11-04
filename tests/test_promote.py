@@ -56,10 +56,10 @@ class PromoteTests(unittest.TestCase):
         role = run["roles"][0]
         self.assertEqual(role["role_id"], quick["role"]["id"])
         self.assertEqual(role["fit"], quick["fit"])                         # 41, quick's "today"
-        self.assertEqual(role["awaiting_review"], ["D2"])                    # the open dispute still waits
+        self.assertEqual(role["awaiting_review"], [])                         # the one-point reviewer score is settled
         judged = self.load("eval", "judgements.json")["roles"][role["role_id"]]
         self.assertEqual(judged["D1"]["reviewed_on"], "2026-11-02")          # agreed in quick's blind review
-        self.assertNotIn("reviewed_on", judged["D2"])
+        self.assertEqual(judged["D2"]["reviewed_on"], "2026-11-02")
         prof = self.load("eval", "profile-dimensions.json")
         self.assertEqual(prof["D6_rules"]["classes"]["australia_nz"]["score"], 5)
         self.assertEqual(prof["D3"]["globex_labs_example"]["evidence"], ["E06"])
@@ -149,7 +149,7 @@ class PromoteTests(unittest.TestCase):
         counts = data["market"]["byOrgFamily"]
         self.assertEqual(sum(sum(v.values()) for v in counts.values()), 1)
 
-    def test_a_blind_review_disagreement_carries_over_as_waiting_for_a_tie_break(self):
+    def test_one_point_review_decision_carries_into_the_review_log(self):
         import glob
         import json
         import re
@@ -158,14 +158,13 @@ class PromoteTests(unittest.TestCase):
         files = glob.glob(os.path.join(self.ws, "eval", "reviews", "*.json"))
         self.assertEqual(len(files), 1)
         d = H.load(files[0])["disputes"][0]
-        self.assertEqual((d["item_id"].endswith("/D2"), d["scorer"]["score"], d["reviewer"]["score"], d["decided_by"]),
-                         (True, 3, 2, "awaiting_tie_break"))
+        self.assertEqual((d["item_id"].endswith("/D2"), d["scorer"]["score"], d["reviewer"]["score"], d["stands"], d["decided_by"]),
+                         (True, 3, 2, 2, "reviewer_one_point"))
         self.assertEqual(V.validate_workspace(self.ws)[0], [])
         with open(os.path.join(self.ws, "report", "index.html"), encoding="utf-8") as fh:
             page = fh.read()
         data = json.loads(re.search(r'<script type="application/json"[^>]*>(.*?)</script>', page, re.S).group(1))
-        self.assertEqual(data["roles"][0]["disp"], {"D2": [3, 2]})
-        self.assertIn("the blind reviewer disagreed (first score", page)
+        self.assertEqual(data["roles"][0]["disp"], {})
 
     def test_an_unfinished_quick_folder_is_refused(self):
         os.remove(os.path.join(self.quick, "eval", "quick.json"))

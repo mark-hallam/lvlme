@@ -85,13 +85,15 @@ def level_card(page, nl):
     to_next = "Top level" if nl["top"] else "%s %s to Level %d, %s" % (
         fp(nl["points_to_next"]), "point" if nl["points_to_next"] == 1 else "points", nl["next_level"], esc(nl["next_band"]))
     ch = changes[-1] if changes else None
+    rubric_note = page.get("meta", {}).get("rubric_comparison_note") or ""
     return ('<div class="level-top"><div class="level-badge">%d</div><div><div class="level-name">Level %d, %s</div>'
             '<div class="tiny sub">%s</div></div></div><div class="prog"><span style="width:%s%%"></span></div>'
-            '<div class="tiny lv-line">%s</div>%s') % (
+            '<div class="tiny lv-line">%s</div>%s%s') % (
         nl["level"], nl["level"], esc(nl["band"]), to_next, "%g" % width, esc(nl_line(nl, today)),
-        '<div class="tiny sub" style="margin-top:2px">%s %s, %s to %s</div>' % (
+            '<div class="tiny sub" style="margin-top:2px">%s %s, %s to %s</div>' % (
             "Levelled up" if ch["change"] == "up" else "Dropped a level", long_date(ch["date"]),
-            esc(L.BANDS[ch["from_level"] - 1]), esc(ch["band"])) if ch else "")
+            esc(L.BANDS[ch["from_level"] - 1]), esc(ch["band"])) if ch else "",
+        '<div class="tiny sub" style="margin-top:4px">%s</div>' % esc(rubric_note) if rubric_note else "")
 
 
 def _steps(acts):
@@ -294,11 +296,13 @@ def progress(page):
                        long_date(h["date"]), h["level"], h["level"], esc(h["band"]), int(h["fit"] + 0.5),
                        ' <span class="tag %s">%s</span>' % (h["change"], "Level up" if h["change"] == "up" else "Level down") if h["change"] else "",
                        esc(_why(by_date.get(h["date"])))) for h in hist)
-    return ('<h2 class="eyebrow">Progress you can trust</h2><div class="streak"><div class="streak-n num%s">%d</div><div>'
+    rubric_note = page.get("meta", {}).get("rubric_comparison_note") or ""
+    return ('<h2 class="eyebrow">Progress you can trust</h2>%s<div class="streak"><div class="streak-n num%s">%d</div><div>'
             '<div style="font-weight:650">%s in a row with real progress</div><div class="tiny sub">%s</div></div></div>'
             '<div class="streak-dots" aria-hidden="true">%s</div><h3 class="eyebrow" style="margin-top:16px">Level history, your best role</h3>'
             '<div class="tiny sub" style="margin-bottom:4px">One row per scored day, newest first, from the dated files in eval/runs.</div>'
-            '<div>%s</div>') % ("" if n else " zero", n, "scored day" if n == 1 else "scored days", note, dots, rows)
+            '<div>%s</div>') % ('<div class="tiny sub">%s</div>' % esc(rubric_note) if rubric_note else "",
+                                "" if n else " zero", n, "scored day" if n == 1 else "scored days", note, dots, rows)
 
 
 def quests_intro(nl):

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "run_date": "2026-10-11",
-  "rubric_version": "1.0",
+  "rubric_version": "1.1",
   "goal": "A program, applied AI or policy role at an AI product company",
   "weights": {
     "D1": 25,
@@ -12,7 +12,7 @@
     "D6": 10,
     "D7": 5
   },
-  "inputs_digest": "sha256:28d89315e12f45bf77b11864f3ee735e257daf819e114ff41a6f7943f1d034fc",
+  "inputs_digest": "sha256:a2db5c7bac6bb57c7f54aa3c5b48b666796a4e31f4d640246df7e04c47456f59",
   "counts": {
     "roles": 10,
     "judged": 10,

@@ -15,7 +15,7 @@ Writes
                                   when no role is judged yet: that would be a
                                   false Day 1, not a measurement.
 
-Rules (method/RUBRIC.md v1.0), applied in this order per dimension:
+Rules (method/RUBRIC.md v1.1), applied in this order per dimension:
   1. evidence cap: a score can be no higher than its best cited evidence
      supports (verified 5, corroborated 4, partially verified the higher of
      the kind's self-reported cap and scoring.partially_verified_cap (default
@@ -51,8 +51,9 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
+import _public_link as PL  # noqa: E402
 
-RUBRIC_VERSION = "1.0"
+RUBRIC_VERSION = "1.1"
 BANDS = C.BANDS
 INTERVIEW_TABLE = [(85, "Strong"), (70, "Good"), (55, "Moderate"), (40, "Low"), (0, "Very low")]
 OFFER_TABLE = [(85, "Good"), (70, "Moderate"), (55, "Low"), (40, "Very low"), (0, "Very low")]
@@ -92,11 +93,21 @@ class Ctx:
         self.top_n_per_org = int(scoring.get("top_n_per_org_for_gaps", self.top_n))
         self.cleared = set(cand.get("eligibility_cleared") or [])
         self.writes_code = bool(cand.get("writes_production_code", False))
-        self.evidence = {e["id"]: e for e in (evidence or {}).get("items", [])}
+        self.evidence = {}
         self.profile = profile or {}
         self.class_order = [c["id"] for c in (config.get("locations") or {}).get("classes", [])]
         self.default_class = (config.get("locations") or {}).get("default_class") or "other"
         self.warnings = set()
+        for original in (evidence or {}).get("items", []):
+            item = dict(original)
+            sources = item.get("sources") or []
+            effective = PL.effective_level(item)
+            if effective != item.get("level"):
+                item["level"] = effective
+                for source in sources:
+                    if not PL.source_is_public(source):
+                        self.warnings.add("%s is not a public link, so it counts as self-reported" % source.get("ref", ""))
+            self.evidence[item["id"]] = item
 
     def warn(self, text):
         self.warnings.add(text)
@@ -399,7 +410,8 @@ def build_run(ws, config, run_date):
         "goal": (config.get("goal") or {}).get("title", ""),
         "weights": ctx.weights,
         # posting_check holds a posting's age, which moves every day: it is a label, never an input to a score
-        "inputs_digest": digest(config, [{k: v for k, v in r.items() if k != "posting_check"} for r in roles],
+        "inputs_digest": digest(RUBRIC_VERSION, config,
+                                [{k: v for k, v in r.items() if k != "posting_check"} for r in roles],
                                 judgements_doc, profile, templates, outlook, evidence),
         "counts": {
             "roles": len(scored),

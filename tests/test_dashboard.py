@@ -33,6 +33,25 @@ def page_data(ws):
 
 
 class ProjectionTests(unittest.TestCase):
+
+    def test_dashboard_says_version_change_is_not_comparable(self):
+        ws = H.copy_demo(self)
+        run_path = os.path.join(ws, "eval", "runs", "2026-11-01.json")
+        run = H.load(run_path)
+        run["rubric_version"] = "1.1"
+        H.save(run_path, run)
+        prior_path = os.path.join(ws, "eval", "runs", "2026-10-25.json")
+        prior = H.load(prior_path)
+        prior["rubric_version"] = "1.0"
+        H.save(prior_path, prior)
+        B.main(["--workspace", ws])
+        payload = H.load(os.path.join(ws, "report", "for-agents", "dashboard.json"))
+        expected = "The scoring rules changed from version 1.0 to 1.1, so this change is not comparable."
+        self.assertEqual(payload["rubric_comparison_note"], expected)
+        self.assertIsNone(payload["top5_average_fit_previous"])
+        page = open(os.path.join(ws, "report", "index.html"), encoding="utf-8").read()
+        self.assertIn(expected, page)
+
     def test_expected_weights_by_chance_and_best_case_lands(self):
         r = role([2, 2, 1, 2, 2, 5, 1])
         acts = [action("A01", [{"dimension": "D3", "set_at_least": 3, "scope": {}}], p=0.5)]

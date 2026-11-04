@@ -74,6 +74,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
+import _public_link as PL  # noqa: E402
 import _dashboard_assets as A  # noqa: E402
 import _levels as L  # noqa: E402
 import _levels_html as LH  # noqa: E402
@@ -512,7 +513,7 @@ def build_runs(data, group_of):
         for x in roles:
             g = group_of.get(x["org"], OTHER_KEY)
             by_group[g] = max(by_group.get(g, 0), x["fit"])
-        out.append({"date": rr["run_date"], "top": top["fit"], "ib": top["interview_band"], "role": clean(top["title"]),
+        out.append({"date": rr["run_date"], "rubric_version": rr.get("rubric_version"), "top": top["fit"], "ib": top["interview_band"], "role": clean(top["title"]),
                     "orgs": by_group, "commit": git_first_commit(data.ws, os.path.join("eval", "runs", f))})
     return out
 
@@ -521,7 +522,7 @@ def build_evidence(data):
     items = []
     for e in data.evidence.get("items", []):
         items.append({"id": e["id"], "claim": clean(e.get("claim")), "cat": e.get("kind", "other"),
-                      "status": e.get("level", "unverified"), "dims": e.get("dimensions") or [],
+                      "status": PL.effective_level(e), "dims": e.get("dimensions") or [],
                       "notes": clean(e.get("notes")),
                       "sources": [{"type": (s.get("type") or "").replace("_", " "), "ref": s.get("ref", ""),
                                    "url": web_url(s.get("ref")), "note": clean(s.get("note")),
@@ -624,6 +625,9 @@ def build_data(data):
                         "reasons": [clean(x) for x in run["outlook"].get("reasons") or []]},
             "sample_allowed": len(data.runs) < SAMPLE_UNTIL_RUNS, "git": os.path.exists(os.path.join(data.ws, ".git")),
             "built": short_date(run_date), "judged": C.judged_by_line(data.judged_by),
+            "rubric_comparison_note": ("The scoring rules changed from version %s to %s, so this change is not comparable." %
+                                        (data.prev.get("rubric_version"), data.cur.get("rubric_version"))
+                                        if data.prev and data.prev.get("rubric_version") != data.cur.get("rubric_version") else ""),
         },
         "dims": DIMS, "dimNames": C.DIMENSION_NAMES, "dimHelp": DIM_HELP,
         "weights": [data.weights[d] for d in DIMS], "caps": [caps.get(d, 0) for d in DIMS],
@@ -865,7 +869,11 @@ def agent_payload(data, page):
         "judged_by": data.judged_by, "judged_by_note": C.judged_by_line(data.judged_by),
         "role_counts": {"open": len(cur["roles"]), "judged": sum(1 for r in cur["roles"] if r.get("judged", True))},
         "top5_average_fit": top5_avg(cur),
-        "top5_average_fit_previous": top5_avg(data.prev) if data.prev else None,
+        "top5_average_fit_previous": (top5_avg(data.prev) if data.prev and
+                                       data.prev.get("rubric_version") == cur.get("rubric_version") else None),
+        "rubric_comparison_note": ("The scoring rules changed from version %s to %s, so this change is not comparable." %
+                                    (data.prev.get("rubric_version"), cur.get("rubric_version"))
+                                    if data.prev and data.prev.get("rubric_version") != cur.get("rubric_version") else ""),
         "per_org": {o: (dict(b, org_name=data.org(o)) if b else None) for o, b in cur["per_org"].items()},
         "projection": projection_summary(page),
         "gaps": cur.get("gaps", []),
@@ -1044,6 +1052,7 @@ def summary_md(data, p):
             p["role_counts"]["judged"], p["role_counts"]["open"]),
         "- Average fit of the 5 best open roles: %s / 100%s" % (
             p["top5_average_fit"],
+            p["rubric_comparison_note"] if p["rubric_comparison_note"] else
             "" if p["top5_average_fit_previous"] is None else " (previous run %s)" % p["top5_average_fit_previous"]),
         "",
         "## Best role at each organisation",

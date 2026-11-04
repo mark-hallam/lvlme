@@ -389,7 +389,14 @@ def review_checks(docs, ev_ids, errors, warnings):
             if s.get("score") == r.get("score"):
                 warnings.append("%s: the scorer and the reviewer agree, so it is not a dispute" % where)
             how, stands = d.get("decided_by"), d.get("stands")
-            if how == "middle_of_three":
+            if how == "reviewer_one_point":
+                if abs((s.get("score") or 0) - (r.get("score") or 0)) != 1:
+                    errors.append("%s: reviewer_one_point requires scores exactly one point apart" % where)
+                if stands != r.get("score"):
+                    errors.append("%s: reviewer_one_point requires the reviewer's score to stand" % where)
+                if "score" in t or not t.get("absent"):
+                    errors.append("%s: reviewer_one_point must not include a tie-break score" % where)
+            elif how == "middle_of_three":
                 if "score" not in t:
                     errors.append("%s: decided by the middle of three, but there is no tie-break score" % where)
                 elif stands != sorted(scores)[1]:
@@ -410,9 +417,9 @@ def review_checks(docs, ev_ids, errors, warnings):
             reviewed = entry.get("reviewed_on") or container.get("reviewed_on") or ""
             if judged > when:
                 continue  # judged again since this review: the dispute is history
-            if how == "middle_of_three" and entry.get("score") != stands:
+            if how in ("middle_of_three", "reviewer_one_point") and entry.get("score") != stands:
                 warnings.append("%s: %s stands, but the judgement file has %s" % (where, stands, entry.get("score")))
-            if how == "middle_of_three" and reviewed < when:
+            if how in ("middle_of_three", "reviewer_one_point") and reviewed < when:
                 warnings.append("%s: decided, but the judgement entry has no reviewed_on on or after %s" % (where, when))
             if how == "awaiting_tie_break" and reviewed >= when:
                 warnings.append("%s: still awaiting a tie-break, but the judgement entry is marked reviewed on %s"

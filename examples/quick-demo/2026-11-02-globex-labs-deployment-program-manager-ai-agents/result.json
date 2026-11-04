@@ -75,7 +75,7 @@
       "name": "Proof of work",
       "weight": 20,
       "score": 2,
-      "raw": 3,
+      "raw": 2,
       "points": 8.0,
       "max_points": 20.0,
       "note": "route-eval is public, checkable and close to this role's work: measuring whether AI answers about logistics are right.",
@@ -92,10 +92,10 @@
         }
       ],
       "why_counted": [
-        "A score above 2 counts as 2 until a blind reviewer gives the same score."
+        "The reviewer moved this score by one point, so the reviewer's score counts, within the evidence and other caps."
       ],
       "review": {
-        "status": "disputed",
+        "status": "adjusted",
         "reviewer_score": 2,
         "judge_score": 3
       }
@@ -211,12 +211,16 @@
     "gain": 15.0
   },
   "adjustments": [
-    "D2 3 counted as 2 until the blind review settles it",
     "D3 3 counted as 1: best cited evidence is self-reported network, which supports at most 1"
   ],
   "review": {
     "agreed": [
       "D1",
+      "D6"
+    ],
+    "reviewed": [
+      "D1",
+      "D2",
       "D6"
     ],
     "disputes": [
@@ -236,7 +240,11 @@
             "E04"
           ]
         },
-        "decided_by": "awaiting_tie_break",
+        "decided_by": "reviewer_one_point",
+        "tie_break": {
+          "absent": true,
+          "why": "The reviewer differs by one point, so their score stands."
+        },
         "stands": 2
       }
     ],
@@ -316,6 +324,6 @@
   },
   "judged_by": null,
   "reviewed_by": null,
-  "inputs_digest": "sha256:dc769cd4632fa15585c62059c7be5aa02cfecfef6848060f49d2d23ab2969060",
+  "inputs_digest": "sha256:d5662c72bceb8e5f6c059510b6c13d2659498ac8f0376a5c0dd2032a9a7349d3",
   "warnings": []
 }

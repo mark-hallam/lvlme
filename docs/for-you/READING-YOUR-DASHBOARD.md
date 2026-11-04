@@ -28,10 +28,10 @@ follow along: `examples/demo-workspace/report/index.html`.
 role. It is not a percentage chance. LVLme scores seven factors, such as how
 well you meet the requirements, your proof of work and whether someone inside
 knows your work, each from 0 to 5, and weights them into this one number. A
-separate, sceptical reviewer must agree with every factor scored above 2.
+separate, sceptical reviewer checks every factor scored above 2. One point
+apart, the reviewer's score counts; further apart, a tie-break decides.
 
-Your chances are the words under it: **Interview** Moderate and **Offer**
-Low in the demo. They run Very low, Low, Moderate, Good, Strong. They are
+Your chances are the words under it: **Interview** Moderate and **Offer** Low in the demo. They run Very low, Low, Moderate, Good, Strong. They are
 careful judgements, not statistics.
 
 ### 2. The level card
@@ -48,9 +48,7 @@ Your fit, put into five levels:
 
 "13 points to Level 4, Good" is the plain distance to the next level. The
 line under the bar says whether your plan gets you there, and by when. In the
-demo the whole plan is expected to fall 7.2 points short. That is useful, not
-bad news: it means the plan needs a new action. **See your quests** opens
-the full list.
+demo the whole plan is expected to fall 7.2 points short. That is useful, not bad news: it means the plan needs a new action. **See your quests** opens the full list.
 
 ### 3. Do next
 
@@ -85,14 +83,13 @@ stay if you do nothing.
 ### 6. What if
 
 Switch any action off to see what it is worth: every number on the page
-updates. Switching changes nothing in your files, so try anything. On a
+updates. It changes nothing in your files. On a
 phone, tap the **What if** button at the bottom of the screen.
 
 ### 7. Warm paths
 
 How far your contacts at each organisation have come, from followed to would
-refer. It shows progress only and never changes a score. Your score moves
-when there is evidence, such as someone agreeing to refer you.
+refer. It shows progress only. Your score moves when there is evidence, such as someone agreeing to refer you.
 
 ### 8. Verifiable record
 
@@ -103,8 +100,7 @@ check the climb. A level down shows as plainly as a level up.
 ### 9. Biggest unlocks
 
 The kinds of moves that would lift the most roles. These numbers are added up
-across your top roles, so +128 across 11 roles is about 12 points on each
-role, not 128 on one.
+across your top roles, so +128 across 11 roles is about 12 points on each role, not 128 on one.
 
 ## Further down the page
 

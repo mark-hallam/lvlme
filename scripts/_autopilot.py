@@ -130,7 +130,8 @@ def previous_run(ws, today):
         return None
     run = C.load_json(runs[-1], {}) or {}
     fits = [r.get("fit") for r in run.get("roles") or [] if r.get("judged", True) and r.get("fit") is not None]
-    return {"date": run.get("run_date") or os.path.basename(runs[-1])[:10], "fit": max(fits) if fits else None}
+    return {"date": run.get("run_date") or os.path.basename(runs[-1])[:10], "fit": max(fits) if fits else None,
+            "rubric_version": run.get("rubric_version")}
 
 
 def newest_note(ws):
@@ -158,7 +159,9 @@ def week_note(ws, config, today):
     summary = roles_doc.get("summary") or {}
     names = C.target_names(config)
     best = (dash.get("levels") or {}).get("best_role") or {}
-    prev = previous_note(ws, today) or previous_run(ws, today)   # a first note compares with the last scored run
+    prev_note = previous_note(ws, today)
+    prior_run = previous_run(ws, today)
+    prev = prev_note or prior_run
     since = (prev or {}).get("date")
     previous = previous_note(ws, today)
     reported = set((previous or {}).get("reported_progress_ids") or [])
@@ -172,10 +175,13 @@ def week_note(ws, config, today):
                         progress.append((kind, item, d.get("date", "")))
                         reported_now.append(ident)
     changed = []
-    if prev and best and prev.get("fit") is not None:
-        delta = round(best["fit"] - prev["fit"], 1)
+    if prior_run and best and prior_run.get("fit") is not None and prior_run.get("rubric_version") == dash.get("rubric_version"):
+        delta = round(best["fit"] - prior_run["fit"], 1)
         changed.append("Best fit %s, from %s to %s." % ("up %s" % num(delta) if delta > 0 else "down %s" % num(-delta)
-                                                      if delta < 0 else "unchanged", num(prev["fit"]), num(best["fit"])))
+                                                      if delta < 0 else "unchanged", num(prior_run["fit"]), num(best["fit"])))
+    elif prior_run and best and prior_run.get("rubric_version") != dash.get("rubric_version"):
+        changed.append("The scoring rules changed from version %s to %s, so this change is not comparable." %
+                       (prior_run.get("rubric_version"), dash.get("rubric_version")))
     done = sorted({item for kind, item, _ in progress if kind == "actions"})
     evidence = sorted({item for kind, item, _ in progress if kind == "evidence"})
     if done:
@@ -222,6 +228,7 @@ def week_note(ws, config, today):
         changed.append("Job boards could not be reached, so the role numbers are from %s." % data_date)
     return {
         "schema_version": 1, "date": today, "since": since,
+        "rubric_version": dash.get("rubric_version"),
         "fit": best.get("fit"), "level": best.get("level"), "band": best.get("band"),
         "role": best.get("title"), "org": names.get(best.get("org"), best.get("org")),
         "points_to_next": best.get("points_to_next"), "next_band": best.get("next_band"),

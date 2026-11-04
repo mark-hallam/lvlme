@@ -27,6 +27,7 @@ import shutil
 import _common as C
 import fetch_roles as FR
 import quick_posting as QP
+from score import RUBRIC_VERSION
 
 ROLE_DIMS = ("D1", "D2", "D4")
 # First estimates for a quick fix turned into a plan action: (effort hours, chance it works), by factor.
@@ -96,13 +97,16 @@ def write_open_disputes(ws, result, role, judged_on):
         if d.get("dimension") not in ROLE_DIMS:
             continue
         side = lambda x, by: dict({k: x[k] for k in ("score", "anchor", "evidence") if x.get(k) not in (None, "")}, by=by)  # noqa: E731
+        one_point = d.get("decided_by") == "reviewer_one_point"
         disputes.append({"item_id": "%s/%s" % (role["id"], d["dimension"]), "scorer": side(d["scorer"], "scorer"),
                          "reviewer": side(d["reviewer"], "reviewer"),
-                         "tie_break": {"absent": True, "why": "LVLme quick has no tie-break; the full campaign runs it."},
-                         "stands": 2, "decided_by": "awaiting_tie_break"})
+                         "tie_break": ({"absent": True, "why": "The reviewer differs by one point, so their score stands."}
+                                       if one_point else {"absent": True, "why": "LVLme quick has no tie-break; the full campaign runs it."}),
+                         "stands": d.get("stands", d.get("reviewer", {}).get("score")) if one_point else 2,
+                         "decided_by": "reviewer_one_point" if one_point else "awaiting_tie_break"})
     if disputes:
         C.write_json(C.wpath(ws, "eval", "reviews", "%s.json" % judged_on),
-                     {"schema_version": 1, "date": judged_on, "rubric_version": "1.0", "disputes": disputes,
+                     {"schema_version": 1, "date": judged_on, "rubric_version": RUBRIC_VERSION, "disputes": disputes,
                       "note": "Carried over from LVLme quick."})
 
 
@@ -146,17 +150,22 @@ def promote(folder, ws, today):
             "locations": role.get("locations") or [], "url": role.get("url"),
             "description": role.get("description_text") or ""}]})
 
-    agreed, judged_on = set((result.get("review") or {}).get("agreed") or []), quick.get("judged_on", today)
+    review_result = result.get("review") or {}
+    agreed = set(review_result.get("reviewed") or review_result.get("agreed") or [])
+    judged_on = quick.get("judged_on", today)
     entry = {"judged_on": judged_on, "hard_requirement_lacking": bool(quick.get("hard_requirement_lacking"))}
     for d in ROLE_DIMS:
         f = quick["factors"].get(d) or {}
-        entry[d] = {"score": f.get("score", 0), "evidence": f.get("evidence") or [], "note": f.get("note", "")}
+        result_factor = next((x for x in result.get("factors") or [] if x.get("dimension") == d), {})
+        review = result_factor.get("review") or {}
+        score = review.get("reviewer_score") if review.get("status") == "adjusted" else f.get("score", 0)
+        entry[d] = {"score": score, "evidence": f.get("evidence") or [], "note": f.get("note", "")}
         if d in agreed:
             entry[d].update(reviewed_on=judged_on)
     if quick.get("eligibility_blocked") is not None:
         entry["eligibility_blocked"] = bool(quick["eligibility_blocked"])
     write_open_disputes(ws, result, role, judged_on)
-    judgements = {"schema_version": 1, "rubric_version": "1.0", "roles": {role["id"]: entry}}
+    judgements = {"schema_version": 1, "rubric_version": RUBRIC_VERSION, "roles": {role["id"]: entry}}
     if quick.get("judged_by"):
         judgements["judged_by"] = quick["judged_by"]
     C.write_json(C.wpath(ws, "eval", "judgements.json"), judgements)

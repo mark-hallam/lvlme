@@ -59,6 +59,57 @@ class Base(unittest.TestCase):
 
 
 class DemoTests(Base):
+    def test_one_point_disagreement_uses_reviewer_score(self):
+        reply = open(os.path.join(self.folder, "eval/review-reply.md"), encoding="utf-8").read()
+        self.write("eval/review-reply.md", reply.replace("| D2 | 2 |", "| D2 | 4 |"))
+        quick = self.load("eval/quick.json")
+        quick["factors"]["D2"]["score"] = 3
+        self.save("eval/quick.json", quick)
+        r = self.result()
+        self.assertEqual((self.factor(r, "D2")["score"], self.factor(r, "D2")["review"]["status"]), (4, "adjusted"))
+        self.assertEqual(self.factor(r, "D2")["review"]["judge_score"], 3)
+
+    def test_judge_four_reviewer_three_counts_three(self):
+        quick = self.load("eval/quick.json")
+        quick["factors"]["D2"]["score"] = 4
+        self.save("eval/quick.json", quick)
+        reply = open(os.path.join(self.folder, "eval/review-reply.md"), encoding="utf-8").read()
+        self.write("eval/review-reply.md", reply.replace("| D2 | 2 |", "| D2 | 3 |"))
+        r = self.result()
+        self.assertEqual((self.factor(r, "D2")["score"], self.factor(r, "D2")["review"]["status"]), (3, "adjusted"))
+        self.assertIn("Proof of work: reviewer moved 4 to 3 by one point", Q.review_sentence(r))
+
+    def test_two_point_disagreement_waits_at_two(self):
+        reply = open(os.path.join(self.folder, "eval/review-reply.md"), encoding="utf-8").read()
+        self.write("eval/review-reply.md", reply.replace("| D2 | 2 |", "| D2 | 1 |"))
+        r = self.result()
+        self.assertEqual((self.factor(r, "D2")["score"], self.factor(r, "D2")["review"]["status"]), (2, "disputed"))
+        self.assertEqual(r["review"]["disputes"][0]["decided_by"], "awaiting_tie_break")
+
+    def test_one_point_disagreement_remains_below_evidence_cap(self):
+        quick = self.load("eval/quick.json")
+        quick["factors"]["D2"].update(score=2, evidence=["E03"])
+        self.save("eval/quick.json", quick)
+        reply = open(os.path.join(self.folder, "eval/review-reply.md"), encoding="utf-8").read()
+        self.write("eval/review-reply.md", reply.replace("| D2 | 2 |", "| D2 | 3 |"))
+        r = self.result()
+        self.assertEqual(self.factor(r, "D2")["score"], 1)
+
+    def test_reviewer_brief_includes_d6_and_public_link_rules(self):
+        brief = Q.reviewer_brief(Q.load(self.folder), [])
+        self.assertIn("5 = own city", brief)
+        self.assertIn("2 = posting says it sponsors visas", brief)
+        self.assertIn("public HTTPS", brief)
+
+    def test_private_evidence_link_is_shown_as_self_reported(self):
+        evidence = self.load("profile/evidence.json")
+        item = next(e for e in evidence["items"] if e["id"] == "E04")
+        item["sources"] = [{"type": "website", "ref": "file:///private/work"}]
+        self.save("profile/evidence.json", evidence)
+        result = self.result()
+        d2 = self.factor(result, "D2")
+        self.assertEqual(d2["evidence"][0]["level"], "self_reported")
+        self.assertTrue(any("file:///private/work is not a public link" in w for w in result["warnings"]))
     def test_demo_is_reproducible(self):
         """A fresh build gives the committed result and page byte for byte."""
         committed = D.folder_for()
@@ -88,14 +139,15 @@ class DemoTests(Base):
         levels = {e["level"] for f in r["factors"] for e in f["evidence"]}
         self.assertLessEqual({"verified", "self_reported"}, levels)
 
-    def test_disagreement_is_logged_and_counts_as_two(self):
+    def test_one_point_disagreement_is_logged_and_reviewer_score_counts(self):
         r = self.load("result.json")
         d2 = self.factor(r, "D2")
-        self.assertEqual(d2["review"], {"status": "disputed", "reviewer_score": 2, "judge_score": 3})
+        self.assertEqual(d2["review"], {"status": "adjusted", "reviewer_score": 2, "judge_score": 3})
         self.assertEqual(r["review"]["agreed"], ["D1", "D6"])
+        self.assertEqual(r["review"]["reviewed"], ["D1", "D2", "D6"])
         [dispute] = r["review"]["disputes"]
         self.assertEqual((dispute["item_id"], dispute["stands"], dispute["decided_by"]),
-                         ("globex_labs_example:0b6f3c2e-1a2b-4c3d-8e9f-000000000001/D2", 2, "awaiting_tie_break"))
+                         ("globex_labs_example:0b6f3c2e-1a2b-4c3d-8e9f-000000000001/D2", 2, "reviewer_one_point"))
         self.assertEqual(self.factor(r, "D3")["review"]["status"], "not_needed")
 
     def test_fixes_are_ranked_and_capped(self):
@@ -201,7 +253,7 @@ class NotCheckedTests(Base):
         self.assertEqual(top["offer_band"], "Low")          # the offer table says Moderate; D3 at 1 caps it at Low
         docs = Q.load(self.folder)
         flags = Q.check_flags(docs["quick"], docs["role"])
-        scored, _ = Q.score(docs, flags, set(r["review"]["agreed"]), {"D5": 5, "D7": 5})
+        scored, _ = Q.score(docs, flags, set(r["review"]["reviewed"]), {"D5": 5, "D7": 5})
         self.assertEqual((scored["scores"]["D5"]["score"], scored["scores"]["D7"]["score"]), (5, 5))
 
     def test_the_page_shows_them_as_not_checked_with_the_range(self):

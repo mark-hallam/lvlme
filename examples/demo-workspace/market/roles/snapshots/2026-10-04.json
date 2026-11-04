@@ -7,70 +7,80 @@
       "title": "Applied AI Deployment Lead, Asia Pacific",
       "family": "applied_ai",
       "url": "https://example.com/jobs/acme/4100002",
-      "published_at": "2026-09-29T09:00:00-04:00"
+      "published_at": "2026-09-29T09:00:00-04:00",
+      "location": "Sydney, Australia"
     },
     "acme:4100004": {
       "org": "acme",
       "title": "Policy Manager, Safeguards Operations",
       "family": "policy_safety",
       "url": "https://example.com/jobs/acme/4100004",
-      "published_at": "2026-09-29T09:00:00-04:00"
+      "published_at": "2026-09-29T09:00:00-04:00",
+      "location": "London, United Kingdom"
     },
     "acme:4100007": {
       "org": "acme",
       "title": "Product Manager, Safety Tooling",
       "family": "product",
       "url": "https://example.com/jobs/acme/4100007",
-      "published_at": "2026-09-29T09:00:00-04:00"
+      "published_at": "2026-09-29T09:00:00-04:00",
+      "location": "Sydney, Australia"
     },
     "acme:4100006": {
       "org": "acme",
       "title": "Program Manager, Government Partnerships",
       "family": "tpm",
       "url": "https://example.com/jobs/acme/4100006",
-      "published_at": "2026-09-29T09:00:00-04:00"
+      "published_at": "2026-09-29T09:00:00-04:00",
+      "location": "Washington, DC"
     },
     "acme:4100001": {
       "org": "acme",
       "title": "Technical Program Manager, Model Launches",
       "family": "tpm",
       "url": "https://example.com/jobs/acme/4100001",
-      "published_at": "2026-09-29T09:00:00-04:00"
+      "published_at": "2026-09-29T09:00:00-04:00",
+      "location": "San Francisco, CA, Sydney, Australia"
     },
     "globex:g-0003": {
       "org": "globex",
       "title": "AI Success Manager, Asia",
       "family": "applied_ai",
       "url": "https://example.com/jobs/globex/g-0003",
-      "published_at": "2026-10-01T00:00:00.000+00:00"
+      "published_at": "2026-10-01T00:00:00.000+00:00",
+      "location": "Singapore"
     },
     "globex:g-0001": {
       "org": "globex",
       "title": "Product Manager, Developer Platform",
       "family": "product",
       "url": "https://example.com/jobs/globex/g-0001",
-      "published_at": "2026-10-01T00:00:00.000+00:00"
+      "published_at": "2026-10-01T00:00:00.000+00:00",
+      "location": "Remote"
     },
     "globex:g-0002": {
       "org": "globex",
       "title": "Technical Program Manager, Infrastructure",
       "family": "tpm",
       "url": "https://example.com/jobs/globex/g-0002",
-      "published_at": "2026-10-01T00:00:00.000+00:00"
+      "published_at": "2026-10-01T00:00:00.000+00:00",
+      "location": "Seattle, WA, Toronto, Canada"
     },
     "initech:i-0003": {
       "org": "initech",
       "title": "Policy Lead, Robotics Safety Standards",
       "family": "policy_safety",
       "url": "https://example.com/jobs/initech/i-0003",
-      "published_at": "2025-10-05T00:00:00Z"
+      "published_at": "2025-10-05T00:00:00Z",
+      "location": "Austin, TX"
     },
     "initech:i-0002": {
       "org": "initech",
       "title": "Product Manager, Warehouse Autonomy",
       "family": "product",
       "url": "https://example.com/jobs/initech/i-0002",
-      "published_at": "2025-10-05T00:00:00Z"
+      "published_at": "2025-10-05T00:00:00Z",
+      "location": "Brisbane, Australia"
     }
   }
 }

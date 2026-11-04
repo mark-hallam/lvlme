@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Review disputes (eval/reviews/<date>.json)",
-  "description": "Every score the scorer and the independent reviewer disagreed on in one review, with each score's cited anchor and evidence ids, the tie-break (or why there was none), and the score that stands. The middle-of-three rule is in method/REVIEW.md. Agreed scores are not listed: they are recorded as reviewed_on and reviewer_note on the judgement entry.",
+  "description": "Every score the scorer and the independent reviewer disagreed on in one review, with each score's cited anchor and evidence ids, the tie-break (or why there was none), and the score that stands. A one-point difference is decided by the reviewer; other unresolved differences await a tie-break, as method/REVIEW.md explains. Agreed scores are not listed: they are recorded as reviewed_on and reviewer_note on the judgement entry.",
   "type": "object",
   "required": ["schema_version", "date", "disputes"],
   "additionalProperties": false,
@@ -36,8 +36,8 @@
         },
         "stands": {"type": "integer", "minimum": 0, "maximum": 5, "description": "The score that stands in the judgement file."},
         "decided_by": {
-          "enum": ["middle_of_three", "awaiting_tie_break", "earlier_rule"],
-          "description": "middle_of_three: the middle of the scorer's, the reviewer's and the tie-break scores (method/REVIEW.md). awaiting_tie_break: no tie-break yet, so the entry stays unreviewed. earlier_rule: decided before the middle-of-three rule (for example history imported from an older campaign); say how in note."
+          "enum": ["middle_of_three", "awaiting_tie_break", "earlier_rule", "reviewer_one_point"],
+          "description": "reviewer_one_point: the reviewer differs by one point, so their score stands without a tie-break. Other decisions follow the descriptions in method/REVIEW.md."
         },
         "note": {"type": "string"}
       }

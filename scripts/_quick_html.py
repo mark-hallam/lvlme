@@ -33,7 +33,8 @@ EXPLAIN = {
     "Good": "You look like a typical shortlisted applicant for this role.",
     "Strong": "You stand out against most shortlisted applicants for this role.",
 }
-REVIEW = {"agreed": ("Reviewer agreed", "v"), "disputed": ("Reviewers disagreed", "p"),
+REVIEW = {"agreed": ("Reviewer agreed", "v"), "adjusted": ("Reviewer score used", "v"),
+          "disputed": ("Reviewers disagreed", "p"),
           "awaiting": ("Waiting for the reviewer", "p"),
           "unreadable": ("Reviewer's score unreadable: counts as 2", "p"),
           "not_needed": ("2 or under: no review needed", "s")}
@@ -314,6 +315,9 @@ def factors(result):
         if f["review"]["status"] == "disputed":
             label = "First score %d, blind reviewer %d: counts as %d" % (
                 f["review"]["judge_score"], f["review"]["reviewer_score"], f["score"])
+        elif f["review"]["status"] == "adjusted":
+            label = "Judge %d, reviewer %d: reviewer score counts within the caps" % (
+                f["review"]["judge_score"], f["review"]["reviewer_score"])
         why = "".join('<p class="why">%s</p>' % esc(w) for w in f["why_counted"])
         rows.append('<li><div class="row-h"><h3>%s</h3><span class="score num">%s %d of 5</span></div>'
                     '<p class="tiny sub">%s of %s fit points · %s</p>%s%s%s</li>' % (
@@ -476,13 +480,22 @@ def checked(result):
     rv = result["review"]
     rows = []
     for d in rv["disputes"]:
+        factor = next(f for f in result["factors"] if f["dimension"] == d["dimension"])
         rows.append("<tr><td>%s</td><td class=\"num\">%d</td><td class=\"num\">%d</td><td class=\"num\">%d</td></tr>" % (
             esc(next(f["name"] for f in result["factors"] if f["dimension"] == d["dimension"])),
-            d["scorer"]["score"], d["reviewer"]["score"], d["stands"]))
+            d["scorer"]["score"], d["reviewer"]["score"], factor["score"]))
+    adjusted_count = sum(1 for f in result["factors"] if f["review"]["status"] == "adjusted")
+    disputed_count = sum(1 for f in result["factors"] if f["review"]["status"] == "disputed")
+    decision_notes = []
+    if adjusted_count:
+        decision_notes.append("The reviewer score counts for %d one-point difference%s, within caps." %
+                              (adjusted_count, "" if adjusted_count == 1 else "s"))
+    if disputed_count:
+        decision_notes.append("%d difference%s of two or more count as 2 until a tie-break reviewer scores them." %
+                              (disputed_count, "" if disputed_count == 1 else "s"))
     table = ('<table><thead><tr><th scope="col">Factor</th><th scope="col">First judge</th>'
              '<th scope="col">Blind reviewer</th><th scope="col">Counts as</th></tr></thead><tbody>%s</tbody></table>'
-             '<p class="tiny sub">A disagreement counts as 2 until a third reviewer settles it. The full campaign '
-             'runs that tie-break.</p>' % "".join(rows)) if rows else ""
+             '<p class="tiny sub">%s</p>' % ("".join(rows), " ".join(decision_notes))) if rows else ""
     flags = "".join("<li><span>%s: \"%s\" %s</span></li>" % (
         "Hard requirement missing" if f["flag"] == "hard_requirement_lacking" else "Eligibility blocked",
         esc(f["posting_sentence"]), {"applied": chip("Applied", "c"), "dismissed": chip("Dismissed: " + f["dismissed"], "s"),
@@ -495,17 +508,14 @@ def checked(result):
     who = ("The blind reviewer was %s%s, a separate agent that saw none of the first scores%s. " % (
         rb["agent"], ", using the model %s" % rb["model"] if rb.get("model") else "",
         " (the same model as the first judge, in a fresh session)" if same else "")) if rb.get("agent") else ""
-    n_dis = len(rv["disputes"])
+    waiting_count = sum(1 for f in result["factors"] if f["review"]["status"] in ("awaiting", "unreadable"))
     lead = ("No score was above 2, so no review was needed." if need == 0 else
-            "%s scored above 2, so a second agent, given only the rubric, your evidence and the posting, scored %s "
-            "again without seeing the first scores. %s" % (
-                "One factor" if need == 1 else "%d factors" % need, "it" if need == 1 else "them",
-                ("It agreed." if need == 1 else "It agreed on all %d." % need) if agreed == need else
-                ("It gave a different score, so the factor counts as 2 until a third reviewer settles it."
-                 if need == 1 and n_dis == 1 else
-                 "It agreed on %d and disagreed on %d; a disagreement counts as 2 until a third reviewer settles it."
-                 % (agreed, n_dis)) if n_dis else
-                "Its score is not in yet, so %s as 2 for now." % ("it counts" if need == 1 else "they count")))
+            "%d score%s still need%s a readable blind-review score and count%s as 2." % (
+                waiting_count, "" if waiting_count == 1 else "s", "s" if waiting_count == 1 else "", 
+                "s" if waiting_count == 1 else "") if waiting_count else
+            "%s scored above 2. A separate agent scored %s again from the rubric, evidence and posting, without seeing "
+            "the first scores." % ("One factor" if need == 1 else "%d factors" % need,
+                                   "it" if need == 1 else "them"))
     return ('<section class="card" aria-labelledby="chkH"><p class="eyebrow">How this was checked</p>'
             '<h2 id="chkH">A blind second opinion</h2><p class="small">%s</p>%s%s'
             '<p class="small sub" style="margin-top:12px">%s</p></section>' % (

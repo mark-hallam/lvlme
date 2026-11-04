@@ -9,9 +9,9 @@ The fixes that would raise them most:
 
 If they all land: fit 55, moderate chance of an interview, low chance of an offer.
 
-A blind reviewer checked every score above 2; 1 disagreement counts as 2 until settled.
+Proof of work: reviewer moved 3 to 2 by one point; that score counts within caps.
 
-Why, factor by factor, with each fix's next step:
+Why, factor by factor:
 
 ```bash
 open examples/quick-demo/2026-11-02-globex-labs-deployment-program-manager-ai-agents/index.html

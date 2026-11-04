@@ -28,9 +28,9 @@ checked from one posting and a CV. The fit today counts them 0, as anything
 without evidence does, and the result shows them as not checked, with the fit
 as a range: today's fit, up to the fit if both turned out strong (5 of 5),
 worked out with the same maths (result.json if_unchecked_strong). The odds are
-always today's. A score above 2 stands only when the blind reviewer gives the
-same score; otherwise it counts as 2, the rule for a dispute still waiting for
-its tie-break (method/REVIEW.md). Fixes are ranked by the fit points they add,
+always today's. When judge and reviewer scores are one point apart, the
+reviewer's score counts within the evidence cap. A difference of two or more
+counts as 2 until a tie-break reviewer scores it (method/REVIEW.md). Fixes are ranked by the fit points they add,
 each capped by the dashboard's projection caps (method/CAMPAIGN.md).
 
 Usage
@@ -404,11 +404,20 @@ def review(docs, flags):
         elif theirs["score"] == mine:
             rows[d] = {"status": "agreed", "reviewer_score": mine}
             agreed.add(d)
+        elif abs(theirs["score"] - mine) == 1:
+            rows[d] = {"status": "adjusted", "reviewer_score": theirs["score"], "judge_score": mine}
+            agreed.add(d)
+            docs["quick"]["factors"][d]["score"] = theirs["score"]
+            disputes.append({"item_id": item_id(docs["role"], d), "dimension": d,
+                             "scorer": {"score": mine, "evidence": pre["scores"][d]["evidence"]},
+                             "reviewer": theirs, "decided_by": "reviewer_one_point",
+                             "tie_break": {"absent": True, "why": "The reviewer differs by one point, so their score stands."}})
         else:
             rows[d] = {"status": "disputed", "reviewer_score": theirs["score"], "judge_score": mine}
             disputes.append({"item_id": item_id(docs["role"], d), "dimension": d,
                              "scorer": {"score": mine, "evidence": pre["scores"][d]["evidence"]},
-                             "reviewer": theirs, "decided_by": "awaiting_tie_break"})
+                             "reviewer": theirs, "decided_by": "awaiting_tie_break",
+                             "tie_break": {"absent": True, "why": "A difference of two or more needs a tie-break reviewer."}})
     if need and docs.get("reply") is None:
         warnings.append("No eval/review-reply.md: %s count as 2 until a blind reviewer scores them."
                         % ", ".join(NAMES[d] for d in need))
@@ -482,6 +491,8 @@ def if_unchecked_strong(docs, flags, agreed, scored):
 def why_counted(entry):
     """Plain-English reasons a factor counts for less than the judge's score."""
     out = []
+    if (entry.get("review") or {}).get("status") == "adjusted":
+        out.append("The reviewer moved this score by one point, so the reviewer's score counts, within the evidence and other caps.")
     for part in [p.strip() for p in (entry.get("capped") or "").split(";") if p.strip()]:
         if part.startswith("evidence: "):
             out.append(part[len("evidence: "):].replace("best cited evidence is", "the best evidence is") + ".")
@@ -494,8 +505,8 @@ def why_counted(entry):
     return [o[0].upper() + o[1:] for o in out]
 
 
-def evidence_rows(docs, ids):
-    by_id = {e["id"]: e for e in docs["evidence"].get("items") or []}
+def evidence_rows(docs, ids, ctx=None):
+    by_id = (ctx.evidence if ctx else {e["id"]: e for e in docs["evidence"].get("items") or []})
     rows = []
     for eid in ids:
         e = by_id.get(eid)
@@ -527,7 +538,8 @@ def build_result(docs):
     agreed, review_rows, disputes, warnings = review(docs, flags)
     scored, ctx = score(docs, flags, agreed)
     for dispute in disputes:
-        dispute["stands"] = scored["scores"][dispute["dimension"]]["score"]
+        dispute["stands"] = (dispute["reviewer"]["score"] if dispute.get("decided_by") == "reviewer_one_point"
+                              else scored["scores"][dispute["dimension"]]["score"])
     quick, role, config = docs["quick"], docs["role"], docs["config"]
     total = ctx.total_weight
     factors = []
@@ -537,8 +549,8 @@ def build_result(docs):
                         "score": s["score"], "raw": s["raw"],
                         "points": round(s["score"] / 5.0 * ctx.weights[d] * 100.0 / total, 1),
                         "max_points": round(ctx.weights[d] * 100.0 / total, 1),
-                        "note": quick["factors"][d].get("note", ""), "evidence": evidence_rows(docs, s["evidence"]),
-                        "why_counted": why_counted(s), "review": review_rows[d]})
+                        "note": quick["factors"][d].get("note", ""), "evidence": evidence_rows(docs, s["evidence"], ctx),
+                        "why_counted": why_counted(dict(s, review=review_rows[d])), "review": review_rows[d]})
     not_checked = [{"dimension": d, "name": NAMES[d], "status": "not_checked", "what": NOT_CHECKED_WHAT[d],
                     "max_points": round(ctx.weights[d] * 100.0 / total, 1)} for d in NOT_CHECKED]
     top, combined, dropped = rank_fixes(docs, flags, agreed, scored)
@@ -563,12 +575,13 @@ def build_result(docs):
         "factors": factors, "not_checked": not_checked,
         "if_unchecked_strong": if_unchecked_strong(docs, flags, agreed, scored),
         "adjustments": scored["adjustments"],
-        "review": {"agreed": sorted(agreed), "disputes": disputes, "flags": flags},
+        "review": {"agreed": sorted(d for d in agreed if review_rows[d]["status"] == "agreed"),
+                   "reviewed": sorted(agreed), "disputes": disputes, "flags": flags},
         "fixes": top, "if_all_fixes": combined, "fixes_not_shown": dropped,
         "brief": brief(docs, factors),
         "judged_by": quick.get("judged_by"),
         "reviewed_by": quick.get("reviewed_by"),
-        "inputs_digest": S.digest(config, role, quick, docs["evidence"], docs.get("reply") or ""),
+        "inputs_digest": S.digest(S.RUBRIC_VERSION, config, role, quick, docs["evidence"], docs.get("reply") or ""),
         "warnings": sorted(set(warnings) | ctx.warnings),
     }
 
@@ -586,14 +599,22 @@ def review_sentence(result):
     waiting = statuses.count("awaiting")
     unread = statuses.count("unreadable")
     n = len(result["review"]["disputes"])
+    adjusted = [f for f in result["factors"] if f["review"]["status"] == "adjusted"]
     if not needed:
         return "No score was above 2, so the blind reviewer had nothing to check."
+    adjusted_text = ""
+    if adjusted:
+        moves = "; ".join("%s: reviewer moved %s to %s by one point" % (
+            f["name"], f["review"]["judge_score"], f["review"]["reviewer_score"]) for f in adjusted)
+        adjusted_text = " %s; that score counts within caps." % moves
     if unread:
-        return "The blind reviewer's reply had no readable score for %d factor%s, so %s as 2." % (
-            unread, "" if unread == 1 else "s", "it counts" if unread == 1 else "they count")
+        return "The blind reviewer's reply had no readable score for %d factor%s, so %s as 2.%s" % (
+            unread, "" if unread == 1 else "s", "it counts" if unread == 1 else "they count", adjusted_text)
     if waiting:
-        return "%d score%s above 2 still wait%s for the blind reviewer and count%s as 2 until then." % (
-            waiting, "" if waiting == 1 else "s", "s" if waiting == 1 else "", "s" if waiting == 1 else "")
+        return "%d score%s above 2 still wait%s for the blind reviewer and count%s as 2 until then.%s" % (
+            waiting, "" if waiting == 1 else "s", "s" if waiting == 1 else "", "s" if waiting == 1 else "", adjusted_text)
+    if adjusted:
+        return adjusted_text.strip()
     return "A blind reviewer checked every score above 2%s." % (
         "" if not n else "; %d disagreement%s count%s as 2 until settled" % (
             n, "" if n == 1 else "s", "s" if n == 1 else ""))
@@ -618,7 +639,7 @@ def message(result, folder):
     if AP.first_draft_line(r["org_name"], r.get("ai_policy")):
         lines += ["", "%s Their guidance: %s" % (AP.first_draft_line(r["org_name"], r["ai_policy"]),
                                                  r["ai_policy"]["source"])]
-    lines += ["", "Why, factor by factor%s:" % (", with each fix's next step" if result["fixes"] else ""),
+    lines += ["", "Why, factor by factor:",
               "", "```bash", "open %s" % os.path.abspath(os.path.join(folder, "index.html")),
               "```", "",
               "Go deeper: say \"run LVLme\" for the full campaign."]
@@ -648,6 +669,9 @@ def reviewer_brief(docs, items):
              "- %s" % os.path.join(docs["folder"], "market", "roles", "latest.json"),
              "- %s" % os.path.join(docs["folder"], "config.json"),
              "Never open the folder's eval/ or intake/ folders, result.json, index.html or message.md.", "",
+             "D6 location anchors: 5 = own city or remote there, with full work rights; 4 = full rights in the role's country, willing to move; 3 = a confirmed route for this person; 2 = posting says it sponsors visas, but no route is confirmed; 1 = no sponsorship stated or unsure about moving; 0 = cannot lawfully work there or will not move for an on-site role.",
+             "Score the posting's location against what the person said. No rule file exists in LVLme quick, so do not score 0 just because a rule file is absent.",
+             "Only a stranger-openable public HTTPS (Hypertext Transfer Protocol Secure) link counts as checked evidence. Local, private-network, file and other non-web links do not count.", "",
              "Items:"]
     lines += ["- %s (%s)" % (i["item_id"], i["name"]) for i in items]
     return "\n".join(lines)

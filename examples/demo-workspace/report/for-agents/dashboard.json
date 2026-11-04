@@ -3,7 +3,7 @@
   "generated_by": "lvlme scripts/build_dashboard.py",
   "sensitive_mode": true,
   "run_date": "2026-11-01",
-  "rubric_version": "1.0",
+  "rubric_version": "1.1",
   "goal": {
     "title": "A program, applied AI or policy role at an AI product company",
     "description": "Fictional demo goal for Alex Example: one of three made-up AI companies, ideally in Australia.",
@@ -28,6 +28,7 @@
   },
   "top5_average_fit": 46.4,
   "top5_average_fit_previous": 45.6,
+  "rubric_comparison_note": "",
   "per_org": {
     "acme": {
       "role_id": "acme:4100001",
@@ -240,7 +241,8 @@
       ],
       "added_on": "2026-11-01",
       "draft": "campaign/drafts/initech-fleet-application.md",
-      "priority": 0.8
+      "priority": 0.8,
+      "late": false
     },
     {
       "id": "A11",
@@ -276,7 +278,8 @@
         "initech"
       ],
       "added_on": "2026-11-01",
-      "priority": 1.6
+      "priority": 1.6,
+      "late": false
     },
     {
       "id": "A07",
@@ -312,7 +315,8 @@
         "initech"
       ],
       "added_on": "2026-10-25",
-      "priority": 6.4
+      "priority": 6.4,
+      "late": false
     },
     {
       "id": "A04",
@@ -332,7 +336,8 @@
         "WT1"
       ],
       "added_on": "2026-10-25",
-      "priority": 43.2
+      "priority": 43.2,
+      "late": false
     },
     {
       "id": "A08",
@@ -348,7 +353,8 @@
       "target_date": "2026-11-04",
       "done_when": "Answer recorded in intake/answers.md and evidence.json",
       "added_on": "2026-10-25",
-      "priority": 21.6
+      "priority": 21.6,
+      "late": false
     },
     {
       "id": "A02",
@@ -386,7 +392,8 @@
       "added_on": "2026-10-18",
       "started_on": "2026-10-25",
       "draft": "campaign/drafts/intro-request-jordan.md",
-      "priority": 4.0
+      "priority": 4.0,
+      "late": false
     },
     {
       "id": "A10",
@@ -422,7 +429,8 @@
       ],
       "added_on": "2026-10-11",
       "started_on": "2026-10-11",
-      "priority": 0.5
+      "priority": 0.5,
+      "late": false
     }
   ],
   "actions_later": [
@@ -952,42 +960,52 @@
     "level_history": [
       {
         "date": "2026-10-04",
+        "rubric_version": "1.1",
         "fit": 40.0,
         "level": 2,
         "band": "Low",
         "change": null,
+        "not_comparable": false,
         "from_level": null
       },
       {
         "date": "2026-10-11",
+        "rubric_version": "1.1",
         "fit": 44.0,
         "level": 2,
         "band": "Low",
         "change": null,
+        "not_comparable": false,
         "from_level": 2
       },
       {
         "date": "2026-10-18",
+        "rubric_version": "1.1",
         "fit": 46.0,
         "level": 2,
         "band": "Low",
         "change": null,
+        "not_comparable": false,
         "from_level": 2
       },
       {
         "date": "2026-10-25",
+        "rubric_version": "1.1",
         "fit": 55.0,
         "level": 3,
         "band": "Moderate",
         "change": "up",
+        "not_comparable": false,
         "from_level": 2
       },
       {
         "date": "2026-11-01",
+        "rubric_version": "1.1",
         "fit": 57.0,
         "level": 3,
         "band": "Moderate",
         "change": null,
+        "not_comparable": false,
         "from_level": 3
       }
     ],

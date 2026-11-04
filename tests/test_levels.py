@@ -41,6 +41,14 @@ def by_date(acts):
 
 
 class LevelBasics(unittest.TestCase):
+
+    def test_level_history_does_not_compare_different_rubric_versions(self):
+        runs = [{"date": "d1", "top": 39, "orgs": {}, "rubric_version": "1.0"},
+                {"date": "d2", "top": 45, "orgs": {}, "rubric_version": "1.1"}]
+        history = L.level_history(runs)
+        self.assertIsNone(history[1]["change"])
+        self.assertTrue(history[1]["not_comparable"])
+
     def test_bands_are_the_rubric_fit_table(self):
         self.assertEqual([L.band_index(v) for v in (0, 39.9, 40, 54.9, 55, 69.9, 70, 84.9, 85, 100)],
                          [0, 0, 1, 1, 2, 2, 3, 3, 4, 4])

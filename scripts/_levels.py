@@ -368,8 +368,10 @@ def level_history(runs, key="best"):
         if v is None:
             continue
         lv = band_index(v)
-        out.append({"date": rn["date"], "fit": v, "level": lv + 1, "band": BANDS[lv],
-                    "change": None if prev is None or lv == prev else "up" if lv > prev else "down",
+        version_changed = bool(out and out[-1].get("rubric_version") != rn.get("rubric_version"))
+        out.append({"date": rn["date"], "rubric_version": rn.get("rubric_version"), "fit": v, "level": lv + 1, "band": BANDS[lv],
+                    "change": None if prev is None or version_changed or lv == prev else "up" if lv > prev else "down",
+                    "not_comparable": version_changed,
                     "from_level": None if prev is None else prev + 1})
         prev = lv
     return out
@@ -392,7 +394,8 @@ def progress_days(runs, evidence_items, plan_actions):
     for prev, cur in zip(runs, runs[1:]):
         a, b = prev["run_date"], cur["run_date"]
         before = {r["role_id"]: r["fit"] for r in prev["roles"]}
-        up = [r for r in cur["roles"] if r["role_id"] in before and r["fit"] > before[r["role_id"]]]
+        same_rules = prev.get("rubric_version") == cur.get("rubric_version")
+        up = [r for r in cur["roles"] if same_rules and r["role_id"] in before and r["fit"] > before[r["role_id"]]]
         ev = sorted(e["id"] for e in evidence_items
                     if e.get("level") in CHECKED and any(a < d <= b for d in _checked_dates(e)))
         done = sorted(x["id"] for x in plan_actions if x.get("status") == "done" and x.get("done_evidence")

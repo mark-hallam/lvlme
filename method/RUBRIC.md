@@ -1,4 +1,13 @@
-# Scoring rubric (version 1.0)
+# Scoring rubric (version 1.1)
+
+## What changed in 1.1
+
+- B1: a one-point disagreement is decided by the reviewer's score; larger
+  disagreements still need a tie-break reviewer.
+- B2: D6 has fixed eligibility and location anchors, including the rules for
+  locations with no rule.
+- B3: verified evidence needs a public link that a stranger can open without
+  signing in.
 
 Purpose: estimate, honestly, a person's chance of being hired into a specific
 open role at a specific organisation, and show what would raise it. Every run
@@ -113,14 +122,35 @@ how many people follow them. Score what exists and is findable, not what is
 planned.
 
 **D6 Eligibility and logistics.** Scored against where the role sits and the
-person's stated work rights and willingness to move. Set one entry per
-location class in `D6_rules.classes`, for example: a role in the person's own
-country with full work rights scores high; a role that needs a visa the
-person has a confirmed route to scores in the middle; a role that needs
-sponsorship with no known route scores low. `scripts/score.py` picks the best
-class among the role's locations (enforced). A judgement can set
-`location_class` to override the automatic choice. A location class with no
-rule scores 0.
+person's stated work rights and willingness to move. Use these anchors:
+
+| Score | Eligibility and location |
+|---|---|
+| 5 | The role is in the person's own city, or remote there, and they have full work rights. |
+| 4 | They have full work rights in the role's country, must move, and are willing to move. |
+| 3 | They need a visa or work right they do not hold, and have a confirmed route for this person: an existing right, a written sponsorship offer, or a listed eligibility clearance. |
+| 2 | They need a visa, the posting says the employer sponsors visas, but no route is confirmed for this person. An employer saying "we sponsor" is a possible route, not a confirmed one. |
+| 1 | They need a visa or work right they lack and the posting says nothing about sponsorship, or they are unsure about moving. |
+| 0 | They cannot lawfully work there because of an uncleared eligibility blocker, the posting says it does not sponsor and they have no route, or they will not move for an on-site role. |
+
+Set one entry per location class in `D6_rules.classes`. `scripts/score.py`
+picks the best class among the role's locations (enforced). A judgement can
+set `location_class` to override the automatic choice. In a full campaign, a
+location class with no rule scores 0, and `scripts/validate.py` warns with the
+class name. LVLme quick has no rules file, so its judge and reviewer score the
+posting's location against what the person said using this table. A quick
+reviewer must not score D6 as 0 only because no rules file exists.
+
+## Links and checkable evidence
+
+A source counts as checked at the `verified` or `corroborated` level only
+when a stranger can open it from the public internet without signing in. It
+must be a public HTTPS (Hypertext Transfer Protocol Secure) address on a public host. A page behind a login or
+available only "on request" is not public evidence. `localhost`, `127.x`,
+`::1`, private network addresses (`10.x`, `192.168.x`, and `172.16` to
+`172.31`), names ending in `.local`, `.internal` or `.lan`, `file:` links and
+other non-web links do not count as checked evidence. If an item's only
+sources are non-public links, it counts as self-reported.
 
 **D7 Application readiness.** A tailored résumé, a portfolio and a crisp,
 true story for this role. A generic résumé scores 1. A résumé tailored to this
