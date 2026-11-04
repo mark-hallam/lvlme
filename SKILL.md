@@ -219,6 +219,10 @@ rights question when `fetch_roles.py` first finds an open role that needs it.
   to send (`method/CAMPAIGN.md`, "Applications and follow-ups"). Give
   `--role-id` for a scored role, so "How right has LVLme been" can check the
   odds it gave that day against what happened.
+- An offer: run `python3 scripts/offer.py <application id> --offered "<their
+  words>"` for the checklist (the posting's advertised pay range beside the
+  offer, and what to ask the employer and a lawyer). Never say an offer is
+  fair or safe to sign, and give no legal, tax or financial advice.
 - Build in public: when the person finishes something shareable, offer
   `/lvlme-public` (`method/CAMPAIGN.md`, "Build in public"). Draft from their
   notes in their voice; they post. Never post or open LinkedIn yourself.

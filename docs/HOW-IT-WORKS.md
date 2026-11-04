@@ -411,7 +411,7 @@ agents/     subagent briefs: evidence-scout, market-scout, role-judge, reviewer,
 .cursor/rules/  Cursor rules
 method/     the rules for each stage (rubric, interview, intake, audits, review, campaign, privacy, runbook)
 schemas/    JSON Schema files (rules for every workspace file)
-scripts/    init, fetch_roles, fetch_doors, doors, applications, stories, practice, public, import_career_ops, network_map,
+scripts/    init, fetch_roles, fetch_doors, doors, applications, stories, practice, public, offer, import_career_ops, network_map,
             claims_audit, consistency_audit, score, build_dashboard, validate, quick, quick_posting
 templates/  the workspace skeleton that init.py copies, and agent prompts
 docs/       INSTALL.md, HOW-IT-WORKS.md, ORCHESTRATION.md, LEVELS.md, DESIGN.md,

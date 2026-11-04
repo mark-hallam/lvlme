@@ -35,6 +35,11 @@ before. Nothing here changes how a score is worked out unless it says so.
   hidden until it has 5 results, and a ranking check (did the higher-rated
   applications do better?) until 10. Advisory only: a test proves scores are
   identical with or without outcomes. The demo now has made-up applications.
+- **Offer help.** `scripts/offer.py <application>` writes a checklist for an
+  application at Interview or Offer: the pay range the posting advertised
+  (only when it published one) beside what you say you were offered, and what
+  to ask the employer and a lawyer before signing. A checklist, not advice:
+  it never says an offer is fair or safe to sign.
 - **Build in public.** `/lvlme-public` and `scripts/public.py` help you show
   your work steadily: ideas from what you finished that is worth sharing
   (never private work, and no one named without their yes), a draft brief

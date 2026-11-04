@@ -1007,6 +1007,7 @@ const appsSub = () => { const A = D.apps; return A.due ? `${plural(A.due, "follo
 function appsHTML(){
   const A = D.apps; if (!A || !A.rows.length) return "";
   return `<div>${A.rows.map(r => `<div class="wp"><div class="wp-h"><span class="wp-n">${esc(r.title)}</span><span class="wp-s${r.status === "none" ? " none" : ""}">${esc(r.stage)}</span></div><div class="tiny sub">${esc(r.org)} · last step ${r.since === 0 ? "today" : plural(r.since, "day") + " ago"}${r.what && r.status !== "waiting" ? ` · <b class="ap-s ${esc(r.status)}">${esc(r.label)}: ${esc(r.what)}</b>` : r.status === "gone_quiet" ? " · gone quiet" : r.what ? " · " + esc(r.what) + " on " + esc(shortDate(r.due)) : ""}</div></div>`).join("")}</div>` +
+    (A.rows.some(r => r.stage === "Offer") ? '<div class="tiny sub" style="margin-top:6px">An offer: ask your agent for the offer checklist (the advertised pay range and what to ask before you sign).</div>' : "") +
     (A.due ? '<div class="tiny sub" style="margin-top:6px">Ask your agent to draft a due note. It goes in campaign/drafts/ for you to finish and send.</div>' : "");
 }
 // Doors (market/doors.json, scripts/fetch_doors.py and doors.py): events, programmes and communities where people from

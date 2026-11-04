@@ -28,6 +28,7 @@ WORKSPACE_SCRIPTS = {
     "stories.py": ["list"],
     "practice.py": ["list"],
     "public.py": ["list"],
+    "offer.py": ["ap1"],
     "import_career_ops.py": ["--from", os.path.join(H.FIXTURES, "career-ops"), "--dry-run"],
     "score.py": [],
     "build_dashboard.py": [],
