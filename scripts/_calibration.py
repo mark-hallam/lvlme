@@ -77,7 +77,7 @@ def reached(ws):
         with open(path, encoding="utf-8") as f:
             for line in f.read().splitlines()[1:]:
                 cells = line.split("\t")
-                if len(cells) >= 5 and cells[2] in ("added", "stage"):
+                if len(cells) >= 5 and cells[2] in ("added", "stage", "imported"):
                     out.setdefault(cells[1], set()).add(cells[4])
     return out
 

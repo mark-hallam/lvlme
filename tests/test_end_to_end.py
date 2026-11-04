@@ -115,6 +115,8 @@ class RepoHygieneTests(unittest.TestCase):
         for path in self.files((".md",)):
             if os.sep + "docs" + os.sep in path:
                 continue  # docs/DESIGN.md is the original spec, kept as written
+            if os.sep + "career-ops" + os.sep in path:
+                continue  # career-ops' own files and format, kept as written (tests/fixtures/career-ops/NOTICE.md)
             with open(path, encoding="utf-8") as fh:
                 text = fh.read()
             self.assertIsNone(re.search("[\u2013\u2014]", text), path)

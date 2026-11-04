@@ -1,0 +1,6 @@
+#	date	from	to	source	note
+2	2026-06-25	-	evaluated	set-status	
+2	2026-06-26	evaluated	applied	set-status	
+2	2026-07-02	applied	interview	set-status	recruiter call
+5	2026-06-28	evaluated	applied	set-status	
+5	2026-06-30	applied	rejected	reply-watch	auto-rejection

@@ -57,7 +57,10 @@ plan that it re-scores as you act on it. It also finds doors: upcoming
 events, programmes and communities where people from your target
 organisations will be, because referrals come from people you meet. And it
 checks itself: once you have applied, it sets the odds it gave each role on the
-day you applied against what happened, so you can see how right it has been. It starts with one short message:
+day you applied against what happened, so you can see how right it has been.
+Already use [career-ops](https://github.com/career-ops-hq/career-ops)? LVLme
+reads its applications, contacts and stories, read only, so you can keep
+both. It starts with one short message:
 three facts from your CV to confirm, which organisations you want, and a
 request for your LinkedIn data export ([the first run, in order](SKILL.md#first-run)).
 A dashboard shows the climb:

@@ -26,6 +26,7 @@ WORKSPACE_SCRIPTS = {
     "fetch_doors.py": [],
     "doors.py": ["list"],
     "stories.py": ["list"],
+    "import_career_ops.py": ["--from", os.path.join(H.FIXTURES, "career-ops"), "--dry-run"],
     "score.py": [],
     "build_dashboard.py": [],
     "network_map.py": ["--csv", os.path.join(H.FIXTURES, "Connections.csv")],

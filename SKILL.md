@@ -121,6 +121,12 @@ other file that describes a first run links here.
    --goal "<goal>"` carries its evidence, posting and judgements into the new
    workspace, so the first score comes at once; the interview then adds
    targets in short rounds, and the LinkedIn export can arrive later.
+   Already use career-ops? Once the targets are in `config.json` (step 3),
+   offer `python3 scripts/import_career_ops.py --from <its folder> --dry-run`,
+   show the person what it would bring in, and run it without `--dry-run`
+   after their yes: applications and their history, contacts at their
+   targets, and their stories, all marked as imported. It never writes into
+   the career-ops folder.
 3. **Config.** From the reply, fill in `config.json` with the person:
    targets (look up each organisation's applicant tracking system (ATS):
    Greenhouse, Ashby, Lever, SmartRecruiters or Workable with the board's

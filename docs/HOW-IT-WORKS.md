@@ -344,6 +344,7 @@ python3 scripts/init.py --goal "Frontier AI labs" --example frontier-ai-labs   #
 export LVLME_HOME=~/lvlme-workspaces/frontier-ai-labs
 python3 scripts/fetch_roles.py                        # open roles from public job boards
 python3 scripts/fetch_doors.py                        # events and programmes (public calendars you name)
+python3 scripts/import_career_ops.py --from ~/career-ops --dry-run   # what an import from career-ops would bring
 python3 scripts/network_map.py --csv ~/Downloads/Connections.csv   # optional: needs your LinkedIn export
 python3 scripts/claims_audit.py https://your-site.example/about
 python3 scripts/score.py                              # deterministic scoring
@@ -405,8 +406,8 @@ agents/     subagent briefs: evidence-scout, market-scout, role-judge, reviewer,
 .cursor/rules/  Cursor rules
 method/     the rules for each stage (rubric, interview, intake, audits, review, campaign, privacy, runbook)
 schemas/    JSON Schema files (rules for every workspace file)
-scripts/    init, fetch_roles, fetch_doors, doors, network_map, claims_audit, consistency_audit,
-            score, build_dashboard, validate, quick, quick_posting
+scripts/    init, fetch_roles, fetch_doors, doors, applications, stories, import_career_ops, network_map,
+            claims_audit, consistency_audit, score, build_dashboard, validate, quick, quick_posting
 templates/  the workspace skeleton that init.py copies, and agent prompts
 docs/       INSTALL.md, HOW-IT-WORKS.md, ORCHESTRATION.md, LEVELS.md, DESIGN.md,
             for-you/ (guides for people who are not technical), demo/ (the static demo folder)

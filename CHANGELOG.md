@@ -35,6 +35,13 @@ before. Nothing here changes how a score is worked out unless it says so.
   hidden until it has 5 results, and a ranking check (did the higher-rated
   applications do better?) until 10. Advisory only: a test proves scores are
   identical with or without outcomes. The demo now has made-up applications.
+- **Import from career-ops.** `scripts/import_career_ops.py --from <folder>`
+  reads a career-ops folder, read only, and brings in its applications with
+  their status history, contacts at your target organisations (name, company
+  and title only, at stage Talked) and its interview stories, all marked as
+  imported. `--dry-run` shows what it would bring first. Importing again
+  never makes a second copy and picks up a changed stage. Tested against
+  career-ops' own tracker and row-splitting test files (version 1.38.0).
 - **Interview story bank.** Your best true stories, in your words, in
   `profile/stories.json`: each in the STAR shape (situation, task, action,
   result) with what you would do differently, the evidence behind it and the
