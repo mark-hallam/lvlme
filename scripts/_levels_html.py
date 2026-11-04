@@ -214,6 +214,15 @@ def path_tag(q, nl):
     return None
 
 
+def gain_title(q):
+    """The full gain and chance behind the one points number, as a tooltip. Mirrors gainTitle() in the page."""
+    a = q["a"]
+    if not a["effects"] or q.get("works", 0) <= q["exp"] + 0.05:
+        return ""
+    return ' title="%s points if it works, about %d%% chance: %s expected"' % (
+        fp(q["works"]), round(a.get("p", 0) * 100), fp(q["exp"]))
+
+
 def points(q):
     """The one points number an action shows everywhere outside the What if rail: its expected points
     toward the next level, on its own, counting its chance. None when it changes no score."""
@@ -228,10 +237,10 @@ def do_next_rows(nl, ordered, limit=None):
     for q in ordered[:limit] if limit else ordered:
         a, tag = q["a"], path_tag(q, nl)
         rows.append('<div class="dn" tabindex="0" data-act="%s"><span class="status-dot %s"></span><div style="flex:1;min-width:0">'
-                    '<div class="dn-t">%s</div><div class="tiny sub">%s%s · %s · %s%s</div></div><div class="dn-p">%s</div></div>' % (
+                    '<div class="dn-t">%s</div><div class="tiny sub">%s%s · %s · %s%s</div></div><div class="dn-p"%s>%s</div></div>' % (
                         esc(a["id"]), esc(a["status"]), esc(a["title"]), status_name(a["status"]),
                         "" if q["on"] else ", switched off", esc(a["owner"]), "by " + short(a["date"]) if a.get("dated") else "no target date yet",
-                        ' · <span class="dn-tag">%s</span>' % tag if tag else "", points(q) or "credibility"))
+                        ' · <span class="dn-tag">%s</span>' % tag if tag else "", gain_title(q), points(q) or "credibility"))
     return "".join(rows)
 
 

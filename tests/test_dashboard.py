@@ -281,7 +281,7 @@ class ParkedAndStaticTests(unittest.TestCase):
         self.assertEqual([r.split('"')[0] for r in rows], [q["id"] for q in up][:4])
         self.assertEqual(rows[0].split('"')[0], "A06")                            # the panel's best-case set leads, not last
         for row, q in zip(rows, up):
-            cell = re.search(r'<div class="dn-p">(.*?)</div>', row).group(1)
+            cell = re.search(r'<div class="dn-p"[^>]*>(.*?)</div>', row).group(1)
             self.assertEqual(cell, "+%g" % q["points_expected"] if q["changes_a_score"] else "credibility", q["id"])
             self.assertEqual(len(re.findall(r"\+\d", re.sub(r"<[^>]+>", " ", row))), 1 if q["changes_a_score"] else 0)
             self.assertRegex(row, r'<div class="tiny sub">(To do|In progress)')  # a word beside the dot, not colour alone

@@ -211,7 +211,7 @@
     "gain": 15.0
   },
   "adjustments": [
-    "D2 3 counted as 2 until the reviewer agrees",
+    "D2 3 counted as 2 until the blind review settles it",
     "D3 3 counted as 1: best cited evidence is self-reported network, which supports at most 1"
   ],
   "review": {

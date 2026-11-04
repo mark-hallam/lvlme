@@ -158,7 +158,7 @@ def score_entry(ctx, dim, entry, container, where):
         score = cap
     if score > ctx.review_above and not is_reviewed(entry, container):
         caps.append("awaiting review")
-        adjustments.append("%s %d counted as %d until the reviewer agrees" % (dim, score, ctx.review_above))
+        adjustments.append("%s %d counted as %d until the blind review settles it" % (dim, score, ctx.review_above))
         awaiting.append(dim)
         score = ctx.review_above
     out = {"score": score, "raw": raw, "evidence": evidence, "note": entry.get("note", "")}

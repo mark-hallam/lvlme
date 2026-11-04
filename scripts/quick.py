@@ -590,7 +590,8 @@ def review_sentence(result):
         return "%d score%s above 2 still wait%s for the blind reviewer and count%s as 2 until then." % (
             waiting, "" if waiting == 1 else "s", "s" if waiting == 1 else "", "s" if waiting == 1 else "")
     return "A blind reviewer checked every score above 2%s." % (
-        "" if not n else "; %d disagreement%s count%s as 2 until settled" % (n, "" if n == 1 else "s", "s" if n == 1 else ""))
+        "" if not n else "; %d disagreement%s count%s as 2 until settled" % (
+            n, "" if n == 1 else "s", "s" if n == 1 else ""))
 
 
 def message(result, folder):

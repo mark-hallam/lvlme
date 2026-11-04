@@ -390,6 +390,17 @@ class JudgedByTests(Base):
             ids = re.findall(r'<span class="id">(E\d+)</span>', QH.evidence_list(f["evidence"]))
             self.assertEqual(ids, sorted(ids))
 
+    def test_the_top_card_says_what_to_do_first_and_the_next_band_goal(self):
+        result = self.result()
+        page = QH.render(result)
+        top = page[page.index('aria-labelledby="oddsH"'):page.index('aria-labelledby="whyH"')]
+        self.assertIn("<b>Do first:</b> %s" % QH.esc(result["fixes"][0]["title"]), top)
+        same = dict(result["if_all_fixes"], interview_band=result["interview_band"], fit=34.0)
+        self.assertEqual(QH.next_band_line(result, same),
+                         "Low starts at a fit of 40: these fixes reach 34, so the other 6 points have to come from "
+                         "the factors this page cannot check or from the full campaign.")
+        self.assertEqual(QH.next_band_line(result, dict(same, interview_band="Strong")), "")
+
     def test_not_recorded_is_said_plainly(self):
         result = self.result()
         self.assertIsNone(result["judged_by"])

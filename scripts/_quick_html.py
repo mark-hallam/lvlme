@@ -250,9 +250,12 @@ def in_short(result):
     gaps = [f for f in gaps if f["max_points"] - f["points"] > 0]
     if not gaps:
         return ""
-    return ('<p class="small"><b>Why, in short:</b> %s. These factors have the most points still to win.</p>'
-            % esc(", ".join("%s %s of %s fit points" % (f["name"].lower(), num(f["points"]), num(f["max_points"]))
-                            for f in gaps)))
+    first = result.get("fixes") or []
+    do_first = ('<p class="small"><b>Do first:</b> %s (+%s fit points). The fixes are below.</p>'
+                % (esc(first[0]["title"]), num(first[0]["gain"]))) if first else ""
+    return ('<p class="small"><b>Why, in short:</b> %s. These factors have the most points still to win.</p>%s'
+            % (esc(", ".join("%s %s of %s fit points" % (f["name"].lower(), num(f["points"]), num(f["max_points"]))
+                             for f in gaps)), do_first))
 
 
 def judged_short(result):
@@ -378,6 +381,21 @@ def not_shown_lines(result):
             if x["id"] != skip and any(r in x["why"] for r in SHOWN_REASONS)]
 
 
+BAND_FLOORS = ((40, "Low"), (55, "Moderate"), (70, "Good"), (85, "Strong"))
+
+
+def next_band_line(result, combined):
+    """When even every fix leaves the fit in today's band: where the next band starts, so the person has a goal."""
+    if not combined or combined.get("interview_band") != result.get("interview_band"):
+        return ""
+    floor = next(((f, b) for f, b in BAND_FLOORS if f > combined["fit"]), None)
+    if not floor:
+        return ""
+    return ("%s starts at a fit of %d: these fixes reach %s, so the other %s points have to come from the factors "
+            "this page cannot check or from the full campaign." % (floor[1], floor[0], num(combined["fit"]),
+                                                                    num(floor[0] - combined["fit"])))
+
+
 def fixes(result):
     hrl = hard_requirement_line(result)
     hrl = '<p class="note">%s</p>' % esc(hrl) if hrl else ""
@@ -399,6 +417,9 @@ def fixes(result):
         "all three land" if n == 3 else "both land" if n == 2 else "all %d land" % n if n > 1 else "it lands",
         num(c["fit"]), num(c["gain"]),
         esc(headline(c, start=False))))
+    nxt = next_band_line(result, c)
+    if nxt:
+        all_line += '<p class="tiny sub">%s</p>' % esc(nxt)
     top = top_of_range(result)
     if top:
         all_line += ('<p class="tiny sub">This counts only the fixes above. The "up to %s" at the top is a '

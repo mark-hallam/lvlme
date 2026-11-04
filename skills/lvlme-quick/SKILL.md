@@ -67,14 +67,17 @@ would raise it most (any fix left out is named, with the reason). Aim for a coup
      use kind `job_history`; achievements use `achievement`);
    - if the CV links to public work (a repository, a live product, a paper),
      you may open up to three such links, read only; if the page confirms the
-     claim, that item is `verified`, with `checked_on` today;
+     claim, that item is `verified`, with `checked_on` today. Open no other
+     page: the posting and those links are all LVLme quick reads;
    - never mark anything `verified` or `corroborated` on the CV's say-so.
 4. **Ask at most two short questions, in one message**, and write the answers
    in `intake/answers.md`:
    - always the warm path: "Do you know someone at <organisation> who has seen
      your work and would vouch for you? (yes or no)". Record a yes as one
      `network` item, `self_reported`, sourced to `intake/answers.md#warm-path`;
-   - work rights only if the CV and the posting do not settle them. If `new`
+   - work rights only if the CV and the posting do not settle them, as a yes
+     or no ("Can you already work in <country> without the employer
+     sponsoring a visa? yes or no"). If `new`
      listed an eligibility blocker (a citizenship, clearance, export-control
      or licence rule), ask whether they meet it instead. A yes goes in
      `eligibility_cleared` (step 5), recorded as they state it.

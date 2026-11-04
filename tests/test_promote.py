@@ -149,6 +149,24 @@ class PromoteTests(unittest.TestCase):
         counts = data["market"]["byOrgFamily"]
         self.assertEqual(sum(sum(v.values()) for v in counts.values()), 1)
 
+    def test_a_blind_review_disagreement_carries_over_as_waiting_for_a_tie_break(self):
+        import glob
+        import json
+        import re
+        code, _ = self.promote()
+        self.assertEqual(code, 0)
+        files = glob.glob(os.path.join(self.ws, "eval", "reviews", "*.json"))
+        self.assertEqual(len(files), 1)
+        d = H.load(files[0])["disputes"][0]
+        self.assertEqual((d["item_id"].endswith("/D2"), d["scorer"]["score"], d["reviewer"]["score"], d["decided_by"]),
+                         (True, 3, 2, "awaiting_tie_break"))
+        self.assertEqual(V.validate_workspace(self.ws)[0], [])
+        with open(os.path.join(self.ws, "report", "index.html"), encoding="utf-8") as fh:
+            page = fh.read()
+        data = json.loads(re.search(r'<script type="application/json"[^>]*>(.*?)</script>', page, re.S).group(1))
+        self.assertEqual(data["roles"][0]["disp"], {"D2": [3, 2]})
+        self.assertIn("the blind reviewer disagreed (first score", page)
+
     def test_an_unfinished_quick_folder_is_refused(self):
         os.remove(os.path.join(self.quick, "eval", "quick.json"))
         with mock.patch("sys.stdout", io.StringIO()), self.assertRaises(SystemExit) as caught:

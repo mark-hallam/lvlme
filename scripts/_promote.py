@@ -88,6 +88,24 @@ def family_for(title):
             "name": title or "The target role", "title_keywords": [keyword]}
 
 
+def write_open_disputes(ws, result, role, judged_on):
+    """The quick answer's blind-review disagreements (D1, D2, D4) carried into eval/reviews/<date>.json, waiting
+    for the tie-break the full campaign runs, so the dashboard says the reviewer disagreed, not that it never ran."""
+    disputes = []
+    for d in (result.get("review") or {}).get("disputes") or []:
+        if d.get("dimension") not in ROLE_DIMS:
+            continue
+        side = lambda x, by: dict({k: x[k] for k in ("score", "anchor", "evidence") if x.get(k) not in (None, "")}, by=by)  # noqa: E731
+        disputes.append({"item_id": "%s/%s" % (role["id"], d["dimension"]), "scorer": side(d["scorer"], "scorer"),
+                         "reviewer": side(d["reviewer"], "reviewer"),
+                         "tie_break": {"absent": True, "why": "LVLme quick has no tie-break; the full campaign runs it."},
+                         "stands": 2, "decided_by": "awaiting_tie_break"})
+    if disputes:
+        C.write_json(C.wpath(ws, "eval", "reviews", "%s.json" % judged_on),
+                     {"schema_version": 1, "date": judged_on, "rubric_version": "1.0", "disputes": disputes,
+                      "note": "Carried over from LVLme quick."})
+
+
 def promote(folder, ws, today):
     """Fill the new campaign workspace ws from the quick folder. Returns a short summary dict."""
     load = lambda *p: C.load_json(os.path.join(folder, *p), None)  # noqa: E731
@@ -137,6 +155,7 @@ def promote(folder, ws, today):
             entry[d].update(reviewed_on=judged_on)
     if quick.get("eligibility_blocked") is not None:
         entry["eligibility_blocked"] = bool(quick["eligibility_blocked"])
+    write_open_disputes(ws, result, role, judged_on)
     judgements = {"schema_version": 1, "rubric_version": "1.0", "roles": {role["id"]: entry}}
     if quick.get("judged_by"):
         judgements["judged_by"] = quick["judged_by"]

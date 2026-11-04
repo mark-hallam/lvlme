@@ -1373,8 +1373,8 @@
         "D7": 1
       },
       "adjustments": [
-        "D1 3 counted as 2 until the reviewer agrees",
-        "D2 3 counted as 2 until the reviewer agrees"
+        "D1 3 counted as 2 until the blind review settles it",
+        "D2 3 counted as 2 until the blind review settles it"
       ],
       "reviewer_note": ""
     },

@@ -475,7 +475,7 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
  .level{padding:10px 12px}
  .level .linkbtn{margin-top:0}
 }
-@media (max-width:420px){.top-in{padding:10px 16px;gap:10px}.brand h1{font-size:16px}.seg.small button{padding:4px 8px}.top .btn{padding:6px 12px}.card{padding:16px}.tiles4{gap:10px}.tile .v{font-size:24px}}
+@media (max-width:420px){.top-in{padding:10px 16px;gap:10px}.brand h1{font-size:16px;white-space:normal}.seg.small button{padding:4px 8px}.top .btn{padding:6px 12px}.card{padding:16px}.tiles4{gap:10px}.tile .v{font-size:24px}}
 @media (max-width:360px){.seg button{padding:6px 8px;font-size:13px}}
 @media (max-width:420px){.share-row div{padding:8px 7px}.share-row b{font-size:20px}.share-row .pill{font-size:11px;padding:2px 6px}}
 @media (max-width:360px){.share-row{gap:6px}.share-row div{padding:8px 6px}.share-row .pill{padding:2px 5px}}
@@ -959,7 +959,8 @@ function renderTiles4(){
   const top5 = fits.length ? fits.slice(0, 5).reduce((a, b) => a + b, 0) / Math.min(5, fits.length) : 0;
   const lowPlus = J.filter(r => BANDS.indexOf(ibM(r)) >= 1).length;
   const open = J.filter(r => !r.blocked).length, of = D.roles.length > J.length ? `, of ${J.length} judged` : "";
-  const tiles = [["Best role fit", fits[0] || 0], ["Average of your top 5", top5], ["Roles at a low interview chance or better" + of, lowPlus], ["Roles open to you" + of, open]];
+  const when = state.mode === "today" ? "" : state.mode === "best" ? " (best case)" : " (plan expected)";
+  const tiles = [["Best role fit" + when, fits[0] || 0], ["Average of your top 5" + when, top5], ["Roles at a low interview chance or better" + when + of, lowPlus], ["Roles open to you" + of, open]];
   $("#tiles4").innerHTML = tiles.map(t => `<div class="tile"><div class="v num" data-to="${t[1]}">${Math.round(t[1])}</div><div class="l">${esc(t[0])}</div></div>`).join("");
   $("#tiles4").querySelectorAll("[data-to]").forEach(n => countTo(n, +n.dataset.to));
 }
@@ -1532,8 +1533,10 @@ const points = q => q.a.effects.length ? "+" + fmtP(Math.max(0, q.exp)) : null;
 function doNextRows(list, nl, limit){
   if (!list.length) return '<div class="small sub">No open actions. The next run adds some from the biggest gaps.</div>';
   return (limit ? list.slice(0, limit) : list).map(q => { const a = q.a, tag = pathTag(q, nl);
-    return `<div class="dn" tabindex="0" data-act="${esc(a.id)}"><span class="status-dot ${esc(a.status)}"></span><div style="flex:1;min-width:0"><div class="dn-t">${esc(a.title)}</div><div class="tiny sub">${stName(a.status)}${q.on ? "" : ", switched off"} · ${esc(a.owner)} · ${a.dated ? "by " + esc(shortDate(a.date)) : "no target date yet"}${tag ? ` · <span class="dn-tag">${esc(tag)}</span>` : ""}</div></div><div class="dn-p">${points(q) || "credibility"}</div></div>`; }).join("");
+    return `<div class="dn" tabindex="0" data-act="${esc(a.id)}"><span class="status-dot ${esc(a.status)}"></span><div style="flex:1;min-width:0"><div class="dn-t">${esc(a.title)}</div><div class="tiny sub">${stName(a.status)}${q.on ? "" : ", switched off"} · ${esc(a.owner)} · ${a.dated ? "by " + esc(shortDate(a.date)) : "no target date yet"}${tag ? ` · <span class="dn-tag">${esc(tag)}</span>` : ""}</div></div><div class="dn-p"${gainTitle(q)}>${points(q) || "credibility"}</div></div>`; }).join("");
 }
+// Mirrors gain_title() in _levels_html.py: the full gain and chance behind the one number, as a tooltip.
+const gainTitle = q => q.a.effects.length && q.works > q.exp + 0.05 ? ` title="${esc(`${fmtP(q.works)} points if it works, about ${Math.round(q.a.p * 100)}% chance: ${fmtP(q.exp)} expected`)}"` : "";
 // One worked example from the first action, so the expected points never look like a different answer from the quick result.
 function chanceExample(){
   const q = (lv().up || []).find(x => x.a.effects.length && x.works > x.exp + 0.05 && x.a.p > 0);
@@ -1762,7 +1765,9 @@ function detailRole(id){
     ${block ? `<div class="small warnline">${esc(block)}</div>` : ""}
     ${r.pc ? `<div class="small ${r.pcl === "suspicious" ? "warnline" : "sub"}" style="margin-top:8px">The posting: ${esc(r.pc)}. ${r.pcl === "suspicious" ? "Check it is a live opening before you spend time on it." : "Worth a quick check that it is still a live opening."} The score is unchanged.</div>` : ""}
     ${!r.judged ? '<div class="small warnline">Not judged yet: requirements match, proof of work and the organisation edge count as 0 until the next run judges it.</div>' : ""}
-    ${r.awaiting.length ? `<div class="small sub" style="margin-top:8px">Waiting for the reviewer: ${esc(r.awaiting.map(d => D.dimNames[d]).join(", "))}. Each counts as 2 until reviewed.</div>` : ""}
+    ${r.awaiting.length ? `<div class="small sub" style="margin-top:8px">${r.awaiting.map(d => (r.disp || {})[d]
+      ? `${esc(D.dimNames[d])}: the blind reviewer disagreed (first score ${r.disp[d][0]}, reviewer ${r.disp[d][1]}), so it counts as 2 until a third reviewer settles it.`
+      : `Waiting for the reviewer: ${esc(D.dimNames[d])}, which counts as 2 until reviewed.`).join(" ")}</div>` : ""}
     ${r.rn ? `<div class="small" style="margin-top:10px"><b>Reviewer:</b> ${esc(r.rn)}</div>` : ""}
     <div class="eyebrow" style="margin-top:16px">The seven factors, tap one to drill in</div>
     <div class="tiny sub" style="margin-bottom:4px">Filled dots: today. Green rings: where the plan is expected to take you.</div>

@@ -181,6 +181,17 @@ def short_date(iso):
 # --------------------------------------------------------------- loading
 
 
+def open_disputes(ws):
+    """{(role id, D1 D2 or D4): (scorer's score, reviewer's score)} for disagreements still waiting for a tie-break."""
+    out = {}
+    for path in sorted(glob.glob(C.wpath(ws, "eval", "reviews", "*.json"))):
+        for d in (C.load_json(path, {}) or {}).get("disputes") or []:
+            m = re.match(r"^(.+)/(D[124])$", d.get("item_id", ""))
+            if m and d.get("decided_by") == "awaiting_tie_break":
+                out[(m.group(1), m.group(2))] = ((d.get("scorer") or {}).get("score"), (d.get("reviewer") or {}).get("score"))
+    return out
+
+
 class Data:
     """Everything the page and the agent files are built from."""
 
@@ -223,6 +234,7 @@ class Data:
         judgements = load("eval", "judgements.json") or {}
         self.judgements = judgements.get("roles", {})
         self.judged_by = judgements.get("judged_by")         # which AI agent judged: another can judge differently
+        self.open_disputes = open_disputes(ws)               # blind reviewer disagreed, no tie-break yet
         self.profile = load("eval", "profile-dimensions.json") or {}
         self.roles_doc = load("market", "roles", "latest.json") or {}
         self.suspicious = PC.suspicious_ids(self.roles_doc)
@@ -377,6 +389,7 @@ def build_roles(data, group_of, hard_types):
             "bt": ", ".join(C.BLOCKER_NAMES.get(t, t) for t in types),
             "hrl": bool(r.get("hard_requirement_lacking")), "judged": r.get("judged", True),
             "awaiting": r.get("awaiting_review") or [],
+            "disp": {d: list(v) for (i, d), v in data.open_disputes.items() if i == rid},
             "s": [r["scores"][d]["score"] for d in DIMS], "n": [clean(r["scores"][d].get("note")) for d in DIMS],
             "e": [r["scores"][d].get("evidence") or [] for d in DIMS],
             "fit": r["fit"], "ib": r["interview_band"], "ob": r["offer_band"],
@@ -653,7 +666,8 @@ def render_page(data):
     card, view = LH.render(page)          # first render, readable without JavaScript; the page script redraws it
     static = ST.render(page, data.cur.get("per_org") or {})
     top = page["roles"][0] if page["roles"] else None
-    out = A.TEMPLATE.replace("__TITLE__", html.escape(page["meta"]["title"]))
+    out = A.TEMPLATE.replace("__TITLE__", html.escape(page["meta"]["title"])).replace(
+        '<span id="builtAt"></span>', '<span id="builtAt">%s</span>' % html.escape(page["meta"]["built"]))
     out = out.replace("__BESTFIT__", str(int(top["fit"] + 0.5)) if top else "0")
     out = out.replace("__BESTROLE__", html.escape("%s: %s" % (top["on"], top["title"])) if top else "")
     out = out.replace("__LEVELCARD__", card).replace("__LEVELUP__", view).replace("__STATIC__", static)
