@@ -293,8 +293,9 @@ def factors(result):
     note = unchecked_note(result)
     return ('<section class="card" aria-labelledby="whyH"><p class="eyebrow">Why</p><h2 id="whyH">Factor by factor</h2>'
             '<p class="small sub">Every point cites evidence, and a score can be no higher than its best evidence '
-            'supports. A line on a CV alone is self-reported. E01, E02 and so on are your evidence items, each '
-            'marked with how far it can be trusted.</p><ul class="rows">%s</ul>%s</section>' % (
+            "supports. A line on a CV alone is self-reported. Each factor's fit points are its score out of 5 times "
+            'its share of the 100 (2 of 5 on a 25 point factor is 10). E01, E02 and so on are your evidence items, '
+            'each marked with how far it can be trusted.</p><ul class="rows">%s</ul>%s</section>' % (
                 "".join(rows), note))
 
 
