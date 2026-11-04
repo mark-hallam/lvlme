@@ -22,3 +22,5 @@ Nice to have
 - Comfort reading Python scripts
 Location
 Sydney, or remote within Australia, with travel to customer sites. You need the right to work in Australia.
+
+Pay, from the job board: AUD 170K to 200K

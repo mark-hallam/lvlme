@@ -134,7 +134,12 @@ def posting_md(role, org_name, source, date, fictional=False):
                                                                           % QP.BOARD_NAMES.get(source["kind"], source["kind"]))), ""]
     if source.get("fallback"):
         head[-1:] = ["Note: %s" % source["fallback"], ""]
-    return "\n".join(head + [role.get("description_text") or ""]) + "\n"
+    extra = []
+    for key, label in (("visa_or_relocation_note", "Visa or relocation, from the job board"),
+                       ("compensation", "Pay, from the job board")):
+        if role.get(key) and str(role[key]) not in (role.get("description_text") or ""):
+            extra += ["", "%s: %s" % (label, role[key])]   # job board fields the description text leaves out
+    return "\n".join(head + [role.get("description_text") or ""] + extra) + "\n"
 
 
 def skeleton(role, date):

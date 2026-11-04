@@ -401,6 +401,17 @@ class JudgedByTests(Base):
                          "the factors this page cannot check or from the full campaign.")
         self.assertEqual(QH.next_band_line(result, dict(same, interview_band="Strong")), "")
 
+    def test_the_saved_posting_keeps_the_visa_and_pay_lines_the_description_drops(self):
+        # Agents are told to read posting.md; one said "the posting does not say" whether the role sponsors visas.
+        role = {"title": "CSM", "locations": ["New York"], "description_text": "About the role.",
+                "visa_or_relocation_note": "Visa sponsorship: We do sponsor visas!", "compensation": "$1 to $2 USD"}
+        text = Q.posting_md(role, "Acme", {"kind": "greenhouse", "link": "https://x"}, "2026-11-05")
+        self.assertIn("Visa or relocation, from the job board: Visa sponsorship: We do sponsor visas!", text)
+        self.assertIn("Pay, from the job board: $1 to $2 USD", text)
+        role["description_text"] += " Visa sponsorship: We do sponsor visas!"
+        self.assertNotIn("Visa or relocation, from the job board",
+                         Q.posting_md(role, "Acme", {"kind": "greenhouse", "link": "https://x"}, "2026-11-05"))
+
     def test_not_recorded_is_said_plainly(self):
         result = self.result()
         self.assertIsNone(result["judged_by"])
