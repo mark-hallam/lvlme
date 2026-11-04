@@ -21,7 +21,7 @@
     "judged_on": "2026-11-01"
   },
   "judged_by": null,
-  "judged_by_note": "Which AI agent judged was not recorded. Another AI agent can judge the same evidence differently; the maths after the judging is the same.",
+  "judged_by_note": "Which AI agent judged was not recorded. Another AI agent, or another run, can judge the same evidence differently, often by a few fit points; the maths after the judging is the same.",
   "role_counts": {
     "open": 12,
     "judged": 11

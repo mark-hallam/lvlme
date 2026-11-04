@@ -4,7 +4,7 @@ LVLme is one folder: a skill (`SKILL.md`), method files, small Python scripts
 and a demo. The same folder installs as a Claude Code plugin and as a Codex
 skill, and it carries Cursor rules. Pick the one that matches the agent you
 use. Claude Code and Codex are tested. Cursor and other agents that run
-commands should work but are not tested yet.
+commands are not tested yet.
 
 You need Python 3.9 or newer (the scripts use only its standard library) and
 git (a tool that copies and updates the folder). Nothing else.
@@ -182,7 +182,7 @@ give it only the packet the lead prepares.
 
 ## Cursor (not tested yet)
 
-Cursor and other agents that run commands should work but are not tested yet.
+Cursor and other agents that run commands are not tested yet.
 The folder carries Cursor rules. Open the cloned folder in Cursor, and the
 rules in `.cursor/rules/` should load on their own:
 

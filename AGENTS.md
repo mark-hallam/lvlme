@@ -9,7 +9,7 @@ in [`method/`](method/). How to run the work in parallel, with its gates, is
 in [`docs/ORCHESTRATION.md`](docs/ORCHESTRATION.md). This file is the short
 version, and it runs the same procedure. Install notes for every agent:
 [`docs/INSTALL.md`](docs/INSTALL.md). Claude Code and Codex are tested.
-Cursor and other agents that run commands should work but are not tested yet.
+Cursor and other agents that run commands are not tested yet.
 
 **First check.** If the engine folder has no `skills/` folder (for example
 `skills/lvlme-quick/SKILL.md` is missing), a skill installer copied only part

@@ -109,7 +109,9 @@ would raise it most (any fix left out is named, with the reason). Aim for a coup
    posting and the item list). Never give it a score, a note or this
    conversation. Save its reply, as it came, to `eval/review-reply.md`; the
    build reads a factor written as `D1`, as `D1 Requirements match` or by its
-   name. If it
+   name. Set `reviewed_by` in `eval/quick.json` to the reviewer you started
+   (for example `{"agent": "Claude Code helper agent (lvlme:reviewer)",
+   "model": "claude-opus-5-5"}`), so the page can say who checked. If it
    names a flag, copy it to `review_flags` in `eval/quick.json` with the exact
    posting sentence it quotes. There is no tie-break in the quick answer: a
    disagreement is logged and the score counts as 2.

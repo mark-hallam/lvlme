@@ -7,7 +7,7 @@ import unittest
 import helpers as H
 
 ROOT = H.ENGINE
-UNTESTED = "Cursor and other agents that run commands should work but are not tested yet"
+UNTESTED = "Cursor and other agents that run commands are not tested yet"
 
 
 def read(rel):

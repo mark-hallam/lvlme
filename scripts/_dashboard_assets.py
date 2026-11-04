@@ -488,7 +488,7 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
 BODY = r"""
 <header class="top"><div class="top-in">
  <div class="brand"><h1 id="brandTitle">__TITLE__</h1><span id="storyLine"></span></div>
- <div class="seg small" id="themeSeg" role="group" aria-label="Appearance"><button data-t="light" aria-pressed="true">Light</button><button data-t="dark" aria-pressed="false">Dark</button></div>
+ <div class="seg small" id="themeSeg" role="group" aria-label="Appearance"><button data-t="auto" aria-pressed="true">Auto</button><button data-t="light" aria-pressed="false">Light</button><button data-t="dark" aria-pressed="false">Dark</button></div>
  <button class="btn primary" id="shareBtn">Share</button>
 </div></header>
 <div class="banner" id="banner" hidden><div id="bannerText"></div></div>
@@ -1345,7 +1345,7 @@ function bindChips(root){
   root.querySelectorAll(".chip[data-act]").forEach(c => c.addEventListener("click", e => { e.stopPropagation(); openDetail({type: "action", id: c.dataset.act}, false); }));
 }
 function swotGrid(G){
-  const q = (k, name) => `<div class="card swot-q"><h3>${name}</h3>${G[k].length ? `<ul>${G[k].map(i => `<li class="small">${esc(i.t)}<div>${i.ev.map(evChip).join("")}${i.src ? `<div class="tiny sub">Source: ${esc(i.src)}</div>` : ""}</div></li>`).join("")}</ul>` : '<div class="small sub">None recorded yet. Your agent fills this in during the full campaign (say "run LVLme").</div>'}</div>`;
+  const q = (k, name) => `<div class="card swot-q"><h3>${name}</h3>${G[k].length ? `<ul>${G[k].map(i => `<li class="small">${esc(i.t)}<div>${i.ev.map(evChip).join("")}${i.src ? `<div class="tiny sub">Source: ${esc(i.src)}</div>` : ""}</div></li>`).join("")}</ul>` : '<div class="small sub">None recorded yet. Your agent fills this in after your career interview, the next step: say "run the LVLme interview".</div>'}</div>`;
   return `<div class="grid2">${q("S","Strengths")}${q("W","Weaknesses")}${q("O","Opportunities")}${q("T","Threats")}</div>`;
 }
 function renderSwot(){
@@ -1617,7 +1617,7 @@ function verdictHTML(nl){
     ${bc ? `<p class="small"><b>Best case only:</b> ${bc.acts.length === 1 ? "the action below" : `the ${bc.acts.length} actions below together`} ${bc.role === nl.r ? `reach${bc.acts.length === 1 ? "es" : ""} ${fmtP(bc.fit)}` : `lift${bc.acts.length === 1 ? "s" : ""} ${roleName(bc.role)} from ${fmtP(bc.role.fit)} to ${fmtP(bc.fit)}`} by ${esc(fmtDate(bc.date))}, but only if ${bc.acts.length === 1 ? "it works" : bc.acts.length === 2 ? "both work" : "all of them work"}.</p>${chanceLine(bc, "Chance of that: ")}${stepRows(bc.acts)}`
       : `<p class="small sub">Not even the best case gets there: if every action works, your best fit reaches ${fmtP(nl.plan.best)}.</p>`}
     <div class="eyebrow" style="margin-top:16px">What is missing</div>
-    ${m.ceiling < nl.target ? `<p class="small">Even with every factor at the most the plan's caps allow, ${who} tops out at ${fmtP(m.ceiling)}. Reaching ${L} needs something the caps rule out within this plan, such as more years in a similar role, or a different role.</p>`
+    ${m.ceiling < nl.target ? `<p class="small">Even with every factor at the most the plan's caps allow, ${who} tops out at ${fmtP(m.ceiling)}. Reaching ${L} needs something the caps rule out within this plan, such as more years in a similar role, or a different role. The rows below are the room left on top of what your actions are already expected to add.</p>`
       : `<p class="small sub">Room left on ${same ? who : who + ", the role the plan takes closest,"} within the plan's caps, in fit points, if new actions fully work. The ${fmtP(m.points)} points have to come from here: add an action where none exists, or raise the odds of the ones you have.</p>`}
     <div>${room || '<div class="small sub">No room left within the caps.</div>'}</div></div>`;
 }
@@ -1885,13 +1885,16 @@ function renderHistory(){
 function refreshDetail(){ if (state.stack.length && (detail.classList.contains("open") || !narrow())) renderDetail(); else if (!narrow()) renderHome(); }
 function refreshNumbers(){ renderTopline(); renderTiles4(); showView(false); refreshDetail(); }
 function refresh(){ recompute(); renderTopline(); drawChart(); renderTiles4(); renderDoNext(); renderSwitches(); renderHistory(); showView(false); refreshDetail(); }
-let theme = "light";
-try { const t = localStorage.getItem("lvlme-theme") || localStorage.getItem("climb-theme"); if (t === "dark" || t === "light") theme = t; } catch (e) {}
+let theme = "auto";   // Auto follows the device's light or dark setting, like the website and the result page
+try { const t = localStorage.getItem("lvlme-theme") || localStorage.getItem("climb-theme"); if (t === "dark" || t === "light" || t === "auto") theme = t; } catch (e) {}
+const darkMQ = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 function applyTheme(){
-  if (theme === "dark") document.documentElement.dataset.theme = "dark"; else delete document.documentElement.dataset.theme;
+  const dark = theme === "dark" || (theme === "auto" && !!darkMQ && darkMQ.matches);
+  if (dark) document.documentElement.dataset.theme = "dark"; else delete document.documentElement.dataset.theme;
   $("#themeSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.t === theme)));
 }
 $("#themeSeg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { theme = b.dataset.t; try { localStorage.setItem("lvlme-theme", theme); } catch (e) {} applyTheme(); chartBuilt = false; lastVals = null; refresh(); }));
+if (darkMQ && darkMQ.addEventListener) darkMQ.addEventListener("change", () => { if (theme === "auto"){ applyTheme(); chartBuilt = false; lastVals = null; refresh(); } });
 $("#allOn").addEventListener("click", () => { D.actions.forEach(a => { if (switchable(a)) enabled.add(a.id); }); refresh(); });
 $("#allOff").addEventListener("click", () => { enabled.clear(); refresh(); });
 $("#sampleTog").addEventListener("click", () => { state.sample = !state.sample; $("#sampleTog").setAttribute("aria-checked", String(state.sample)); renderTopline(); drawChart(); renderHistory(); });

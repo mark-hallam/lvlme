@@ -425,8 +425,8 @@ def rank_fixes(docs, flags, agreed, scored):
         cur = scored["scores"][d]["score"]
         to = min(5, int(fx["target_score"]), cur + int(caps.get(d, 0)))
         if to <= cur:
-            why = ("this factor does not move in a few months" if caps.get(d, 0) == 0 and fx["target_score"] > cur
-                   else "already at or above the target")
+            why = ("%s does not move in a few months" % NAMES[d].lower()
+                   if caps.get(d, 0) == 0 and fx["target_score"] > cur else "already at or above the target")
             dropped.append({"id": fx["id"], "dimension": d, "title": fx["title"], "why": why})
             continue
         after, _ = score(docs, flags, agreed, {d: to})
@@ -449,7 +449,8 @@ def rank_fixes(docs, flags, agreed, scored):
         seen.add(r["dimension"])
         ranked.append(r)
     top = ranked[:TOP_FIXES]
-    dropped += [{"id": r["id"], "dimension": r["dimension"], "title": r["title"], "why": "not in the top %d" % TOP_FIXES}
+    dropped += [{"id": r["id"], "dimension": r["dimension"], "title": r["title"],
+                 "why": "it adds fewer fit points (+%s) than the top %d" % (QH.num(r["gain"]), TOP_FIXES)}
                 for r in ranked[TOP_FIXES:]]
     combined = None
     if top:
@@ -561,6 +562,7 @@ def build_result(docs):
         "fixes": top, "if_all_fixes": combined, "fixes_not_shown": dropped,
         "brief": brief(docs, factors),
         "judged_by": quick.get("judged_by"),
+        "reviewed_by": quick.get("reviewed_by"),
         "inputs_digest": S.digest(config, role, quick, docs["evidence"], docs.get("reply") or ""),
         "warnings": sorted(set(warnings) | ctx.warnings),
     }

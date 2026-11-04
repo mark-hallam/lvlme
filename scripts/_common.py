@@ -426,11 +426,11 @@ def judged_by_line(judged_by):
     """One plain line naming the AI agent (and model) that judged, because another agent can judge differently.
 
     >>> judged_by_line({"agent": "Claude Code", "model": "claude-opus-5-5"})
-    'Judged by Claude Code (model claude-opus-5-5). Another AI agent can judge the same evidence differently; the maths after the judging is the same.'
+    'Judged by Claude Code (model claude-opus-5-5). Another AI agent, or another run, can judge the same evidence differently, often by a few fit points; the maths after the judging is the same.'
     >>> judged_by_line(None)
-    'Which AI agent judged was not recorded. Another AI agent can judge the same evidence differently; the maths after the judging is the same.'
+    'Which AI agent judged was not recorded. Another AI agent, or another run, can judge the same evidence differently, often by a few fit points; the maths after the judging is the same.'
     """
-    tail = " Another AI agent can judge the same evidence differently; the maths after the judging is the same."
+    tail = " Another AI agent, or another run, can judge the same evidence differently, often by a few fit points; the maths after the judging is the same."
     agent = ((judged_by or {}).get("agent") or "").strip()
     if not agent:
         return "Which AI agent judged was not recorded." + tail

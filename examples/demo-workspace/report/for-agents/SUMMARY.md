@@ -13,7 +13,7 @@ Privacy: sensitive mode is ON. Employer names, third-party names and salary are 
 A program, applied AI or policy role at an AI product company. Fictional demo goal for Alex Example: one of three made-up AI companies, ideally in Australia.
 
 ## Outlook
-- Which AI agent judged was not recorded. Another AI agent can judge the same evidence differently; the maths after the judging is the same.
+- Which AI agent judged was not recorded. Another AI agent, or another run, can judge the same evidence differently, often by a few fit points; the maths after the judging is the same.
 - Chance of reaching the goal within 12 months if the campaign is followed: Low
 - An offer at one of the three organisations within 12 months is possible but not likely yet. The best path is Initech Robotics in Australia, where Alex's work rights and warehouse background fit. It moves to Moderate if a warm path into Initech opens and the overstated LinkedIn claim is fixed.
 - Best match (the best fit across your open roles, a fit score, not a probability): 57 of 100

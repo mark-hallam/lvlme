@@ -294,7 +294,7 @@
       "id": "F4",
       "dimension": "D1",
       "title": "Add customer-facing deployment experience",
-      "why": "this factor does not move in a few months"
+      "why": "requirements match does not move in a few months"
     }
   ],
   "brief": {
@@ -315,6 +315,7 @@
     ]
   },
   "judged_by": null,
+  "reviewed_by": null,
   "inputs_digest": "sha256:dc769cd4632fa15585c62059c7be5aa02cfecfef6848060f49d2d23ab2969060",
   "warnings": []
 }

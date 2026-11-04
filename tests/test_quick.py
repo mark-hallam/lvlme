@@ -104,12 +104,12 @@ class DemoTests(Base):
                          [("F1", 1, 3, 8.0), ("F2", 2, 3, 4.0), ("F3", 2, 3, 2.0)])   # F1 asked for 4; the cap allows +2
         self.assertEqual(r["if_all_fixes"], {"fit": 55.0, "interview_band": "Moderate", "offer_band": "Low", "gain": 14.0})
         self.assertEqual(r["fixes_not_shown"], [{"id": "F4", "dimension": "D1", "title": "Add customer-facing deployment experience",
-                                                 "why": "this factor does not move in a few months"}])
+                                                 "why": "requirements match does not move in a few months"}])
 
     def test_a_left_out_fix_is_named_with_its_reason(self):
         """A fix the agent suggested never disappears without a word: the page always says why, and the
         message does too when fewer than three fixes are shown."""
-        line = 'Not listed: "Add customer-facing deployment experience", because this factor does not move in a few months.'
+        line = 'Not listed: "Add customer-facing deployment experience", because requirements match does not move in a few months.'
         page = open(os.path.join(self.folder, "index.html"), encoding="utf-8").read()
         self.assertIn(line, page.replace("&quot;", '"'))
         self.assertNotIn("Not listed", open(os.path.join(self.folder, "message.md"), encoding="utf-8").read())
@@ -121,11 +121,15 @@ class DemoTests(Base):
         self.assertIn(line, message)
         self.assertLess(len(message.split()), 150)
 
-    def test_a_beaten_fix_needs_no_line(self):
+    def test_every_left_out_fix_is_named_so_the_agent_cannot_add_one(self):
+        # An agent once told the person the page listed a left-out fix it did not; now every one is named.
         r = self.load("result.json")
-        r["fixes_not_shown"] = [{"id": "F9", "dimension": "D2", "title": "Smaller", "why": "not in the top 3"},
+        r["fixes_not_shown"] = [{"id": "F9", "dimension": "D2", "title": "Smaller",
+                                 "why": "it adds fewer fit points (+1) than the top 3"},
                                 {"id": "F8", "dimension": "D2", "title": "Same", "why": "another fix to the same factor adds more"}]
-        self.assertEqual(QH.not_shown_lines(r), [])
+        self.assertEqual(QH.not_shown_lines(r), [
+            'Not listed: "Smaller", because it adds fewer fit points (+1) than the top 3.',
+            'Not listed: "Same", because another fix to the same factor adds more.'])
 
     def test_brief_never_holds_application_answers(self):
         r = self.load("result.json")
@@ -316,7 +320,7 @@ class ReviewTests(Base):
         self.assertEqual(result["fixes_not_shown"][0]["dimension"], "D1")
         line = ("A hard requirement is missing (5+ years deploying language models), so both chances drop a step, "
                 "and none of the fixes below changes that. The requirements match fix (\"Add customer-facing "
-                "deployment experience\") is not listed because this factor does not move in a few months.")
+                "deployment experience\") is not listed because requirements match does not move in a few months.")
         self.assertIn(line, message)
         self.assertLess(message.index(line), message.index("The fixes that would raise them most"))
         page = open(os.path.join(self.folder, "index.html"), encoding="utf-8").read()
@@ -359,8 +363,19 @@ class JudgedByTests(Base):
         self.assertEqual(result["judged_by"], {"agent": "Codex", "model": "gpt-5-codex"})
         with open(os.path.join(self.folder, "index.html"), encoding="utf-8") as fh:
             page = fh.read()
-        self.assertIn("Judged by Codex (model gpt-5-codex). Another AI agent can judge the same evidence differently", page)
+        self.assertIn("Judged by Codex (model gpt-5-codex). Another AI agent, or another run, can judge the same evidence differently", page)
         self.assertLess(len(text.split()), 150)        # the chat message stays short; the page says who judged
+
+    def test_the_blind_reviewer_is_named_when_recorded(self):
+        q = self.load("eval/quick.json")
+        q["reviewed_by"] = {"agent": "Claude Code helper agent (lvlme:reviewer)", "model": "claude-opus-5-5"}
+        self.save("eval/quick.json", q)
+        with mock.patch("sys.stdout", io.StringIO()):
+            result, _ = Q.build(self.folder)
+        page = QH.render(result)
+        self.assertIn("The blind reviewer was Claude Code helper agent (lvlme:reviewer) (model claude-opus-5-5), "
+                      "a separate agent that saw none of the first scores.", page)
+        self.assertNotIn("The blind reviewer was", QH.render(dict(result, reviewed_by=None)))
 
     def test_not_recorded_is_said_plainly(self):
         result = self.result()
@@ -431,7 +446,7 @@ class NewFolderTests(unittest.TestCase):
                       "https://www.anthropic.com/candidate-ai-guidance", message)
         self.assertLess(len(message.split()), 150)
         page = QH.render(result)
-        self.assertIn('Anthropic asks for your own first draft. Write it, then I&#x27;ll review it. <a class="guide" '
+        self.assertIn('Anthropic asks for your own first draft. Write it, then ask your agent to review it. <a class="guide" '
                       'href="https://www.anthropic.com/candidate-ai-guidance">Their guidance on AI use</a>, checked '
                       '3 November 2026.', page)
         code, out, _ = run(["new", "--posting", LINK, "--saved-response", BOARD, "--date", "2026-11-02",

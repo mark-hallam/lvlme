@@ -82,19 +82,19 @@ CLIMB_HOME setting still work. If you installed the Climb plugin, one step
 moves it to the new name: see [Coming from Climb](docs/INSTALL.md#coming-from-climb).
 
 You need an AI agent (Claude Code or Codex; Cursor and other agents that run
-commands should work but are not tested yet), Python 3.9 or newer
-(LVLme uses only its standard library) and git. LVLme is tested on macOS; the
-scripts should work on Linux, and Windows is untested.
+commands are not tested yet), Python 3.9 or newer
+(LVLme uses only its standard library) and git. LVLme is tested on macOS;
+Linux and Windows are not tested yet.
 
 - **Claude Code** (version 2.1.275 or later): the one line above. Or download
   the folder and install from your copy (option B in the install guide).
 - **Codex:** run exactly
   `git clone https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme`
-  and type `$lvlme`, or open Codex in the folder (it follows `AGENTS.md`). Do
+  and say "run LVLme quick", or open Codex in the folder (it follows `AGENTS.md`). Do
   not use a skill installer: it copies only part of the folder.
 - **Cursor** (not tested yet): open the folder. The rules in `.cursor/rules/`
   and `AGENTS.md` should load on their own. Cursor and other agents that run
-  commands should work but are not tested yet.
+  commands are not tested yet.
 
 Every agent, step by step: [`docs/INSTALL.md`](docs/INSTALL.md).
 
@@ -128,8 +128,9 @@ weekly, plus whenever something changes.
   evidence and the postings and told not to open the first scores, checks
   every point above 2. The maths is a script, so the
   same judgements always give the same score. Different AI agents (for
-  example Claude and Codex) can judge the same evidence differently, so the
-  result page and the dashboard name which agent and model judged. The
+  example Claude and Codex) can judge the same evidence differently, and so
+  can two runs of the same agent, often by a few fit points, so the result
+  page and the dashboard name which agent and model judged. The
   default answer is "unlikely".
 - **Private.** Your data lives in a folder on your own computer
   (`~/lvlme-workspaces/`), never in this repository, and the scripts refuse to

@@ -174,7 +174,8 @@ def verdict(page, nl, lead):
     who = "this role" if same else role_name(m["role"])
     if m["ceiling"] < nl["target"]:
         out.append('<p class="small">Even with every factor at the most the plan\'s caps allow, %s tops out at %s. Reaching %s needs '
-                   'something the caps rule out within this plan, such as more years in a similar role, or a different role.</p>'
+                   'something the caps rule out within this plan, such as more years in a similar role, or a different role. '
+                   'The rows below are the room left on top of what your actions are already expected to add.</p>'
                    % (who, fp(m["ceiling"]), lvl))
     else:
         out.append('<p class="small sub">Room left on %s within the plan\'s caps, in fit points, if new actions fully work. The %s '

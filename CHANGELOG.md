@@ -8,6 +8,66 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## 0.6.2 (5 November 2026)
+
+A first-run polish release after a second new-user test and three rounds of
+independent design review (Claude, Codex and Grok, each blind). It makes the
+first answer a stranger gets agree with itself everywhere: in the chat, on
+the result page and on the dashboard. How a score is worked out did not
+change. The full notes are in [LVLme 0.6.2](docs/RELEASE-0.6.2.md).
+
+Tests: 538 pass.
+
+### Fixed
+
+- **The blind review is read whichever way the reviewer writes it.** A
+  reviewer that wrote the factor as "D1 Requirements match" or by its name
+  alone was not read, so the result said "Waiting for the reviewer" next to
+  the reviewer's own score. `quick.py` now reads the code, the name or both,
+  and a reply it still cannot read is said plainly ("no readable score ...
+  counts as 2"), never shown as waiting.
+- **A promoted campaign keeps its role.** `quick.py promote` made the role
+  family's keyword from the title without its punctuation, so "Customer
+  Success Manager, Commercial" matched nothing and the first job-board
+  refresh after promoting dropped the campaign's only role. The keyword now
+  matches the title's own words in order. The dashboard's market table also
+  counts the promoted role before any job-board summary exists.
+- **Every fix the agent suggested is accounted for.** The result page now
+  names every left-out fix with its reason (including "it adds fewer fit
+  points than the top 3"), and names the factor that cannot move in a few
+  months, so an agent cannot tell the person the page lists something it
+  does not.
+
+### Changed
+
+- **One status per factor on the result page**, for example "First score 3,
+  blind reviewer 2: counts as 2". The page says who did the blind review
+  when the agent records it (new optional `reviewed_by` in
+  `eval/quick.json`), how a factor's fit points are worked out, what E01 and
+  the other evidence ids are, and that the fixes total and the "up to" range
+  are two different what ifs. It says what the AI provider sees, and folds
+  the inputs fingerprint into Technical details.
+- **Honest about run to run differences.** The result page, the dashboard
+  and the docs say that another AI agent, or another run of the same one,
+  can judge the same evidence differently, often by a few fit points; the
+  maths after the judging is the same.
+- **Dashboard words.** Altitude (fit) and Flight level (chance) say what
+  they are; Do next and the promote message explain that expected points
+  are a fix's gain times its chance of working, so they are smaller than the
+  gains on a quick result; Biggest unlocks says its numbers have no time
+  limit; the version history, outlook and empty SWOT text are plain and
+  point at the next step (the career interview); "What is missing" explains
+  its rows. The theme switch has Auto, the new default, which follows the
+  device like the website and the result page.
+- **The quick skill.** Agents never write or edit the blind review
+  themselves (if they cannot start a separate reviewer, the scores wait for
+  one), write notes in plain words with no file paths, paste the result as
+  it is, and record who reviewed.
+- **Docs.** LVLme quick asks at most two yes or no questions (not one). If
+  the `/lvlme-quick` command is not found right after installing, start a
+  new Claude Code session. Cursor, other agents, Linux and Windows are
+  described as not tested yet, without predicting that they work.
+
 ## 0.6.1 (5 November 2026)
 
 A fix release after a new-user test: we installed LVLme the way a new person

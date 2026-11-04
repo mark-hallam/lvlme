@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
   "band": "Not yet judged",
-  "text": "Your agent writes this when it runs the full campaign (say \"run LVLme\").",
+  "text": "Your agent writes this after your career interview, the next step: say \"run the LVLme interview\".",
   "reasons": []
 }

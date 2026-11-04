@@ -195,8 +195,9 @@ Most career advice flatters. LVLme is built to do the opposite.
 - **The maths is a script, not a mood.** Judgements live in files. A
   deterministic script turns them into scores, so the same judgements always
   give the same score, and every change can be traced. Different AI agents
-  (for example Claude and Codex) can judge the same evidence differently, so
-  the result page and the dashboard name which agent and model judged.
+  (for example Claude and Codex) can judge the same evidence differently, and
+  so can two runs of the same agent, often by a few fit points, so the result
+  page and the dashboard name which agent and model judged.
 - **The default answer is "unlikely".** Competitive employers reject most
   applicants. The bands start from that fact.
 - **No fabrication, no profiling.** It never invents experience, numbers,

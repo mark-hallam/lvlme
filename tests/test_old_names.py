@@ -210,7 +210,7 @@ class DashboardStorageTests(unittest.TestCase):
         pend = js[start:js.index("function savePending", start)]
         prog = ("const store = %s; globalThis.localStorage = {getItem: k => k in store ? store[k] : null};\n"
                 "const D = {meta: {title: 'Demo'}, actions: [{id: 'A01'}, {id: 'A02'}]}; const live = a => true;\n"
-                "let theme = 'light';\n%s\n%s\nconsole.log(JSON.stringify({theme, pending: [...pending]}));"
+                "let theme = 'auto';\n%s\n%s\nconsole.log(JSON.stringify({theme, pending: [...pending]}));"
                 % (json.dumps(store), theme, pend))
         res = subprocess.run([NODE, "-"], input=prog, capture_output=True, text=True, timeout=60)
         self.assertEqual(res.returncode, 0, res.stderr)
@@ -224,6 +224,10 @@ class DashboardStorageTests(unittest.TestCase):
         got = self.run_js({"climb-theme": "dark", "lvlme-theme": "light",
                            "climb-pending:Demo": json.dumps(["A02"]), "lvlme-pending:Demo": json.dumps(["A01"])})
         self.assertEqual(got, {"theme": "light", "pending": ["A01"]})
+
+    def test_auto_is_the_default_and_is_kept(self):
+        self.assertEqual(self.run_js({})["theme"], "auto")
+        self.assertEqual(self.run_js({"lvlme-theme": "auto"})["theme"], "auto")
 
     def test_new_keys_are_written(self):
         js = A.JS_CORE + A.JS_HOME + A.JS_VIEWS + A.JS_LEVELS + A.JS_DETAIL

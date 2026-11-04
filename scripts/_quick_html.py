@@ -342,21 +342,21 @@ def hard_requirement_line(result):
     return line
 
 
-SHOWN_REASONS = ("this factor does not move", "adds no fit points", "already at or above")
+SHOWN_REASONS = ("does not move in a few months", "adds no fit points", "already at or above", "it adds fewer fit points",
+                 "another fix to the same factor")
 
 
 def not_shown_lines(result):
-    """One plain line per fix the agent suggested that is left off for a reason the person would
-    wonder about (it cannot move in a few months, it adds nothing, it is already met). A fix
-    beaten by a bigger one on the same factor, or outside the top, needs no line. The
-    requirements match fix is skipped when the hard requirement line already explains it."""
+    """One plain line per fix the agent suggested that is left off, with the reason, so the page, the
+    message and anything the agent says name the same fixes. The requirements match fix is skipped
+    when the hard requirement line already explains it."""
     skip = None
     if result.get("hard_requirement_lacking"):
         d1 = [x for x in result.get("fixes_not_shown") or [] if x.get("dimension") == "D1"]
         skip = d1[0]["id"] if d1 else None
     return ['Not listed: "%s", because %s.' % (x["title"], x["why"])
             for x in result.get("fixes_not_shown") or []
-            if x["id"] != skip and x["why"].startswith(SHOWN_REASONS)]
+            if x["id"] != skip and any(r in x["why"] for r in SHOWN_REASONS)]
 
 
 def fixes(result):
@@ -406,7 +406,8 @@ def brief(result):
             '<h2 id="briefH">Before you apply</h2>%s<p class="small sub" style="margin-top:12px">LVLme gives fixes and a '
             'brief, never application answers: you write those in your own words. %s</p></section>'
             % ("".join(parts), ai_guidance(result["role"]).replace(
-                "then I'll review it", "then ask your agent to review it")))
+                "then I'll review it", "then ask your agent to review it").replace(
+                "then I&#x27;ll review it", "then ask your agent to review it")))
 
 
 def ai_guidance(role):
@@ -437,6 +438,9 @@ def checked(result):
         for f in rv["flags"])
     agreed = len(rv["agreed"])
     need = agreed + len(rv["disputes"]) + sum(1 for f in result["factors"] if f["review"]["status"] in ("awaiting", "unreadable"))
+    rb = result.get("reviewed_by") or {}
+    who = ("The blind reviewer was %s%s, a separate agent that saw none of the first scores. " % (
+        rb["agent"], " (model %s)" % rb["model"] if rb.get("model") else "")) if rb.get("agent") else ""
     lead = ("No score was above 2, so no review was needed." if need == 0 else
             "A second agent, given only the rubric, your evidence and the posting, scored every factor above 2 "
             "without seeing the first scores. It agreed on %d of %d%s." % (
@@ -446,7 +450,7 @@ def checked(result):
             '<h2 id="chkH">A blind second opinion</h2><p class="small">%s</p>%s%s'
             '<p class="small sub" style="margin-top:12px">%s</p></section>' % (
                 esc(lead), table, ('<ul class="ev">%s</ul>' % flags) if flags else "",
-                esc(C.judged_by_line(result.get("judged_by")))))
+                esc((who if need else "") + C.judged_by_line(result.get("judged_by")))))
 
 
 def deeper():
