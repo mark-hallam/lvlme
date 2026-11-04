@@ -377,6 +377,19 @@ class JudgedByTests(Base):
                       "a separate agent that saw none of the first scores.", page)
         self.assertNotIn("The blind reviewer was", QH.render(dict(result, reviewed_by=None)))
 
+    def test_the_top_card_names_the_judge_and_evidence_is_in_order(self):
+        q = self.load("eval/quick.json")
+        q["judged_by"] = {"agent": "Codex"}
+        self.save("eval/quick.json", q)
+        with mock.patch("sys.stdout", io.StringIO()):
+            result, _ = Q.build(self.folder)
+        page = QH.render(result)
+        top = page[page.index('aria-labelledby="oddsH"'):page.index('aria-labelledby="whyH"')]
+        self.assertIn("Judged by Codex.", top)
+        for f in result["factors"]:
+            ids = re.findall(r'<span class="id">(E\d+)</span>', QH.evidence_list(f["evidence"]))
+            self.assertEqual(ids, sorted(ids))
+
     def test_not_recorded_is_said_plainly(self):
         result = self.result()
         self.assertIsNone(result["judged_by"])

@@ -238,10 +238,18 @@ def hero(result):
             '<p class="lead"><b>%s.</b> %s</p>%s'
             '<p class="sub small">The chances are for today\'s fit. They are judgement estimates, not statistics. '
             'Most applicants to competitive roles are turned down, so LVLme starts from "unlikely" and only evidence '
-            'moves it.</p>%s</section>'
+            'moves it.%s</p>%s</section>'
             % (esc(r["title"]), where, link, meter(result["interview_band"], "Interview chance"),
                meter(result["offer_band"], "Offer chance"), esc(headline(result)),
-               esc(EXPLAIN[result["interview_band"]]), fit_range(result), banners))
+               esc(EXPLAIN[result["interview_band"]]), fit_range(result), judged_short(result), banners))
+
+
+def judged_short(result):
+    """' Judged by Claude Code (model ...).' in the top card, so the person sees who judged before reading on."""
+    jb = result.get("judged_by") or {}
+    if not jb.get("agent"):
+        return ""
+    return " Judged by %s%s." % (esc(jb["agent"]), esc(" (model %s)" % jb["model"]) if jb.get("model") else "")
 
 
 def fit_range(result):
@@ -265,7 +273,7 @@ def evidence_list(rows):
     if not rows:
         return '<p class="small sub">No evidence cited, so this counts 0.</p>'
     items = []
-    for e in rows:
+    for e in sorted(rows, key=lambda x: x["id"]):
         label, cls = LEVELS.get(e["level"], (e["level"], "s"))
         src = ", ".join(SOURCES.get(s, s) for s in e["sources"])
         items.append('<li><span class="id">%s</span><span>%s %s%s</span></li>' % (
@@ -466,7 +474,8 @@ def render(result):
     demo = '<span class="sep"> · </span><span class="nw">fictional demo</span>' if result.get("fictional") else ""
     foot = ("Drafts only: LVLme never applies, sends or posts for you. Your CV and this page stay on your computer; "
             "like anything your AI agent reads, they were also processed by its provider. "
-            "<details class=\"tech\"><summary>Technical details</summary>Inputs fingerprint %s.</details>"
+            "<details class=\"tech\"><summary>Technical details</summary>Inputs fingerprint %s: a code that changes if the "
+            "CV, the posting or any judgement changes, so two results can be told apart.</details>"
             % esc(result["inputs_digest"][:19]))
     body = "".join([hero(result), factors(result), fixes(result), brief(result), checked(result), deeper()])
     return ("<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">"

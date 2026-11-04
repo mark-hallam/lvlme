@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "updated_on": "2026-01-01",
-  "principle": "Attack the binding constraint first: eligibility, then a warm path, then visible proof of work, then a tailored application.",
+  "principle": "Work first on what holds your odds down most: usually eligibility, then a warm path, then visible proof of work, then a tailored application. Do next orders the actions by expected points for the effort.",
   "max_active": 8,
   "north_star": [
     {
