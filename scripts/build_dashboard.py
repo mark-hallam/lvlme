@@ -81,6 +81,7 @@ import _posting_checks as PC  # noqa: E402
 import _applications as AP  # noqa: E402
 import _calibration as CAL  # noqa: E402
 import _research as RS  # noqa: E402
+import _stories as STY  # noqa: E402
 import _doors as DR  # noqa: E402
 import _autopilot as APL  # noqa: E402
 import _static_html as ST  # noqa: E402
@@ -208,6 +209,7 @@ class Data:
         self.today = today or C.today_in(config)            # follow-ups fall due, and doors pass, by the calendar
         self.calib = CAL.summary(ws, self.apps, self.today) if self.apps else None   # advisory: never scored
         self.orgs_doc = load("market", "orgs.json")
+        self.stories = load("profile", "stories.json")       # progress only: never scored
         self.packs = {}                                      # research packs, written by main() before the page
         self.claims = (load("profile", "claims-audit.json") or {}).get("claims", [])
         self.swot = load("eval", "swot.json")
@@ -622,6 +624,7 @@ def build_data(data):
         "doors": DR.page_data(data.doors, data.today, data.org_names),
         "calib": data.calib,
         "packs": data.packs,
+        "stories": STY.page_data(data.stories, data.config, data.evidence),
         "week": APL.page_data(data.week, clean),
     }
     out["orgOrder"] = [g for g in groups if g in out["orgs"]]
@@ -868,6 +871,8 @@ def agent_payload(data, page):
         payload["applications"] = AP.agent_data(data.apps, data.today, data.org_names)
     if data.calib:
         payload["calibration"] = data.calib
+    if data.stories is not None:
+        payload["stories"] = STY.page_data(data.stories, data.config, data.evidence)
     if data.packs:
         payload["research_packs"] = {o: dict(p, path="report/" + p["path"]) for o, p in data.packs.items()}
     if data.doors is not None:
@@ -1036,6 +1041,7 @@ def summary_md(data, p):
         lines += AP.summary_lines(p["applications"])
     lines += DR.summary_lines(p.get("doors"))
     lines += CAL.summary_lines(p.get("calibration"))
+    lines += STY.summary_lines(p.get("stories"))
     lines += RS.summary_lines(data.packs, data.org_names)
     return "\n".join(lines) + "\n"
 

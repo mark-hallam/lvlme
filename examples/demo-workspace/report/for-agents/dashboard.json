@@ -2104,6 +2104,114 @@
       "ranking": null
     }
   },
+  "stories": {
+    "note": "Progress only: it changes no score. Every story is yours, in your words; LVLme never writes one for you.",
+    "themes_note": "Inferred from common interview guidance; no employer publishes its question list.",
+    "themes": [
+      {
+        "id": "why_here",
+        "name": "Why this organisation",
+        "ask": "Why do you want to work here, on this mission?",
+        "status": "backed",
+        "stories": [
+          "S02"
+        ]
+      },
+      {
+        "id": "impact",
+        "name": "Impact with a number",
+        "ask": "Tell me about something you changed that you can measure.",
+        "status": "backed",
+        "stories": [
+          "S01"
+        ]
+      },
+      {
+        "id": "hard_problem",
+        "name": "A hard problem solved",
+        "ask": "Tell me about the hardest problem you have solved.",
+        "status": "backed",
+        "stories": [
+          "S02"
+        ]
+      },
+      {
+        "id": "mistake",
+        "name": "A mistake and what changed",
+        "ask": "Tell me about a mistake, and what you changed after.",
+        "status": "word",
+        "stories": [
+          "S04"
+        ]
+      },
+      {
+        "id": "disagree",
+        "name": "Disagreeing well",
+        "ask": "Tell me about a time you disagreed with a decision.",
+        "status": "word",
+        "stories": [
+          "S03"
+        ]
+      },
+      {
+        "id": "lead",
+        "name": "Leading without authority",
+        "ask": "Tell me about getting people to act when they did not report to you.",
+        "status": "backed",
+        "stories": [
+          "S01"
+        ]
+      },
+      {
+        "id": "values",
+        "name": "Values under pressure",
+        "ask": "Tell me about a time doing the right thing cost you something.",
+        "status": "missing",
+        "stories": []
+      }
+    ],
+    "stories": [
+      {
+        "id": "S01",
+        "title": "Six-site scheduling rollout",
+        "themes": [
+          "impact",
+          "lead"
+        ],
+        "strength": "corroborated",
+        "result": "All six sites moved over in five months. The case study, with numbers checked by my former manager, is public."
+      },
+      {
+        "id": "S02",
+        "title": "Testing AI answers about logistics",
+        "themes": [
+          "hard_problem",
+          "why_here"
+        ],
+        "strength": "verified",
+        "result": "Fourteen releases and two outside contributors so far. It is why I want to help AI companies deploy well."
+      },
+      {
+        "id": "S03",
+        "title": "Pushing back on the peak staffing plan",
+        "themes": [
+          "disagree"
+        ],
+        "strength": "partially_verified",
+        "result": "The trial worked and became the plan for all six sites; overtime fell by about 12 percent."
+      },
+      {
+        "id": "S04",
+        "title": "Fixing my own headline",
+        "themes": [
+          "mistake"
+        ],
+        "strength": "self_reported",
+        "result": "Every number I use now matches across my CV, LinkedIn and site."
+      }
+    ],
+    "gaps": 3
+  },
   "research_packs": {
     "acme": {
       "path": "report/research/acme.html",

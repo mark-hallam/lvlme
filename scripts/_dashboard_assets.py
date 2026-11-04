@@ -544,6 +544,7 @@ BODY = r"""
   <div class="card pair" id="warmCard" hidden><div class="eyebrow">Warm paths</div><div class="tiny sub" id="warmSub" style="margin-bottom:4px"></div><div id="warm"></div></div>
   <div class="card pair" id="doorsCard" hidden><div class="eyebrow">Doors</div><div class="tiny sub" id="doorsSub" style="margin-bottom:4px"></div><div id="doors"></div></div>
   <div class="card pair" id="appsCard" hidden><div class="eyebrow">Applications</div><div class="tiny sub" id="appsSub" style="margin-bottom:4px"></div><div id="apps"></div></div>
+  <div class="card pair" id="storiesCard" hidden><div class="eyebrow">Story bank</div><div class="tiny sub" id="storiesSub" style="margin-bottom:4px"></div><div id="stories"></div></div>
   <div class="card pair" id="calibCard" hidden><div class="eyebrow">How right has LVLme been?</div><div class="tiny sub" id="calibSub" style="margin-bottom:4px"></div><div id="calib"></div></div>
   <div class="card pair" id="unlocksCard"><div class="eyebrow">Biggest unlocks</div><div class="tiny sub" id="unlocksSub" style="margin-bottom:4px"></div><div id="unlocks"></div></div>
 
@@ -1013,6 +1014,17 @@ function doorsHTML(){
     <div class="tiny sub">${esc(r.why)}${r.action ? ` Plan action ${esc(r.action)}.` : ""}${r.verified ? "" : " Not yet checked."}</div></div>`).join("")}</div>` +
     `<div class="tiny sub" style="margin-top:6px">${R.more ? plural(R.more, "more door") + " in market/doors.json. " : ""}Ask your agent to add one to your plan, for example "add ${esc(R.rows[0].id)} to my plan".</div>`;
 }
+// Story bank (profile/stories.json, scripts/stories.py): which interview themes have a true story ready, and how
+// well it is backed. Progress only. The person's stories, in their words; LVLme never writes one.
+const storiesSub = () => { const S = D.stories; return S.gaps ? `${plural(S.gaps, "theme")} still need a story backed by evidence.` : "Every theme has a story backed by evidence."; };
+function storiesHTML(){
+  const S = D.stories; if (!S) return "";
+  const word = {backed: "Backed", word: "Not backed yet", missing: "No story yet"};
+  const byId = Object.fromEntries(S.stories.map(s => [s.id, s]));
+  return `<div>${S.themes.map(t => `<div class="wp"><div class="wp-h"><span class="wp-n">${esc(t.name)}</span><span class="wp-s${t.status === "backed" ? "" : " none"}">${esc(word[t.status])}</span></div>
+    <div class="tiny sub">${t.stories.length ? t.stories.map(id => esc((byId[id] || {}).title || id)).join(" · ") : `Interviews ask: "${esc(t.ask)}"`}</div></div>`).join("")}</div>
+    <div class="tiny sub" style="margin-top:6px">${esc(S.themes_note)} ${S.gaps ? `Ask your agent to add a story, or to put a gap in your plan.` : ""}</div>`;
+}
 // How right has LVLme been (scripts/_calibration.py): the odds each application had on the day it was sent, against
 // what happened. Advisory only: it never changes a score. A band's rate stays hidden until it has enough results.
 const calibSub = () => `The odds LVLme gave on the day you applied, against what happened. Checks LVLme; changes no score.`;
@@ -1060,16 +1072,19 @@ function renderDoNext(){
   if (doors) $("#doorsSub").textContent = doorsSub();
   const apps = appsHTML(); $("#apps").innerHTML = apps; $("#appsCard").hidden = !apps;
   if (apps) $("#appsSub").textContent = appsSub();
+  const stories = storiesHTML(); $("#stories").innerHTML = stories; $("#storiesCard").hidden = !stories;
+  if (stories) $("#storiesSub").textContent = storiesSub();
   const calib = calibHTML(); $("#calib").innerHTML = calib; $("#calibCard").hidden = !calib;
   if (calib) $("#calibSub").textContent = calibSub();
   if (!narrow() && !state.stack.length) renderHome();
 }
 function renderHome(){
-  const card = $("#detailCard"), warm = warmHTML(), apps = appsHTML(), doors = doorsHTML(), calib = calibHTML();
+  const card = $("#detailCard"), warm = warmHTML(), apps = appsHTML(), doors = doorsHTML(), calib = calibHTML(), stories = storiesHTML();
   card.innerHTML = `<div class="d-body"><div class="eyebrow">Start here</div><h2 class="pane-h" style="margin:0">Do next</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doNextSub(lv().nl))}</div><div>${doNextHTML()}</div>
     ${warm ? `<h2 class="pane-h" style="margin:18px 0 0">Warm paths</h2><div class="tiny sub" style="margin-bottom:4px">${esc(warmSub())}</div>${warm}` : ""}
     ${doors ? `<h2 class="pane-h" style="margin:18px 0 0">Doors</h2><div class="tiny sub" style="margin-bottom:4px">${esc(doorsSub())}</div>${doors}` : ""}
     ${apps ? `<h2 class="pane-h" style="margin:18px 0 0">Applications</h2><div class="tiny sub" style="margin-bottom:4px">${esc(appsSub())}</div>${apps}` : ""}
+    ${stories ? `<h2 class="pane-h" style="margin:18px 0 0">Story bank</h2><div class="tiny sub" style="margin-bottom:4px">${esc(storiesSub())}</div>${stories}` : ""}
     ${calib ? `<h2 class="pane-h" style="margin:18px 0 0">How right has LVLme been?</h2><div class="tiny sub" style="margin-bottom:4px">${esc(calibSub())}</div>${calib}` : ""}
     <h2 class="pane-h" style="margin:18px 0 0">Biggest unlocks</h2><div class="tiny sub" style="margin-bottom:4px">${UNLOCKS_SUB}</div><div>${unlocksHTML()}</div>
     <div class="tiny sub" style="margin-top:18px;padding-top:12px;border-top:1px solid var(--rule)">Tap any organisation, role, factor, action or piece of evidence to drill in here.</div></div>`;

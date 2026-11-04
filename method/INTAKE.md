@@ -333,4 +333,10 @@ that is a fact as an evidence item with a source of type `interview` and a
    (`CONSISTENCY.md`).
 5. Update `config.json` if the goal, targets, families, locations or
    `candidate.eligibility_cleared` changed.
-6. Run `python3 scripts/validate.py`.
+6. Put the stories into the story bank. Each true story the person told
+   (story questions 3 and 7, and any other), in their words, goes in with
+   `python3 scripts/stories.py add --source intake`, in the STAR shape
+   (situation, task, action, result), with the evidence ids behind it and the
+   themes it answers. Read it back to them first. Never fill a gap in a story
+   or a number yourself: ask.
+7. Run `python3 scripts/validate.py`.

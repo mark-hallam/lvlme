@@ -25,6 +25,7 @@ WORKSPACE_SCRIPTS = {
     "fetch_roles.py": [],
     "fetch_doors.py": [],
     "doors.py": ["list"],
+    "stories.py": ["list"],
     "score.py": [],
     "build_dashboard.py": [],
     "network_map.py": ["--csv", os.path.join(H.FIXTURES, "Connections.csv")],

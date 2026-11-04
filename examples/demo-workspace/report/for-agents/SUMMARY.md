@@ -155,6 +155,17 @@ A program, applied AI or policy role at an AI product company. Fictional demo go
   - Ranking check: shows after 10 results, with at least one that led to an offer and one that didn't.
 - Public figures: Ashby Talent Trends: referrals (16 May 2025, https://www.ashbyhq.com/talent-trends-report/reports/referrals).
 
+## Story bank (progress only: changes no score)
+- Inferred from common interview guidance; no employer publishes its question list.
+- Why this organisation: backed by evidence (S02).
+- Impact with a number: backed by evidence (S01).
+- A hard problem solved: backed by evidence (S02).
+- A mistake and what changed: not backed yet (S04).
+- Disagreeing well: not backed yet (S03).
+- Leading without authority: backed by evidence (S01).
+- Values under pressure: no story yet.
+- Never write a story for the person. Ask for theirs, then record it with `scripts/stories.py add`.
+
 ## Research packs (one page per target, every line sourced)
 - Acme AI: report/research/acme.html (12 lines, 2 not yet checked).
 - Globex Labs: report/research/globex.html (10 lines, 2 not yet checked).

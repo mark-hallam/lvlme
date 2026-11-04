@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "updated_on": "2026-11-01",
+  "stories": [
+    {
+      "id": "S01",
+      "title": "Six-site scheduling rollout",
+      "themes": [
+        "impact",
+        "lead"
+      ],
+      "situation": "Contoso Freight ran six warehouses on paper rosters, and late trucks backed up every Monday.",
+      "task": "I was asked to move all six sites to one scheduling system without stopping a shift.",
+      "action": "I ran it one site at a time, trained a lead at each site first, and kept paper as a fallback for two weeks.",
+      "result": "All six sites moved over in five months. The case study, with numbers checked by my former manager, is public.",
+      "reflection": "I would bring the site leads in before choosing the system, not after.",
+      "evidence": [
+        "E05",
+        "E15"
+      ],
+      "source": "intake",
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "S02",
+      "title": "Testing AI answers about logistics",
+      "themes": [
+        "hard_problem",
+        "why_here"
+      ],
+      "situation": "AI tools gave confident answers about freight rules that were often wrong, and nobody could say how often.",
+      "task": "I wanted a repeatable way to score those answers before anyone relied on them.",
+      "action": "I built route-eval, an open source tool with a set of checked logistics questions, and published every release.",
+      "result": "Fourteen releases and two outside contributors so far. It is why I want to help AI companies deploy well.",
+      "evidence": [
+        "E04"
+      ],
+      "source": "intake",
+      "added_on": "2026-10-04"
+    },
+    {
+      "id": "S03",
+      "title": "Pushing back on the peak staffing plan",
+      "themes": [
+        "disagree"
+      ],
+      "situation": "For the 2024 peak season the plan was to add overtime across all six warehouses.",
+      "task": "I thought overtime would burn people out and asked to test a different roster first.",
+      "action": "I showed the regional manager last year's overtime data and proposed a two-week trial at one site.",
+      "result": "The trial worked and became the plan for all six sites; overtime fell by about 12 percent.",
+      "evidence": [
+        "E20"
+      ],
+      "source": "intake",
+      "added_on": "2026-10-11"
+    },
+    {
+      "id": "S04",
+      "title": "Fixing my own headline",
+      "themes": [
+        "mistake"
+      ],
+      "situation": "My LinkedIn headline said I led a team of 40. It was 8; the 40 was everyone on the program.",
+      "task": "A consistency check caught it, and it would have undercut everything else I claimed.",
+      "action": "I corrected the headline and checked every other number against my CV and my referee.",
+      "result": "Every number I use now matches across my CV, LinkedIn and site.",
+      "reflection": "I now write the number first and the sentence second.",
+      "evidence": [],
+      "source": "person",
+      "added_on": "2026-10-18"
+    }
+  ]
+}

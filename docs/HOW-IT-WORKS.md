@@ -266,6 +266,11 @@ For a plain-English tour of each number and what to do first, see
 - **Doors**: the next events, programmes and communities where people from
   your targets will be, soonest first, with why each one matters. Ask your
   agent to add one to your plan.
+- **Story bank**: your best true stories for interviews, in your words, in
+  the STAR shape (situation, task, action, result), each linked to its
+  evidence. The card shows which common interview themes have a story backed
+  by evidence, which need backing and which have none yet; a gap can become a
+  plan action.
 - **Research packs**: one page per target organisation (report/research/),
   opened from the organisation's detail: what it is building, recent news,
   offices, the teams hiring, its events and programmes, and its rules on AI

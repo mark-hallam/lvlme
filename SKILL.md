@@ -213,6 +213,11 @@ rights question when `fetch_roles.py` first finds an open role that needs it.
   to send (`method/CAMPAIGN.md`, "Applications and follow-ups"). Give
   `--role-id` for a scored role, so "How right has LVLme been" can check the
   odds it gave that day against what happened.
+- Story bank: record each true story the person tells, in their words, with
+  `python3 scripts/stories.py add` (themes, STAR parts, evidence ids). Never
+  write a story or a number for them. `stories.py gaps` shows the themes with
+  no story backed by evidence; offer to put one in the plan with
+  `stories.py plan <theme>`.
 - Before a coffee chat, an event or an application, point the person to that
   organisation's research pack (`report/research/<org>.html`, rebuilt with
   the dashboard) and offer to check any line marked not yet checked.

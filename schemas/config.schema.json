@@ -106,6 +106,16 @@
         "horizon_days": {"type": "integer", "minimum": 7, "maximum": 365, "description": "How far ahead to keep events. Default 120."}
       }
     },
+    "stories": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The interview story bank (profile/stories.json).",
+      "properties": {
+        "themes": {"type": "array", "minItems": 1, "description": "Replaces LVLme's default question themes.",
+          "items": {"type": "object", "required": ["id", "name"], "additionalProperties": false,
+            "properties": {"id": {"type": "string", "pattern": "^[a-z0-9_]+$"}, "name": {"type": "string"}, "ask": {"type": "string"}}}}
+      }
+    },
     "autopilot": {
       "type": "object",
       "additionalProperties": false,

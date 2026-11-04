@@ -35,6 +35,15 @@ before. Nothing here changes how a score is worked out unless it says so.
   hidden until it has 5 results, and a ranking check (did the higher-rated
   applications do better?) until 10. Advisory only: a test proves scores are
   identical with or without outcomes. The demo now has made-up applications.
+- **Interview story bank.** Your best true stories, in your words, in
+  `profile/stories.json`: each in the STAR shape (situation, task, action,
+  result) with what you would do differently, the evidence behind it and the
+  interview themes it answers. `scripts/stories.py add` records one (the
+  career interview's stories go in at the end of the interview), `gaps` lists
+  the themes with no story backed by evidence, and `plan` turns a gap into a
+  plan action. A new Story bank card shows every theme's status. Themes are
+  inferred from common interview guidance and can be replaced in
+  `config.json` (`stories.themes`). LVLme never writes a story for you.
 - **Research packs.** One page per target organisation, in
   `report/research/`, linked from the organisation's detail on the
   dashboard: what it is building, recent news, offices, the teams hiring,

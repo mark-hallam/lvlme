@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Interview story bank (profile/stories.json)",
+  "description": "The person's best true stories, in their own words, each in the STAR shape (situation, task, action, result) with what they would do differently, the evidence behind it, and the question themes it answers. Written by scripts/stories.py after the person confirms each story. Progress only: score.py never reads this file.",
+  "type": "object",
+  "required": ["schema_version", "stories"],
+  "additionalProperties": false,
+  "patternProperties": {"^x_": {"description": "Extension field: any key starting x_ holds data the engine never reads."}},
+  "properties": {
+    "schema_version": {"const": 1},
+    "updated_on": {"$ref": "#/definitions/date"},
+    "stories": {"type": "array", "items": {"$ref": "#/definitions/story"}},
+    "actions": {"type": "object", "description": "Theme id to the plan action that closes its gap (scripts/stories.py plan).",
+                "additionalProperties": {"type": "string", "pattern": "^A[0-9]+$"}}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "story": {
+      "type": "object",
+      "required": ["id", "title", "themes", "situation", "task", "action", "result"],
+      "additionalProperties": false,
+      "patternProperties": {"^x_": {}},
+      "properties": {
+        "id": {"type": "string", "pattern": "^S[0-9]{2,}$"},
+        "title": {"type": "string", "minLength": 1},
+        "themes": {"type": "array", "minItems": 1, "items": {"type": "string"}, "description": "Theme ids (scripts/_stories.py THEMES, or config.json stories.themes)."},
+        "situation": {"type": "string", "minLength": 1},
+        "task": {"type": "string", "minLength": 1},
+        "action": {"type": "string", "minLength": 1},
+        "result": {"type": "string", "minLength": 1},
+        "reflection": {"type": "string", "description": "What the person would do differently."},
+        "evidence": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z]{1,3}[0-9]+$"}},
+        "source": {"enum": ["intake", "person", "debrief", "career-ops"]},
+        "added_on": {"$ref": "#/definitions/date"}
+      }
+    }
+  }
+}
