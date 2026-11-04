@@ -111,9 +111,9 @@ class PromoteTests(unittest.TestCase):
         self.assertEqual(self.load("eval", "judgements.json")["judged_by"], q["judged_by"])
         with open(os.path.join(self.ws, "report", "for-agents", "SUMMARY.md"), encoding="utf-8") as f:
             summary = f.read()
-        self.assertIn("Judged by Claude Code (model claude-opus-5-5).", summary)
+        self.assertIn("Judged by Claude Code, using the model claude-opus-5-5.", summary)
         with open(os.path.join(self.ws, "report", "index.html"), encoding="utf-8") as f:
-            self.assertIn("Judged by Claude Code (model claude-opus-5-5).", f.read())
+            self.assertIn("Judged by Claude Code, using the model claude-opus-5-5.", f.read())
 
     def test_the_agent_summary_says_the_goal_once(self):
         self.promote()

@@ -363,7 +363,7 @@ class JudgedByTests(Base):
         self.assertEqual(result["judged_by"], {"agent": "Codex", "model": "gpt-5-codex"})
         with open(os.path.join(self.folder, "index.html"), encoding="utf-8") as fh:
             page = fh.read()
-        self.assertIn("Judged by Codex (model gpt-5-codex). Another AI agent, or another run, can judge the same evidence differently", page)
+        self.assertIn("Judged by Codex, using the model gpt-5-codex. Another AI agent, or another run, can judge the same evidence differently", page)
         self.assertLess(len(text.split()), 150)        # the chat message stays short; the page says who judged
 
     def test_the_blind_reviewer_is_named_when_recorded(self):
@@ -373,7 +373,7 @@ class JudgedByTests(Base):
         with mock.patch("sys.stdout", io.StringIO()):
             result, _ = Q.build(self.folder)
         page = QH.render(result)
-        self.assertIn("The blind reviewer was Claude Code helper agent (lvlme:reviewer) (model claude-opus-5-5), "
+        self.assertIn("The blind reviewer was Claude Code helper agent (lvlme:reviewer), using the model claude-opus-5-5, "
                       "a separate agent that saw none of the first scores.", page)
         self.assertNotIn("The blind reviewer was", QH.render(dict(result, reviewed_by=None)))
 

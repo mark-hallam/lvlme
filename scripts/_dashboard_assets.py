@@ -1533,8 +1533,13 @@ function doNextRows(list, nl, limit){
   return (limit ? list.slice(0, limit) : list).map(q => { const a = q.a, tag = pathTag(q, nl);
     return `<div class="dn" tabindex="0" data-act="${esc(a.id)}"><span class="status-dot ${esc(a.status)}"></span><div style="flex:1;min-width:0"><div class="dn-t">${esc(a.title)}</div><div class="tiny sub">${stName(a.status)}${q.on ? "" : ", switched off"} · ${esc(a.owner)} · ${a.dated ? "by " + esc(shortDate(a.date)) : "no target date yet"}${tag ? ` · <span class="dn-tag">${esc(tag)}</span>` : ""}</div></div><div class="dn-p">${points(q) || "credibility"}</div></div>`; }).join("");
 }
-const doNextSub = nl => nl.top ? "Expected points each action adds to your best fit on its own: its full gain times its chance of working, so smaller than the gain on a LVLme quick result."
-  : `Expected points toward Level ${nl.nextLevel}, each action on its own: its full gain times its chance of working, so smaller than the gain on a LVLme quick result. The path to Level ${nl.nextLevel} comes first.`;
+// One worked example from the first action, so the expected points never look like a different answer from the quick result.
+function chanceExample(){
+  const q = (lv().up || []).find(x => x.a.effects.length && x.works > x.exp + 0.05 && x.a.chance > 0);
+  return q ? ` For example, ${fmtP(q.works)} points if "${q.a.title}" works, at about a ${Math.round(q.a.chance * 100)}% chance, is ${fmtP(q.exp)} expected.` : "";
+}
+const doNextSub = nl => (nl.top ? "Expected points each action adds to your best fit on its own: its full gain times its chance of working, so smaller than the gain on a LVLme quick result."
+  : `Expected points toward Level ${nl.nextLevel}, each action on its own: its full gain times its chance of working, so smaller than the gain on a LVLme quick result. The path to Level ${nl.nextLevel} comes first.`) + chanceExample();
 
 // Each scored day's level for the journey the organisation selector follows.
 function levelHist(){

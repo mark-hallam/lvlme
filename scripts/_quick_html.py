@@ -235,13 +235,24 @@ def hero(result):
     return ('<section class="card" aria-labelledby="oddsH"><p class="eyebrow">Your honest odds today</p>'
             '<h1 id="oddsH">%s</h1><p class="sub small">%s%s</p>'
             '<div class="odds">%s%s</div>'
-            '<p class="lead"><b>%s.</b> %s</p>%s'
+            '<p class="lead"><b>%s.</b> %s</p>%s%s'
             '<p class="sub small">The chances are for today\'s fit. They are judgement estimates, not statistics. '
             'Most applicants to competitive roles are turned down, so LVLme starts from "unlikely" and only evidence '
             'moves it.%s</p>%s</section>'
             % (esc(r["title"]), where, link, meter(result["interview_band"], "Interview chance"),
                meter(result["offer_band"], "Offer chance"), esc(headline(result)),
-               esc(EXPLAIN[result["interview_band"]]), fit_range(result), judged_short(result), banners))
+               esc(EXPLAIN[result["interview_band"]]), in_short(result), fit_range(result), judged_short(result), banners))
+
+
+def in_short(result):
+    """'Why, in short:' the three factors with the most fit points still to win, before the detail below."""
+    gaps = sorted(result["factors"], key=lambda f: (-(f["max_points"] - f["points"]), f["dimension"]))[:3]
+    gaps = [f for f in gaps if f["max_points"] - f["points"] > 0]
+    if not gaps:
+        return ""
+    return ('<p class="small"><b>Why, in short:</b> %s. These factors have the most points still to win.</p>'
+            % esc(", ".join("%s %s of %s fit points" % (f["name"].lower(), num(f["points"]), num(f["max_points"]))
+                            for f in gaps)))
 
 
 def judged_short(result):
@@ -249,7 +260,7 @@ def judged_short(result):
     jb = result.get("judged_by") or {}
     if not jb.get("agent"):
         return ""
-    return " Judged by %s%s." % (esc(jb["agent"]), esc(" (model %s)" % jb["model"]) if jb.get("model") else "")
+    return " Judged by %s%s." % (esc(jb["agent"]), esc(", using the model %s" % jb["model"]) if jb.get("model") else "")
 
 
 def fit_range(result):
@@ -448,12 +459,18 @@ def checked(result):
     need = agreed + len(rv["disputes"]) + sum(1 for f in result["factors"] if f["review"]["status"] in ("awaiting", "unreadable"))
     rb = result.get("reviewed_by") or {}
     who = ("The blind reviewer was %s%s, a separate agent that saw none of the first scores. " % (
-        rb["agent"], " (model %s)" % rb["model"] if rb.get("model") else "")) if rb.get("agent") else ""
+        rb["agent"], ", using the model %s" % rb["model"] if rb.get("model") else "")) if rb.get("agent") else ""
+    n_dis = len(rv["disputes"])
     lead = ("No score was above 2, so no review was needed." if need == 0 else
-            "A second agent, given only the rubric, your evidence and the posting, scored every factor above 2 "
-            "without seeing the first scores. It agreed on %d of %d%s." % (
-                agreed, need, "; where it disagreed, the score counts as 2 until a third reviewer settles it"
-                if rv["disputes"] else ""))
+            "%s scored above 2, so a second agent, given only the rubric, your evidence and the posting, scored %s "
+            "again without seeing the first scores. %s" % (
+                "One factor" if need == 1 else "%d factors" % need, "it" if need == 1 else "them",
+                ("It agreed." if need == 1 else "It agreed on all %d." % need) if agreed == need else
+                ("It gave a different score, so the factor counts as 2 until a third reviewer settles it."
+                 if need == 1 and n_dis == 1 else
+                 "It agreed on %d and disagreed on %d; a disagreement counts as 2 until a third reviewer settles it."
+                 % (agreed, n_dis)) if n_dis else
+                "Its score is not in yet, so %s as 2 for now." % ("it counts" if need == 1 else "they count")))
     return ('<section class="card" aria-labelledby="chkH"><p class="eyebrow">How this was checked</p>'
             '<h2 id="chkH">A blind second opinion</h2><p class="small">%s</p>%s%s'
             '<p class="small sub" style="margin-top:12px">%s</p></section>' % (
