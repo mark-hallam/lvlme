@@ -139,7 +139,7 @@ rounds while roles and evidence are gathered.
      D6 rules, when evidence changes (a warm introduction, a credential, a
      public repository, an answer about work rights).
    - `eval/gap-templates.json` and `eval/outlook.json`: revise when the
-     picture changes.
+     picture changes. Give every gap a `kind`: `show_it` when the proof is missing but the person can probably already do it (a project example, a public link, a reference, a write-up; usually days), or `build_it` when they have to learn or do the thing first (usually weeks or months). If unsure, write `build_it`: never guess `show_it`.
 
 7. **Review.** Start a separate, fresh, sceptical reviewer agent with the
    prompt in `REVIEW.md`. Give it the rubric, the evidence, the postings and

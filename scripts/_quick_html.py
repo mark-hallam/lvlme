@@ -26,6 +26,8 @@ SOURCES = {"resume": "CV", "interview": "your answer", "linkedin_export": "Linke
            "app_store": "app store", "publication": "publication", "certification": "certificate",
            "talk": "talk", "web_search": "web search", "email": "email", "reference": "referee",
            "document": "document", "other": "other"}
+KIND_LABEL = {"show_it": "Show it", "build_it": "Build it"}
+KIND_MEANING = "Show it: the proof is missing, usually days. Build it: the skill is missing, usually weeks or months."
 EXPLAIN = {
     "Almost none": "As things stand, this application would almost certainly be screened out.",
     "Very low": "As things stand, this application would most likely be screened out.",
@@ -424,9 +426,11 @@ def fixes(result):
                 'campaign, which looks wider.</p>%s%s</section>' % (hrl, gone))
     items = []
     for f in result["fixes"]:
-        items.append('<li><h3>%s</h3><p class="small"><span class="gain">+%s fit points</span> · %s %d to %d · '
+        kind = f.get("kind") or "build_it"
+        items.append('<li><h3>%s %s</h3><p class="small"><span class="gain">+%s fit points</span> · %s %d to %d · '
                      '%s</p><p class="step"><b>Next step:</b> %s</p></li>' % (
-                         esc(f["title"]), num(f["gain"]), esc(f["name"]), f["from"], f["to"],
+                         chip(KIND_LABEL[kind], "v" if kind == "show_it" else "s"), esc(f["title"]), num(f["gain"]),
+                         esc(f["name"]), f["from"], f["to"],
                          esc(band_change(result, f)), esc(f["next_step"])))
     c = result["if_all_fixes"]
     n = len(result["fixes"])
@@ -443,8 +447,9 @@ def fixes(result):
                      'different what if: the two factors this page cannot check turning out strong.</p>' % num(top["fit"]))
     return ('<section class="card" aria-labelledby="fixH"><p class="eyebrow">What would raise your odds</p>'
             '<h2 id="fixH">The top %s</h2><p class="small sub">Ranked by the fit points each adds, with the same '
-            'maths as the score. Each one is capped at what can realistically change in a few months.</p>%s'
-            '<ol class="fixes">%s</ol>%s%s</section>' % ("fix" if n == 1 else "%d fixes" % n, hrl, "".join(items),
+            'maths as the score, Show it first. Each one is capped at what can realistically change in a few months. '
+            '%s</p>%s'
+            '<ol class="fixes">%s</ol>%s%s</section>' % ("fix" if n == 1 else "%d fixes" % n, esc(KIND_MEANING), hrl, "".join(items),
                                                            all_line, gone))
 
 

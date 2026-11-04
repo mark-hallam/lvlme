@@ -14,6 +14,12 @@
   A missing hard requirement can move Very low down to Almost none. The five
   fit levels are unchanged. Applications already recorded keep the bands they
   were given on the day.
+- B5: every gap and every quick fix says what kind it is: Show it (the proof
+  is missing, usually days) or Build it (the skill is missing, usually weeks
+  or months). A missing kind counts as Build it, with a warning. In LVLme
+  quick, the shown fixes list Show it first; which fixes are shown, and the
+  points, are worked out as before. The campaign shows the label next to each
+  gap; its plan order is unchanged.
 
 Purpose: estimate, honestly, a person's chance of being hired into a specific
 open role at a specific organisation, and show what would raise it. Every run
@@ -307,7 +313,8 @@ band. A change to this table is a new rubric version.
    sum of the fit points gained if that dimension rose to the gap's target
    score. A D1 target is capped at 1 on roles with a lacking hard requirement,
    and a D6 gap skips roles with an eligibility blocker (raising D6 there
-   means clearing the blocker, which is its own gap).
+   means clearing the blocker, which is its own gap). Each gap carries its
+   `kind` (Show it or Build it); the order stays by points.
    By default there is one pool, the top roles overall, so a gap at an
    organisation with no role in that pool scores 0. With
    `scoring.gap_pool` set to `per_org`, each target organisation gets its own

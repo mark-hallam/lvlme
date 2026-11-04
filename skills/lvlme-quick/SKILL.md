@@ -127,6 +127,7 @@ would raise it most (any fix left out is named, with the reason). Aim for a coup
    each factor that could realistically rise (ids `F1`, `F2` and so on), each
    with a target score, a short title and one concrete next step the person
    can take this week or this month. Name the action, not the words to write.
+   Give each fix a `kind`: `show_it` when the proof is missing but the person can probably already do it (a project example, a public link, a reference, a write-up; usually days), or `build_it` when they have to learn or do the thing first (usually weeks or months). If unsure, write `build_it`: never guess `show_it`. The page shows Show it fixes first.
 8. **Build the result:**
 
    ```bash

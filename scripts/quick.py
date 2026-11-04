@@ -450,7 +450,7 @@ def rank_fixes(docs, flags, agreed, scored):
                             "why": "adds no fit points (a blocker or a missing hard requirement holds it down)"})
             continue
         rows.append({"id": fx["id"], "dimension": d, "name": NAMES[d], "title": fx["title"],
-                     "next_step": fx["next_step"], "from": cur, "to": to, "gain": gain, "fit_after": after["fit"],
+                     "next_step": fx["next_step"], "kind": fx.get("kind") or "build_it", "from": cur, "to": to, "gain": gain, "fit_after": after["fit"],
                      "interview_after": after["interview_band"], "offer_after": after["offer_band"]})
     rows.sort(key=lambda r: (-r["gain"], -C.CHANCE_BANDS.index(r["interview_after"]), -C.CHANCE_BANDS.index(r["offer_after"]),
                              r["id"]))
@@ -462,7 +462,7 @@ def rank_fixes(docs, flags, agreed, scored):
             continue
         seen.add(r["dimension"])
         ranked.append(r)
-    top = ranked[:TOP_FIXES]
+    top = sorted(ranked[:TOP_FIXES], key=lambda r: r["kind"] != "show_it")   # Show it first; otherwise as ranked
     dropped += [{"id": r["id"], "dimension": r["dimension"], "title": r["title"],
                  "why": "it is not in the top %d (+%s fit points)" % (TOP_FIXES, QH.num(r["gain"]))}
                 for r in ranked[TOP_FIXES:]]
@@ -554,6 +554,9 @@ def build_result(docs):
     not_checked = [{"dimension": d, "name": NAMES[d], "status": "not_checked", "what": NOT_CHECKED_WHAT[d],
                     "max_points": round(ctx.weights[d] * 100.0 / total, 1)} for d in NOT_CHECKED]
     top, combined, dropped = rank_fixes(docs, flags, agreed, scored)
+    for fx in quick.get("fixes") or []:
+        if not fx.get("kind"):
+            warnings.append("Fix %s has no kind (show_it or build_it) in eval/quick.json, so it counts as Build it." % fx["id"])
     if quick.get("warm_path") is None:
         warnings.append("The warm path question was not asked (warm_path is null in eval/quick.json).")
     if not docs["evidence"].get("items"):
@@ -629,7 +632,7 @@ def message(result, folder):
     if result["fixes"]:
         lines.append("The fixes that would raise them most:")
         for i, f in enumerate(result["fixes"], 1):
-            lines.append("%d. %s (+%s fit points)" % (i, f["title"], QH.num(f["gain"])))
+            lines.append("%d. %s: %s (+%s fit points)" % (i, QH.KIND_LABEL[f["kind"]], f["title"], QH.num(f["gain"])))
         c = result["if_all_fixes"]
         lines += ["", "If %s: fit %s, %s." % (
             "they all land" if len(result["fixes"]) > 1 else "it lands", QH.num(c["fit"]), QH.headline(c, start=False)), ""]

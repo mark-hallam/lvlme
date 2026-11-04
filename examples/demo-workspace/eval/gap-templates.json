@@ -10,7 +10,8 @@
       "orgs": [
         "initech"
       ],
-      "families": "all"
+      "families": "all",
+      "kind": "show_it"
     },
     {
       "id": "warm-intro",
@@ -19,7 +20,8 @@
       "dimension": "D3",
       "target_score": 3,
       "orgs": "all",
-      "families": "all"
+      "families": "all",
+      "kind": "show_it"
     },
     {
       "id": "referral",
@@ -28,7 +30,8 @@
       "dimension": "D3",
       "target_score": 4,
       "orgs": "all",
-      "families": "all"
+      "families": "all",
+      "kind": "build_it"
     },
     {
       "id": "proof-piece",
@@ -37,7 +40,8 @@
       "dimension": "D2",
       "target_score": 3,
       "orgs": "all",
-      "families": "all"
+      "families": "all",
+      "kind": "show_it"
     },
     {
       "id": "tailored-application",
@@ -46,7 +50,8 @@
       "dimension": "D7",
       "target_score": 4,
       "orgs": "all",
-      "families": "all"
+      "families": "all",
+      "kind": "show_it"
     },
     {
       "id": "public-signal",
@@ -55,7 +60,8 @@
       "dimension": "D5",
       "target_score": 3,
       "orgs": "all",
-      "families": "all"
+      "families": "all",
+      "kind": "show_it"
     },
     {
       "id": "org-edge",
@@ -64,7 +70,8 @@
       "dimension": "D4",
       "target_score": 3,
       "orgs": "all",
-      "families": "all"
+      "families": "all",
+      "kind": "build_it"
     },
     {
       "id": "work-rights",
@@ -74,7 +81,8 @@
       "target_score": 3,
       "orgs": "all",
       "families": "all",
-      "exclude_blocked": true
+      "exclude_blocked": true,
+      "kind": "show_it"
     }
   ]
 }

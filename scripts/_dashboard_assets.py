@@ -974,10 +974,10 @@ const DO_NEXT = 4;
 function doNextHTML(){ const L = lv(); return doNextRows(L.up, L.nl, DO_NEXT); }
 // A gap's points are summed across roles, so the total can pass 100 beside fits out of 100. Show the
 // average a role gains, with how many roles, so every number reads as fit points on one role.
-const UNLOCKS_SUB = "Fit points each role gains on average if the gap closes completely, with no time limit (so bigger than a plan action's expected points), and how many of your top judged roles it lifts.";
+const UNLOCKS_SUB = "Fit points each role gains on average if the gap closes completely, with no time limit (so bigger than a plan action's expected points), and how many of your top judged roles it lifts. Show it: the proof is missing, usually days. Build it: the skill is missing, usually weeks or months.";
 const perRole = x => { const v = x.roles ? x.points / x.roles : x.points; return v >= 10 ? Math.round(v) : Math.round(v * 10) / 10; };
 function unlocksHTML(){
-  return D.gaps.slice(0, 4).map(x => `<div class="dn" tabindex="0" data-moves="1"><div style="flex:1;min-width:0"><div class="dn-t">${esc(x.title)}</div><div class="tiny sub">lifts ${plural(x.roles, "role")}</div></div><div class="dn-p">+${perRole(x)}<span class="tiny sub"> each</span></div></div>`).join("") +
+  return D.gaps.slice(0, 4).map(x => `<div class="dn" tabindex="0" data-moves="1"><div style="flex:1;min-width:0"><div class="dn-t">${esc(x.title)}</div><div class="tiny sub">${x.kind === "show_it" ? "Show it" : "Build it"} · lifts ${plural(x.roles, "role")}</div></div><div class="dn-p">+${perRole(x)}<span class="tiny sub"> each</span></div></div>`).join("") +
     `<button class="linkbtn" data-see-moves="1" style="margin-top:8px">See everything that moves you ›</button>`;
 }
 // Warm paths (campaign/warm-paths.json): how far each contact at each organisation has come. Progress only: no score
@@ -1306,7 +1306,7 @@ function renderMoves(){
   const max = Math.max(1, ...D.gaps.map(g => g.points));
   $("#v-moves").innerHTML = `<div class="card"><div class="eyebrow">What would lift your odds most</div>
     <p class="small sub" style="margin:0 0 8px">Fit points gained, added up across your top roles. Hover a bar for the detail.</p>
-    <div>${D.gaps.map(g => `<div class="gbar" tabindex="0" data-tip="${esc(g.title)}: +${g.points} points across ${plural(g.roles, "role")}. ${esc(g.why)}"><div class="small">${esc(g.title)}</div><div class="gtrack"><div class="gfill" style="width:${Math.max(3, g.points / max * 100)}%"></div><span class="small num" style="font-weight:650">+${g.points}</span></div></div>`).join("") || '<div class="small sub">No gaps listed yet.</div>'}</div>
+    <div>${D.gaps.map(g => `<div class="gbar" tabindex="0" data-tip="${esc(g.title)}: +${g.points} points across ${plural(g.roles, "role")}. ${esc(g.why)}"><div class="small">${esc(g.title)} <span class="tiny sub">${g.kind === "show_it" ? "Show it" : "Build it"}</span></div><div class="gtrack"><div class="gfill" style="width:${Math.max(3, g.points / max * 100)}%"></div><span class="small num" style="font-weight:650">+${g.points}</span></div></div>`).join("") || '<div class="small sub">No gaps listed yet.</div>'}</div>
     <details class="tableview"><summary>Show as a table</summary><div class="tscroll"><table><tr><th>Gap</th><th>Points</th><th>Roles</th></tr>${D.gaps.map(g => `<tr><td>${esc(g.title)}</td><td class="num">${g.points}</td><td class="num">${g.roles}</td></tr>`).join("")}</table></div></details></div>
     <div class="card"><div class="eyebrow">Questions only you can answer</div><p class="small sub" style="margin:0 0 6px">Each answer unlocks points the eval can't count yet.</p>
     ${D.vtu.map(v => `<div style="padding:10px 0;border-top:1px solid var(--rule)"><div style="font-weight:600;font-size:15px">${esc(v.q)}</div><div class="small sub">What it unlocks: ${esc(v.why)}</div></div>`).join("") || '<div class="small sub">None right now.</div>'}</div>`;

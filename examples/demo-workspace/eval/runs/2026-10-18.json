@@ -12,7 +12,7 @@
     "D6": 10,
     "D7": 5
   },
-  "inputs_digest": "sha256:bc0db9cf6c34449a650b152e8774c3b928bbd20176ddcdc7af4e45f7752559e1",
+  "inputs_digest": "sha256:a72eaf211e364d9a39ccf5a70b4fa8cb98a75043e703d6d40a1d3ddcd01d1355",
   "counts": {
     "roles": 11,
     "judged": 10,
@@ -953,7 +953,8 @@
       "dimension": "D3",
       "target_score": 4,
       "points_gain": 128.0,
-      "roles_affected": 10
+      "roles_affected": 10,
+      "kind": "build_it"
     },
     {
       "id": "warm-intro",
@@ -962,7 +963,8 @@
       "dimension": "D3",
       "target_score": 3,
       "points_gain": 88.0,
-      "roles_affected": 10
+      "roles_affected": 10,
+      "kind": "show_it"
     },
     {
       "id": "proof-piece",
@@ -971,7 +973,8 @@
       "dimension": "D2",
       "target_score": 3,
       "points_gain": 48.0,
-      "roles_affected": 8
+      "roles_affected": 8,
+      "kind": "show_it"
     },
     {
       "id": "org-edge",
@@ -980,7 +983,8 @@
       "dimension": "D4",
       "target_score": 3,
       "points_gain": 30.0,
-      "roles_affected": 9
+      "roles_affected": 9,
+      "kind": "build_it"
     },
     {
       "id": "tailored-application",
@@ -989,7 +993,8 @@
       "dimension": "D7",
       "target_score": 4,
       "points_gain": 30.0,
-      "roles_affected": 10
+      "roles_affected": 10,
+      "kind": "show_it"
     },
     {
       "id": "public-signal",
@@ -998,7 +1003,8 @@
       "dimension": "D5",
       "target_score": 3,
       "points_gain": 20.0,
-      "roles_affected": 10
+      "roles_affected": 10,
+      "kind": "show_it"
     },
     {
       "id": "initech-path",
@@ -1007,7 +1013,8 @@
       "dimension": "D3",
       "target_score": 2,
       "points_gain": 16.0,
-      "roles_affected": 2
+      "roles_affected": 2,
+      "kind": "show_it"
     },
     {
       "id": "work-rights",
@@ -1016,7 +1023,8 @@
       "dimension": "D6",
       "target_score": 3,
       "points_gain": 8.0,
-      "roles_affected": 4
+      "roles_affected": 4,
+      "kind": "show_it"
     }
   ],
   "outlook": {

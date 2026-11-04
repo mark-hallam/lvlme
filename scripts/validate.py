@@ -241,6 +241,10 @@ def cross_checks(ws, docs, errors, warnings):
     cite("eval/profile-dimensions.json D6 blocked", (rules.get("blocked") or {}).get("evidence"))
 
     gap_ids = {g.get("id") for g in (docs.get("eval/gap-templates.json") or {}).get("gaps", [])}
+    for g in (docs.get("eval/gap-templates.json") or {}).get("gaps", []):
+        if not g.get("kind"):
+            warnings.append("eval/gap-templates.json: gap %s has no kind (show_it or build_it), so it counts as build_it"
+                            % g.get("id"))
 
     plan = docs.get("campaign/plan.json") or {}
     actions = plan.get("actions", [])

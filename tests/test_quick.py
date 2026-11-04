@@ -493,6 +493,43 @@ class JudgedByTests(Base):
         self.assertNotEqual(V.check(q, H.schema("quick.schema.json")), [])
 
 
+class ShowItBuildItTests(Base):
+    """Every fix says whether the proof is missing (Show it) or the skill is (Build it); Show it comes first."""
+
+    def test_a_show_it_fix_with_fewer_points_comes_before_a_build_it_with_more(self):
+        quick = self.load("eval/quick.json")
+        kinds = {f["id"]: f.get("kind") for f in quick["fixes"]}
+        self.assertEqual(kinds["F1"], "show_it")
+        for f in quick["fixes"]:                  # flip the kinds: the biggest fix becomes Build it
+            f["kind"] = "build_it" if f["id"] == "F1" else "show_it"
+        self.save("eval/quick.json", quick)
+        r = self.result()
+        shown = [(f["id"], f["kind"], f["gain"]) for f in r["fixes"]]
+        self.assertEqual([k for _, k, _ in shown], ["show_it", "show_it", "build_it"])
+        self.assertEqual(shown[-1][0], "F1")
+        self.assertGreater(shown[-1][2], shown[0][2])   # F1 still adds the most, it is just shown last
+        self.assertEqual(sorted(i for i, _, _ in shown), ["F1", "F2", "F3"])   # the same top three by points
+
+    def test_a_fix_without_a_kind_is_build_it_and_warns(self):
+        quick = self.load("eval/quick.json")
+        for f in quick["fixes"]:
+            f.pop("kind", None)
+        self.save("eval/quick.json", quick)
+        r = self.result()
+        self.assertTrue(all(f["kind"] == "build_it" for f in r["fixes"]))
+        self.assertTrue(any("Fix F1 has no kind" in w for w in r["warnings"]))
+
+    def test_the_label_is_on_the_page_in_the_message_and_in_the_json(self):
+        result, message = Q.build(self.folder)
+        self.assertEqual(result["fixes"][0]["kind"], "show_it")
+        self.assertIn("1. Show it: ", message)
+        page = open(os.path.join(self.folder, "index.html"), encoding="utf-8").read()
+        self.assertIn(">Show it</span>", page)
+        self.assertIn(">Build it</span>", page)
+        self.assertIn("Show it: the proof is missing, usually days. Build it: the skill is missing, usually weeks or months.",
+                      page)
+
+
 class NewFolderTests(unittest.TestCase):
     def test_new_makes_a_private_quick_folder(self):
         parent = tmpdir(self)

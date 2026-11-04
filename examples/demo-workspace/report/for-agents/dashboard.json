@@ -109,7 +109,8 @@
       "dimension": "D3",
       "target_score": 4,
       "points_gain": 128.0,
-      "roles_affected": 11
+      "roles_affected": 11,
+      "kind": "build_it"
     },
     {
       "id": "warm-intro",
@@ -118,7 +119,8 @@
       "dimension": "D3",
       "target_score": 3,
       "points_gain": 84.0,
-      "roles_affected": 11
+      "roles_affected": 11,
+      "kind": "show_it"
     },
     {
       "id": "proof-piece",
@@ -127,7 +129,8 @@
       "dimension": "D2",
       "target_score": 3,
       "points_gain": 48.0,
-      "roles_affected": 8
+      "roles_affected": 8,
+      "kind": "show_it"
     },
     {
       "id": "org-edge",
@@ -136,7 +139,8 @@
       "dimension": "D4",
       "target_score": 3,
       "points_gain": 30.0,
-      "roles_affected": 9
+      "roles_affected": 9,
+      "kind": "build_it"
     },
     {
       "id": "tailored-application",
@@ -145,7 +149,8 @@
       "dimension": "D7",
       "target_score": 4,
       "points_gain": 27.0,
-      "roles_affected": 11
+      "roles_affected": 11,
+      "kind": "show_it"
     },
     {
       "id": "initech-path",
@@ -154,7 +159,8 @@
       "dimension": "D3",
       "target_score": 2,
       "points_gain": 24.0,
-      "roles_affected": 3
+      "roles_affected": 3,
+      "kind": "show_it"
     },
     {
       "id": "public-signal",
@@ -163,7 +169,8 @@
       "dimension": "D5",
       "target_score": 3,
       "points_gain": 22.0,
-      "roles_affected": 11
+      "roles_affected": 11,
+      "kind": "show_it"
     },
     {
       "id": "work-rights",
@@ -172,7 +179,8 @@
       "dimension": "D6",
       "target_score": 3,
       "points_gain": 10.0,
-      "roles_affected": 5
+      "roles_affected": 5,
+      "kind": "show_it"
     }
   ],
   "verify_to_unlock": [

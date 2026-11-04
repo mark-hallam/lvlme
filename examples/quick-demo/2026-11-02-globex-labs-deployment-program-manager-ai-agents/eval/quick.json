@@ -5,29 +5,81 @@
   "warm_path": true,
   "eligibility_cleared": [],
   "factors": {
-    "D1": {"score": 3, "evidence": ["E01", "E02", "E04"],
-           "note": "Meets the core asks: five years running programs with operations teams, a rollout across six sites, and hands-on AI evaluation through route-eval. No customer-facing deployment work shown."},
-    "D2": {"score": 3, "evidence": ["E04"],
-           "note": "route-eval is public, checkable and close to this role's work: measuring whether AI answers about logistics are right."},
-    "D3": {"score": 3, "evidence": ["E06"],
-           "note": "Said yes: knows someone at Globex Labs who has seen their work. A yes alone is self-reported, so it counts 1 until that person says so in their own words."},
-    "D4": {"score": 2, "evidence": ["E01", "E03"],
-           "note": "Ten years in logistics operations, a sector Globex Labs sells into and the posting's first nice to have. Self-reported."},
-    "D6": {"score": 5, "evidence": ["E05"],
-           "note": "The role is in Sydney or remote within Australia, and Alex can work in Australia without a visa."}
+    "D1": {
+      "score": 3,
+      "evidence": [
+        "E01",
+        "E02",
+        "E04"
+      ],
+      "note": "Meets the core asks: five years running programs with operations teams, a rollout across six sites, and hands-on AI evaluation through route-eval. No customer-facing deployment work shown."
+    },
+    "D2": {
+      "score": 3,
+      "evidence": [
+        "E04"
+      ],
+      "note": "route-eval is public, checkable and close to this role's work: measuring whether AI answers about logistics are right."
+    },
+    "D3": {
+      "score": 3,
+      "evidence": [
+        "E06"
+      ],
+      "note": "Said yes: knows someone at Globex Labs who has seen their work. A yes alone is self-reported, so it counts 1 until that person says so in their own words."
+    },
+    "D4": {
+      "score": 2,
+      "evidence": [
+        "E01",
+        "E03"
+      ],
+      "note": "Ten years in logistics operations, a sector Globex Labs sells into and the posting's first nice to have. Self-reported."
+    },
+    "D6": {
+      "score": 5,
+      "evidence": [
+        "E05"
+      ],
+      "note": "The role is in Sydney or remote within Australia, and Alex can work in Australia without a visa."
+    }
   },
   "hard_requirement_lacking": false,
   "hard_requirement_note": "",
   "eligibility_blocked": null,
   "review_flags": [],
   "fixes": [
-    {"id": "F1", "dimension": "D3", "target_score": 4, "title": "Get a written word from the person you know at Globex Labs",
-     "next_step": "This week, ask them whether they know your work well enough to vouch for you, and whether they would refer you for this role. Keep their reply: their own words are the evidence."},
-    {"id": "F2", "dimension": "D2", "target_score": 3, "title": "Publish a case study of the six-site scheduling rollout",
-     "next_step": "Write up the problem, what you did and the result on your own site, with numbers your former manager will confirm in writing. A case study a stranger can check counts as proof of work."},
-    {"id": "F3", "dimension": "D4", "target_score": 3, "title": "Show route-eval on the kind of agent Globex Labs builds",
-     "next_step": "Run route-eval on a public logistics or retail AI agent demo and publish the results and the method. Proof aimed at this organisation beats general claims."},
-    {"id": "F4", "dimension": "D1", "target_score": 4, "title": "Add customer-facing deployment experience",
-     "next_step": "Lead one rollout with an outside customer, not only your own sites."}
+    {
+      "id": "F1",
+      "dimension": "D3",
+      "target_score": 4,
+      "title": "Get a written word from the person you know at Globex Labs",
+      "next_step": "This week, ask them whether they know your work well enough to vouch for you, and whether they would refer you for this role. Keep their reply: their own words are the evidence.",
+      "kind": "show_it"
+    },
+    {
+      "id": "F2",
+      "dimension": "D2",
+      "target_score": 3,
+      "title": "Publish a case study of the six-site scheduling rollout",
+      "next_step": "Write up the problem, what you did and the result on your own site, with numbers your former manager will confirm in writing. A case study a stranger can check counts as proof of work.",
+      "kind": "show_it"
+    },
+    {
+      "id": "F3",
+      "dimension": "D4",
+      "target_score": 3,
+      "title": "Show route-eval on the kind of agent Globex Labs builds",
+      "next_step": "Run route-eval on a public logistics or retail AI agent demo and publish the results and the method. Proof aimed at this organisation beats general claims.",
+      "kind": "build_it"
+    },
+    {
+      "id": "F4",
+      "dimension": "D1",
+      "target_score": 4,
+      "title": "Add customer-facing deployment experience",
+      "next_step": "Lead one rollout with an outside customer, not only your own sites.",
+      "kind": "build_it"
+    }
   ]
 }

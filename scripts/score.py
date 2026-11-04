@@ -334,7 +334,8 @@ def compute_gaps(ctx, scored, templates):
             if key is not None and n:
                 by_org[key] = {"points_gain": round(pts, 1), "roles_affected": n}
         gap = {"id": g["id"], "title": g["title"], "why": g.get("why", ""), "dimension": g["dimension"],
-               "target_score": int(g["target_score"]), "points_gain": round(total, 1), "roles_affected": affected}
+               "target_score": int(g["target_score"]), "points_gain": round(total, 1), "roles_affected": affected,
+               "kind": g.get("kind") or "build_it"}
         if ctx.gap_pool == "per_org":
             gap.update(pool="per_org", by_org=by_org)
         gaps.append(gap)

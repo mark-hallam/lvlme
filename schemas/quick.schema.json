@@ -60,7 +60,8 @@
           "dimension": {"enum": ["D1", "D2", "D3", "D4", "D6"]},
           "target_score": {"type": "integer", "minimum": 1, "maximum": 5},
           "title": {"type": "string", "minLength": 1},
-          "next_step": {"type": "string", "minLength": 1, "description": "One concrete step the person takes. Never an application answer written for them."}
+          "next_step": {"type": "string", "minLength": 1, "description": "One concrete step the person takes. Never an application answer written for them."},
+          "kind": {"enum": ["show_it", "build_it"], "description": "show_it: the proof is missing but the person can probably already do it (usually days). build_it: the skill or experience is missing (usually weeks or months). Missing means build_it."}
         }
       }
     }

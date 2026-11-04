@@ -22,7 +22,8 @@
           "orgs": {"anyOf": [{"const": "all"}, {"type": "array", "items": {"type": "string"}}]},
           "families": {"anyOf": [{"const": "all"}, {"type": "array", "items": {"type": "string"}}]},
           "location_classes": {"type": "array", "items": {"type": "string"}},
-          "exclude_blocked": {"type": "boolean"}
+          "exclude_blocked": {"type": "boolean"},
+          "kind": {"enum": ["show_it", "build_it"], "description": "show_it: the proof is missing but the person can probably already do it (usually days). build_it: the skill or experience is missing (usually weeks or months). Missing means build_it."}
         }
       }
     }

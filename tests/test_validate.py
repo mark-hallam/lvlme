@@ -62,6 +62,15 @@ class CheckTests(unittest.TestCase):
 
 
 class WorkspaceTests(unittest.TestCase):
+    def test_a_gap_without_a_kind_warns(self):
+        ws = H.copy_demo(self)
+        path = os.path.join(ws, "eval", "gap-templates.json")
+        doc = H.load(path)
+        doc["gaps"][0].pop("kind", None)
+        H.save(path, doc)
+        _, warnings, _ = V.validate_workspace(ws)
+        self.assertTrue(any("gap %s has no kind" % doc["gaps"][0]["id"] in w for w in warnings))
+
     def test_missing_location_rule_warns_with_class_name(self):
         ws = H.copy_demo(self)
         profile_path = os.path.join(ws, "eval", "profile-dimensions.json")

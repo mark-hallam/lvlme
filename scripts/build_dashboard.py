@@ -636,7 +636,8 @@ def build_data(data):
         "metrics": [{"name": clean(m["name"]), "current": m["current"], "target": m["target"],
                      "start": first.get(m["id"], m["current"])} for m in plan.get("north_star", [])],
         "gaps": [{"title": clean(g["title"]), "why": clean(g.get("why")), "dim": g.get("dimension"),
-                  "points": g["points_gain"], "roles": g["roles_affected"]} for g in run.get("gaps", [])],
+                  "points": g["points_gain"], "roles": g["roles_affected"], "kind": g.get("kind") or "build_it"}
+                 for g in run.get("gaps", [])],
         "vtu": [{"q": clean(v["question"]), "why": clean(v["why"])} for v in run.get("verify_to_unlock", [])],
         "evidence": build_evidence(data),
         "claims": [{"id": c["id"], "text": clean(c.get("text")), "status": c.get("status", "pending"),

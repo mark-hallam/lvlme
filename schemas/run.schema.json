@@ -49,6 +49,7 @@
           "target_score": {"type": "integer", "minimum": 0, "maximum": 5},
           "points_gain": {"type": "number", "minimum": 0},
           "roles_affected": {"type": "integer", "minimum": 0},
+          "kind": {"enum": ["show_it", "build_it"], "description": "Show it: the proof is missing (usually days). Build it: the skill is missing (usually weeks or months)."},
           "pool": {"enum": ["overall", "per_org"], "description": "Only written when config.json scoring.gap_pool is per_org."},
           "by_org": {
             "type": "object",

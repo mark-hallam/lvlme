@@ -12,7 +12,7 @@
     "D6": 10,
     "D7": 5
   },
-  "inputs_digest": "sha256:369e8cc63781ad56b46cee706adb2f3f99cc54fffa5665c1d2b541c8d9d689b6",
+  "inputs_digest": "sha256:c63b144bb73c2151305bf7ee97d6c30e6aff8bc404459a8e8548acbfeecd665d",
   "counts": {
     "roles": 11,
     "judged": 11,
@@ -967,7 +967,8 @@
       "dimension": "D3",
       "target_score": 4,
       "points_gain": 128.0,
-      "roles_affected": 11
+      "roles_affected": 11,
+      "kind": "build_it"
     },
     {
       "id": "warm-intro",
@@ -976,7 +977,8 @@
       "dimension": "D3",
       "target_score": 3,
       "points_gain": 84.0,
-      "roles_affected": 11
+      "roles_affected": 11,
+      "kind": "show_it"
     },
     {
       "id": "proof-piece",
@@ -985,7 +987,8 @@
       "dimension": "D2",
       "target_score": 3,
       "points_gain": 48.0,
-      "roles_affected": 8
+      "roles_affected": 8,
+      "kind": "show_it"
     },
     {
       "id": "tailored-application",
@@ -994,7 +997,8 @@
       "dimension": "D7",
       "target_score": 4,
       "points_gain": 33.0,
-      "roles_affected": 11
+      "roles_affected": 11,
+      "kind": "show_it"
     },
     {
       "id": "org-edge",
@@ -1003,7 +1007,8 @@
       "dimension": "D4",
       "target_score": 3,
       "points_gain": 30.0,
-      "roles_affected": 9
+      "roles_affected": 9,
+      "kind": "build_it"
     },
     {
       "id": "initech-path",
@@ -1012,7 +1017,8 @@
       "dimension": "D3",
       "target_score": 2,
       "points_gain": 24.0,
-      "roles_affected": 3
+      "roles_affected": 3,
+      "kind": "show_it"
     },
     {
       "id": "public-signal",
@@ -1021,7 +1027,8 @@
       "dimension": "D5",
       "target_score": 3,
       "points_gain": 22.0,
-      "roles_affected": 11
+      "roles_affected": 11,
+      "kind": "show_it"
     },
     {
       "id": "work-rights",
@@ -1030,7 +1037,8 @@
       "dimension": "D6",
       "target_score": 3,
       "points_gain": 10.0,
-      "roles_affected": 5
+      "roles_affected": 5,
+      "kind": "show_it"
     }
   ],
   "outlook": {
