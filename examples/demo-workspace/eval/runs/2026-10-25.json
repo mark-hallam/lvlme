@@ -12,7 +12,7 @@
     "D6": 10,
     "D7": 5
   },
-  "inputs_digest": "sha256:1c5449b85db11ebbf37eeca235ce70343d05403a34309dd3921a2c7cfd5938d3",
+  "inputs_digest": "sha256:3855716e5d9230f7ea78e0e15aa24ef3b1e6de125e7196db9433a14211a70960",
   "counts": {
     "roles": 11,
     "judged": 11,
@@ -52,6 +52,10 @@
             "E15"
           ],
           "note": "Corroborated multi-site rollout case study.",
+          "judgings": [
+            3,
+            4
+          ],
           "evidence_fingerprint": "sha256:569e3e435ae333c5"
         },
         "D3": {
@@ -100,7 +104,7 @@
       },
       "fit": 55.0,
       "fit_low": 55.0,
-      "fit_high": 55.0,
+      "fit_high": 59.0,
       "interview_band": "Moderate",
       "offer_band": "Low",
       "adjustments": [],
@@ -1023,7 +1027,7 @@
       "title": "Program Manager, Robot Fleet Deployments",
       "fit": 55.0,
       "fit_low": 55.0,
-      "fit_high": 55.0,
+      "fit_high": 59.0,
       "interview_band": "Moderate",
       "offer_band": "Low"
     }

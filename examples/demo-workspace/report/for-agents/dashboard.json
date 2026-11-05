@@ -30,10 +30,10 @@
       "role": "Program Manager, Robot Fleet Deployments",
       "org": "Initech Robotics",
       "fit": 57.0,
-      "fit_text": "fit 57",
+      "fit_text": "fit about 57 to 61",
       "fit_low": 57.0,
-      "fit_high": 57.0,
-      "has_range": false,
+      "fit_high": 61.0,
+      "has_range": true,
       "level": 3,
       "band": "Moderate",
       "chance_word": "Moderate",
@@ -75,7 +75,7 @@
       "next": "No plan gets you to Level 4 yet: the plan is about 7.2 points short. What is missing: warm path, proof of work or org-specific edge."
     },
     "state": "ready",
-    "stand": "You are at Level 3, Moderate. Your best match is Program Manager, Robot Fleet Deployments at Initech Robotics: fit 57 out of 100, with a moderate chance of an interview.",
+    "stand": "You are at Level 3, Moderate. Your best match is Program Manager, Robot Fleet Deployments at Initech Robotics: fit about 57 to 61 out of 100, with a moderate chance of an interview.",
     "move": {
       "id": "A11",
       "title": "Go to the Initech warehouse operators meetup in Melbourne",
@@ -177,7 +177,7 @@
       "title": "Program Manager, Robot Fleet Deployments",
       "fit": 57.0,
       "fit_low": 57.0,
-      "fit_high": 57.0,
+      "fit_high": 61.0,
       "interview_band": "Moderate",
       "offer_band": "Low",
       "org_name": "Initech Robotics"
@@ -1409,6 +1409,8 @@
       "title": "Program Manager, Robot Fleet Deployments",
       "family": "tpm",
       "judged": true,
+      "fit_low": 57.0,
+      "fit_high": 61.0,
       "locations": [
         "Melbourne, Australia"
       ],
@@ -1434,6 +1436,8 @@
       "title": "Technical Program Manager, Model Launches",
       "family": "tpm",
       "judged": true,
+      "fit_low": 46.0,
+      "fit_high": 50.0,
       "locations": [
         "San Francisco, CA",
         "Sydney, Australia"
@@ -1460,6 +1464,8 @@
       "title": "Applied AI Deployment Lead, Asia Pacific",
       "family": "applied_ai",
       "judged": true,
+      "fit_low": 45.0,
+      "fit_high": 45.0,
       "locations": [
         "Sydney, Australia"
       ],
@@ -1485,6 +1491,8 @@
       "title": "Product Manager, Warehouse Autonomy",
       "family": "product",
       "judged": true,
+      "fit_low": 45.0,
+      "fit_high": 45.0,
       "locations": [
         "Brisbane, Australia"
       ],
@@ -1510,6 +1518,8 @@
       "title": "AI Success Manager, Asia",
       "family": "applied_ai",
       "judged": true,
+      "fit_low": 39.0,
+      "fit_high": 39.0,
       "locations": [
         "Singapore"
       ],
@@ -1538,6 +1548,8 @@
       "title": "Technical Program Manager, Infrastructure",
       "family": "tpm",
       "judged": true,
+      "fit_low": 37.0,
+      "fit_high": 37.0,
       "locations": [
         "Seattle, WA",
         "Toronto, Canada"
@@ -1564,6 +1576,8 @@
       "title": "Product Manager, Developer Platform",
       "family": "product",
       "judged": true,
+      "fit_low": 34.0,
+      "fit_high": 34.0,
       "locations": [
         "Remote"
       ],
@@ -1591,6 +1605,8 @@
       "title": "Trust and Safety Operations Lead",
       "family": "policy_safety",
       "judged": true,
+      "fit_low": 28.0,
+      "fit_high": 28.0,
       "locations": [
         "Dublin, Ireland"
       ],
@@ -1618,6 +1634,8 @@
       "title": "Policy Manager, Safeguards Operations",
       "family": "policy_safety",
       "judged": true,
+      "fit_low": 24.0,
+      "fit_high": 24.0,
       "locations": [
         "London, United Kingdom"
       ],
@@ -1645,6 +1663,8 @@
       "title": "Policy Lead, Robotics Safety Standards",
       "family": "policy_safety",
       "judged": true,
+      "fit_low": 24.0,
+      "fit_high": 24.0,
       "locations": [
         "Austin, TX"
       ],
@@ -1672,6 +1692,8 @@
       "title": "Program Manager, Government Partnerships",
       "family": "tpm",
       "judged": true,
+      "fit_low": 18.0,
+      "fit_high": 18.0,
       "locations": [
         "Washington, DC"
       ],
@@ -1700,6 +1722,8 @@
       "title": "Customer Success Manager, Fleet Operations",
       "family": "applied_ai",
       "judged": false,
+      "fit_low": 17.0,
+      "fit_high": 17.0,
       "locations": [
         "Auckland, New Zealand"
       ],

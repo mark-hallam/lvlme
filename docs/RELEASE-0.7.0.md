@@ -1,9 +1,43 @@
 # LVLme 0.7.0: goals and campaigns
 
 5 November 2026. LVLme now works with goals and campaigns only. This page
-covers the engine part of the release: steadier scoring (rules version 1.2)
-and the end of LVLme quick. The lead adds the other parts when the work is
-merged.
+covers all three parts of the release: the engine (every factor judged twice,
+a fit range, rules version 1.2, the end of LVLme quick), the journey (set a
+goal, a starting line, a Today screen, a weekly rhythm, level-up events) and a
+proof profile.
+
+## The journey
+
+- **Set a goal** (role, organisations, where, by when). LVLme tests it against
+  your starting line and, if no plan reaches it in time, proposes a stepping
+  stone with the reason. You choose.
+- **The starting line.** Your level, your fit range ("fit about 57 to 61" when
+  a role was judged twice) and the date the plan is expected to reach the next
+  level, or a plain statement that no plan gets there yet. A first run judges
+  only the best few roles so it comes in about 15 minutes; Today says what is
+  still being checked.
+- **Today first.** The dashboard opens on Today in plain words. Mission control,
+  the full dashboard, is one tap away.
+- **A weekly rhythm:** a Monday plan note, a Friday review and a count of weeks
+  in a row with real evidence.
+- **Level-up and goal-reached events**, marked on Today, with a share card that
+  names no organisation or person.
+- **Outcomes you can choose to share:** a numbers-only export after a plain
+  consent screen. LVLme sends nothing anywhere.
+
+## The proof profile
+
+`scripts/proof_profile.py` builds a page of only the claims checked at verified
+or corroborated level, each with its public source. It refuses to write if the
+page would contain an email, a phone number, a folder path, a private link or
+an unchecked claim. Private by default. See docs/PROOF-PROFILE.md.
+
+## Known items for the reviewers
+
+- The accent colour: Today is orange and Mission control is blue. Whether they
+  should share one accent is still open.
+- Mission control keeps its aviation labels for the chart; Today does not use
+  them.
 
 ## Scoring rules 1.2
 

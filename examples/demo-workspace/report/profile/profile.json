@@ -1,7 +1,10 @@
 {
   "name": "Alex Example",
   "goal": {
-    "title": "A program, applied AI or policy role at an AI product company"
+    "title": "A program, applied AI or policy role at an AI product company",
+    "role": "A program, applied AI or policy role",
+    "where": "Australia",
+    "by": "2027-03-31"
   },
   "built_on": "2026-11-05",
   "levels": [
@@ -35,7 +38,7 @@
       "band": "Moderate",
       "change": "up",
       "rules_changed": false,
-      "event": null
+      "event": "level_up"
     },
     {
       "date": "2026-11-01",

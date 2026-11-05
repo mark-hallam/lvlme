@@ -17,7 +17,13 @@ rhythm, level-up events, outcomes you can choose to share) and a proof
 profile. The scoring rules are now version 1.2. **This release changes how a
 score is worked out**: see Changed.
 
-Tests: TESTCOUNT pass.
+Tests: 678 pass.
+
+**Known items for the reviewers.** Judging twice did not make scores steadier
+in the three-run test below (26, 24 and 19 on the same CV); nothing in this
+release claims otherwise. The accent colour question is still open: Today is
+orange and Mission control is blue. Mission control keeps its aviation labels
+for the chart; Today, the first thing you see, does not use them.
 
 ### Added
 
@@ -102,16 +108,6 @@ These are the scoring rules version 1.2.
   that described it. Someone who says "run LVLme quick" is told that LVLme now
   works with a goal and is offered to set one. Nothing the person reads
   offers it any more.
-
-### Known items for the reviewers
-
-- **The accent colour.** Today is orange and Mission control is blue. Whether
-  the two should share one accent is still open.
-- **Judging twice did not make scores steadier** in the three-run test above.
-  Nothing in this release claims otherwise.
-- Mission control keeps its aviation labels for the chart; Today, the first
-  thing you see, does not use them.
-
 
 ## 0.6.3 (5 November 2026)
 

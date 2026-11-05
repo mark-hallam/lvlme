@@ -232,12 +232,15 @@
         "note": "Warehouse and transport programs map closely to fleet rollouts at customer sites."
       },
       "D2": {
-        "score": 3,
         "evidence": [
           "E04",
           "E15"
         ],
-        "note": "Corroborated multi-site rollout case study."
+        "note": "Corroborated multi-site rollout case study.",
+        "judgings": [
+          3,
+          4
+        ]
       },
       "D4": {
         "score": 4,

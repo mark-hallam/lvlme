@@ -38,6 +38,7 @@ import fetch_doors  # noqa: E402
 import fetch_roles  # noqa: E402
 import network_map  # noqa: E402
 import practice  # noqa: E402
+import proof_profile  # noqa: E402
 import public  # noqa: E402
 import score  # noqa: E402
 
@@ -267,6 +268,7 @@ def main():
             run(public.main, ["--workspace", DEMO] + rest + ["--date", date])
         run(score.main, ["--workspace", DEMO, "--date", today])
         run(build_dashboard.main, ["--workspace", DEMO, "--today", today])
+        run(proof_profile.main, ["--workspace", DEMO, "--date", "2026-11-05"])
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print("Demo rebuilt: examples/demo-workspace/report/index.html")

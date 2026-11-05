@@ -48,7 +48,7 @@ class RunPlanTests(unittest.TestCase):
         p = R.plan(self.ws, self.config)
         first = p["first"]
         self.assertEqual(len(first["role_ids"]), R.FIRST_ROLES)
-        self.assertEqual((first["judges"], first["scouts"]), (1, 0))
+        self.assertEqual((first["judges"], first["scouts"]), (R.JUDGES_PER_BATCH, 0))   # one batch, each judged twice
         self.assertEqual(first["deepen_later"], p["full"]["roles"] - R.FIRST_ROLES)
         self.assertNotIn(suspicious, first["role_ids"])                        # a suspicious posting is never a first pick
         self.assertIn("First result: judges the best 8 roles of", R.say(p)[0])

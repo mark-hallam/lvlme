@@ -79,8 +79,20 @@ class TodayFirstTests(unittest.TestCase):
 
 
 class RangeTests(unittest.TestCase):
-    def test_single_fit_until_the_engine_writes_a_range(self):
+    def test_demo_best_role_judged_twice_shows_a_range(self):
         ws, page = build(self, lambda ws: None, today="2026-10-10")
+        self.assertIn("fit about 57 to 61 out of 100", text_of(today_part(page)))
+        self.assertNotIn("One judging so far", text_of(today_part(page)))
+
+    def test_single_fit_when_the_run_file_has_no_range(self):
+        def tweak(ws):
+            path = os.path.join(ws, "eval", "runs", "2026-11-01.json")
+            run = H.load(path)
+            for r in run["roles"]:
+                r.pop("fit_low", None)
+                r.pop("fit_high", None)
+            H.save(path, run)
+        ws, page = build(self, tweak, today="2026-10-10")
         self.assertIn("fit 57 out of 100", text_of(today_part(page)))
         self.assertIn("One judging so far", text_of(today_part(page)))
 

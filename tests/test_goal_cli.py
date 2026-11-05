@@ -57,7 +57,19 @@ class GoalCliTests(unittest.TestCase):
     def test_startline_in_plain_words(self):
         code, out = run(self.ws, "startline", "--date", "2026-11-05")
         self.assertIn("Level 3, Moderate", out)
-        self.assertIn("One judging so far", out)       # no range from the engine yet
+        self.assertIn("fit about 57 to 61", out)       # the demo's best role is judged twice
+        self.assertNotIn("One judging so far", out)
+        self.assertNotIn("altitude", out.lower())
+
+    def test_startline_with_one_judging_says_so(self):
+        path = os.path.join(self.ws, "eval", "runs", "2026-11-01.json")
+        run_doc = H.load(path)
+        for r in run_doc["roles"]:
+            r.pop("fit_low", None)
+            r.pop("fit_high", None)
+        H.save(path, run_doc)
+        code, out = run(self.ws, "startline", "--date", "2026-11-05")
+        self.assertIn("One judging so far", out)
         self.assertNotIn("altitude", out.lower())
 
     def test_next_goal_keeps_the_old_one(self):
