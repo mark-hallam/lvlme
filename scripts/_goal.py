@@ -197,23 +197,29 @@ def starting_line(page, today):
         out.update(next="You are at the top level. Keep the evidence fresh so you stay there.", date=None, moves=0, reachable=True)
         return out
     out.update(next_level=nl["next_level"], next_band=nl["next_band"], points_to_next=nl["points_to_next"])
-    lvl = "Level %d" % nl["next_level"]
     if nl["reachable"]:
         s = nl["set"]
         n = len(s["ids"])
         names = {a["id"]: a["title"] for a in page["actions"]}
         out.update(reachable=True, date=s["date"], moves=n, move_titles=[names.get(i, i) for i in s["ids"]],
-                   chance=s.get("chance"),
-                   next="%s expected by %s with %s." % (lvl, short_date(s["date"]) if s["date"] else "the plan's dates",
-                                                         "this move" if n == 1 else "these %s moves" % _number(n)))
+                   chance=s.get("chance"), next=next_sentence(nl["next_level"], True, s["date"], n))
         return out
     missing = nl["missing"]
     room = [C.DIMENSION_NAMES[x["dimension"]].lower() for x in missing["room"][:3]]
     out.update(reachable=False, date=None, moves=0, missing=missing["room"], points_short=missing["points"],
-               next="No plan gets you to %s yet: the plan is about %s points short. %s" % (
-                   lvl, "%g" % missing["points"],
-                   ("What is missing: %s." % join_names(room)) if room else "Add moves that raise what is missing."))
+               next=next_sentence(nl["next_level"], False, None, 0, missing["points"], room))
     return out
+
+
+def next_sentence(level, reachable, date, moves, points_short=None, missing=()):
+    """The one sentence on the next level, used on the starting line, on Today and in the weekly notes."""
+    lvl = "Level %d" % level
+    if reachable:
+        return "%s expected by %s with %s." % (lvl, short_date(date) if date else "the plan's dates",
+                                                "this move" if moves == 1 else "these %s moves" % _number(moves))
+    return "No plan gets you to %s yet: the plan is about %s points short. %s" % (
+        lvl, "%g" % points_short,
+        ("What is missing: %s." % join_names(list(missing))) if missing else "Add moves that raise what is missing.")
 
 
 def _number(n):

@@ -22,6 +22,8 @@ import _common as C
 import _doors as DR
 import _applications as AP
 import _public as PB
+import _weekly as WK
+import _goal as GL
 
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 DAY_NAMES = dict(zip(DAYS, ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]))
@@ -88,6 +90,9 @@ def task_prompt(engine, ws, ap):
          "6. Start no helper agents: leave new scores above 2 waiting for review (they count as 2) and say so."),
         "7. python3 scripts/score.py --workspace %s, then python3 scripts/build_dashboard.py --workspace %s, then python3 scripts/validate.py --workspace %s (it must exit 0)." % (ws, ws, ws),
         "8. python3 scripts/autopilot.py week --workspace %s (writes this week's note and rebuilds the dashboard's This week card)." % ws,
+        "9. On a Monday also run python3 scripts/autopilot.py plan --workspace %s (the Monday plan note). "
+        "On a Friday also run python3 scripts/autopilot.py review --workspace %s (the Friday review: what was done with "
+        "evidence, what moved, next week's one move)." % (ws, ws),
         "",
         "Never apply for a job, send any email or message, post anything, accept anything, or change an account. "
         "Drafts go in campaign/drafts/ for the person to send. Evidence or it scores zero; never invent anything.",
@@ -218,6 +223,8 @@ def week_note(ws, config, today):
         changed.append("Nothing moved since %s." % since if since else "This is the first scored run: the next note says what moved.")
     apps = AP.due_now(apps_doc, today)
     top = (dash.get("actions_active") or [None])[0]
+    next_level = next_level_line(best)
+    streak = WK.weeks_in_a_row((dash.get("levels") or {}).get("progress_days") or [], today)
     runs = sorted(glob.glob(os.path.join(C.wpath(ws, "eval", "runs"), "*.json")))
     run = C.load_json(runs[-1], {}) if runs else {}
     awaiting = sum(1 for r in (run or {}).get("roles") or [] if r.get("awaiting_review"))
@@ -233,6 +240,7 @@ def week_note(ws, config, today):
         "fit": best.get("fit"), "level": best.get("level"), "band": best.get("band"),
         "role": best.get("title"), "org": names.get(best.get("org"), best.get("org")),
         "points_to_next": best.get("points_to_next"), "next_band": best.get("next_band"),
+        "next_level_line": next_level, "weeks_in_a_row": streak,
         "changed": changed, "reported_progress_ids": reported_now,
         "roles": {"new": len(summary.get("new_role_ids") or []), "closed": len(summary.get("closed_role_ids") or []),
                   "suspicious": (summary.get("posting_checks") or {}).get("suspicious", 0),
@@ -247,6 +255,18 @@ def week_note(ws, config, today):
         "autopilot": {"enabled": bool(settings(config).get("enabled")), "when": when_text(settings(config)),
                       "next": next_run(settings(config), (dt.date.fromisoformat(today) + dt.timedelta(days=1)).isoformat())},
     }
+
+
+def next_level_line(best):
+    """One sentence on the next level from the dashboard's agent file (levels.best_role), or None at the top."""
+    if not best or best.get("top_level") or not best.get("next_level"):
+        return None
+    if best.get("reachable_on_expected_odds"):
+        s = best.get("smallest_set") or {}
+        return GL.next_sentence(best["next_level"], True, s.get("level_reached_on"), len(s.get("actions") or []))
+    m = best.get("missing") or {}
+    return GL.next_sentence(best["next_level"], False, None, 0, m.get("points_short", 0),
+                            [x["name"].lower() for x in (m.get("room_by_factor") or [])[:3]])
 
 
 def public_line(ws, config, today):
@@ -272,6 +292,10 @@ def note_md(n):
                                                        ", %s" % n["org"] if n.get("org") else ""))
         if n.get("points_to_next"):
             lines.append("%s points to Level %s, %s." % (num(n["points_to_next"]), n["level"] + 1, n["next_band"]))
+        if n.get("next_level_line"):
+            lines.append(n["next_level_line"])
+        if n.get("weeks_in_a_row") is not None:
+            lines.append(WK.streak_text(n["weeks_in_a_row"]))
         lines.append("")
     lines += ["What changed:", ""] + ["- " + c for c in n["changed"]] + [""]
     r = n["roles"]
@@ -301,11 +325,15 @@ def note_md(n):
     return "\n".join(lines) + "\n"
 
 
-def write_note(ws, config, today):
-    """Write campaign/weekly/<today>.json, and .md unless the agent already wrote one. Returns the note."""
+def write_note(ws, config, today, stamp=None):
+    """Write campaign/weekly/<stamp or today>.json, and .md unless the agent already wrote one. Returns the note.
+
+    stamp is the Monday for the Monday plan note, so the file is named for the week's Monday."""
     n = week_note(ws, config, today)
-    C.write_json(C.wpath(ws, *WEEKLY_DIR, today + ".json"), n)
-    md = C.wpath(ws, *WEEKLY_DIR, today + ".md")
+    stamp = stamp or today
+    n["date"] = stamp
+    C.write_json(C.wpath(ws, *WEEKLY_DIR, stamp + ".json"), n)
+    md = C.wpath(ws, *WEEKLY_DIR, stamp + ".md")
     mine = os.path.exists(md) and open(md, encoding="utf-8").read().startswith("# This week: ")
     if mine or not os.path.exists(md):   # rewrite our own note; never one the agent wrote
         C.write_text(md, note_md(n))

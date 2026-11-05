@@ -12,6 +12,8 @@ Usage
   python3 scripts/autopilot.py prompt          # the scheduled task's prompt (also saved to campaign/autopilot-prompt.md)
   python3 scripts/autopilot.py schedule-line   # a crontab line, for a computer without the desktop app
   python3 scripts/autopilot.py week [--date YYYY-MM-DD]   # write this week's note, then rebuild the dashboard
+  python3 scripts/autopilot.py plan [--date YYYY-MM-DD]   # the Monday plan note: campaign/weekly/<monday>.md
+  python3 scripts/autopilot.py review [--date YYYY-MM-DD] # the Friday review: campaign/weekly/<friday>-review.md
 Every command takes --workspace PATH.
 """
 import argparse
@@ -23,6 +25,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 import _autopilot as A  # noqa: E402
+import _weekly as WK  # noqa: E402
 
 ENGINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROMPT_REL = ("campaign", "autopilot-prompt.md")
@@ -69,9 +72,10 @@ def main(argv=None):
     sub.choices["status"].add_argument("--json", action="store_true")
     for name in ("on", "off", "status"):
         sub.choices[name].add_argument("--date", help="YYYY-MM-DD (default: today in the person's time zone)")
-    wk = sub.add_parser("week")
-    wk.add_argument("--date")
-    wk.add_argument("--no-dashboard", action="store_true", help="write the note only")
+    for name in ("week", "plan", "review"):
+        wk = sub.add_parser(name)
+        wk.add_argument("--date")
+        wk.add_argument("--no-dashboard", action="store_true", help="write the note only")
     for p in sub.choices.values():
         p.add_argument("--workspace", default=argparse.SUPPRESS, help=argparse.SUPPRESS)
     args = ap.parse_args(argv)
@@ -120,8 +124,13 @@ def main(argv=None):
         claude_path = A.claude_path()
         print("Claude Code path found: %s." % (claude_path or "no, replace CLAUDE_PATH_HERE (run: which claude)"))
         print(A.cron_line(ENGINE, ws, s, prompt, C.wpath(ws, "campaign", "autopilot.log")))
+    elif args.cmd == "review":
+        dash = C.load_json(C.wpath(ws, "report", "for-agents", "dashboard.json"), {}) or {}
+        r = WK.write_review(ws, config, today, today, dash)
+        print("Wrote campaign/weekly/%s-review.md. %s Next week's one move: %s" % (
+            r["date"], r["moved"]["text"], r["next_move"]["title"] if r["next_move"] else "nothing new yet."))
     else:
-        note = A.write_note(ws, config, today)
+        note = A.write_note(ws, config, today, WK.monday_of(today) if args.cmd == "plan" else None)
         if not args.no_dashboard:
             import build_dashboard as B
             with open(os.devnull, "w") as quiet:
