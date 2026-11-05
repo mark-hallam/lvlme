@@ -290,7 +290,8 @@ class RuleTests(Base):
         self.assertEqual(gaps["globex"]["points_gain"], 0.0)
         self.assertEqual(run["gaps"][0]["id"], "intro")
         qs = run["verify_to_unlock"]
-        self.assertEqual([q["source"] for q in qs], ["open_question", "unverified_evidence"])
+        self.assertEqual([q["source"] for q in qs], ["open_question", "unverified_evidence",
+                                                     "warm_path_not_asked", "warm_path_not_asked"])  # Acme, Globex
         self.assertEqual(qs[1]["id"], "E05")
         self.assertEqual(run["outlook"]["band"], "Not yet judged")
 

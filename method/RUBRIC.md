@@ -1,5 +1,26 @@
 # Scoring rubric (version 1.2)
 
+## Added in LVLme 0.7.2 (still rubric 1.2: no score changes)
+
+- **Job match.** Each role carries `match` (with `match_low` and
+  `match_high`): the factors judged against the job itself, D1, D2, D4 and
+  D6, with their weights, rescaled to 0 to 100. Fit adds D3, D5 and D7, which
+  are about the person's campaign and are the same for every role at an
+  organisation. Use job match to find and rank well matched jobs; use fit and
+  its bands for the chance of an interview or offer if the person applied
+  today. A job match of 60 with the default weights is about what a typical
+  shortlisted applicant shows (3 out of 5 on requirements and proof of work,
+  1 on the organisation edge, full marks on location). Fit, bands, levels and
+  gaps are unchanged.
+- **A warm path not asked is not a warm path of 0 known people.** A D3 entry
+  for an organisation counts as asked unless it says `asked: false`. The
+  `default` entry counts as asked only with `asked: true` (the person
+  answered for every target at once). A role whose organisation was not
+  asked carries `warm_path_asked: false`, its D3 note says "Not asked yet",
+  the run counts `warm_path_not_asked`, and `verify_to_unlock` gets one
+  question per organisation (source `warm_path_not_asked`). The score is
+  still 0 until the person answers: evidence or zero.
+
 ## What changed in 1.2
 
 - C1: requirements match (D1), proof of work (D2) and organisation edge (D4)
@@ -354,6 +375,9 @@ band. A change to this table is a new rubric version.
 5. **Verify to unlock**: open questions from `profile/evidence.json`, plus one
    question for each unverified evidence item.
 6. **Trend**: the change since the last run, for each headline number.
+7. **Job match**: per role, beside fit (see "Added in LVLme 0.7.2" above). A
+   search for well matched jobs ("roles above 70") filters on job match and
+   says which number it used.
 
 ## Repeatability
 

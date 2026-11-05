@@ -15,7 +15,7 @@ Writes
                                   when no role is judged yet: that would be a
                                   false Day 1, not a measurement.
 
-Rules (method/RUBRIC.md v1.1), applied in this order per dimension:
+Rules (method/RUBRIC.md v1.2), applied in this order per dimension:
   1. evidence cap: a score can be no higher than its best cited evidence
      supports (verified 5, corroborated 4, partially verified the higher of
      the kind's self-reported cap and scoring.partially_verified_cap (default
@@ -25,6 +25,8 @@ Rules (method/RUBRIC.md v1.1), applied in this order per dimension:
   3. hard requirement lacking (or an eligibility blocker): D1 capped at 1.
 Then fit = sum(score / 5 x weight), bands from the fit table, and the three
 adjustments: warm referral up, hard requirement lacking down, cold-only cap.
+Job match (match, match_low, match_high) uses only the factors judged against
+the role (D1, D2, D4, D6); see scripts/_match.py. It changes no fit or band.
 
 Gap leaderboard: over the top scoring.top_n_for_gaps roles overall (the
 default, scoring.gap_pool "overall"), or, with gap_pool "per_org", over each
@@ -53,6 +55,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 import _judge_change as JC  # noqa: E402
+import _match as M  # noqa: E402
 import _public_link as PL  # noqa: E402
 
 RUBRIC_VERSION = "1.2"
@@ -283,6 +286,9 @@ def score_role(ctx, role, judgement):
         scores[d] = s
         adjustments += adj
         awaiting += aw
+    asked = M.warm_path_asked(ctx.profile, org)
+    if not asked:
+        M.mark_not_asked(scores["D3"])
     loc_class, (d6, adj, aw) = best_d6(ctx, role, judgement)
     if blocked:
         rule = (ctx.profile.get("D6_rules") or {}).get("blocked") or {}
@@ -311,6 +317,9 @@ def score_role(ctx, role, judgement):
     fit = fit_of(lambda x: x["score"])
     fit_low = min(fit, fit_of(lambda x: x.get("_lo", x["score"])))
     fit_high = max(fit, fit_of(lambda x: x.get("_hi", x["score"])))
+    match = M.match_of(scores, ctx.weights, lambda x: x["score"])
+    match_low = min(match, M.match_of(scores, ctx.weights, lambda x: x.get("_lo", x["score"])))
+    match_high = max(match, M.match_of(scores, ctx.weights, lambda x: x.get("_hi", x["score"])))
     for x in scores.values():
         x.pop("_lo", None)
         x.pop("_hi", None)
@@ -331,6 +340,7 @@ def score_role(ctx, role, judgement):
         "role_id": rid, "org": org, "title": role["title"], "family": role["family"],
         "locations": list(role.get("locations") or []), "location_class": loc_class, "url": role.get("url"),
         "scores": scores, "fit": fit, "fit_low": fit_low, "fit_high": fit_high,
+        "match": match, "match_low": match_low, "match_high": match_high, "warm_path_asked": asked,
         "interview_band": interview, "offer_band": offer,
         "adjustments": adjustments, "judged": judgement is not None,
         "awaiting_review": sorted(set(awaiting)), "eligibility_blocked": blocked,
@@ -454,7 +464,7 @@ def build_run(ws, config, run_date):
     for tid in C.target_ids(config):
         best = next((r for r in scored if r["org"] == tid and r["judged"]), None)
         per_org[tid] = None if best is None else {k: best[k] for k in
-                                                  ("role_id", "title", "fit", "fit_low", "fit_high", "interview_band", "offer_band")}
+                                                  ("role_id", "title", "fit", "fit_low", "fit_high", "match", "interview_band", "offer_band")}
     if outlook:
         out_look = {"band": outlook.get("band", "Not yet judged"), "text": outlook.get("text", ""),
                     "reasons": list(outlook.get("reasons") or [])}
@@ -483,12 +493,13 @@ def build_run(ws, config, run_date):
             "eligibility_blocked": sum(1 for r in scored if r["eligibility_blocked"]),
             "hard_requirement_lacking": sum(1 for r in scored if r["hard_requirement_lacking"]),
             "stale_judgements": len(stale),
+            "warm_path_not_asked": sum(1 for t in C.target_ids(config) if not M.warm_path_asked(profile, t)),
         },
         "roles": scored,
         "per_org": per_org,
         "gaps": compute_gaps(ctx, scored, templates),
         "outlook": out_look,
-        "verify_to_unlock": verify_questions(evidence),
+        "verify_to_unlock": verify_questions(evidence) + M.warm_path_questions(config, profile),
         "warnings": sorted(ctx.warnings),
     }
     return run

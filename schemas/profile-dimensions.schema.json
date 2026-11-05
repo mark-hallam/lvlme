@@ -47,7 +47,8 @@
         "note": {"type": "string"},
         "judged_on": {"$ref": "#/definitions/date"},
         "reviewed_on": {"$ref": "#/definitions/date"},
-        "reviewer_note": {"type": "string"}
+        "reviewer_note": {"type": "string"},
+        "asked": {"type": "boolean", "description": "D3 only. On an organisation's entry, false says the person was not asked about it. On the default entry, true says the person answered for every target at once; without it the default counts as not asked."}
       }
     }
   }

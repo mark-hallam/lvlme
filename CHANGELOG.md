@@ -8,6 +8,28 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## Unreleased
+
+From a real search for senior project roles: no role reached a fit of 70,
+and the reason was mostly not the jobs. Fit adds three factors about the
+person's campaign (who they know, how findable they are, a tailored CV) that
+are the same for every role at an organisation, and a warm path nobody asked
+about counted the same as knowing nobody. Fit, the bands and the levels are
+unchanged.
+
+### Added
+
+- **Job match:** every role now has a job match beside its fit, from the four
+  factors judged against the job itself (requirements, proof of work, what the
+  organisation values, eligibility and location), with their weights, on 0 to
+  100. Use it to find well matched jobs; fit stays the estimate of your chance
+  if you applied today. Shown in the role panel and in the agent file.
+- **Warm path not asked:** when nobody asked whether you know anyone at an
+  organisation, the run says so, the warm path is marked "not asked yet"
+  instead of reading as nobody, and the questions to unlock list one
+  "Do you know anyone at ...?" per organisation. It still counts as 0 until
+  you answer: evidence or zero.
+
 ## 0.7.1 (5 November 2026)
 
 Fixes from three rounds of independent review of 0.7 (a Claude reviewer and a

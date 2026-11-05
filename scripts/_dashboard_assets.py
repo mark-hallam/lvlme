@@ -1773,6 +1773,7 @@ function detailRole(id){
   return `<h2>${esc(r.title)}</h2><div class="small sub">${esc(r.on)} · ${esc(D.families[r.family] || "")} · ${esc(r.loc.join(", "))}</div>
     <div class="journey-mini"><b>${Math.round(r.fit)}</b><span class="arrow">→</span><b>${Math.round(exp.end)}</b><span class="arrow">→</span><b>${Math.round(best.end)}</b></div><div class="tiny sub">today, expected, best case</div>
     <div class="kv" style="margin-top:8px"><span>Interview chance now</span>${pill(r.ib)}</div><div class="kv"><span>Offer chance now</span>${pill(r.ob)}</div>
+    ${r.m != null ? `<div class="kv"><span>Job match</span><b class="num">${Math.round(r.m)}</b></div><div class="tiny sub">How well you match the job itself: requirements, proof of work, what this organisation values and location. Fit also counts who knows you here, how findable you are and a tailored CV.</div>` : ""}
     <div class="kv"><span>If the plan works</span>${pill(interviewBand(exp.end, exp.scores, r.hrl))}</div>
     ${block ? `<div class="small warnline">${esc(block)}</div>` : ""}
     ${r.pc ? `<div class="small ${r.pcl === "suspicious" ? "warnline" : "sub"}" style="margin-top:8px">The posting: ${esc(r.pc)}. ${r.pcl === "suspicious" ? "Check it is a live opening before you spend time on it." : "Worth a quick check that it is still a live opening."} The score is unchanged.</div>` : ""}

@@ -138,6 +138,11 @@ rounds while roles and evidence are gathered.
    - `eval/profile-dimensions.json`: D3, D5 and D7 per organisation and the
      D6 rules, when evidence changes (a warm introduction, a credential, a
      public repository, an answer about work rights).
+     Ask the warm-path questions in `method/INTAKE.md` for each target before
+     you set D3. Mark an organisation's entry, or the `default` entry, with
+     `asked: true` only once the person has answered; otherwise the run says
+     the warm path was not asked and asks for them. Never cite evidence about
+     other organisations (for example contacts at a different goal's targets).
    - `eval/gap-templates.json` and `eval/outlook.json`: revise when the
      picture changes. Give every gap a `kind`: `show_it` when the proof is missing but the person can probably already do it (a project example, a public link, a reference, a write-up; usually days), or `build_it` when they have to learn or do the thing first (usually weeks or months). If unsure, write `build_it`: never guess `show_it`.
 

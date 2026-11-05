@@ -397,6 +397,7 @@ def build_roles(data, group_of, hard_types):
             "e": [r["scores"][d].get("evidence") or [] for d in DIMS],
             "fit": r["fit"], "ib": r["interview_band"], "ob": r["offer_band"],
             "lo": r.get("fit_low"), "hi": r.get("fit_high"),   # the range across two judgings, once the engine writes it
+            "m": r.get("match"),   # job match: the job-side factors only (D1, D2, D4, D6), once the engine writes it
             "adj": [clean(x) for x in r.get("adjustments") or []], "rn": clean(r.get("reviewer_note")),
             "hardReq": [clean(h) for h in (p.get("hard_requirements") or [])[:5]],
             **posting_label(p),
@@ -902,6 +903,7 @@ def agent_payload(data, page):
         "roles": [{"role_id": r["role_id"], "org": r["org"], "title": r["title"], "family": r["family"],
                    "judged": r.get("judged", True),
                    **({"fit_low": r["fit_low"], "fit_high": r["fit_high"]} if r.get("fit_low") is not None and r.get("fit_high") is not None else {}),
+                   **({"match": r["match"]} if r.get("match") is not None else {}),
                    "locations": r.get("locations", []), "url": r.get("url"), "fit": r["fit"],
                    "interview_band": r["interview_band"], "offer_band": r["offer_band"],
                    "scores": {d: r["scores"][d]["score"] for d in DIMS},

@@ -257,6 +257,7 @@
       "fit": 46.0,
       "fit_low": 46.0,
       "fit_high": 50.0,
+      "match": 56.9,
       "interview_band": "Low",
       "offer_band": "Very low",
       "org_name": "Acme AI"
@@ -267,6 +268,7 @@
       "fit": 39.0,
       "fit_low": 39.0,
       "fit_high": 39.0,
+      "match": 40.0,
       "interview_band": "Very low",
       "offer_band": "Very low",
       "org_name": "Globex Labs"
@@ -277,6 +279,7 @@
       "fit": 57.0,
       "fit_low": 57.0,
       "fit_high": 61.0,
+      "match": 76.9,
       "interview_band": "Moderate",
       "offer_band": "Low",
       "org_name": "Initech Robotics"
@@ -1510,6 +1513,7 @@
       "judged": true,
       "fit_low": 57.0,
       "fit_high": 61.0,
+      "match": 76.9,
       "locations": [
         "Melbourne, Australia"
       ],
@@ -1537,6 +1541,7 @@
       "judged": true,
       "fit_low": 46.0,
       "fit_high": 50.0,
+      "match": 56.9,
       "locations": [
         "San Francisco, CA",
         "Sydney, Australia"
@@ -1565,6 +1570,7 @@
       "judged": true,
       "fit_low": 45.0,
       "fit_high": 45.0,
+      "match": 55.4,
       "locations": [
         "Sydney, Australia"
       ],
@@ -1592,6 +1598,7 @@
       "judged": true,
       "fit_low": 45.0,
       "fit_high": 45.0,
+      "match": 58.5,
       "locations": [
         "Brisbane, Australia"
       ],
@@ -1619,6 +1626,7 @@
       "judged": true,
       "fit_low": 39.0,
       "fit_high": 39.0,
+      "match": 40.0,
       "locations": [
         "Singapore"
       ],
@@ -1649,6 +1657,7 @@
       "judged": true,
       "fit_low": 37.0,
       "fit_high": 37.0,
+      "match": 36.9,
       "locations": [
         "Seattle, WA",
         "Toronto, Canada"
@@ -1677,6 +1686,7 @@
       "judged": true,
       "fit_low": 34.0,
       "fit_high": 34.0,
+      "match": 32.3,
       "locations": [
         "Remote"
       ],
@@ -1706,6 +1716,7 @@
       "judged": true,
       "fit_low": 28.0,
       "fit_high": 28.0,
+      "match": 23.1,
       "locations": [
         "Dublin, Ireland"
       ],
@@ -1735,6 +1746,7 @@
       "judged": true,
       "fit_low": 24.0,
       "fit_high": 24.0,
+      "match": 23.1,
       "locations": [
         "London, United Kingdom"
       ],
@@ -1764,6 +1776,7 @@
       "judged": true,
       "fit_low": 24.0,
       "fit_high": 24.0,
+      "match": 26.2,
       "locations": [
         "Austin, TX"
       ],
@@ -1793,6 +1806,7 @@
       "judged": true,
       "fit_low": 18.0,
       "fit_high": 18.0,
+      "match": 13.8,
       "locations": [
         "Washington, DC"
       ],
@@ -1823,6 +1837,7 @@
       "judged": false,
       "fit_low": 17.0,
       "fit_high": 17.0,
+      "match": 15.4,
       "locations": [
         "Auckland, New Zealand"
       ],

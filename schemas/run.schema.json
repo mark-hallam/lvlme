@@ -30,6 +30,7 @@
               "fit": {"type": "number"},
               "fit_low": {"type": "number"},
               "fit_high": {"type": "number"},
+              "match": {"type": "number"},
               "interview_band": {"$ref": "#/definitions/band"},
               "offer_band": {"$ref": "#/definitions/band"}
             }
@@ -88,7 +89,7 @@
           "question": {"type": "string"},
           "why": {"type": "string"},
           "dimensions": {"type": "array", "items": {"$ref": "#/definitions/dimension"}},
-          "source": {"enum": ["open_question", "unverified_evidence"]}
+          "source": {"enum": ["open_question", "unverified_evidence", "warm_path_not_asked"]}
         }
       }
     },
@@ -152,6 +153,10 @@
         "fit": {"type": "number", "minimum": 0, "maximum": 100, "description": "The average fit, from the averaged factor scores."},
         "fit_low": {"type": "number", "minimum": 0, "maximum": 100, "description": "The lowest fit the judgings allow: every judged factor at its lower judging. Equals fit when each factor was judged once."},
         "fit_high": {"type": "number", "minimum": 0, "maximum": 100, "description": "The highest fit the judgings allow: every judged factor at its higher judging. Equals fit when each factor was judged once."},
+        "match": {"type": "number", "minimum": 0, "maximum": 100, "description": "Job match: how well the person matches the job itself, from D1, D2, D4 and D6 only, with their weights, rescaled to 0 to 100. Fit adds the campaign factors (D3, D5, D7)."},
+        "match_low": {"type": "number", "minimum": 0, "maximum": 100, "description": "Job match with every judged factor at its lower judging."},
+        "match_high": {"type": "number", "minimum": 0, "maximum": 100, "description": "Job match with every judged factor at its higher judging."},
+        "warm_path_asked": {"type": "boolean", "description": "False when the person was never asked whether they know anyone at this organisation: D3 then counts 0 as unknown, not as nobody."},
         "interview_band": {"$ref": "#/definitions/band"},
         "offer_band": {"$ref": "#/definitions/band"},
         "adjustments": {"type": "array", "items": {"type": "string"}},
