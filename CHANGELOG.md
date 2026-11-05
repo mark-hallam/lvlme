@@ -14,7 +14,10 @@ before. Nothing here changes how a score is worked out unless it says so.
 
 - **Role fetch:** only software or coding job titles (not civil, site,
   maintenance, biomedical or property developer roles) are treated as heavy
-  coding when the person does not write production code.
+  coding when the person does not write production code. Title matching no
+  longer treats every engineering manager or ambiguous posting words (for
+  example platform in a company blurb) as a coding job; site reliability and
+  software quality engineer titles still count.
 
 ## 0.7.2 (6 November 2026)
 

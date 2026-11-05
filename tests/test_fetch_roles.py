@@ -95,23 +95,43 @@ class EngineeringTitles(unittest.TestCase):
         self.assertFalse(F.engineering_title("Technical Program Manager, Engineering"))
 
     def test_non_software_engineer_and_developer_titles_are_not_coding_jobs(self):
-        for title in ("Civil Engineer", "Site Engineer", "Maintenance Engineer",
-                      "Biomedical Engineer", "Property Developer"):
+        for title in ("Civil Engineer", "Civil Infrastructure Engineer", "Infrastructure Engineer",
+                      "Site Engineer", "Maintenance Engineer", "Biomedical Engineer", "Property Developer",
+                      "Engineering Manager, Facilities", "Senior Engineering Manager, Civil Works",
+                      "Project Engineer", "Chemical Engineer"):
             with self.subTest(title=title):
                 self.assertFalse(F.engineering_title(title))
-        for title in ("Software Engineer", "Backend Developer"):
+        for title in ("Software Engineer", "Backend Developer", "Site Reliability Engineer",
+                      "Software Quality Engineer"):
             with self.subTest(title=title):
                 self.assertTrue(F.engineering_title(title))
 
+    def test_posting_blurb_does_not_make_field_engineer_a_coding_title(self):
+        blurb = (
+            "plant performance targets, deployment of the programme, and batches of 50 ml samples."
+        )
+        for title in ("Project Engineer", "Chemical Engineer"):
+            with self.subTest(title=title):
+                self.assertFalse(F.engineering_title(title, blurb))
+
     def test_non_software_engineer_roles_are_not_heavy_coding_from_title(self):
         body = "<h3>Requirements</h3><ul><li>5+ years of field experience.</li></ul>"
+        cfg = H.deep(CFG)
+        cfg["families"].append({
+            "id": "field_engineering",
+            "name": "Field engineering",
+            "title_keywords": [],
+            "department_keywords": ["Operations"],
+            "drop_if_heavy_coding": False,
+        })
         for title in ("Civil Engineer", "Site Engineer", "Maintenance Engineer",
                       "Biomedical Engineer", "Property Developer"):
             with self.subTest(title=title):
                 base = next(F.greenhouse_postings({"jobs": [gh_job(99, title, "Operations", body)]}))
-                role, _ = F.build_role(TARGET, base, CFG)
-                if role:
-                    self.assertFalse(role["requires_heavy_coding"], title)
+                role, _ = F.build_role(TARGET, base, cfg)
+                self.assertIsNotNone(role, title)
+                self.assertFalse(role["requires_heavy_coding"], title)
+                self.assertFalse(F.engineering_title(title, base["raw_html"]))
 
 
 class AdapterTests(unittest.TestCase):

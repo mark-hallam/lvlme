@@ -240,17 +240,31 @@ NEGATION = re.compile(r"(?:n't|\bnot|\bnever|\bwithout|\bno need to|\bno)\s+(?:\
 # Main title ends in Engineer or Developer, or starts with Engineering Manager.
 ENGINEERING_JOB = re.compile(r"(?:\b(?:engineer|developer)(?:\s+(?:i{1,3}|iv|v|\d))?\s*$|^\s*(?:senior\s+|sr\.?\s+)?engineering\s+manager\b)", re.I)
 NON_SOFTWARE_ENGINEER = re.compile(
-    r"\b(?:civil|site|maintenance|biomedical|structural|mechanical|electrical|environmental|"
-    r"property|construction|manufacturing|quality|reliability|process|packaging)\s+"
-    r"(?:engineer|developer)\b|\bproperty\s+developer\b",
+    r"\bcivil\s+(?:\w+\s+)*engineer\b|"
+    r"\binfrastructure\s+engineer\b|"
+    r"\b(?:site|maintenance|biomedical|structural|mechanical|electrical|environmental|"
+    r"property|construction|manufacturing|process|packaging|chemical|project)\s+"
+    r"(?:engineer|developer)\b|"
+    r"\b(?<!software\s)quality\s+(?:engineer|developer)\b|"
+    r"\b(?<!site\s)reliability\s+(?:engineer|developer)\b|"
+    r"\bproperty\s+developer\b",
     re.I,
 )
-SOFTWARE_CODING_WORD = re.compile(
+# Ambiguous words (deployment, platform, performance, ml) apply to the title only, not the company blurb.
+TITLE_SOFTWARE_CODING_WORD = re.compile(
     r"\b(?:software|coding|programming|programmer|devops|sre\b|"
     r"backend|back[- ]end|frontend|front[- ]end|full[- ]stack|fullstack|"
     r"machine\s+learning|\bml\b|android|ios|"
-    r"deployment|forward[- ]deployed|platform|infra(?:structure)?|performance|"
+    r"deployment|forward[- ]deployed|platform|performance|"
+    r"site\s+reliability|software\s+quality|"
     r"plugin|monetization|chatgpt|data\s+engineer|analytics\s+engineer)\b",
+    re.I,
+)
+POSTING_SOFTWARE_CODING_WORD = re.compile(
+    r"\b(?:software|coding|programming|programmer|devops|sre\b|"
+    r"backend|back[- ]end|frontend|front[- ]end|full[- ]stack|fullstack|"
+    r"machine\s+learning|android|ios|"
+    r"plugin|chatgpt|data\s+engineer|analytics\s+engineer)\b",
     re.I,
 )
 
@@ -260,12 +274,13 @@ def engineering_title(title, posting_text=None):
     main = re.split(r"\s*(?:,|\(|\||\s[-\u2013\u2014]\s)", title or "", maxsplit=1)[0]
     if NON_SOFTWARE_ENGINEER.search(main):
         return False
-    if re.match(r"^\s*(?:senior\s+|sr\.?\s+)?engineering\s+manager\b", main, re.I):
-        return True
     if not ENGINEERING_JOB.search(main):
         return False
-    scope = ((title or "") + " " + (posting_text or "")).strip()
-    return bool(SOFTWARE_CODING_WORD.search(scope))
+    if TITLE_SOFTWARE_CODING_WORD.search(main):
+        return True
+    if posting_text and POSTING_SOFTWARE_CODING_WORD.search(posting_text):
+        return True
+    return False
 
 
 def coding_check(title, text):
