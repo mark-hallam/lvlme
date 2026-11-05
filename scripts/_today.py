@@ -278,8 +278,8 @@ def _start(t):
 def _reached(t):
     if not t.get("goal_reached"):
         return ""
-    return ('<section class="td-card"><div class="td-eyebrow">Next goal</div><p class="td-big">You reached your goal.</p>'
-            '<p class="td-sub">Set the next one. The goal you just reached is kept in your history.</p>'
+    return ('<section class="td-card"><div class="td-eyebrow">Next goal</div><p class="td-big">You reached the level you set as your goal.</p>'
+            '<p class="td-sub">This is your measured level, not a job offer. Set the next goal. The one you just reached is kept in your history.</p>'
             '<div class="td-actions"><button class="td-btn" type="button" data-copy="%s">Set my next goal</button></div>'
             '<div class="td-msg" role="status"></div></section>' % esc("Set my next goal with LVLme: ask me for the role, the organisations, where and by when, then run scripts/goal.py next-goal."))
 

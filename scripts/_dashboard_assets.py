@@ -97,7 +97,7 @@ h3{font-size:17px;margin:0 0 6px}
 .tog{position:relative;width:44px;height:26px;flex-shrink:0;border-radius:999px;background:var(--rule);border:none;cursor:pointer;margin-top:2px}
 .tog::before{content:"";position:absolute;inset:-9px 0}
 .tog::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
-.tog[aria-checked=true]{background:var(--ok)}
+.tog[aria-checked=true]{background:var(--accent)}
 .tog[aria-checked=true]::after{transform:translateX(18px)}
 .rail-actions{display:flex;gap:8px;margin:6px 0 4px}
 .metric{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-top:1px solid var(--rule);font-size:15px;gap:8px}

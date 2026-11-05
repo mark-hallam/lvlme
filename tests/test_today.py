@@ -148,7 +148,7 @@ class MomentTests(unittest.TestCase):
         _, page = build(self, tweak)
         words = text_of(today_part(page))
         self.assertIn("Goal reached: Level 3, Moderate", words)
-        self.assertIn("You reached your goal.", words)
+        self.assertIn("You reached the level you set as your goal.", words)
         self.assertIn("Set my next goal", words)
 
 
