@@ -189,10 +189,23 @@ rounds while roles and evidence are gathered.
     `campaign/metrics-history.json`. Open the page only if a browser is
     available, to check it renders.
 
-12. **Validate once more.** `python3 scripts/validate.py`. It must exit 0.
+12. **Levels.** `build_dashboard.py` also records level events in
+    `eval/levels.json` (a level-up when the best fit crosses into a higher
+    band under the same rubric version; a goal reached at the goal's level,
+    default Level 4). Events are only added. When one is new, tell the person
+    on the Today screen's words and mention the share card (level and dates,
+    no names). On a goal reached, offer the next goal
+    (`python3 scripts/goal.py next-goal --role ...`).
 
-13. **Weekly comparison** (on the comparison day): write
-    `campaign/weekly/<YYYY-MM-DD>.md`.
+12b. **Validate once more.** `python3 scripts/validate.py`. It must exit 0.
+
+13. **Weekly rhythm.** On Monday run `python3 scripts/autopilot.py plan`
+    (the plan note, `campaign/weekly/<monday>.md`: what changed, the level,
+    the one move, when the next level is expected, weeks in a row). On Friday
+    run `python3 scripts/autopilot.py review`
+    (`campaign/weekly/<friday>-review.md`: what was done with evidence, what
+    moved, next week's one move). A week counts toward "weeks in a row" only
+    when something was finished or checked with evidence.
 
 14. **Tell the person**, in under 150 words: the outlook band and any change,
     today's 1 to 3 actions, anything that needs their answer, and the

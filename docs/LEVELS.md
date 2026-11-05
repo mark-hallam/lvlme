@@ -108,6 +108,22 @@ plan") and shows:
 - if even the caps cannot reach the level (for example years in a similar role, which the
   default caps hold still), it says that role tops out below it.
 
+## Level events and the goal
+
+Each time a build finds that the best fit has crossed into a higher level
+(under the same rubric version, never across a rubric change), it records a
+`level_up` event in `eval/levels.json`: `{date, kind, from_level, to_level,
+role_id, evidence: [ids]}`. A `goal_reached` event is recorded the first time
+the best fit reaches the goal's level (`goal.target_level`, default 4, Good).
+Events are only ever added. The Today screen marks a recent one and offers a
+share card that shows the level and the dates and nothing else.
+
+The goal itself is `goal.role`, `organisations`, `where` and `by`.
+`scripts/goal.py check` tests it on the plan's own dates: on track, only if
+every move works, or no plan gets there; in the last two cases it may propose
+a stepping stone (a lower level that is reachable) with the reason, and the
+person chooses.
+
 ## Quests
 
 Each open action is a card with: its status (a word beside the dot), tags, the title,

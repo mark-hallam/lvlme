@@ -400,6 +400,14 @@ The self-check list, for the person, before they submit:
 - [ ] It leads with the strongest verified evidence in the brief.
 - [ ] I could defend every sentence in an interview.
 
+## The weekly rhythm
+
+Monday: `python3 scripts/autopilot.py plan` writes the plan note
+`campaign/weekly/<monday>.md`. Friday: `python3 scripts/autopilot.py review`
+writes `campaign/weekly/<friday>-review.md` and `.json`: what was done with
+evidence, what moved (not compared across a rubric change), next week's one
+move, and the weeks in a row with real evidence. Notes only; nothing is sent.
+
 ## Cadence
 
 - **Weekly**, plus a run whenever something changes: an action done, new

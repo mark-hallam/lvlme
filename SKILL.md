@@ -120,9 +120,12 @@ they need to act. To see the full Python details, run it again with
 The first full run for a goal, in this order. This is the one list: every
 other file that describes a first run links here.
 
-1. **Workspace.** Ask for the goal in one sentence, then run
-   `python3 scripts/init.py --goal "<goal>"`. It starts with no target
-   organisations or role families.
+1. **Workspace and goal.** Ask for the goal as four plain answers: the role
+   they want, the organisations, where, and by when. Then run
+   `python3 scripts/init.py --role "<role>" --organisations "<A, B>" --where "<place>" --by <YYYY-MM-DD>`
+   (a short `--goal "<goal>"` still works). It writes one goal sentence that
+   everything is measured against, and starts with no target organisations or
+   role families.
 2. **The first message**, about 120 words at most (`method/INTERVIEW.md`,
    "The first message"): confirm three facts from the CV, ask which
    organisations they want, and ask for the LinkedIn data export. No CV yet?
@@ -159,6 +162,23 @@ other file that describes a first run links here.
    rights answers.
 7. **Carry on.** Finish stages 2 and 3, then run stages 4 to 10 as in any
    run.
+8. **The first result, in about 15 minutes.** Run
+   `python3 scripts/run_plan.py`: with no scored run yet it sizes a first
+   result that judges only the best few roles (8, one judge batch), so the
+   person sees a first honest starting line quickly. Judge those, run the
+   blind review, score, and build the dashboard. The Today screen says what
+   is still being checked; every later run judges more roles and adds
+   evidence, and the first result can change. Say that plainly.
+9. **Test the goal, then show the starting line.** Run
+   `python3 scripts/goal.py check`, which tests the goal against the first
+   result on the plan's own dates. When no plan reaches it in time it
+   proposes a stepping stone with the reason; the person chooses
+   (`goal.py stone accept` or `decline`), and nothing changes until they do.
+   Then run `python3 scripts/goal.py startline` and tell the person: the
+   level, the fit (a range once each role is judged twice, one number until
+   then), and the date the plan is expected to reach the next level, or that
+   no plan gets there yet and what is missing. Their dashboard opens on the
+   Today screen; Mission control, the full dashboard, is one tap away.
 
 ## Run it in parallel
 
