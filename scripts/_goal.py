@@ -134,8 +134,8 @@ def check(page, goal, today):
         out.update(verdict="on_track", text="On the plan's dates your best match is expected to reach %s%s%s." % (
             level_name, when, " (about %s)" % short_date(out["reach_date"]) if out["reach_date"] and by else ""))
     elif best >= thr:
-        out.update(verdict="stretch", text="Only if every move works does your best match reach %s%s. On expected odds "
-                                           "it reaches about %d." % (level_name, when, int(exp + 0.5)))
+        out.update(verdict="stretch", text="On expected odds your plan gets your best match to about %d, and %d is needed. "
+                                           "Only if every move works does it reach %s%s." % (int(exp + 0.5), thr, level_name, when))
     else:
         out.update(verdict="out_of_reach", text="No plan reaches %s%s. The plan gets your best match to about %d, "
                                                 "and %d is needed." % (level_name, when, int(exp + 0.5), thr))

@@ -146,7 +146,8 @@ def render(model):
     name = model["name"] or "Proof profile"
     cl = model["claims"]
     if cl:
-        claims = '<ul class="claims">\n%s\n</ul>' % "\n".join(claim_html(c) for c in cl)
+        claims = ('<p class="note key"><b>Verified</b>: checked directly against the source shown. '
+                  '<b>Corroborated</b>: two independent sources agree.</p>\n<ul class="claims">\n%s\n</ul>' % "\n".join(claim_html(c) for c in cl))
     else:
         claims = '<p class="note">No claims have been checked against a public source yet.</p>'
     footer = ("Only claims checked against a public source are shown. Everything else is left out"

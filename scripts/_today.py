@@ -14,6 +14,7 @@ shown, with the single fit in its place.
 import datetime as dt
 import html
 import json
+import os
 
 import _common as C
 import _events as EV
@@ -71,6 +72,7 @@ def build(page, data, events):
     out["level_up"] = share_of(EV.recent(events, today, "level_up"), page)
     out["goal_reached"] = share_of(EV.recent(events, today, "goal_reached", 60), page)
     out["week"] = WK.latest(data.ws, today)
+    out["profile"] = os.path.exists(C.wpath(data.ws, "report", "profile", "profile.json"))
     out["show_start_line"] = len(page["runs"]) <= 2 or (dt.date.fromisoformat(today) - dt.date.fromisoformat(page["meta"]["baseline"])).days <= STARTING_LINE_DAYS
     out["stone_to_choose"] = stone_to_choose(data, out["goal_check"])
     return out
@@ -125,7 +127,7 @@ def render(t, has_numbers_page=False):
         body = ('<h1 id="tdH" class="td-h">Your first result is on its way</h1><p class="td-stand">%s</p>' % esc(t["stand"]))
         return head + goal + body + _footer(t, has_numbers_page) + "</div></main>"
     parts = [head, goal, _moment(t), _hero(t), '<p class="td-stand">%s</p>' % esc(t["stand"]), _move(t), _next(t),
-             _week(t), _streak(t), _checking(t), _stone(t), _start(t), _reached(t), _footer(t, has_numbers_page), "</div></main>"]
+             _week(t), _streak(t), _checking(t), _profile(t), _stone(t), _start(t), _reached(t), _footer(t, has_numbers_page), "</div></main>"]
     return "".join(parts)
 
 
@@ -165,18 +167,21 @@ def _move(t):
         meta.append("by " + G.short_date(m["by"]))
     return ('<section class="td-card td-move"><div class="td-eyebrow">Your one move today</div><h2 class="td-big">%s</h2>%s%s%s'
             '<div class="td-actions"><button class="td-btn" type="button" data-copy="%s">Done? Tell your agent</button></div>'
+            '<p class="td-tiny">The button copies this for your agent: %s</p>'
             '<div class="td-msg" role="status"></div></section>') % (
         esc(m["title"]), '<p class="td-sub">%s</p>' % esc(m["why"]) if m["why"] else "",
         '<p class="td-meta">%s</p>' % esc(" · ".join(meta)) if meta else "",
-        '<p class="td-sub">Done when: %s</p>' % esc(m["done_when"]) if m["done_when"] else "", esc(m["tell"]))
+        '<p class="td-sub">Done when: %s</p>' % esc(m["done_when"]) if m["done_when"] else "", esc(m["tell"]), esc(m["tell"]))
 
 
 def _next(t):
     sl = t["start_line"]
     check = t.get("goal_check")
     extra = '<p class="td-sub">%s</p>' % esc(check["text"]) if check and check.get("verdict") not in (None, "unknown") and t.get("goal_by") else ""
-    return ('<section class="td-card"><div class="td-eyebrow">Next level</div><p class="td-big">%s</p>%s%s</section>' % (
-        esc(sl["next"]), _chance_line(sl), extra))
+    scale = ("" if t.get("top") else '<p class="td-tiny">Fit is scored out of 100. Level %d, %s starts at %d. A move\'s points are fit points.</p>'
+             % (t["level"] + 1, esc(t["next_band"]), L.THRESH[t["level"]]))
+    return ('<section class="td-card"><div class="td-eyebrow">Next level</div><p class="td-big">%s</p>%s%s%s</section>' % (
+        esc(sl["next"]), _chance_line(sl), extra, scale))
 
 
 def _chance_line(sl):
@@ -192,6 +197,18 @@ def _streak(t):
             '<p class="td-sub" style="margin:0">%s</p>%s'
             '<p class="td-tiny" style="margin:6px 0 0">A week counts when a move is finished or evidence is checked.</p></div></section>'
             % (n, esc(t["streak_text"]), '<div class="td-dots" role="img" aria-label="%d weeks">%s</div>' % (n, dots) if n else ""))
+
+
+def _profile(t):
+    if not t.get("profile"):
+        return ""
+    return ('<section class="td-card"><div class="td-eyebrow">Your proof profile</div>'
+            '<p class="td-sub">One clean page of your checked claims, each with its source. It is private: it stays on this '
+            'computer until you choose to host it.</p>'
+            '<div class="td-actions"><a class="td-btn quiet" href="profile/index.html">Open my proof profile</a>'
+            '<button class="td-btn quiet" type="button" data-copy="%s">Publish it myself</button></div>'
+            '<div class="td-msg" role="status"></div></section>'
+            % esc("Help me publish my proof profile on GitHub Pages. Read docs/PROOF-PROFILE.md, check the page for anything private first, and walk me through it. Do not publish anything for me."))
 
 
 def _short(iso):

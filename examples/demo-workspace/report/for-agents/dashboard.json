@@ -102,7 +102,7 @@
       "expected_by": 62.8,
       "best_case_by": 70.0,
       "verdict": "stretch",
-      "text": "Only if every move works does your best match reach Level 4 (Good) by 31 Mar 2027. On expected odds it reaches about 63. There is no smaller step to propose, so the choices are a later date or more moves in the plan."
+      "text": "On expected odds your plan gets your best match to about 63, and 70 is needed. Only if every move works does it reach Level 4 (Good) by 31 Mar 2027. There is no smaller step to propose, so the choices are a later date or more moves in the plan."
     },
     "checking": [
       "1 of 12 open roles is still being judged. Your level uses the 11 judged so far.",
@@ -132,7 +132,7 @@
       "plan": {
         "schema_version": 1,
         "date": "2026-10-26",
-        "since": "2026-10-25",
+        "since": "2026-10-18",
         "rubric_version": "1.2",
         "fit": 55.0,
         "level": 3,
@@ -144,16 +144,18 @@
         "next_level_line": "No plan gets you to Level 4 yet: the plan is about 9.2 points short. What is missing: warm path, proof of work or org-specific edge.",
         "weeks_in_a_row": 3,
         "changed": [
-          "Best fit unchanged, from 55 to 55.",
+          "Best fit up 9, from 46 to 55.",
           "1 plan action done: Publish the scheduling rollout case study with numbers your former manager has checked.",
-          "2 new pieces of evidence counted.",
-          "Warm contact [contact]: followed (2026-10-26).",
-          "Job boards could not be reached, so the role numbers are from 2026-10-25."
+          "3 new pieces of evidence counted.",
+          "Warm contact [contact]: connected (2026-10-24).",
+          "Warm contact [contact]: followed (2026-10-26)."
         ],
         "reported_progress_ids": [
+          "evidence:2026-10-18:E14",
           "actions:2026-10-25:A03",
           "evidence:2026-10-25:E09",
           "evidence:2026-10-25:E15",
+          "warm:W01:connected:2026-10-24",
           "warm:W04:followed:2026-10-26"
         ],
         "roles": {
@@ -161,7 +163,7 @@
           "closed": 1,
           "suspicious": 3,
           "board_errors": [],
-          "checked": false,
+          "checked": true,
           "data_date": "2026-10-25"
         },
         "follow_ups": [],
@@ -213,6 +215,7 @@
         "streak_text": "4 weeks in a row with real evidence."
       }
     },
+    "profile": true,
     "show_start_line": false,
     "stone_to_choose": null
   },

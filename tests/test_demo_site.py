@@ -26,6 +26,8 @@ import build_demo_site as S  # noqa: E402
 COMMITTED = os.path.join(H.ENGINE, "docs", "demo")
 FILES = ["index.html", os.path.join("dashboard", "index.html")]
 FILES += [os.path.join("dashboard", "research", "%s.html" % o) for o in ("acme", "globex", "initech")]
+FILES += [os.path.join("goal-reached", "index.html"), os.path.join("dashboard", "profile", "index.html"), os.path.join("goal-reached", "profile", "index.html")]
+FILES += [os.path.join("goal-reached", "research", "%s.html" % o) for o in ("acme", "globex", "initech")]
 
 
 def read(path):
@@ -67,7 +69,14 @@ class Base(unittest.TestCase):
 
 
 class BuildTests(Base):
-    def test_writes_the_index_and_two_exact_copies(self):
+    def test_a_goal_reached_demo_shows_the_moment_the_share_card_and_the_next_goal(self):
+        page = read(os.path.join(self.out, "goal-reached", "index.html"))
+        self.assertIn("Goal reached: Level 3, Moderate", page)
+        self.assertIn("Share this", page)
+        self.assertIn("Set my next goal", page)
+        self.assertIn("goal-reached/index.html", self.index)
+
+    def test_writes_the_index_and_the_copies(self):
         self.assertEqual(sorted(os.path.relpath(p, self.out) for p in self.written), sorted(FILES))
         for name, workspace, page in S.sources():
             self.assertEqual(read(os.path.join(self.out, name, "index.html")), read(os.path.join(workspace, page)), name)

@@ -249,7 +249,7 @@ def main():
             run(build_dashboard.main, ["--workspace", work])
             if week == "2026-10-25":     # the Monday plan note for the next day, written from the data of this run
                 autopilot_notes.write_note(work, json.load(open(os.path.join(work, "config.json"), encoding="utf-8")),
-                                           "2026-10-26", "2026-10-26")
+                                           "2026-10-25", "2026-10-26")
         clean_outputs(DEMO)
         for name in glob.glob(os.path.join(work, "campaign", "weekly", "2026-10-26.*")):
             shutil.copy2(name, os.path.join(DEMO, "campaign", "weekly", os.path.basename(name)))
@@ -274,6 +274,7 @@ def main():
         for date, *rest in PUBLIC:
             run(public.main, ["--workspace", DEMO] + rest + ["--date", date])
         run(score.main, ["--workspace", DEMO, "--date", today])
+        run(proof_profile.main, ["--workspace", DEMO, "--date", "2026-11-05"])
         run(build_dashboard.main, ["--workspace", DEMO, "--today", today])
         cfg = json.load(open(os.path.join(DEMO, "config.json"), encoding="utf-8"))
         dash = json.load(open(os.path.join(DEMO, "report", "for-agents", "dashboard.json"), encoding="utf-8"))

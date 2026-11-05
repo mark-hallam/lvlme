@@ -241,6 +241,13 @@ class UnjudgedRoleTests(unittest.TestCase):
         self.assertIn("No role judged yet (", self.page)                # the static summary too
 
 
+class PhoneHeaderTests(unittest.TestCase):
+    def test_on_a_phone_the_title_has_its_own_row_and_the_bottom_bar_is_slim(self):
+        css = A.CSS
+        self.assertRegex(css, r"@media \(max-width:520px\)\{[^}]*\.top-in\{flex-wrap:wrap\}[^}]*\.brand\{flex:1 1 100%\}")
+        self.assertIn(".bottombar{padding:8px 16px", css)
+
+
 class ParkedAndStaticTests(unittest.TestCase):
     def setUp(self):
         self.ws = H.copy_demo(self)

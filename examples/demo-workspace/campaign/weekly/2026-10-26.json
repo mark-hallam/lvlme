@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "date": "2026-10-26",
-  "since": "2026-10-25",
+  "since": "2026-10-18",
   "rubric_version": "1.2",
   "fit": 55.0,
   "level": 3,
@@ -13,16 +13,18 @@
   "next_level_line": "No plan gets you to Level 4 yet: the plan is about 9.2 points short. What is missing: warm path, proof of work or org-specific edge.",
   "weeks_in_a_row": 3,
   "changed": [
-    "Best fit unchanged, from 55 to 55.",
+    "Best fit up 9, from 46 to 55.",
     "1 plan action done: Publish the scheduling rollout case study with numbers your former manager has checked.",
-    "2 new pieces of evidence counted.",
-    "Warm contact Harper Mock: followed (2026-10-26).",
-    "Job boards could not be reached, so the role numbers are from 2026-10-25."
+    "3 new pieces of evidence counted.",
+    "Warm contact Jordan Sample: connected (2026-10-24).",
+    "Warm contact Harper Mock: followed (2026-10-26)."
   ],
   "reported_progress_ids": [
+    "evidence:2026-10-18:E14",
     "actions:2026-10-25:A03",
     "evidence:2026-10-25:E09",
     "evidence:2026-10-25:E15",
+    "warm:W01:connected:2026-10-24",
     "warm:W04:followed:2026-10-26"
   ],
   "roles": {
@@ -30,7 +32,7 @@
     "closed": 1,
     "suspicious": 3,
     "board_errors": [],
-    "checked": false,
+    "checked": true,
     "data_date": "2026-10-25"
   },
   "follow_ups": [],

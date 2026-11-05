@@ -219,6 +219,24 @@ class WeekCardTests(unittest.TestCase):
         self.assertIn("Your Monday plan and Friday review appear here", words)
         self.assertIn("Ask your agent", words)
 
+    def test_next_level_says_what_a_point_is_and_where_the_next_level_starts(self):
+        ws, page = build(self, lambda ws: None)
+        words = text_of(today_part(page))
+        self.assertIn("Fit is scored out of 100. Level 4, Good starts at 70.", words)
+        self.assertIn("On expected odds your plan gets your best match to about 63, and 70 is needed.", words)
+
+    def test_the_proof_profile_card_links_to_the_page_and_says_it_is_private(self):
+        ws, page = build(self, lambda ws: None)
+        today = today_part(page)
+        self.assertIn('href="profile/index.html"', today)
+        self.assertIn("It is private", text_of(today))
+        self.assertIn("Publish it myself", text_of(today))
+
+    def test_the_move_shows_the_sentence_the_button_copies(self):
+        ws, page = build(self, lambda ws: None)
+        words = text_of(today_part(page))
+        self.assertIn("The button copies this for your agent:", words)
+
     def test_the_streak_says_what_counts_as_a_week(self):
         ws, page = build(self, lambda ws: None)
         self.assertIn("A week counts when a move is finished or evidence is checked", text_of(today_part(page)))

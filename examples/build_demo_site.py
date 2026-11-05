@@ -28,6 +28,7 @@ import json
 import os
 import shutil
 import sys
+import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ENGINE = os.path.dirname(HERE)
@@ -76,6 +77,30 @@ def sources():
     return [(name, ws, page) for name, ws, page in PAGES]
 
 
+def goal_reached_page():
+    """The dashboard of the same fictional person if her goal had been Level 3 (Moderate): the engine itself then records
+    the goal as reached on 25 Oct, and Today shows the goal-reached moment, the share card and the next-goal offer."""
+    import build_dashboard
+    tmp = tempfile.mkdtemp(prefix="lvlme-goal-reached-")
+    try:
+        ws = os.path.join(tmp, "ws")
+        shutil.copytree(DEMO, ws)
+        cfg_path = os.path.join(ws, "config.json")
+        cfg = load(cfg_path)
+        cfg["goal"]["target_level"] = 3
+        with open(cfg_path, "w", encoding="utf-8") as fh:
+            json.dump(cfg, fh, indent=2)
+        levels = os.path.join(ws, "eval", "levels.json")
+        if os.path.exists(levels):
+            os.remove(levels)
+        today = load(os.path.join(DEMO, "report", "for-agents", "dashboard.json"))["today"]["date"]
+        build_dashboard.main(["--workspace", ws, "--today", today])
+        with open(os.path.join(ws, "report", "index.html"), encoding="utf-8") as fh:
+            return fh.read()
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def check_fictional(workspace):
     """Stop unless the workspace's config.json says it is fictional."""
     path = os.path.join(workspace, "config.json")
@@ -102,6 +127,12 @@ def render(dash):
         row("dashboard/index.html", "The full campaign dashboard",
             "Five weekly runs at three organisations: your level, the fit range for each role and what to do "
             "next. " + dashboard_line(dash)),
+        row("goal-reached/index.html", "A goal reached",
+            "The same made-up person if her goal had been Level 3, Moderate: the screen LVLme shows when a goal is "
+            "reached, with the share card and the offer to set the next goal."),
+        row("dashboard/profile/index.html", "The proof profile",
+            "The page LVLme builds from checked evidence only, each claim with its source. Private until you choose "
+            "to host it. The source links in this demo are made-up addresses."),
     ])
     body = (
         '<section class="card" aria-labelledby="introH"><p class="eyebrow">Demo</p>'
@@ -149,6 +180,21 @@ def build(out=OUT):
         os.makedirs(os.path.dirname(dest), exist_ok=True)
         shutil.copyfile(os.path.join(research, name), dest)
         written.append(dest)
+    reached = os.path.join(out, "goal-reached", "index.html")
+    os.makedirs(os.path.dirname(reached), exist_ok=True)
+    with open(reached, "w", encoding="utf-8") as fh:
+        fh.write(goal_reached_page())
+    written.append(reached)
+    for name in sorted(os.listdir(research)) if os.path.isdir(research) else []:
+        dest = os.path.join(out, "goal-reached", "research", name)
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        shutil.copyfile(os.path.join(research, name), dest)
+        written.append(dest)
+    for where in ("dashboard", "goal-reached"):       # Today links to profile/index.html next to itself
+        profile = os.path.join(out, where, "profile", "index.html")
+        os.makedirs(os.path.dirname(profile), exist_ok=True)
+        shutil.copyfile(os.path.join(DEMO, "report", "profile", "index.html"), profile)
+        written.append(profile)
     dash = load(os.path.join(DEMO, "report", "for-agents", "dashboard.json"))
     index = os.path.join(out, "index.html")
     with open(index, "w", encoding="utf-8") as fh:

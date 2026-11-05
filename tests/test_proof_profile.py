@@ -57,6 +57,11 @@ class ProofProfileTests(unittest.TestCase):
         self.assertNotIn("Jordan Sample", html)
         self.assertIn("3 checked claims with no public link", html)
 
+    def test_the_page_explains_verified_and_corroborated(self):
+        page = open(os.path.join(H.DEMO, "report", "profile", "index.html"), encoding="utf-8").read()
+        self.assertIn("checked directly against the source shown", page)
+        self.assertIn("two independent sources agree", page)
+
     def test_unchecked_and_contradicted_claims_never_appear(self):
         run(self.ws)
         html = page(self.ws)
