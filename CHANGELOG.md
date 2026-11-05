@@ -8,6 +8,27 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## 0.7.1 (5 November 2026)
+
+Fixes from three rounds of independent review of 0.7 (a Claude reviewer and a
+Codex reviewer, blind, in a real browser). How a score is worked out did not
+change. The full notes are in [LVLme 0.7.1](docs/RELEASE-0.7.1.md).
+
+Tests: 689 pass.
+
+### Changed
+
+- **Goal reached says what it is:** a measured level, not a job offer.
+- **One accent:** the switches in Mission control use the same orange as Today.
+- **Plainer next level:** when no date is expected, it says so plainly.
+- **Phones:** a slimmer level-up banner and no theme switch crowding the header.
+
+### Fixed
+
+- **The demo agrees with itself:** its Friday review now matches the demo
+  data, and the goal-reached demo has a Level 3 goal.
+- **The demo profile says its example.com source links are made up.**
+
 ## 0.7.0 (5 November 2026)
 
 LVLme now works with goals and campaigns only. 0.7.0 has three parts: the
