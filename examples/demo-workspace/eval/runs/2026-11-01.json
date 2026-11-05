@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "run_date": "2026-11-01",
-  "rubric_version": "1.1",
+  "rubric_version": "1.2",
   "goal": "A program, applied AI or policy role at an AI product company",
   "weights": {
     "D1": 25,
@@ -12,7 +12,7 @@
     "D6": 10,
     "D7": 5
   },
-  "inputs_digest": "sha256:e4a80445417db687fff498da23f07e76c3665c6adeff633780280b5581ffe5cb",
+  "inputs_digest": "sha256:0810efe8c219835e9f216b28b6e4357b28fe2d165e528d18dc327c5de5cdd02b",
   "counts": {
     "roles": 12,
     "judged": 11,
@@ -99,6 +99,8 @@
         }
       },
       "fit": 57.0,
+      "fit_low": 57.0,
+      "fit_high": 57.0,
       "interview_band": "Moderate",
       "offer_band": "Low",
       "adjustments": [],
@@ -129,6 +131,10 @@
             "E02"
           ],
           "note": "Ten years of operations and programs; launches were physical, not model launches.",
+          "judgings": [
+            3,
+            3
+          ],
           "evidence_fingerprint": "sha256:2ab8707efbd36580"
         },
         "D2": {
@@ -139,6 +145,10 @@
             "E05"
           ],
           "note": "route-eval is relevant to evaluation sign-off; no launch case study yet.",
+          "judgings": [
+            2,
+            3
+          ],
           "evidence_fingerprint": "sha256:d5121dcd09dc56db"
         },
         "D3": {
@@ -185,6 +195,8 @@
         }
       },
       "fit": 46.0,
+      "fit_low": 46.0,
+      "fit_high": 50.0,
       "interview_band": "Low",
       "offer_band": "Very low",
       "adjustments": [],
@@ -269,6 +281,8 @@
         }
       },
       "fit": 45.0,
+      "fit_low": 45.0,
+      "fit_high": 45.0,
       "interview_band": "Low",
       "offer_band": "Very low",
       "adjustments": [],
@@ -353,6 +367,8 @@
         }
       },
       "fit": 45.0,
+      "fit_low": 45.0,
+      "fit_high": 45.0,
       "interview_band": "Low",
       "offer_band": "Very low",
       "adjustments": [],
@@ -440,6 +456,8 @@
         }
       },
       "fit": 39.0,
+      "fit_low": 39.0,
+      "fit_high": 39.0,
       "interview_band": "Very low",
       "offer_band": "Very low",
       "adjustments": [
@@ -532,6 +550,8 @@
         }
       },
       "fit": 37.0,
+      "fit_low": 37.0,
+      "fit_high": 37.0,
       "interview_band": "Very low",
       "offer_band": "Very low",
       "adjustments": [],
@@ -615,6 +635,8 @@
         }
       },
       "fit": 34.0,
+      "fit_low": 34.0,
+      "fit_high": 34.0,
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -700,6 +722,8 @@
         }
       },
       "fit": 28.0,
+      "fit_low": 28.0,
+      "fit_high": 28.0,
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -785,6 +809,8 @@
         }
       },
       "fit": 24.0,
+      "fit_low": 24.0,
+      "fit_high": 24.0,
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -870,6 +896,8 @@
         }
       },
       "fit": 24.0,
+      "fit_low": 24.0,
+      "fit_high": 24.0,
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -955,6 +983,8 @@
         }
       },
       "fit": 18.0,
+      "fit_low": 18.0,
+      "fit_high": 18.0,
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -1032,6 +1062,8 @@
         }
       },
       "fit": 17.0,
+      "fit_low": 17.0,
+      "fit_high": 17.0,
       "interview_band": "Very low",
       "offer_band": "Almost none",
       "adjustments": [
@@ -1050,6 +1082,8 @@
       "role_id": "acme:4100001",
       "title": "Technical Program Manager, Model Launches",
       "fit": 46.0,
+      "fit_low": 46.0,
+      "fit_high": 50.0,
       "interview_band": "Low",
       "offer_band": "Very low"
     },
@@ -1057,6 +1091,8 @@
       "role_id": "globex:g-0003",
       "title": "AI Success Manager, Asia",
       "fit": 39.0,
+      "fit_low": 39.0,
+      "fit_high": 39.0,
       "interview_band": "Very low",
       "offer_band": "Very low"
     },
@@ -1064,6 +1100,8 @@
       "role_id": "initech:i-0001",
       "title": "Program Manager, Robot Fleet Deployments",
       "fit": 57.0,
+      "fit_low": 57.0,
+      "fit_high": 57.0,
       "interview_band": "Moderate",
       "offer_band": "Low"
     }

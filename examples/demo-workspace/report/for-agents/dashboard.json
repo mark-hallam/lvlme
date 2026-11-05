@@ -3,7 +3,7 @@
   "generated_by": "lvlme scripts/build_dashboard.py",
   "sensitive_mode": true,
   "run_date": "2026-11-01",
-  "rubric_version": "1.1",
+  "rubric_version": "1.2",
   "goal": {
     "title": "A program, applied AI or policy role at an AI product company",
     "description": "Fictional demo goal for Alex Example: one of three made-up AI companies, ideally in Australia.",
@@ -34,6 +34,8 @@
       "role_id": "acme:4100001",
       "title": "Technical Program Manager, Model Launches",
       "fit": 46.0,
+      "fit_low": 46.0,
+      "fit_high": 50.0,
       "interview_band": "Low",
       "offer_band": "Very low",
       "org_name": "Acme AI"
@@ -42,6 +44,8 @@
       "role_id": "globex:g-0003",
       "title": "AI Success Manager, Asia",
       "fit": 39.0,
+      "fit_low": 39.0,
+      "fit_high": 39.0,
       "interview_band": "Very low",
       "offer_band": "Very low",
       "org_name": "Globex Labs"
@@ -50,6 +54,8 @@
       "role_id": "initech:i-0001",
       "title": "Program Manager, Robot Fleet Deployments",
       "fit": 57.0,
+      "fit_low": 57.0,
+      "fit_high": 57.0,
       "interview_band": "Moderate",
       "offer_band": "Low",
       "org_name": "Initech Robotics"
@@ -968,7 +974,7 @@
     "level_history": [
       {
         "date": "2026-10-04",
-        "rubric_version": "1.1",
+        "rubric_version": "1.2",
         "fit": 40.0,
         "level": 2,
         "band": "Low",
@@ -978,7 +984,7 @@
       },
       {
         "date": "2026-10-11",
-        "rubric_version": "1.1",
+        "rubric_version": "1.2",
         "fit": 44.0,
         "level": 2,
         "band": "Low",
@@ -988,7 +994,7 @@
       },
       {
         "date": "2026-10-18",
-        "rubric_version": "1.1",
+        "rubric_version": "1.2",
         "fit": 46.0,
         "level": 2,
         "band": "Low",
@@ -998,7 +1004,7 @@
       },
       {
         "date": "2026-10-25",
-        "rubric_version": "1.1",
+        "rubric_version": "1.2",
         "fit": 55.0,
         "level": 3,
         "band": "Moderate",
@@ -1008,7 +1014,7 @@
       },
       {
         "date": "2026-11-01",
-        "rubric_version": "1.1",
+        "rubric_version": "1.2",
         "fit": 57.0,
         "level": 3,
         "band": "Moderate",

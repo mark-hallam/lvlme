@@ -23,9 +23,7 @@ Rules:
   the evidence does not meet, quoting the posting sentence. Flag
   `eligibility_blocked` where the detector missed a blocker in the text.
 - For D6, use the eligibility and location anchors in `method/RUBRIC.md`.
-  In a full campaign, a location class without a rule scores 0. In LVLme
-  quick, there is no rules file, so score the posting's location against what
-  the person said using the same anchors.
+  A location class without a rule scores 0.
 - A source counts as checked only when a stranger can open its public HTTPS
   (Hypertext Transfer Protocol Secure)
   address without signing in. Localhost, loopback, private network addresses,
@@ -33,6 +31,9 @@ Rules:
   checked evidence. A page behind a login or available only on request is not
   public evidence.
 - Never use, infer or score protected attributes.
+- You are one of two independent judges. The lead gives the same batch to a
+  second judge who cannot see your work; judge from the evidence alone and
+  never look for another judge's file. Scoring averages the two.
 - Your scores are not final. An independent reviewer will challenge every
   score above 2, so do not argue for points; record what the evidence shows.
 

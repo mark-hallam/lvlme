@@ -28,6 +28,8 @@
               "role_id": {"type": "string"},
               "title": {"type": "string"},
               "fit": {"type": "number"},
+              "fit_low": {"type": "number"},
+              "fit_high": {"type": "number"},
               "interview_band": {"$ref": "#/definitions/band"},
               "offer_band": {"$ref": "#/definitions/band"}
             }
@@ -104,6 +106,7 @@
       "properties": {
         "score": {"type": "integer", "minimum": 0, "maximum": 5},
         "raw": {"type": "integer", "minimum": 0, "maximum": 5},
+        "judgings": {"type": "array", "minItems": 2, "items": {"type": "integer", "minimum": 0, "maximum": 5}, "description": "D1, D2 and D4: each independent judging, before caps, when the factor was judged more than once. The score is their average (halves round down)."},
         "evidence": {"type": "array", "items": {"type": "string"}},
         "note": {"type": "string"},
         "capped": {"type": "string"},
@@ -146,7 +149,9 @@
             "D7": {"$ref": "#/definitions/score"}
           }
         },
-        "fit": {"type": "number", "minimum": 0, "maximum": 100},
+        "fit": {"type": "number", "minimum": 0, "maximum": 100, "description": "The average fit, from the averaged factor scores."},
+        "fit_low": {"type": "number", "minimum": 0, "maximum": 100, "description": "The lowest fit the judgings allow: every judged factor at its lower judging. Equals fit when each factor was judged once."},
+        "fit_high": {"type": "number", "minimum": 0, "maximum": 100, "description": "The highest fit the judgings allow: every judged factor at its higher judging. Equals fit when each factor was judged once."},
         "interview_band": {"$ref": "#/definitions/band"},
         "offer_band": {"$ref": "#/definitions/band"},
         "adjustments": {"type": "array", "items": {"type": "string"}},

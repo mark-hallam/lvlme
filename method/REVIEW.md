@@ -73,7 +73,7 @@ is challenged this way, because each one is scored again from scratch.
 
 The scoring agent applies the agreed changes to the judgement files:
 
-- Set the `score` to the one that stands (agreed, or the middle of three).
+- Set the `score` to the one that stands (agreed, or the middle of three). Where a factor was judged twice (`judgings`), the reviewer checks the averaged score; the `score` you write settles it and counts instead of the average, and the `judgings` stay so the range still shows.
 - Set `reviewed_on` to today and write a one-line `reviewer_note`:
   - in `eval/judgements.json`, on the role judgement (covers D1, D2 and D4)
     or on a single dimension entry;

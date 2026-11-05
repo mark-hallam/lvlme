@@ -23,6 +23,7 @@ Exit codes: 0 valid (warnings allowed), 1 errors found, 2 refused location.
 import argparse
 import glob
 import json
+import math
 import os
 import re
 import sys
@@ -421,8 +422,11 @@ def review_checks(docs, ev_ids, errors, warnings):
             reviewed = entry.get("reviewed_on") or container.get("reviewed_on") or ""
             if judged > when:
                 continue  # judged again since this review: the dispute is history
-            if how in ("middle_of_three", "reviewer_one_point") and entry.get("score") != stands:
-                warnings.append("%s: %s stands, but the judgement file has %s" % (where, stands, entry.get("score")))
+            held = entry.get("score")
+            if held is None and entry.get("judgings"):   # two judgings and no settled score: their average counts
+                held = int(math.ceil(sum(entry["judgings"]) / float(len(entry["judgings"])) - 0.5))
+            if how in ("middle_of_three", "reviewer_one_point") and held != stands:
+                warnings.append("%s: %s stands, but the judgement file has %s" % (where, stands, held))
             if how in ("middle_of_three", "reviewer_one_point") and reviewed < when:
                 warnings.append("%s: decided, but the judgement entry has no reviewed_on on or after %s" % (where, when))
             if how == "awaiting_tie_break" and reviewed >= when:

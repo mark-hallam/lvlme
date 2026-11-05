@@ -174,6 +174,7 @@ Full detail, the stage graph and the subagent briefs:
   connector to a helper, because its read and send tools come together. It may start as soon as the person has approved the sources, while
   the interview carries on.
 - **Fan-out 2, assess (stage 4).** Role judges in batches of about 8 roles,
+  each batch given to two judges who cannot see each other (judge twice),
   the claims audit, the consistency audit and the recruiter screen, all at
   once.
 - **Gates.** G1: findings come back with sources and tags, and you re-check
@@ -273,12 +274,23 @@ they give. Never register, RSVP, apply or pay (`method/CAMPAIGN.md`).
   anything you change. Cite evidence ids for every point. Unjudged roles score
   0 on D1, D2 and D4, so judge the best-looking roles first. Merge the
   judges' batches yourself and spot-check one role per batch for consistency.
+- **Judge twice (rubric 1.2).** Judge D1, D2 and D4 twice, independently: two
+  `lvlme:role-judge` helpers on the same batch, or, without helpers, two passes
+  where the second does not read the first's scores (start it fresh). Write
+  both into each factor as `judgings: [first, second]`, with the union of the
+  evidence ids both cited, and one note that says where they differed. Do not
+  write `score` beside `judgings` yourself: `score.py` averages the two (a
+  half rounds down), records `judgings` on the factor, and gives every role
+  `fit_low` and `fit_high`, the range the two judgings allow. Show the range,
+  not only the average, to the person. A `score` is written only to settle a
+  blind review (`method/REVIEW.md`). An older file with one `score` per factor
+  still works and has a range of one fit.
   Set `judged_by` at the top of `eval/judgements.json` to the agent you are
   and your model when you know it (for example `{"agent": "Claude Code",
   "model": "claude-opus-5-5"}`): another agent can judge the same evidence
   differently, and the dashboard says which one judged. When only the agent
   changed and a factor's cited evidence did not, scoring keeps that factor's
-  previous score and says so (rubric 1.1, B6).
+  previous score and says so (rubric 1.1, B6, still true in 1.2).
 - **Claims audit.** `python3 scripts/claims_audit.py <their site> <other pages>`.
   Judge each `pending` claim as `supported`, `overstated`, `unsupported` or
   `contradicted`, with evidence ids and suggested honest wording.

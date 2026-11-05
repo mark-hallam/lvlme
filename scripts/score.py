@@ -46,6 +46,7 @@ no plan action finished since): it would read as a day with no progress.
 import argparse
 import hashlib
 import json
+import math
 import os
 import sys
 
@@ -54,7 +55,7 @@ import _common as C  # noqa: E402
 import _judge_change as JC  # noqa: E402
 import _public_link as PL  # noqa: E402
 
-RUBRIC_VERSION = "1.1"
+RUBRIC_VERSION = "1.2"
 BANDS = C.BANDS
 CHANCE_BANDS = C.CHANCE_BANDS
 INTERVIEW_TABLE = [(85, "Strong"), (70, "Good"), (55, "Moderate"), (40, "Low"), (15, "Very low"), (0, "Almost none")]
@@ -160,12 +161,20 @@ def is_reviewed(entry, container):
     return bool(reviewed) and reviewed >= judged
 
 
-def score_entry(ctx, dim, entry, container, where):
-    """Apply the evidence and review caps. Returns (score dict, adjustments, awaiting review)."""
-    raw = min(max(int(entry.get("score", 0)), 0), 5)
-    evidence = list(entry.get("evidence") or [])
+def average_score(values):
+    """The mean of whole-point judgings as a whole point: halves round down (a doubtful half point is not
+    given, evidence or zero). 3 and 4 give 3; 2, 3 and 3 give 3; 4 and 4 give 4.
+
+    >>> average_score([3, 4]), average_score([4, 4]), average_score([2, 3, 3]), average_score([0, 1])
+    (3, 4, 3, 0)
+    """
+    return int(math.ceil(sum(values) / float(len(values)) - 0.5))
+
+
+def cap_one(ctx, dim, raw, entry, container, where):
+    """Apply the evidence and review caps to one whole-point score. Returns (score, caps, adjustments, awaiting)."""
     score, caps, adjustments, awaiting = raw, [], [], []
-    cap, why = evidence_cap(ctx, evidence, where)
+    cap, why = evidence_cap(ctx, list(entry.get("evidence") or []), where)
     if score > cap:
         caps.append("evidence: " + why)
         adjustments.append("%s %d counted as %d: %s" % (dim, raw, cap, why))
@@ -175,9 +184,40 @@ def score_entry(ctx, dim, entry, container, where):
         adjustments.append("%s %d counted as %d until the blind review settles it" % (dim, score, ctx.review_above))
         awaiting.append(dim)
         score = ctx.review_above
+    return score, caps, adjustments, awaiting
+
+
+def clamp5(n):
+    return min(max(int(n), 0), 5)
+
+
+def score_entry(ctx, dim, entry, container, where):
+    """Apply the evidence and review caps. Returns (score dict, adjustments, awaiting review).
+
+    An entry holds `score` (one judging, or the settled score after a blind review) and/or `judgings` (the two
+    independent judgings). With judgings and no score, each judging is capped on its own and the score is their
+    average (average_score). `_lo` and `_hi` carry the lowest and highest capped judging for the fit range;
+    score_role removes them."""
+    judgings = [clamp5(j) for j in entry.get("judgings") or []]
+    evidence = list(entry.get("evidence") or [])
+    if "score" in entry or not judgings:
+        raw = clamp5(entry.get("score", 0))
+        score, caps, adjustments, awaiting = cap_one(ctx, dim, raw, entry, container, where)
+        capped = [cap_one(ctx, dim, j, entry, container, where)[0] for j in judgings] + [score]
+    else:
+        parts = [cap_one(ctx, dim, j, entry, container, where) for j in judgings]
+        raw = average_score(judgings)
+        score = average_score([p[0] for p in parts])
+        caps = sorted({c for p in parts for c in p[1]})
+        adjustments = list(dict.fromkeys(a for p in parts for a in p[2]))
+        awaiting = sorted({a for p in parts for a in p[3]})
+        capped = [p[0] for p in parts]
     out = {"score": score, "raw": raw, "evidence": evidence, "note": entry.get("note", "")}
+    if judgings:
+        out["judgings"] = judgings
     if caps:
         out["capped"] = "; ".join(caps)
+    out["_lo"], out["_hi"] = min(capped + [score]), max(capped + [score])
     return out, adjustments, awaiting
 
 
@@ -231,6 +271,7 @@ def score_role(ctx, role, judgement):
             s, adj, aw = score_entry(ctx, d, judgement[d], judgement, "%s %s" % (rid, d))
             if JC.apply(ctx, rid, d, s):
                 aw = []
+                s["_lo"] = s["_hi"] = s["score"]
             scores[d] = s
             adjustments += adj
             awaiting += aw
@@ -254,12 +295,25 @@ def score_role(ctx, role, judgement):
         adjustments += adj
         awaiting += aw
     scores["D6"] = d6
+    if blocked:
+        d6["_lo"] = d6["_hi"] = 0
+    if lacking:
+        d1 = scores["D1"]
+        d1["_lo"], d1["_hi"] = min(d1.get("_lo", 0), 1), min(d1.get("_hi", 0), 1)
     if lacking and scores["D1"]["score"] > 1:
         scores["D1"]["score"] = 1
         scores["D1"]["capped"] = "; ".join(filter(None, [scores["D1"].get("capped"), "hard requirement lacking"]))
     scores = {d: scores[d] for d in C.DIMENSIONS}
 
-    fit = round(sum(scores[d]["score"] / 5.0 * ctx.weights[d] for d in C.DIMENSIONS) * 100.0 / ctx.total_weight, 1)
+    def fit_of(pick):
+        return round(sum(pick(scores[d]) / 5.0 * ctx.weights[d] for d in C.DIMENSIONS) * 100.0 / ctx.total_weight, 1)
+
+    fit = fit_of(lambda x: x["score"])
+    fit_low = min(fit, fit_of(lambda x: x.get("_lo", x["score"])))
+    fit_high = max(fit, fit_of(lambda x: x.get("_hi", x["score"])))
+    for x in scores.values():
+        x.pop("_lo", None)
+        x.pop("_hi", None)
     interview, offer = band_for(INTERVIEW_TABLE, fit), band_for(OFFER_TABLE, fit)
     if role.get("requires_heavy_coding"):
         adjustments.append("Posting expects production coding")
@@ -276,7 +330,8 @@ def score_role(ctx, role, judgement):
     return {
         "role_id": rid, "org": org, "title": role["title"], "family": role["family"],
         "locations": list(role.get("locations") or []), "location_class": loc_class, "url": role.get("url"),
-        "scores": scores, "fit": fit, "interview_band": interview, "offer_band": offer,
+        "scores": scores, "fit": fit, "fit_low": fit_low, "fit_high": fit_high,
+        "interview_band": interview, "offer_band": offer,
         "adjustments": adjustments, "judged": judgement is not None,
         "awaiting_review": sorted(set(awaiting)), "eligibility_blocked": blocked,
         "hard_requirement_lacking": lacking, "requires_heavy_coding": bool(role.get("requires_heavy_coding")),
@@ -399,7 +454,7 @@ def build_run(ws, config, run_date):
     for tid in C.target_ids(config):
         best = next((r for r in scored if r["org"] == tid and r["judged"]), None)
         per_org[tid] = None if best is None else {k: best[k] for k in
-                                                  ("role_id", "title", "fit", "interview_band", "offer_band")}
+                                                  ("role_id", "title", "fit", "fit_low", "fit_high", "interview_band", "offer_band")}
     if outlook:
         out_look = {"band": outlook.get("band", "Not yet judged"), "text": outlook.get("text", ""),
                     "reasons": list(outlook.get("reasons") or [])}

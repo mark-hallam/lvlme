@@ -1,4 +1,27 @@
-# Scoring rubric (version 1.1)
+# Scoring rubric (version 1.2)
+
+## What changed in 1.2
+
+- C1: requirements match (D1), proof of work (D2) and organisation edge (D4)
+  are judged twice, independently: two helper agents, or two passes that
+  cannot see each other or each other's scores. Both judgings are recorded as
+  `judgings: [a, b]` in `eval/judgements.json`, with the evidence ids from
+  both (their union) and one note.
+- C2: scoring caps each judging on its own (the evidence cap, then the review
+  cap), then averages the capped judgings. The average is a whole point and a
+  half always rounds down, every time: 3 and 4 give 3, 2 and 3 give 2. A
+  doubtful half point is not given. This replaces one judge's single score.
+- C3: every role carries `fit_low` and `fit_high`, the fit with every factor at
+  its lower judging and at its higher judging, beside `fit` (the average). A
+  factor judged once has equal low and high, so an older judgement file with a
+  single `score` per factor still works and has a range of one fit. The
+  scores that count in the bands, levels and gaps are the averages.
+- C4: a `score` written beside `judgings` is the settled score (for example
+  after the blind review) and counts instead of the average; the range still
+  shows the judgings.
+- The blind review (`method/REVIEW.md`) and B6 work as before: the review
+  challenges the averaged score, and B6 keeps a factor's previous score when
+  only the judging agent changed and the evidence did not.
 
 ## What changed in 1.1
 

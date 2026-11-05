@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "run_date": "2026-10-18",
-  "rubric_version": "1.1",
+  "rubric_version": "1.2",
   "goal": "A program, applied AI or policy role at an AI product company",
   "weights": {
     "D1": 25,
@@ -12,7 +12,7 @@
     "D6": 10,
     "D7": 5
   },
-  "inputs_digest": "sha256:a72eaf211e364d9a39ccf5a70b4fa8cb98a75043e703d6d40a1d3ddcd01d1355",
+  "inputs_digest": "sha256:88dd1862a3971ac543addd139206d9943981b89ab179f2ecab32499b16c47be8",
   "counts": {
     "roles": 11,
     "judged": 10,
@@ -43,6 +43,10 @@
             "E02"
           ],
           "note": "Ten years of operations and programs; launches were physical, not model launches.",
+          "judgings": [
+            3,
+            3
+          ],
           "evidence_fingerprint": "sha256:2ab8707efbd36580"
         },
         "D2": {
@@ -53,6 +57,10 @@
             "E05"
           ],
           "note": "route-eval is relevant to evaluation sign-off; no launch case study yet.",
+          "judgings": [
+            2,
+            3
+          ],
           "evidence_fingerprint": "sha256:d5121dcd09dc56db"
         },
         "D3": {
@@ -99,6 +107,8 @@
         }
       },
       "fit": 46.0,
+      "fit_low": 46.0,
+      "fit_high": 50.0,
       "interview_band": "Low",
       "offer_band": "Very low",
       "adjustments": [],
@@ -183,6 +193,8 @@
         }
       },
       "fit": 45.0,
+      "fit_low": 45.0,
+      "fit_high": 45.0,
       "interview_band": "Low",
       "offer_band": "Very low",
       "adjustments": [],
@@ -267,6 +279,8 @@
         }
       },
       "fit": 44.0,
+      "fit_low": 44.0,
+      "fit_high": 44.0,
       "interview_band": "Low",
       "offer_band": "Very low",
       "adjustments": [],
@@ -351,6 +365,8 @@
         }
       },
       "fit": 39.0,
+      "fit_low": 39.0,
+      "fit_high": 39.0,
       "interview_band": "Very low",
       "offer_band": "Very low",
       "adjustments": [],
@@ -434,6 +450,8 @@
         }
       },
       "fit": 34.0,
+      "fit_low": 34.0,
+      "fit_high": 34.0,
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -519,6 +537,8 @@
         }
       },
       "fit": 30.0,
+      "fit_low": 30.0,
+      "fit_high": 30.0,
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -607,6 +627,8 @@
         }
       },
       "fit": 29.0,
+      "fit_low": 29.0,
+      "fit_high": 29.0,
       "interview_band": "Very low",
       "offer_band": "Very low",
       "adjustments": [
@@ -692,6 +714,8 @@
         }
       },
       "fit": 24.0,
+      "fit_low": 24.0,
+      "fit_high": 24.0,
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -777,6 +801,8 @@
         }
       },
       "fit": 22.0,
+      "fit_low": 22.0,
+      "fit_high": 22.0,
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -862,6 +888,8 @@
         }
       },
       "fit": 18.0,
+      "fit_low": 18.0,
+      "fit_high": 18.0,
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -939,6 +967,8 @@
         }
       },
       "fit": 15.0,
+      "fit_low": 15.0,
+      "fit_high": 15.0,
       "interview_band": "Very low",
       "offer_band": "Almost none",
       "adjustments": [
@@ -957,6 +987,8 @@
       "role_id": "acme:4100001",
       "title": "Technical Program Manager, Model Launches",
       "fit": 46.0,
+      "fit_low": 46.0,
+      "fit_high": 50.0,
       "interview_band": "Low",
       "offer_band": "Very low"
     },
@@ -964,6 +996,8 @@
       "role_id": "globex:g-0003",
       "title": "AI Success Manager, Asia",
       "fit": 44.0,
+      "fit_low": 44.0,
+      "fit_high": 44.0,
       "interview_band": "Low",
       "offer_band": "Very low"
     },
@@ -971,6 +1005,8 @@
       "role_id": "initech:i-0002",
       "title": "Product Manager, Warehouse Autonomy",
       "fit": 39.0,
+      "fit_low": 39.0,
+      "fit_high": 39.0,
       "interview_band": "Very low",
       "offer_band": "Very low"
     }

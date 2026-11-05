@@ -27,7 +27,8 @@ is the reference. `SKILL.md` carries the short version.
   session the person is watching, where the agent's own permission prompts
   still guard any send.
 - **Judges.** Each judges one batch of roles against the rubric and returns
-  judgement entries. Brief: `agents/role-judge.md`.
+  judgement entries. Every batch goes to two judges who cannot see each other
+  (judge twice, rubric 1.2); scoring averages them and records the range. Brief: `agents/role-judge.md`.
 - **Independent checkers.** The sceptical reviewer (`agents/reviewer.md`) and
   the recruiter screen (`agents/recruiter-screen.md`). Fresh context, and
   never the campaign's own scores.
@@ -138,14 +139,14 @@ Start these at the same time, once join 1 is written:
 
 | Subagent | One per | Gets | Returns |
 |---|---|---|---|
-| Role judge | batch of about 8 new or changed roles (batch by organisation where possible) | the rubric, the evidence file, the postings, `config.json` | judgement entries for `eval/judgements.json`, open questions |
+| Role judge (two per batch, independent) | batch of about 8 new or changed roles (batch by organisation where possible) | the rubric, the evidence file, the postings, `config.json` | judgement entries for `eval/judgements.json`, open questions |
 | Claims audit | run | `python3 scripts/claims_audit.py <pages>`, then the pending claims and the evidence | a verdict per claim, with evidence ids and honest wording |
 | Consistency audit | run | `scripts/consistency_audit.py` as `method/CONSISTENCY.md` describes | mismatches between CV, LinkedIn, website and forms |
 | Recruiter screen | set of postings | the application materials and real postings only (G2) | the screen, in the format of `templates/prompts/recruiter-screen.md` |
 
 ### Join 2 (lead)
 
-Merge the judge batches into `eval/judgements.json` yourself. Spot-check one
+Merge the judge batches into `eval/judgements.json` yourself, writing each factor as `judgings: [first, second]` (the union of the evidence ids both cited). Spot-check one
 role from each batch against another batch for consistency. Set D3, D5, D7
 and the D6 rules in `eval/profile-dimensions.json`, using the audits and the
 screen. Record audit verdicts in `profile/claims-audit.json` and where

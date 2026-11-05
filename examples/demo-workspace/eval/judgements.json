@@ -1,23 +1,29 @@
 {
   "schema_version": 1,
-  "rubric_version": "1.1",
+  "rubric_version": "1.2",
   "roles": {
     "acme:4100001": {
       "D1": {
-        "score": 3,
         "evidence": [
           "E01",
           "E02"
         ],
-        "note": "Ten years of operations and programs; launches were physical, not model launches."
+        "note": "Ten years of operations and programs; launches were physical, not model launches.",
+        "judgings": [
+          3,
+          3
+        ]
       },
       "D2": {
-        "score": 2,
         "evidence": [
           "E04",
           "E05"
         ],
-        "note": "route-eval is relevant to evaluation sign-off; no launch case study yet."
+        "note": "route-eval is relevant to evaluation sign-off; no launch case study yet.",
+        "judgings": [
+          2,
+          3
+        ]
       },
       "D4": {
         "score": 2,
