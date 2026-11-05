@@ -77,6 +77,32 @@ class InitTests(unittest.TestCase):
             self.assertEqual(I.main(["--goal", "AI labs", "--workspace", inside]), 2)
         self.assertFalse(os.path.exists(inside))
 
+    def test_goal_fields_make_one_goal_sentence(self):
+        ws = os.path.join(self.tmp(), "cs")
+        code, printed = self.run_init(["--role", "Customer success", "--organisations", "Anthropic, OpenAI",
+                                       "--where", "Melbourne", "--by", "2027-06-30", "--workspace", ws])
+        self.assertEqual(code, 0)
+        goal = H.load(os.path.join(ws, "config.json"))["goal"]
+        self.assertEqual((goal["role"], goal["organisations"], goal["where"], goal["by"]),
+                         ("Customer success", ["Anthropic", "OpenAI"], "Melbourne", "2027-06-30"))
+        self.assertEqual(goal["title"], "Customer success at Anthropic or OpenAI, in Melbourne, by 30 Jun 2027")
+        self.assertEqual(goal["slug"], "customer-success-anthropic-openai")
+        self.assertEqual(V.validate_workspace(ws)[0], [C.NO_TARGETS])
+
+    def test_goal_needs_a_role_or_a_goal_and_a_date_in_the_future(self):
+        with mock.patch("sys.stderr") as err:
+            self.assertEqual(I.main(["--workspace", os.path.join(self.tmp(), "x")]), 1)
+            self.assertEqual(I.main(["--role", "PM", "--by", "2020-01-01", "--workspace", os.path.join(self.tmp(), "y")]), 1)
+            self.assertEqual(I.main(["--role", "PM", "--by", "soon", "--workspace", os.path.join(self.tmp(), "z")]), 1)
+        said = "".join(c.args[0] for c in err.write.call_args_list)
+        self.assertIn("role you want", said)
+        self.assertIn("already past", said)
+
+    def test_plain_goal_still_works(self):
+        ws = os.path.join(self.tmp(), "plain")
+        self.assertEqual(self.run_init(["--goal", "AI labs", "--workspace", ws])[0], 0)
+        self.assertNotIn("role", H.load(os.path.join(ws, "config.json"))["goal"])
+
     def test_slugify(self):
         self.assertEqual(I.slugify("Frontier AI labs"), "frontier-ai-labs")
         self.assertEqual(I.slugify("!!!"), "my-goal")
