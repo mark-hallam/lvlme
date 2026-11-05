@@ -18,6 +18,11 @@ Every other role keeps its last judgement, and the score says when it was judged
 Full run: every role that needs judging. Light run: of those, the top N by
 fit in the newest run (default 30), plus every role never judged.
 
+First run: with no scored run yet, a third kind of run is sized, the first result. It judges only the best few
+roles (default 8, one judge batch: roles near the person first, then by role family order, postings that look
+suspicious last) so the starting line comes in about 15 minutes. Every other role is judged on the next runs,
+and the dashboard's Today screen says what is still being checked.
+
 Helpers, as docs/ORCHESTRATION.md sizes them: one role judge per batch of
 about 8 roles, about one blind reviewer per two judge batches (the reviewer
 only sees scores above 2 and a few others), and, on a full run only, one
@@ -37,6 +42,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 
 BATCH = 8
+FIRST_ROLES = 8
 JUDGED = {"D1", "D2", "D4"}
 
 
@@ -76,6 +82,28 @@ def helpers(n_roles, targets):
             "helpers": judges + reviewers + targets}
 
 
+def home_class(config):
+    classes = (config.get("locations") or {}).get("classes") or []
+    home = (config.get("candidate") or {}).get("home_region") or ""
+    for c in classes:
+        if C.matches_any(c.get("keywords"), home):
+            return c["id"]
+    return classes[0]["id"] if classes else None
+
+
+def first_pass(roles, config, n=FIRST_ROLES):
+    """The best few roles to judge first, by what is known before any scoring: near the person, in the
+    person's first role families, not suspicious, then by title. Returns role ids."""
+    home = home_class(config)
+    order = {f.get("id"): i for i, f in enumerate(config.get("families") or [])}
+
+    def key(r):
+        near = home is not None and home in (r.get("location_classes") or [])
+        sus = ((r.get("posting_check") or {}).get("label") or "") == "suspicious"
+        return (sus, not near, order.get(r.get("family"), len(order)), r.get("title", ""), r["id"])
+    return [r["id"] for r in sorted(roles, key=key)[:n]]
+
+
 def plan(ws, config, top=30):
     roles = (C.load_json(C.wpath(ws, "market", "roles", "latest.json"), {}) or {}).get("roles") or []
     judgements = (C.load_json(C.wpath(ws, "eval", "judgements.json"), {}) or {}).get("roles") or {}
@@ -87,12 +115,19 @@ def plan(ws, config, top=30):
     light = [rid for rid in ranked if rid in fits][:top] + [rid for rid in todo if reasons[rid] == "new"]
     light = list(dict.fromkeys(light))
     targets = len(C.target_ids(config))
-    return {
+    first = None
+    if not fits and roles:
+        ids = first_pass(roles, config)
+        first = dict(helpers(len(ids), 0), role_ids=ids, deepen_later=len(todo) - len(ids))
+    out = {
         "open_roles": len(roles), "unchanged": len(roles) - len(todo),
         "reasons": {k: sum(1 for w in reasons.values() if w == k) for k in ("new", "posting changed", "new evidence")},
         "full": dict(helpers(len(todo), targets), role_ids=sorted(todo)),
         "light": dict(helpers(len(light), 0), role_ids=light, top=top),
     }
+    if first:
+        out["first"] = first
+    return out
 
 
 def n_of(n, one, many=None):
@@ -102,7 +137,13 @@ def n_of(n, one, many=None):
 def say(p):
     f, lt = p["full"], p["light"]
     kept = p["unchanged"]
-    lines = ["%s open. %s." % (n_of(p["open_roles"], "role"),
+    lines = []
+    if p.get("first"):
+        fr = p["first"]
+        lines.append("First result: judges the best %s of %d open with about %s, so your starting line comes first. "
+                     "The other %s are judged on the next runs, and the Today screen says what is still being checked." % (
+                         n_of(fr["roles"], "role"), p["open_roles"], n_of(fr["helpers"], "helper"), n_of(fr["deepen_later"], "role")))
+    lines += ["%s open. %s." % (n_of(p["open_roles"], "role"),
                                "All of them need judging" if not kept else
                                "1 keeps its last judgement: nothing it depends on has changed" if kept == 1 else
                                "%d keep their last judgement: nothing they depend on has changed" % kept)]

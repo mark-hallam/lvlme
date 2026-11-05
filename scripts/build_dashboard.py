@@ -87,6 +87,7 @@ import _practice as PR  # noqa: E402
 import _public as PB  # noqa: E402
 import _doors as DR  # noqa: E402
 import _autopilot as APL  # noqa: E402
+import _events as EV  # noqa: E402
 import _static_html as ST  # noqa: E402
 import _warm_paths as W  # noqa: E402
 
@@ -1112,6 +1113,7 @@ def main(argv=None):
     update_metrics_history(data)
     data.packs = RS.write_all(ws, config, data.orgs_doc, data.roles_doc, data.doors, data.today)
     page_html, page = render_page(data)
+    EV.update(ws, data.runs, page["progress"], (data.config.get("goal") or {}))
     C.write_text(C.wpath(ws, "report", "index.html"), page_html)
     payload = agent_payload(data, page)
     C.write_json(C.wpath(ws, "report", "for-agents", "dashboard.json"), payload)
