@@ -32,10 +32,12 @@ Field notes
                 control and clearance questions only when their count is
                 above 0 (method/INTERVIEW.md, "Work rights").
   requires_heavy_coding  heuristic; coding_signals lists the phrases found.
-                When candidate.writes_production_code is false, an engineering
-                title (ending in Engineer or Developer, or starting with
-                Engineering Manager) counts too, unless the posting says the
-                role needs no production code.
+                When candidate.writes_production_code is false, a software or
+                coding title (software, coding or programming in the title or
+                posting, or a known software role such as backend engineer)
+                counts too, unless the posting says the role needs no production
+                code. Civil, site, maintenance, biomedical and property roles
+                are not treated as coding jobs from the title alone.
 """
 import argparse
 import datetime as dt
@@ -235,16 +237,35 @@ CODE_STRONG = CODE_CORE + [
     r"strong\s+engineering\s+depth",
 ]
 NEGATION = re.compile(r"(?:n't|\bnot|\bnever|\bwithout|\bno need to|\bno)\s+(?:\w+\s+){0,3}$", re.I)
-ENGINEER_TITLE = re.compile(r"\b(engineer|developer)\b", re.I)
-# An engineering job by its title: the main part (before a comma, a dash or a bracket) ends in Engineer or
-# Developer ("Android Engineer, Plugin Platform"), or the title starts with Engineering Manager.
+# Main title ends in Engineer or Developer, or starts with Engineering Manager.
 ENGINEERING_JOB = re.compile(r"(?:\b(?:engineer|developer)(?:\s+(?:i{1,3}|iv|v|\d))?\s*$|^\s*(?:senior\s+|sr\.?\s+)?engineering\s+manager\b)", re.I)
+NON_SOFTWARE_ENGINEER = re.compile(
+    r"\b(?:civil|site|maintenance|biomedical|structural|mechanical|electrical|environmental|"
+    r"property|construction|manufacturing|quality|reliability|process|packaging)\s+"
+    r"(?:engineer|developer)\b|\bproperty\s+developer\b",
+    re.I,
+)
+SOFTWARE_CODING_WORD = re.compile(
+    r"\b(?:software|coding|programming|programmer|devops|sre\b|"
+    r"backend|back[- ]end|frontend|front[- ]end|full[- ]stack|fullstack|"
+    r"machine\s+learning|\bml\b|android|ios|"
+    r"deployment|forward[- ]deployed|platform|infra(?:structure)?|performance|"
+    r"plugin|monetization|chatgpt|data\s+engineer|analytics\s+engineer)\b",
+    re.I,
+)
 
 
-def engineering_title(title):
-    """True when the title alone names an engineering job (see ENGINEERING_JOB)."""
+def engineering_title(title, posting_text=None):
+    """True when the title names a software or coding job (see ENGINEERING_JOB)."""
     main = re.split(r"\s*(?:,|\(|\||\s[-\u2013\u2014]\s)", title or "", maxsplit=1)[0]
-    return bool(ENGINEERING_JOB.search(main))
+    if NON_SOFTWARE_ENGINEER.search(main):
+        return False
+    if re.match(r"^\s*(?:senior\s+|sr\.?\s+)?engineering\s+manager\b", main, re.I):
+        return True
+    if not ENGINEERING_JOB.search(main):
+        return False
+    scope = ((title or "") + " " + (posting_text or "")).strip()
+    return bool(SOFTWARE_CODING_WORD.search(scope))
 
 
 def coding_check(title, text):
@@ -259,7 +280,7 @@ def coding_check(title, text):
             hits.append(m.group(0)[:80])
             core = core or rx in CODE_CORE
             break
-    heavy = bool(core or (ENGINEER_TITLE.search(title) and hits) or len(hits) >= 2)
+    heavy = bool(core or (engineering_title(title, text) and hits) or len(hits) >= 2)
     return heavy, hits + list(dict.fromkeys(negated))
 
 
@@ -578,10 +599,11 @@ def build_role(target, base, config):
     if not (config.get("heavy_coding") or {}).get("detect", True):
         heavy, signals = False, []
     elif (not heavy and "candidate" in config and not (config["candidate"] or {}).get("writes_production_code", False)
-          and engineering_title(base["title"]) and not any(s.startswith("NOT required") for s in signals)):
-        # Someone who doesn't write production code: an engineering title counts as heavy coding
+          and engineering_title(base["title"], parsed.get("full_text") or "")
+          and not any(s.startswith("NOT required") for s in signals)):
+        # Someone who doesn't write production code: a software or coding title counts as heavy coding
         # unless the posting itself says the role doesn't need it.
-        heavy, signals = True, signals + ["title names an engineering job: " + base["title"][:70]]
+        heavy, signals = True, signals + ["title names a software or coding job: " + base["title"][:70]]
     fam_cfg = next(f for f in config["families"] if f["id"] == fam)
     if heavy and fam_cfg.get("drop_if_heavy_coding"):
         return None, "the %s family drops postings that expect production coding" % fam

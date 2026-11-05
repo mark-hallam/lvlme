@@ -94,6 +94,25 @@ class EngineeringTitles(unittest.TestCase):
         self.assertFalse(F.engineering_title("Engineer Relations Lead"))
         self.assertFalse(F.engineering_title("Technical Program Manager, Engineering"))
 
+    def test_non_software_engineer_and_developer_titles_are_not_coding_jobs(self):
+        for title in ("Civil Engineer", "Site Engineer", "Maintenance Engineer",
+                      "Biomedical Engineer", "Property Developer"):
+            with self.subTest(title=title):
+                self.assertFalse(F.engineering_title(title))
+        for title in ("Software Engineer", "Backend Developer"):
+            with self.subTest(title=title):
+                self.assertTrue(F.engineering_title(title))
+
+    def test_non_software_engineer_roles_are_not_heavy_coding_from_title(self):
+        body = "<h3>Requirements</h3><ul><li>5+ years of field experience.</li></ul>"
+        for title in ("Civil Engineer", "Site Engineer", "Maintenance Engineer",
+                      "Biomedical Engineer", "Property Developer"):
+            with self.subTest(title=title):
+                base = next(F.greenhouse_postings({"jobs": [gh_job(99, title, "Operations", body)]}))
+                role, _ = F.build_role(TARGET, base, CFG)
+                if role:
+                    self.assertFalse(role["requires_heavy_coding"], title)
+
 
 class AdapterTests(unittest.TestCase):
     def test_greenhouse(self):

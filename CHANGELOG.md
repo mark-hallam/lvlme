@@ -8,6 +8,14 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## Unreleased
+
+### Fixed
+
+- **Role fetch:** only software or coding job titles (not civil, site,
+  maintenance, biomedical or property developer roles) are treated as heavy
+  coding when the person does not write production code.
+
 ## 0.7.2 (6 November 2026)
 
 From a real search for senior project roles: no role reached a fit of 70,
