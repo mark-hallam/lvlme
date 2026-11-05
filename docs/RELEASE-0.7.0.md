@@ -15,7 +15,18 @@ merged.
   so you see how far the two judgings disagreed instead of one number.
 - Older judgement files with one score per factor still work.
 
-## LVLme quick is gone
+## How steady is it? Measured, honestly
+
+We ran the same decent CV and the same job three times with Codex through the
+new instructions (a one-job campaign, each judged twice). The best fits were
+26, 24 and 19, a spread of 7 points. The ranges the runs reported were 15 to
+26, 24 to 26 and 19 to 26. The old quick path scored the same CV five times
+at 20 to 22, but it checked fewer factors, so the two numbers are not directly
+comparable. **This sample does not show that judging twice makes the score
+steadier**; it shows the disagreement instead of hiding it. Three runs on one
+CV is a small test, and we make no steadier claim.
+
+## LVLme quick is gone as a product
 
 LVLme works with a goal: the role you want, at which organisations, where,
 and by when. Say "run LVLme" and tell it your goal.

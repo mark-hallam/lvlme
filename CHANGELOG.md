@@ -61,6 +61,9 @@ These are the scoring rules version 1.2.
   `method/FIRST-PASS.md`. The shared page style moved to
   `scripts/_page_html.py`. The demo CV also lives in
   `examples/demo-workspace/intake/sources/`.
+- **Measured spread.** Three Codex runs of the same CV and job under the new
+  rules gave best fits of 26, 24 and 19. We do not claim the score is steadier;
+  the range now shows the disagreement. See the release notes.
 - **Version 0.7.0.**
 
 ### Removed
