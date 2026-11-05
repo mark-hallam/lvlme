@@ -74,6 +74,7 @@ class BuildTests(Base):
         self.assertIn("Goal reached: Level 3, Moderate", page)
         self.assertIn("Share this", page)
         self.assertIn("Set my next goal", page)
+        self.assertIn("first target: Level 3", page)
         self.assertIn("goal-reached/index.html", self.index)
 
     def test_writes_the_index_and_the_copies(self):

@@ -480,7 +480,7 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
 @media (max-width:420px){.top-in{padding:10px 16px;gap:10px}.brand h1{font-size:16px;white-space:normal}.seg.small button{padding:4px 8px}.top .btn{padding:6px 12px}.card{padding:16px}.tiles4{gap:10px}.tile .v{font-size:24px}}
 @media (max-width:360px){.seg button{padding:6px 8px;font-size:13px}}
 /* on a phone the title takes its own row and the controls sit under it, so the title never breaks into fragments */
-@media (max-width:520px){.top-in{flex-wrap:wrap}.brand{flex:1 1 100%}.brand h1{font-size:18px}.brand span{white-space:normal}.top-in .btn{flex:none}}
+@media (max-width:520px){.top-in{flex-wrap:wrap}.brand{flex:1 1 100%}.brand h1{font-size:18px}#themeSeg{display:none}.brand span{white-space:normal}.top-in .btn{flex:none}}
 @media (max-width:759px){.bottombar{padding:8px 16px calc(8px + env(safe-area-inset-bottom));gap:10px}.bb-text b{font-size:14px}.app{padding-bottom:calc(76px + env(safe-area-inset-bottom))}}
 @media (max-width:420px){.share-row div{padding:8px 7px}.share-row b{font-size:20px}.share-row .pill{font-size:11px;padding:2px 6px}}
 @media (max-width:360px){.share-row{gap:6px}.share-row div{padding:8px 6px}.share-row .pill{padding:2px 5px}}

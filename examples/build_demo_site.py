@@ -88,6 +88,8 @@ def goal_reached_page():
         cfg_path = os.path.join(ws, "config.json")
         cfg = load(cfg_path)
         cfg["goal"]["target_level"] = 3
+        cfg["goal"]["role"] = "A program, applied AI or policy role (first target: Level 3, Moderate)"
+        cfg["goal"]["by"] = "2026-12-31"
         with open(cfg_path, "w", encoding="utf-8") as fh:
             json.dump(cfg, fh, indent=2)
         levels = os.path.join(ws, "eval", "levels.json")

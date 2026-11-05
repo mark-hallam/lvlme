@@ -241,6 +241,7 @@ def _week(t):
         nm = rev.get("next_move")
         out.append('<p class="td-sub">%s</p>' % esc("Next week's one move: %s." % nm["title"].rstrip(".") if nm
                                                     else "Next week's one move: ask your agent to add one."))
+    out.append('<p class="td-tiny">How the week runs: your agent writes the Monday plan and the Friday review when you ask for them, or on a timer if you turn on autopilot. Nothing is sent.</p>')
     out.append("</section>")
     return "".join(out)
 
@@ -350,6 +351,7 @@ CSS = r"""
 body.is-today .top,body.is-today .banner,body.is-today .app,body.is-today .bottombar,body.is-today .scrim,body.is-today .modal,body.is-today .tip{display:none!important}
 body.is-mc #today{display:none}
 .to-today{white-space:nowrap}
+@media (max-width:520px){.td-moment{padding:10px 14px;margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.td-moment-h{font-size:16px;flex:1 1 60%}.td-moment-l{display:none}.td-moment .td-btn{margin-top:0;width:auto;padding:8px 14px;min-height:44px}}
 @media (max-width:420px){.td-wrap{padding:18px 16px 48px}.td-h{font-size:26px}.td-badge{width:64px;height:64px;font-size:38px}.td-stand{font-size:17px}.td-btn{width:100%}}
 """
 

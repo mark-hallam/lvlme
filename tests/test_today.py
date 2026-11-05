@@ -237,6 +237,12 @@ class WeekCardTests(unittest.TestCase):
         words = text_of(today_part(page))
         self.assertIn("The button copies this for your agent:", words)
 
+    def test_a_phone_gets_a_slim_level_up_banner_and_the_week_says_how_it_runs(self):
+        ws, page = build(self, lambda ws: None)
+        self.assertIn(".td-moment-l{display:none}", page)
+        self.assertIn("How the week runs:", text_of(today_part(page)))
+        self.assertIn("so there is no expected date", text_of(today_part(page)))
+
     def test_the_streak_says_what_counts_as_a_week(self):
         ws, page = build(self, lambda ws: None)
         self.assertIn("A week counts when a move is finished or evidence is checked", text_of(today_part(page)))

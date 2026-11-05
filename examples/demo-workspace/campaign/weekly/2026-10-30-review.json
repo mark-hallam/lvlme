@@ -3,13 +3,24 @@
   "kind": "review",
   "date": "2026-10-30",
   "week_of": "2026-10-26",
-  "done": [],
-  "evidence": [],
+  "done": [
+    {
+      "id": "A05",
+      "title": "Tailor your resume and cover note for the Initech fleet deployments role",
+      "evidence": "campaign/drafts/initech-fleet-application.md"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E18",
+      "title": "Tailored resume and cover note for the Initech Robotics fleet deployments role"
+    }
+  ],
   "moved": {
-    "changed": false,
-    "text": "Best fit unchanged, from 55 to 55.",
+    "changed": true,
+    "text": "Best fit up 2, from 55 to 57.",
     "from": 55.0,
-    "to": 55.0,
+    "to": 57.0,
     "level_from": 3,
     "level_to": 3
   },

@@ -72,7 +72,7 @@
         }
       ],
       "points_short": 7.2,
-      "next": "No plan gets you to Level 4 yet: the plan is about 7.2 points short. What is missing: warm path, proof of work or org-specific edge."
+      "next": "No plan gets you to Level 4 yet, so there is no expected date: the plan is about 7.2 points short. What is missing: warm path, proof of work or org-specific edge."
     },
     "state": "ready",
     "stand": "You are at Level 3, Moderate. Your best match is Program Manager, Robot Fleet Deployments at Initech Robotics: fit about 57 to 61 out of 100, with a moderate chance of an interview.",
@@ -141,7 +141,7 @@
         "org": "Initech Robotics",
         "points_to_next": 15.0,
         "next_band": "Good",
-        "next_level_line": "No plan gets you to Level 4 yet: the plan is about 9.2 points short. What is missing: warm path, proof of work or org-specific edge.",
+        "next_level_line": "No plan gets you to Level 4 yet, so there is no expected date: the plan is about 9.2 points short. What is missing: warm path, proof of work or org-specific edge.",
         "weeks_in_a_row": 3,
         "changed": [
           "Best fit up 9, from 46 to 55.",
@@ -196,13 +196,24 @@
         "kind": "review",
         "date": "2026-10-30",
         "week_of": "2026-10-26",
-        "done": [],
-        "evidence": [],
+        "done": [
+          {
+            "id": "A05",
+            "title": "Tailor your resume and cover note for the Initech fleet deployments role",
+            "evidence": "campaign/drafts/initech-fleet-application.md"
+          }
+        ],
+        "evidence": [
+          {
+            "id": "E18",
+            "title": "Tailored resume and cover note for the Initech Robotics fleet deployments role"
+          }
+        ],
         "moved": {
-          "changed": false,
-          "text": "Best fit unchanged, from 55 to 55.",
+          "changed": true,
+          "text": "Best fit up 2, from 55 to 57.",
           "from": 55.0,
-          "to": 55.0,
+          "to": 57.0,
           "level_from": 3,
           "level_to": 3
         },

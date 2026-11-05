@@ -278,7 +278,7 @@ def main():
         run(build_dashboard.main, ["--workspace", DEMO, "--today", today])
         cfg = json.load(open(os.path.join(DEMO, "config.json"), encoding="utf-8"))
         dash = json.load(open(os.path.join(DEMO, "report", "for-agents", "dashboard.json"), encoding="utf-8"))
-        weekly.write_review(DEMO, cfg, "2026-10-30", "2026-10-30", dash)         # Friday review of the week of 26 Oct
+        weekly.write_review(DEMO, cfg, "2026-10-30", today, dash)         # the review of the week of 26 Oct, written once that week is over (it ends on the Sunday run)
         run(build_dashboard.main, ["--workspace", DEMO, "--today", today])
         run(proof_profile.main, ["--workspace", DEMO, "--date", "2026-11-05"])
     finally:

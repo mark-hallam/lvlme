@@ -217,7 +217,7 @@ def next_sentence(level, reachable, date, moves, points_short=None, missing=()):
     if reachable:
         return "%s expected by %s with %s." % (lvl, short_date(date) if date else "the plan's dates",
                                                 "this move" if moves == 1 else "these %s moves" % _number(moves))
-    return "No plan gets you to %s yet: the plan is about %s points short. %s" % (
+    return "No plan gets you to %s yet, so there is no expected date: the plan is about %s points short. %s" % (
         lvl, "%g" % points_short,
         ("What is missing: %s." % join_names(list(missing))) if missing else "Add moves that raise what is missing.")
 
