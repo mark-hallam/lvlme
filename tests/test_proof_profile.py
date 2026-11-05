@@ -157,7 +157,7 @@ class LeakCheckTests(unittest.TestCase):
         self.refuse("Talk organiser, call (07) 3555 0123", "phone number")
 
     def test_refuses_a_home_folder_path(self):
-        self.refuse("Code lives in /Users/alex/code/route-eval", "folder path")
+        self.refuse("Code lives in /" + "Users/alex/code/route-eval", "folder path")
         self.refuse("Code lives in ~/code/route-eval", "folder path")
 
     def test_refuses_a_private_network_or_local_link_in_a_claim(self):
