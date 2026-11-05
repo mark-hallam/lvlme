@@ -15,7 +15,7 @@ LVLme now works with goals and campaigns only. This is the engine part of
 now version 1.2. **This release changes how a score is worked out**: see
 Changed.
 
-Tests: 483 pass.
+Tests: 591 pass.
 
 ### Added
 
@@ -53,18 +53,23 @@ These are the scoring rules version 1.2.
 - **A run says how much it varied.** The score summary prints the fit range
   for any role judged twice.
 - **The demo is rebuilt** under the new rules, with one role judged twice.
+- **The first pass stays as an internal path** for the app's goal-first first
+  run: `scripts/quick.py` (`new`, `review-items`, `build`, `promote`),
+  `scripts/quick_posting.py`, `scripts/_promote.py`, `schemas/quick.schema.json`
+  and `eval/quick.json` all work as before, with their messages saying "first
+  pass". The agent instructions moved from `skills/lvlme-quick/SKILL.md` to
+  `method/FIRST-PASS.md`. The shared page style moved to
+  `scripts/_page_html.py`. The demo CV also lives in
+  `examples/demo-workspace/intake/sources/`.
 - **Version 0.7.0.**
 
 ### Removed
 
-- **LVLme quick.** The `/lvlme-quick` command and skill, the quick scripts
-  (`quick.py`, `quick_posting.py`, `_promote.py`), its result page and schema,
-  its demo and screenshots, and every page of the docs that described it.
-  Someone who says "run LVLme quick" is told that LVLme now works with a goal
-  and is offered to set one. The scoring functions a campaign uses
-  (`score.py`, the job-board readers and the shared page style) stay; the
-  shared page style moved to `scripts/_page_html.py`. The demo CV moved to
-  `examples/demo-workspace/intake/sources/`.
+- **LVLme quick, as a product.** The `/lvlme-quick` command and skill, its
+  result page on the demo site, its screenshots and every page of the docs
+  that described it. Someone who says "run LVLme quick" is told that LVLme now
+  works with a goal and is offered to set one. Nothing the person reads
+  offers it any more.
 
 ## 0.6.3 (5 November 2026)
 

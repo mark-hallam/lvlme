@@ -154,7 +154,7 @@ Most career advice flatters. LVLme is built to do the opposite.
   names and salary figures out of the briefing files written for other agents.
 - No telemetry. The only network calls are to public job-board APIs in
   `fetch_roles.py`, the public event calendars you name in `fetch_doors.py`
-  (never Meetup, Eventbrite or LinkedIn), the web pages you name in `claims_audit.py`, and the
+  (never Meetup, Eventbrite or LinkedIn), the one posting link a first pass reads (`quick_posting.py`), the web pages you name in `claims_audit.py`, and the
   sources you approve for your agent to read.
 
 Full details: [`method/PRIVACY.md`](../method/PRIVACY.md).

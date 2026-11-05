@@ -17,8 +17,7 @@ ROOT = H.ENGINE
 COMMANDS = {"lvlme", "lvlme-interview", "lvlme-screen", "lvlme-audit", "lvlme-dashboard",
             "lvlme-autopilot", "lvlme-practice", "lvlme-debrief",
             "lvlme-public"}
-REMOVED = {"scripts/quick.py", "scripts/quick_posting.py", "scripts/_quick_html.py", "scripts/_promote.py",
-           "skills/lvlme-quick/SKILL.md", "schemas/quick.schema.json", "examples/build_quick_demo.py"}
+REMOVED = {"skills/lvlme-quick/SKILL.md"}
 AGENTS = {"evidence-scout", "market-scout", "role-judge", "reviewer", "recruiter-screen"}
 INDEPENDENT = {"reviewer", "recruiter-screen"}
 AFTER_MERGE = {"method/INTERVIEW.md", "method/CONSISTENCY.md", "scripts/consistency_audit.py",
@@ -317,38 +316,42 @@ class DocTests(unittest.TestCase):
 
 
 class NetworkTests(unittest.TestCase):
-    def test_only_three_scripts_can_reach_the_network(self):
-        """AGENTS.md: network calls only in fetch_roles.py, fetch_doors.py and claims_audit.py."""
+    def test_only_four_scripts_can_reach_the_network(self):
+        """AGENTS.md: network calls only in fetch_roles.py, fetch_doors.py, claims_audit.py and quick_posting.py."""
         net = re.compile(r"\b(urllib\.request|urlopen|http\.client|socket|ftplib|smtplib)\b")
         found = sorted(name for name in os.listdir(os.path.join(ROOT, "scripts"))
                        if name.endswith(".py") and net.search(read(os.path.join("scripts", name))))
-        self.assertEqual(found, ["claims_audit.py", "fetch_doors.py", "fetch_roles.py"])
+        self.assertEqual(found, ["claims_audit.py", "fetch_doors.py", "fetch_roles.py", "quick_posting.py"])
 
 
 class QuickRetiredTests(unittest.TestCase):
-    """LVLme quick was removed in 0.7.0: LVLme works with a goal. Nothing in the product may still offer it."""
+    """LVLme quick is not a product from 0.7.0: no command, no skill, no page, no wording. The first pass
+    (method/FIRST-PASS.md and scripts/quick.py) stays as an internal path for the app's goal-first first run."""
 
     # The only places that may say the words: the history, and the lines that route "run LVLme quick" to a goal.
     ALLOWED = {"CHANGELOG.md", "SKILL.md", "AGENTS.md", os.path.join(".cursor", "rules", "lvlme-run.mdc")}
 
-    def test_no_quick_skill_command_script_schema_or_demo_is_left(self):
-        for rel in ("skills/lvlme-quick", "scripts/quick.py", "scripts/quick_posting.py", "scripts/_quick_html.py",
-                    "schemas/quick.schema.json", "examples/quick-demo", "examples/build_quick_demo.py",
-                    "docs/demo/quick", "tests/test_quick.py"):
+    def test_no_quick_command_skill_page_or_screenshot_is_left(self):
+        for rel in ("skills/lvlme-quick", "docs/demo/quick", "docs/images/quick-result-hero.png"):
             self.assertFalse(os.path.exists(os.path.join(ROOT, rel)), rel)
 
-    def test_no_file_points_at_quick(self):
-        word = re.compile(r"quick[-_ ](?:demo|posting|result|mode)|lvlme[- ]quick|/quick/|quick\.py", re.I)
-        for base, dirs, files in os.walk(ROOT):
-            dirs[:] = [d for d in dirs if d not in (".git", "__pycache__")]
-            for name in files:
-                rel = os.path.relpath(os.path.join(base, name), ROOT)
-                if rel in self.ALLOWED or rel.startswith(os.path.join("docs", "RELEASE-")) or name == "test_packaging.py":
-                    continue
-                if not name.endswith((".md", ".py", ".json", ".mdc", ".html", ".txt")):
-                    continue
-                with open(os.path.join(base, name), encoding="utf-8", errors="ignore") as fh:
-                    self.assertIsNone(word.search(fh.read()), rel)
+    def test_the_first_pass_path_is_kept_and_documented(self):
+        for rel in ("method/FIRST-PASS.md", "scripts/quick.py", "scripts/_promote.py", "schemas/quick.schema.json"):
+            self.assertTrue(os.path.exists(os.path.join(ROOT, rel)), rel)
+        text = read("method/FIRST-PASS.md")
+        for cmd in ("quick.py new", "quick.py review-items", "quick.py build", "quick.py promote",
+                    "skills/lvlme-quick/SKILL.md"):
+            self.assertIn(cmd, text)
+
+    def test_no_reader_facing_file_offers_quick(self):
+        word = re.compile(r"/lvlme[- ]quick|run (?:LVLme|Climb) quick|LVLme quick|lvlme:lvlme-quick", re.I)
+        files = ["README.md"] + [os.path.join("docs", n) for n in os.listdir(os.path.join(ROOT, "docs"))
+                                 if n.endswith(".md") and not n.startswith("RELEASE-")]
+        files += [os.path.join(b, n) for b, _, ns in os.walk(os.path.join(ROOT, "skills")) for n in ns]
+        for rel in files:
+            path = rel if os.path.isabs(rel) else os.path.join(ROOT, rel)
+            with open(path, encoding="utf-8") as fh:
+                self.assertIsNone(word.search(fh.read()), rel)
 
     def test_the_words_run_lvlme_quick_route_to_setting_a_goal(self):
         for rel in ("SKILL.md", "AGENTS.md"):

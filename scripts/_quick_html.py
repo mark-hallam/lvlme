@@ -1,0 +1,446 @@
+"""The LVLme first pass result page (index.html in a quick folder): one self-contained page.
+
+Rendered once in Python from result.json. Inline CSS, no script, no external
+requests (no fonts, images or styles loaded from anywhere). Light by default,
+with a dark mode that follows the device. Plain semantic HTML: headings,
+lists and one table, so a screen reader or a text browser reads it in order.
+The colours are the dashboard's tokens, so the two pages look like one product.
+
+Accessibility (tests/test_quick_page_a11y.py keeps it so): every text colour
+pair passes WCAG AA contrast in both themes, no text is under 12px, the
+meters and bars stay visible in forced colours (Windows contrast themes), the
+device's "increase contrast" setting darkens the grey text, each link has a
+larger tap area, and nothing that is not a control looks like a button.
+"""
+import html
+
+import _ai_policies as AP
+import _common as C
+
+BANDS = C.CHANCE_BANDS
+LEVELS = {"verified": ("Verified", "v"), "corroborated": ("Corroborated", "v"),
+          "partially_verified": ("Partly checked", "p"), "self_reported": ("Self-reported", "s"),
+          "unverified": ("No source", "c"), "contradicted": ("Contradicted", "c")}
+SOURCES = {"resume": "CV", "interview": "your answer", "linkedin_export": "LinkedIn export",
+           "linkedin_profile": "LinkedIn text you pasted", "github": "GitHub", "website": "website",
+           "app_store": "app store", "publication": "publication", "certification": "certificate",
+           "talk": "talk", "web_search": "web search", "email": "email", "reference": "referee",
+           "document": "document", "other": "other"}
+KIND_LABEL = {"show_it": "Show it", "build_it": "Build it"}
+KIND_MEANING = "Show it: the proof is missing, usually days. Build it: the skill is missing, usually weeks or months."
+EXPLAIN = {
+    "Almost none": "As things stand, this application would almost certainly be screened out.",
+    "Very low": "As things stand, this application would most likely be screened out.",
+    "Low": "An interview is possible, but unlikely as things stand.",
+    "Moderate": "You are in the running for an interview, but not yet a strong pick.",
+    "Good": "You look like a typical shortlisted applicant for this role.",
+    "Strong": "You stand out against most shortlisted applicants for this role.",
+}
+REVIEW = {"agreed": ("Reviewer agreed", "v"), "adjusted": ("Reviewer score used", "v"),
+          "disputed": ("Reviewers disagreed", "p"),
+          "awaiting": ("Waiting for the reviewer", "p"),
+          "unreadable": ("Reviewer's score unreadable: counts as 2", "p"),
+          "not_needed": ("2 or under: no review needed", "s")}
+
+from _page_html import CSS, LOGO, esc, long_date, chip  # noqa: E402,F401  (the shared page style)
+
+
+def num(v):
+    v = round(float(v), 1)
+    return "%d" % v if v == int(v) else "%.1f" % v
+
+
+def headline(r, start=True):
+    """'Low chance of an interview, very low chance of an offer' from a result (or any bands dict).
+
+    start=False gives the lower-case form for the middle of a sentence."""
+    text = "%s chance of an interview, %s chance of an offer" % (r["interview_band"], r["offer_band"].lower())
+    return text if start else text[0].lower() + text[1:]
+
+
+def and_list(names):
+    return names[0] if len(names) == 1 else "%s and %s" % (", ".join(names[:-1]), names[-1])
+
+
+def unchecked_names(result):
+    """'public signal and application readiness': the factors LVLme first pass cannot check, in a sentence."""
+    return and_list([x["name"].lower() for x in result.get("not_checked") or []])
+
+
+def top_of_range(result):
+    """The fit if the unchecked factors turned out strong, or None when they could add nothing."""
+    top = result.get("if_unchecked_strong")
+    return top if top and top.get("gain", 0) > 0 else None
+
+
+def fit_sentence(result):
+    """'Fit 41 of 100 today, up to 56 if public signal and application readiness (not checked here) turn out
+    strong.' The range is honest about what one posting and a CV cannot show."""
+    top = top_of_range(result)
+    if not top:
+        return "Fit %s of 100." % num(result["fit"])
+    return "Fit %s of 100 today, up to %s if %s (not checked here) turn out strong." % (
+        num(result["fit"]), num(top["fit"]), unchecked_names(result))
+
+
+def meter(band, label):
+    i = BANDS.index(band)
+    pips = "".join('<i class="on"></i>' if k <= i else "<i></i>" for k in range(len(BANDS)))
+    return ('<div class="tile"><div class="k">%s</div><div class="b">%s</div>'
+            '<div class="meter" role="img" aria-label="Step %d of 6, from Almost none to Strong">%s</div>'
+            '<div class="meter-l" aria-hidden="true"><span>Almost none</span><span>Strong</span></div></div>'
+            % (label, esc(band), i + 1, pips))
+
+
+def pips(score):
+    return '<span class="pips" aria-hidden="true">%s</span>' % "".join(
+        '<i class="on"></i>' if k < score else "<i></i>" for k in range(5))
+
+
+def adjustments(result):
+    out = []
+    for a in result["adjustments"]:
+        if a.startswith("Warm referral"):
+            out.append("Someone inside has agreed to refer you, so the interview chance moves up one step.")
+        elif a.startswith("Hard requirement lacking"):
+            note = result.get("hard_requirement_note")
+            if note:
+                note = note[:1].lower() + note[1:]
+                note = note.rstrip().removesuffix(".")
+            out.append("A hard requirement is missing%s, so both chances move down one step." % (
+                " (%s)" % note if note else ""))
+        elif a.startswith("Cold application only"):
+            out.append("Nobody inside has vouched for you yet, so the offer chance is capped at Low.")
+        elif a.startswith("Eligibility blocker"):
+            out.append("The posting has an eligibility rule you have not cleared, so eligibility counts 0.")
+    return out
+
+
+def hero(result):
+    r = result["role"]
+    locs = ", ".join(r["locations"])
+    remote = "Remote" if r.get("remote") is True and "remote" not in locs.lower() else ""
+    if r.get("remote") is not True and r.get("workplace") == "Hybrid":
+        remote = "Hybrid"
+    where = " · ".join(x for x in [esc(r["org_name"]), esc(locs), remote] if x)
+    real_link = str(r.get("url") or "").startswith(("http://", "https://"))
+    if result.get("fictional"):  # a made-up posting has no page: never send a visitor to a real job board
+        link = " · fictional posting"
+    else:
+        link = (' · <a class="posting" href="%s">Open the posting</a>' % esc(r["url"])) if real_link else ""
+    banners = "".join('<div class="banner">%s</div>' % esc(a) for a in adjustments(result))
+    return ('<section class="card" aria-labelledby="oddsH"><p class="eyebrow">Your honest odds today</p>'
+            '<h1 id="oddsH">%s</h1><p class="sub small">%s%s</p>'
+            '<div class="odds">%s%s</div>'
+            '<p class="lead"><b>%s.</b> %s</p>%s%s'
+            '<p class="sub small">The chances are for today\'s fit. They are judgement estimates, not statistics. '
+            'Most applicants to competitive roles are turned down, so LVLme starts from "unlikely" and only evidence '
+            'moves it.%s</p>%s</section>'
+            % (esc(r["title"]), where, link, meter(result["interview_band"], "Interview chance"),
+               meter(result["offer_band"], "Offer chance"), esc(headline(result)),
+               esc(EXPLAIN[result["interview_band"]]), in_short(result), fit_range(result), judged_short(result), banners))
+
+
+def in_short(result):
+    """'Why, in short:' the three factors with the most fit points still to win, before the detail below."""
+    gaps = sorted(result["factors"], key=lambda f: (-(f["max_points"] - f["points"]), f["dimension"]))[:3]
+    gaps = [f for f in gaps if f["max_points"] - f["points"] > 0]
+    if not gaps:
+        return ""
+    first = result.get("fixes") or []
+    do_first = ('<p class="small"><b>Do first:</b> %s (+%s fit points). The fixes are below.</p>'
+                % (esc(first[0]["title"]), num(first[0]["gain"]))) if first else ""
+    return ('<p class="small"><b>Why, in short:</b> %s. These factors have the most points still to win.</p>%s'
+            % (esc(", ".join("%s %s of %s fit points" % (f["name"].lower(), num(f["points"]), num(f["max_points"]))
+                             for f in gaps)), do_first))
+
+
+def judged_short(result):
+    """' Judged by Claude Code (model ...).' in the top card, so the person sees who judged before reading on."""
+    jb = result.get("judged_by") or {}
+    if not jb.get("agent"):
+        return ""
+    return " Judged by %s%s." % (esc(jb["agent"]), esc(", using the model %s" % jb["model"]) if jb.get("model") else "")
+
+
+def fit_range(result):
+    """Today's fit as a bar, with the part the unchecked factors could add striped, and the words for it."""
+    top = top_of_range(result)
+    now = '<i class="now" style="width:%s%%"></i>' % num(result["fit"])
+    if not top:
+        return ('<div class="fit"><div class="fit-h"><span class="k">Fit, out of 100</span><span><b class="num">%s'
+                '</b></span></div><div class="track" aria-hidden="true">%s</div></div>' % (num(result["fit"]), now))
+    many = len(result["not_checked"]) > 1
+    return ('<div class="fit"><div class="fit-h"><span class="k">Fit, out of 100</span><span><b class="num">%s</b> '
+            'today, up to <b class="num">%s</b></span></div>'
+            '<div class="track" aria-hidden="true">%s<i class="maybe" style="width:%s%%"></i></div>'
+            '<p class="tiny sub">The striped part is %s. LVLme first pass cannot check %s from one posting and a CV, '
+            'so today %s 0.%s</p></div>' % (
+                num(result["fit"]), num(top["fit"]), now, num(top["gain"]), esc(unchecked_names(result)),
+                "them" if many else "it", "they count" if many else "it counts", esc(two_cases(result, top))))
+
+
+def two_cases(result, top):
+    """' The fixes below reach 34; 35 is a different case.' so the two numbers never read as one promise."""
+    c = result.get("if_all_fixes")
+    if not c or not result.get("fixes"):
+        return ""
+    return (" The fixes below reach %s on their own; %s is the different case where %s turn out strong."
+            % (num(c["fit"]), num(top["fit"]), "those two" if len(result["not_checked"]) > 1 else "that one"))
+
+
+def evidence_list(rows):
+    if not rows:
+        return '<p class="small sub">No evidence cited, so this counts 0.</p>'
+    items = []
+    for e in sorted(rows, key=lambda x: x["id"]):
+        label, cls = LEVELS.get(e["level"], (e["level"], "s"))
+        src = ", ".join(SOURCES.get(s, s) for s in e["sources"])
+        items.append('<li><span class="id">%s</span><span>%s %s%s</span></li>' % (
+            esc(e["id"]), chip(label, cls), esc(e["claim"]), (' <span class="sub">(%s)</span>' % esc(src)) if src else ""))
+    return '<ul class="ev">%s</ul>' % "".join(items)
+
+
+def factors(result):
+    rows = []
+    for f in result["factors"]:
+        label, cls = REVIEW[f["review"]["status"]]
+        if f["review"]["status"] == "disputed":
+            label = "First score %d, blind reviewer %d: counts as %d" % (
+                f["review"]["judge_score"], f["review"]["reviewer_score"], f["score"])
+        elif f["review"]["status"] == "adjusted":
+            label = "Judge %d, reviewer %d: reviewer score counts within the caps" % (
+                f["review"]["judge_score"], f["review"]["reviewer_score"])
+        why = "".join('<p class="why">%s</p>' % esc(w) for w in f["why_counted"])
+        rows.append('<li><div class="row-h"><h3>%s</h3><span class="score num">%s %d of 5</span></div>'
+                    '<p class="tiny sub">%s of %s fit points · %s</p>%s%s%s</li>' % (
+                        esc(f["name"]), pips(f["score"]), f["score"], num(f["points"]), num(f["max_points"]),
+                        chip(label, cls), ('<p class="small">%s</p>' % esc(f["note"])) if f["note"] else "",
+                        evidence_list(f["evidence"]), why))
+    for x in result["not_checked"]:
+        rows.append('<li><div class="row-h"><h3>%s</h3><span class="score nc">Not checked</span></div>'
+                    '<p class="tiny sub">Up to %s fit points · %s</p><p class="small">%s</p></li>' % (
+                        esc(x["name"]), num(x["max_points"]), chip("Counts 0 today", "s"), esc(x.get("what", ""))))
+    note = unchecked_note(result)
+    return ('<section class="card" aria-labelledby="whyH"><p class="eyebrow">Why</p><h2 id="whyH">Factor by factor</h2>'
+            '<p class="small sub">Every point cites evidence, and a score can be no higher than its best evidence '
+            "supports. A line on a CV alone is self-reported. Each factor's fit points are its score out of 5 times "
+            'its share of the 100 (2 of 5 on a 25 point factor is 10). E01, E02 and so on are your evidence items, '
+            'each marked with how far it can be trusted.</p><ul class="rows">%s</ul>%s</section>' % (
+                "".join(rows), note))
+
+
+def unchecked_note(result):
+    """The top of the range, in words, under the factors: what the fit would be if the unchecked ones were strong."""
+    top = top_of_range(result)
+    if not top:
+        return ""
+    names = unchecked_names(result)
+    many = len(result["not_checked"]) > 1
+    return ('<p class="note">%s %s not checked here. If %s strong (5 of 5), the fit is <b class="num">%s</b> '
+            'instead of %s: %s. The full campaign checks %s.</p>' % (
+                esc(names[0].upper() + names[1:]), "are" if many else "is",
+                "both turn out" if len(result["not_checked"]) == 2 else "they turn out" if many else "it turns out",
+                num(top["fit"]), num(result["fit"]), esc(headline(top, start=False)), "them" if many else "it"))
+
+
+def band_change(result, f):
+    """How a fix moves the two chances, in words."""
+    moves = []
+    for key, after, label in (("interview_band", "interview_after", "interview"), ("offer_band", "offer_after", "offer")):
+        if f[after] != result[key]:
+            moves.append("%s chance %s to %s" % (label, result[key], f[after]))
+    return ", ".join(moves) if moves else "chances stay in the same bands"
+
+
+def hard_requirement_line(result):
+    """One plain line when a hard requirement is missing: it holds both chances down and no fix shown changes it,
+    with why the requirements match fix (if one was considered) is not listed. Empty otherwise."""
+    if not result.get("hard_requirement_lacking"):
+        return ""
+    note = result.get("hard_requirement_note")
+    if note:
+        head = "A hard requirement is missing (%s)" % note
+    elif result.get("eligibility_blocked"):
+        head = "The posting has an eligibility rule you have not cleared"
+    else:
+        head = "A hard requirement is missing"
+    line = "%s, so both chances drop a step, and %s changes that." % (
+        head, "none of the fixes below" if result["fixes"] else "no fix found here")
+    d1 = [x for x in result.get("fixes_not_shown") or [] if x.get("dimension") == "D1"]
+    if d1:
+        line += ' The requirements match fix ("%s") is not listed because %s.' % (d1[0]["title"], d1[0]["why"])
+    return line
+
+
+SHOWN_REASONS = ("does not move in a few months", "adds no fit points", "already at or above", "it is not in the top",
+                 "another fix to the same factor")
+
+
+def not_shown_lines(result):
+    """One plain line per fix the agent suggested that is left off, with the reason, so the page, the
+    message and anything the agent says name the same fixes. The requirements match fix is skipped
+    when the hard requirement line already explains it."""
+    skip = None
+    if result.get("hard_requirement_lacking"):
+        d1 = [x for x in result.get("fixes_not_shown") or [] if x.get("dimension") == "D1"]
+        skip = d1[0]["id"] if d1 else None
+    return ['Not listed: "%s", because %s.' % (x["title"], x["why"])
+            for x in result.get("fixes_not_shown") or []
+            if x["id"] != skip and any(r in x["why"] for r in SHOWN_REASONS)]
+
+
+BAND_FLOORS = ((40, "Low"), (55, "Moderate"), (70, "Good"), (85, "Strong"))
+
+
+def next_band_line(result, combined):
+    """When even every fix leaves the fit in today's band: where the next band starts, so the person has a goal."""
+    if not combined or combined.get("interview_band") != result.get("interview_band"):
+        return ""
+    floor = next(((f, b) for f, b in BAND_FLOORS if f > combined["fit"]), None)
+    if not floor:
+        return ""
+    return ("%s starts at a fit of %d: these fixes reach %s, so the other %s points have to come from the factors "
+            "this page cannot check or from the full campaign." % (floor[1], floor[0], num(combined["fit"]),
+                                                                    num(floor[0] - combined["fit"])))
+
+
+def fixes(result):
+    hrl = hard_requirement_line(result)
+    hrl = '<p class="note">%s</p>' % esc(hrl) if hrl else ""
+    gone = "".join('<p class="small sub gone">%s</p>' % esc(x) for x in not_shown_lines(result))
+    if not result["fixes"]:
+        return ('<section class="card" aria-labelledby="fixH"><p class="eyebrow">What would raise your odds</p>'
+                '<h2 id="fixH">No fix found</h2>'
+                '<p class="small sub">None of the fixes considered adds fit points. Say "run LVLme" for the full '
+                'campaign, which looks wider.</p>%s%s</section>' % (hrl, gone))
+    items = []
+    for f in result["fixes"]:
+        kind = f.get("kind") or "build_it"
+        items.append('<li><h3>%s %s</h3><p class="small"><span class="gain">+%s fit points</span> · %s %d to %d · '
+                     '%s</p><p class="step"><b>Next step:</b> %s</p></li>' % (
+                         chip(KIND_LABEL[kind], "v" if kind == "show_it" else "s"), esc(f["title"]), num(f["gain"]),
+                         esc(f["name"]), f["from"], f["to"],
+                         esc(band_change(result, f)), esc(f["next_step"])))
+    c = result["if_all_fixes"]
+    n = len(result["fixes"])
+    all_line = ('<div class="all">If %s: fit <b class="num">%s</b> (up %s), %s.</div>' % (
+        "all three land" if n == 3 else "both land" if n == 2 else "all %d land" % n if n > 1 else "it lands",
+        num(c["fit"]), num(c["gain"]),
+        esc(headline(c, start=False))))
+    nxt = next_band_line(result, c)
+    if nxt:
+        all_line += '<p class="tiny sub">%s</p>' % esc(nxt)
+    top = top_of_range(result)
+    if top:
+        all_line += ('<p class="tiny sub">This counts only the fixes above. The "up to %s" at the top is a '
+                     'different what if: the two factors this page cannot check turning out strong.</p>' % num(top["fit"]))
+    return ('<section class="card" aria-labelledby="fixH"><p class="eyebrow">What would raise your odds</p>'
+            '<h2 id="fixH">The top %s</h2><p class="small sub">Ranked by the fit points each adds, with the same '
+            'maths as the score, Show it first. Each one is capped at what can realistically change in a few months. '
+            '%s</p>%s'
+            '<ol class="fixes">%s</ol>%s%s</section>' % ("fix" if n == 1 else "%d fixes" % n, esc(KIND_MEANING), hrl, "".join(items),
+                                                           all_line, gone))
+
+
+def brief(result):
+    b = result["brief"]
+    lead = "".join("<li><span>%s %s <span class=\"sub\">(%s)</span></span></li>" % (
+        chip(LEVELS[e["level"]][0], LEVELS[e["level"]][1]), esc(e["claim"]), esc(e["factor"])) for e in b["lead_with"])
+    back = "".join("<li><span>%s %s</span></li>" % (chip(LEVELS[e["level"]][0], LEVELS[e["level"]][1]), esc(e["claim"]))
+                   for e in b["back_up"])
+    parts = []
+    if lead:
+        parts.append('<h3>Lead with</h3><ul class="ev">%s</ul>' % lead)
+    if back:
+        parts.append('<h3 style="margin-top:12px">Have a source ready for</h3><ul class="ev">%s</ul>' % back)
+    return ('<section class="card" aria-labelledby="briefH"><p class="eyebrow">Your brief</p>'
+            '<h2 id="briefH">Before you apply</h2>%s<p class="small sub" style="margin-top:12px">LVLme gives fixes and a '
+            'brief, never application answers: you write those in your own words. %s</p></section>'
+            % ("".join(parts), ai_guidance(result["role"]).replace(
+                "then I'll review it", "then ask your agent to review it").replace(
+                "then I&#x27;ll review it", "then ask your agent to review it")))
+
+
+def ai_guidance(role):
+    """The employer's own rule on AI use, linked, when LVLme knows it; otherwise a nudge to check."""
+    line = AP.first_draft_line(role["org_name"], role.get("ai_policy"))
+    if not line:
+        return "Some employers publish guidance on how candidates may use AI; check theirs."
+    p = role["ai_policy"]
+    return '%s <a class="guide" href="%s">Their guidance on AI use</a>, checked %s.' % (
+        esc(line), esc(p["source"]), esc(long_date(p["checked_on"])))
+
+
+def checked(result):
+    rv = result["review"]
+    rows = []
+    for d in rv["disputes"]:
+        factor = next(f for f in result["factors"] if f["dimension"] == d["dimension"])
+        rows.append("<tr><td>%s</td><td class=\"num\">%d</td><td class=\"num\">%d</td><td class=\"num\">%d</td></tr>" % (
+            esc(next(f["name"] for f in result["factors"] if f["dimension"] == d["dimension"])),
+            d["scorer"]["score"], d["reviewer"]["score"], factor["score"]))
+    adjusted_count = sum(1 for f in result["factors"] if f["review"]["status"] == "adjusted")
+    disputed_count = sum(1 for f in result["factors"] if f["review"]["status"] == "disputed")
+    decision_notes = []
+    if adjusted_count:
+        decision_notes.append("The reviewer score counts for %d one-point difference%s, within caps." %
+                              (adjusted_count, "" if adjusted_count == 1 else "s"))
+    if disputed_count:
+        decision_notes.append("%d difference%s of two or more count as 2 until a tie-break reviewer scores them." %
+                              (disputed_count, "" if disputed_count == 1 else "s"))
+    table = ('<table><thead><tr><th scope="col">Factor</th><th scope="col">First judge</th>'
+             '<th scope="col">Blind reviewer</th><th scope="col">Counts as</th></tr></thead><tbody>%s</tbody></table>'
+             '<p class="tiny sub">%s</p>' % ("".join(rows), " ".join(decision_notes))) if rows else ""
+    flags = "".join("<li><span>%s: \"%s\" %s</span></li>" % (
+        "Hard requirement missing" if f["flag"] == "hard_requirement_lacking" else "Eligibility blocked",
+        esc(f["posting_sentence"]), {"applied": chip("Applied", "c"), "dismissed": chip("Dismissed: " + f["dismissed"], "s"),
+                                     "not_in_posting": chip("Not in the posting, ignored", "s")}[f["status"]])
+        for f in rv["flags"])
+    agreed = len(rv["agreed"])
+    need = agreed + len(rv["disputes"]) + sum(1 for f in result["factors"] if f["review"]["status"] in ("awaiting", "unreadable"))
+    rb = result.get("reviewed_by") or {}
+    same = rb.get("model") and rb.get("model") == (result.get("judged_by") or {}).get("model")
+    who = ("The blind reviewer was %s%s, a separate agent that saw none of the first scores%s. " % (
+        rb["agent"], ", using the model %s" % rb["model"] if rb.get("model") else "",
+        " (the same model as the first judge, in a fresh session)" if same else "")) if rb.get("agent") else ""
+    waiting_count = sum(1 for f in result["factors"] if f["review"]["status"] in ("awaiting", "unreadable"))
+    lead = ("No score was above 2, so no review was needed." if need == 0 else
+            "%d score%s still need%s a readable blind-review score and count%s as 2." % (
+                waiting_count, "" if waiting_count == 1 else "s", "s" if waiting_count == 1 else "", 
+                "s" if waiting_count == 1 else "") if waiting_count else
+            "%s scored above 2. A separate agent scored %s again from the rubric, evidence and posting, without seeing "
+            "the first scores." % ("One factor" if need == 1 else "%d factors" % need,
+                                   "it" if need == 1 else "them"))
+    return ('<section class="card" aria-labelledby="chkH"><p class="eyebrow">How this was checked</p>'
+            '<h2 id="chkH">A blind second opinion</h2><p class="small">%s</p>%s%s'
+            '<p class="small sub" style="margin-top:12px">%s</p></section>' % (
+                esc(lead), table, ('<ul class="ev">%s</ul>' % flags) if flags else "",
+                esc((who if need else "") + C.judged_by_line(result.get("judged_by")))))
+
+
+def deeper():
+    return ('<section class="card" aria-labelledby="deepH"><div class="deeper"><div><p class="eyebrow">Go deeper</p>'
+            '<h2 id="deepH">Want the full picture?</h2><p class="small sub">The full campaign checks every open role at '
+            'the organisations you choose, gathers evidence from the sources you approve, adds a recruiter screen and a '
+            'consistency audit of your CV, LinkedIn and website, and re-scores as you act on the plan.</p></div>'
+            '<p class="say"><span class="k">Say to your agent</span> <b>"run LVLme"</b></p></div></section>')
+
+
+def render(result):
+    r = result["role"]
+    demo = '<span class="sep"> · </span><span class="nw">fictional demo</span>' if result.get("fictional") else ""
+    foot = ("Drafts only: LVLme never applies, sends or posts for you. Your CV and this page stay on your computer; "
+            "like anything your AI agent reads, they were also processed by its provider. "
+            "<details class=\"tech\"><summary>Technical details</summary>Inputs fingerprint %s: a code that changes if the "
+            "CV, the posting or any judgement changes, so two results can be told apart.</details>"
+            % esc(result["inputs_digest"][:19]))
+    body = "".join([hero(result), factors(result), fixes(result), brief(result), checked(result), deeper()])
+    return ("<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">"
+            "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+            "<meta name=\"color-scheme\" content=\"light dark\">"
+            "<title>LVLme first pass: %s</title><style>%s</style></head><body><div class=\"wrap\">"
+            "<header class=\"top\"><span class=\"mark\">%s</span><b>LVLme first pass</b>"
+            "<span class=\"sub\"><span class=\"nw\">%s</span>%s</span></header><main>%s</main><footer>%s</footer>"
+            "</div></body></html>\n" % (
+                esc("%s at %s" % (r["title"], r["org_name"])), CSS, LOGO, esc(long_date(result["date"])), demo, body, foot))

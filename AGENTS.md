@@ -140,7 +140,8 @@ role, the organisations, where, and by when).
   in `fetch_roles.py` (public job-board APIs, or application programming
   interfaces), `fetch_doors.py` (public Luma calendar feeds the person
   named; never Meetup, Eventbrite or LinkedIn), `claims_audit.py`
-  (addresses the person passes).
+  (addresses the person passes) and `quick_posting.py` (the one posting
+  link the first-pass path reads, `method/FIRST-PASS.md`).
 - Every script ends `sys.exit(C.run_main(main))`, so a failure reaches the
   person as one plain `lvlme:` line, never a traceback (a Python error
   listing). Read workspace JSON with `C.load_json`, which names the file, line

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "fetched_on": "2026-11-02",
+  "summary": {
+    "matched_total": 1,
+    "endpoints": {
+      "globex_labs_example": "https://api.ashbyhq.com/posting-api/job-board/globex-labs-example?includeCompensation=true"
+    }
+  },
+  "roles": [
+    {
+      "id": "globex_labs_example:0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
+      "org": "globex_labs_example",
+      "title": "Deployment Program Manager, AI Agents",
+      "family": "quick",
+      "team_or_department": "Customer / Deployments",
+      "locations": [
+        "Sydney, Australia",
+        "Remote (Australia)"
+      ],
+      "location_classes": [
+        "quick"
+      ],
+      "remote": true,
+      "workplace": "Hybrid",
+      "url": "https://jobs.ashbyhq.com/globex-labs-example/0b6f3c2e-1a2b-4c3d-8e9f-000000000001",
+      "updated_at": "2026-10-27T00:00:00.000+00:00",
+      "published_at": "2026-10-27T00:00:00.000+00:00",
+      "compensation": "AUD 170K to 200K",
+      "years_experience": 5,
+      "years_experience_basis": "required",
+      "degree_requirement": null,
+      "hard_requirements": [
+        "5+ years running programs or projects with operations teams",
+        "A record of rolling out software across several sites or teams",
+        "Hands-on experience evaluating AI systems or large language models",
+        "Clear writing for both engineers and customer executives"
+      ],
+      "nice_to_haves": [
+        "Experience in logistics, warehousing or retail operations",
+        "Comfort reading Python scripts"
+      ],
+      "responsibilities": [
+        "Run deployment programs with customer operations teams, from pilot to full rollout",
+        "Design how we measure whether an agent is working, and report it to customer leaders",
+        "Turn what you learn on site into product requests the engineering team can act on"
+      ],
+      "requires_heavy_coding": false,
+      "coding_signals": [],
+      "eligibility_blockers": [],
+      "visa_or_relocation_note": null,
+      "description_text": "About Globex Labs\nGlobex Labs makes AI agents for operations teams. A fictional company for the LVLme demo.\nAbout the role\nLead the rollout of our AI agents at logistics and retail customers across Australia and New Zealand, from the first pilot to full production.\nWhat you'll do\n- Run deployment programs with customer operations teams, from pilot to full rollout\n- Design how we measure whether an agent is working, and report it to customer leaders\n- Turn what you learn on site into product requests the engineering team can act on\nWhat you'll bring\n- 5+ years running programs or projects with operations teams\n- A record of rolling out software across several sites or teams\n- Hands-on experience evaluating AI systems or large language models\n- Clear writing for both engineers and customer executives\nNice to have\n- Experience in logistics, warehousing or retail operations\n- Comfort reading Python scripts\nLocation\nSydney, or remote within Australia, with travel to customer sites. You need the right to work in Australia."
+    }
+  ]
+}

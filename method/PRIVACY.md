@@ -123,6 +123,8 @@ sensitive, the agent does not record it.
 - `fetch_doors.py` reads only the public calendar feeds you list in
   `doors.calendars`, and never a Meetup, Eventbrite or LinkedIn address.
 - `claims_audit.py` fetches only the addresses you pass it.
+- `quick_posting.py` (the first pass, `method/FIRST-PASS.md`) fetches only the one posting link
+  you give it, through the public job-board API or the page itself, once. It never opens LinkedIn.
 - No other script uses the network.
 
 ## What the engine never does

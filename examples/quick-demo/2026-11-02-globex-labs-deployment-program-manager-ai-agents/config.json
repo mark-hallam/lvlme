@@ -1,0 +1,15 @@
+{
+  "quick": true,
+  "fictional": true,
+  "goal": {
+    "title": "LVLme first pass: Deployment Program Manager, AI Agents at Globex Labs"
+  },
+  "targets": [
+    {
+      "id": "globex_labs_example",
+      "name": "Globex Labs",
+      "ats": "ashby"
+    }
+  ],
+  "candidate": {}
+}
