@@ -7,7 +7,129 @@
   "goal": {
     "title": "A program, applied AI or policy role at an AI product company",
     "description": "Fictional demo goal for Alex Example: one of three made-up AI companies, ideally in Australia.",
-    "horizon_months": 12
+    "horizon_months": 12,
+    "role": "A program, applied AI or policy role",
+    "organisations": [
+      "Acme AI",
+      "Globex Labs",
+      "Initech Robotics"
+    ],
+    "where": "Australia",
+    "by": "2027-03-31"
+  },
+  "today": {
+    "date": "2026-11-01",
+    "run_date": "2026-11-01",
+    "goal": "A program, applied AI or policy role at Acme AI, Globex Labs or Initech Robotics, in Australia, by 31 Mar 2027",
+    "goal_by": "2027-03-31",
+    "stepping_stone_accepted": null,
+    "weeks_in_a_row": 4,
+    "streak_text": "4 weeks in a row with real evidence.",
+    "start_line": {
+      "role_id": "initech:i-0001",
+      "role": "Program Manager, Robot Fleet Deployments",
+      "org": "Initech Robotics",
+      "fit": 57.0,
+      "fit_text": "fit 57",
+      "fit_low": 57.0,
+      "fit_high": 57.0,
+      "has_range": false,
+      "level": 3,
+      "band": "Moderate",
+      "chance_word": "Moderate",
+      "top": false,
+      "next_level": 4,
+      "next_band": "Good",
+      "points_to_next": 13.0,
+      "reachable": false,
+      "date": null,
+      "moves": 0,
+      "missing": [
+        {
+          "dimension": "D3",
+          "points": 7.0,
+          "covered": true
+        },
+        {
+          "dimension": "D2",
+          "points": 4.0,
+          "covered": false
+        },
+        {
+          "dimension": "D4",
+          "points": 2.0,
+          "covered": false
+        },
+        {
+          "dimension": "D5",
+          "points": 2.0,
+          "covered": false
+        },
+        {
+          "dimension": "D7",
+          "points": 1.2,
+          "covered": true
+        }
+      ],
+      "points_short": 7.2,
+      "next": "No plan gets you to Level 4 yet: the plan is about 7.2 points short. What is missing: warm path, proof of work or org-specific edge."
+    },
+    "state": "ready",
+    "stand": "You are at Level 3, Moderate. Your best match is Program Manager, Robot Fleet Deployments at Initech Robotics: fit 57 out of 100, with a moderate chance of an interview.",
+    "move": {
+      "id": "A11",
+      "title": "Go to the Initech warehouse operators meetup in Melbourne",
+      "why": "Meets Initech staff in person; a possible warm path.",
+      "effort": "4 hours",
+      "points": 2.4,
+      "by": "2026-12-10",
+      "done_when": "Met at least one Initech employee who has seen your work (follow-up email)",
+      "tell": "Mark action A11 done (\"Go to the Initech warehouse operators meetup in Melbourne\"). Evidence: <paste a link, file path or email reference>. Done when: Met at least one Initech employee who has seen your work (follow-up email)"
+    },
+    "level": 3,
+    "band": "Moderate",
+    "top": false,
+    "points_to_next": 13.0,
+    "next_band": "Good",
+    "progress_pct": 13.333333333333334,
+    "goal_check": {
+      "target_level": 4,
+      "target_band": "Good",
+      "by": "2027-03-31",
+      "stepping_stone": null,
+      "fit_now": 57.0,
+      "reach_date": null,
+      "expected_by": 62.8,
+      "best_case_by": 70.0,
+      "verdict": "stretch",
+      "text": "Only if every move works does your best match reach Level 4 (Good) by 31 Mar 2027. On expected odds it reaches about 63. There is no smaller step to propose, so the choices are a later date or more moves in the plan."
+    },
+    "checking": [
+      "1 of 12 open roles is still being judged. Your level uses the 11 judged so far.",
+      "1 score is waiting for the blind review and counts as 2 until it is done."
+    ],
+    "level_up": {
+      "date": "2026-10-25",
+      "kind": "level_up",
+      "from_level": 2,
+      "to_level": 3,
+      "role_id": "initech:i-0001",
+      "evidence": [
+        "A03",
+        "E09",
+        "E15"
+      ],
+      "card": {
+        "head": "Levelled up: Level 2, Low to Level 3, Moderate",
+        "line": "Reached on 25 Oct 2026, 21 days after the first measurement on 4 Oct 2026.",
+        "level": 3,
+        "date": "2026-10-25",
+        "start": "2026-10-04"
+      }
+    },
+    "goal_reached": null,
+    "show_start_line": false,
+    "stone_to_choose": null
   },
   "outlook": {
     "band": "Low",
