@@ -156,7 +156,7 @@ def render(model):
     values = {
         "title": esc("%s: proof profile" % name),
         "description": esc("%s. %d checked claims, each with its source." % (g.get("title") or name, len(cl))),
-        "banner": '<p class="demo">This is a fictional demo profile. Alex Example is not a real person.</p>' if model["fictional"] else "",
+        "banner": '<p class="demo">This is a fictional demo profile. Alex Example is not a real person. The source links below are made-up addresses (example.com) and do not open a real page; in a real profile each one is a public page you can check.</p>' if model["fictional"] else "",
         "name": esc(name), "goal": esc(g.get("title") or "Goal not set yet"),
         "goal_meta": '<p class="goal-meta">%s</p>' % esc(", ".join(meta)) if meta else "",
         "level": cur["level"] if cur else 0, "band": esc(cur["band"]) if cur else "No",

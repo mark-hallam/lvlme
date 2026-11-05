@@ -57,6 +57,10 @@ class ProofProfileTests(unittest.TestCase):
         self.assertNotIn("Jordan Sample", html)
         self.assertIn("3 checked claims with no public link", html)
 
+    def test_the_demo_page_says_its_source_links_are_made_up(self):
+        page = open(os.path.join(H.DEMO, "report", "profile", "index.html"), encoding="utf-8").read()
+        self.assertIn("made-up addresses (example.com)", page)
+
     def test_the_page_explains_verified_and_corroborated(self):
         page = open(os.path.join(H.DEMO, "report", "profile", "index.html"), encoding="utf-8").read()
         self.assertIn("checked directly against the source shown", page)
