@@ -14,11 +14,10 @@ follow along: `examples/demo-workspace/report/index.html`.
 
 ## Your first two minutes
 
-1. Read the big number (1) and the two chance words under it.
-2. Read your level card (2): the points to the next level, and whether your
-   plan gets you there.
-3. Do the first action in **Do next** (3; on a phone it sits under the level
-   card). That is enough.
+1. Your dashboard opens on **Today**: your level, where you stand, and when
+   the next level is expected.
+2. Do the one move for today, then tell your agent with the evidence.
+3. Tap **Open Mission control** for the full dashboard this page explains.
 
 ## What each part means
 

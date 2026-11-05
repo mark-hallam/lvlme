@@ -35,6 +35,28 @@ class RunPlanTests(unittest.TestCase):
         self.assertEqual((p["full"]["roles"], p["full"]["judges"], p["unchanged"]), (0, 0, len(roles)))
         self.assertIn("Nothing needs judging: this run starts no judging helpers.", R.say(p))
 
+    def test_first_result_judges_only_the_best_few_roles_when_nothing_is_scored(self):
+        for f in os.listdir(os.path.join(self.ws, "eval", "runs")):
+            os.remove(os.path.join(self.ws, "eval", "runs", f))
+        doc = H.load(os.path.join(self.ws, "market", "roles", "latest.json"))
+        doc["roles"][0]["posting_check"]["label"] = "suspicious"
+        suspicious = doc["roles"][0]["id"]
+        template = doc["roles"][1]
+        for i in range(12):                              # plenty of roles, so the first result has to choose
+            doc["roles"].append(dict(template, id="acme:extra%d" % i, title="Extra role %02d" % i))
+        H.save(os.path.join(self.ws, "market", "roles", "latest.json"), doc)
+        p = R.plan(self.ws, self.config)
+        first = p["first"]
+        self.assertEqual(len(first["role_ids"]), R.FIRST_ROLES)
+        self.assertEqual((first["judges"], first["scouts"]), (1, 0))
+        self.assertEqual(first["deepen_later"], p["full"]["roles"] - R.FIRST_ROLES)
+        self.assertNotIn(suspicious, first["role_ids"])                        # a suspicious posting is never a first pick
+        self.assertIn("First result: judges the best 8 roles of", R.say(p)[0])
+        self.assertIn("what is still being checked", R.say(p)[0])
+
+    def test_a_workspace_with_a_scored_run_has_no_first_result_plan(self):
+        self.assertNotIn("first", R.plan(self.ws, self.config))
+
     def test_why_a_role_needs_judging(self):
         ev = [("2026-10-10", None), ("2026-10-20", {"globex"})]
         role = {"id": "acme:1", "org": "acme", "updated_at": "2026-10-01T09:00:00Z"}

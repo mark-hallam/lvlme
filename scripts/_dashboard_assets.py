@@ -9,6 +9,8 @@ categorical palette for organisations, in config.json target order.
 
 # Categorical slots (light, dark), fixed order, never cycled. Colour follows
 # the organisation (its position in config.json targets).
+import _today as TODAY  # the Today screen's style and script
+
 PALETTE = [
     ("#2a78d6", "#3987e5"), ("#eb6834", "#d95926"), ("#1baf7a", "#199e70"), ("#eda100", "#c98500"),
     ("#e87ba4", "#d55181"), ("#008300", "#008300"), ("#6250d6", "#9085e9"), ("#e34948", "#e66767"),
@@ -487,8 +489,10 @@ select{font:inherit;font-size:14px;padding:7px 10px;border-radius:10px;border:1p
 """
 
 BODY = r"""
+__TODAYHEAD____TODAY__
 <header class="top"><div class="top-in">
  <div class="brand"><h1 id="brandTitle">__TITLE__</h1><span id="storyLine"></span></div>
+ <a class="btn to-today" href="#today" id="toToday">Today</a>
  <div class="seg small" id="themeSeg" role="group" aria-label="Appearance"><button data-t="auto" aria-pressed="true">Auto</button><button data-t="light" aria-pressed="false">Light</button><button data-t="dark" aria-pressed="false">Dark</button></div>
  <button class="btn primary" id="shareBtn">Share</button>
 </div></header>
@@ -1979,6 +1983,6 @@ HEADER = r"""<!doctype html>
 <title>__TITLE__</title>
 <style>"""
 
-TEMPLATE = (HEADER + CSS + "</style></head>\n<body>" + BODY
+TEMPLATE = (HEADER + CSS + TODAY.CSS + "</style></head>\n<body>" + BODY.replace("__TODAYHEAD__", TODAY.HEAD_SCRIPT)
             + '\n<script type="application/json" id="data">__DATA__</script>\n<script>'
-            + JS_CORE + JS_CHART + JS_HOME + JS_VIEWS + JS_LEVELS + JS_DETAIL + "</script>\n</body></html>\n")
+            + JS_CORE + JS_CHART + JS_HOME + JS_VIEWS + JS_LEVELS + JS_DETAIL + "</script>\n<script>" + TODAY.JS + "</script>\n</body></html>\n")

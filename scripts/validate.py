@@ -56,6 +56,7 @@ FILES = [
     ("eval/outlook.json", "outlook.schema.json", False),
     ("eval/swot.json", "swot.schema.json", False),
     ("eval/ceilings.json", "ceilings.schema.json", False),
+    ("eval/levels.json", "levels.schema.json", False),
     ("campaign/plan.json", "plan.schema.json", True),
     ("campaign/warm-paths.json", "warm-paths.schema.json", False),
     ("campaign/applications.json", "applications.schema.json", False),

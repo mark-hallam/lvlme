@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Level events (eval/levels.json)",
+  "description": "The moments a level was gained or the goal was reached, recorded from the scored runs by scripts/build_dashboard.py. Events are only ever added.",
+  "type": "object",
+  "required": ["schema_version", "events"],
+  "additionalProperties": false,
+  "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
+  "properties": {
+    "schema_version": {"const": 1},
+    "events": {"type": "array", "items": {"$ref": "#/definitions/event"}}
+  },
+  "definitions": {
+    "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "extension": {"description": "Extension field: any key starting x_ holds data the engine never reads. Kept as is."},
+    "event": {
+      "type": "object",
+      "required": ["date", "kind", "from_level", "to_level", "role_id", "evidence"],
+      "additionalProperties": false,
+      "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
+      "properties": {
+        "date": {"$ref": "#/definitions/date"},
+        "kind": {"enum": ["level_up", "goal_reached"]},
+        "from_level": {"type": "integer", "minimum": 1, "maximum": 5},
+        "to_level": {"type": "integer", "minimum": 1, "maximum": 5},
+        "role_id": {"type": "string"},
+        "outcome": {"type": "string", "description": "goal_reached only: how the goal ended, for example reached."},
+        "evidence": {"type": "array", "items": {"type": "string"}, "description": "Ids of the evidence items and plan actions finished with evidence in the period that led to it."}
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "date": "2026-10-25",
+      "kind": "level_up",
+      "from_level": 2,
+      "to_level": 3,
+      "role_id": "initech:i-0001",
+      "evidence": [
+        "A03",
+        "E09",
+        "E15"
+      ]
+    }
+  ]
+}

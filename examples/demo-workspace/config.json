@@ -5,7 +5,11 @@
     "title": "A program, applied AI or policy role at an AI product company",
     "description": "Fictional demo goal for Alex Example: one of three made-up AI companies, ideally in Australia.",
     "horizon_months": 12,
-    "started_on": "2026-10-04"
+    "started_on": "2026-10-04",
+  "role": "A program, applied AI or policy role",
+  "organisations": ["Acme AI", "Globex Labs", "Initech Robotics"],
+  "where": "Australia",
+  "by": "2027-03-31"
   },
   "candidate": {
     "display_name": "Alex Example",

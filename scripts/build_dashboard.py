@@ -87,6 +87,8 @@ import _practice as PR  # noqa: E402
 import _public as PB  # noqa: E402
 import _doors as DR  # noqa: E402
 import _autopilot as APL  # noqa: E402
+import _events as EV  # noqa: E402
+import _today as TD  # noqa: E402
 import _static_html as ST  # noqa: E402
 import _warm_paths as W  # noqa: E402
 
@@ -394,6 +396,7 @@ def build_roles(data, group_of, hard_types):
             "s": [r["scores"][d]["score"] for d in DIMS], "n": [clean(r["scores"][d].get("note")) for d in DIMS],
             "e": [r["scores"][d].get("evidence") or [] for d in DIMS],
             "fit": r["fit"], "ib": r["interview_band"], "ob": r["offer_band"],
+            "lo": r.get("fit_low"), "hi": r.get("fit_high"),   # the range across two judgings, once the engine writes it
             "adj": [clean(x) for x in r.get("adjustments") or []], "rn": clean(r.get("reviewer_note")),
             "hardReq": [clean(h) for h in (p.get("hard_requirements") or [])[:5]],
             **posting_label(p),
@@ -676,6 +679,10 @@ def render_page(data):
         '<span id="builtAt"></span>', '<span id="builtAt">%s</span>' % html.escape(page["meta"]["built"]))
     out = out.replace("__BESTFIT__", str(int(top["fit"] + 0.5)) if top else "0")
     out = out.replace("__BESTROLE__", html.escape("%s: %s" % (top["on"], top["title"])) if top else "")
+    events, _ = EV.merged(EV.load(data.ws), data.runs, page["progress"], data.config.get("goal") or {})
+    today = TD.build(page, data, events)
+    page["today"] = today
+    out = out.replace("__TODAY__", TD.render(today, os.path.exists(C.wpath(data.ws, "report", "share-numbers.html"))))
     out = out.replace("__LEVELCARD__", card).replace("__LEVELUP__", view).replace("__STATIC__", static)
     return out.replace("__DATA__", blob), page
 
@@ -864,8 +871,10 @@ def agent_payload(data, page):
         "generated_by": "lvlme scripts/build_dashboard.py",
         "sensitive_mode": sensitive,
         "run_date": cur["run_date"], "rubric_version": cur["rubric_version"],
-        "goal": {"title": goal.get("title", ""), "description": goal.get("description", ""),
-                 "horizon_months": goal.get("horizon_months", 12)},
+        "goal": dict({"title": goal.get("title", ""), "description": goal.get("description", ""),
+                      "horizon_months": goal.get("horizon_months", 12)},
+                     **{k: goal[k] for k in ("role", "organisations", "where", "by", "target_level", "stepping_stone") if k in goal}),
+        "today": page.get("today"),
         "outlook": cur["outlook"],
         "judged_by": data.judged_by, "judged_by_note": C.judged_by_line(data.judged_by),
         "role_counts": {"open": len(cur["roles"]), "judged": sum(1 for r in cur["roles"] if r.get("judged", True))},
@@ -892,6 +901,7 @@ def agent_payload(data, page):
         "network_first_degree_counts": {o: v.get("count", 0) for o, v in ((data.network or {}).get("orgs") or {}).items()},
         "roles": [{"role_id": r["role_id"], "org": r["org"], "title": r["title"], "family": r["family"],
                    "judged": r.get("judged", True),
+                   **({"fit_low": r["fit_low"], "fit_high": r["fit_high"]} if r.get("fit_low") is not None and r.get("fit_high") is not None else {}),
                    "locations": r.get("locations", []), "url": r.get("url"), "fit": r["fit"],
                    "interview_band": r["interview_band"], "offer_band": r["offer_band"],
                    "scores": {d: r["scores"][d]["score"] for d in DIMS},
@@ -1112,6 +1122,7 @@ def main(argv=None):
     update_metrics_history(data)
     data.packs = RS.write_all(ws, config, data.orgs_doc, data.roles_doc, data.doors, data.today)
     page_html, page = render_page(data)
+    EV.update(ws, data.runs, page["progress"], (data.config.get("goal") or {}))
     C.write_text(C.wpath(ws, "report", "index.html"), page_html)
     payload = agent_payload(data, page)
     C.write_json(C.wpath(ws, "report", "for-agents", "dashboard.json"), payload)
