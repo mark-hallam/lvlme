@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Alex Example: proof profile</title>
+<meta name="description" content="A program, applied AI or policy role at an AI product company. 5 checked claims, each with its source.">
+<style>
+:root{--bg:#fff;--bg2:#f5f5f7;--ink:#0c0e12;--mute:#5b6068;--line:#e4e5e8;--accent:#ff4a1c;--accent-ink:#b8300a;--ok:#1a7f3c;--ok-bg:#e8f5ec;--seg:#e4e5e8;--focus:#0a66ff}
+@media (prefers-color-scheme:dark){:root{--bg:#0c0e12;--bg2:#171a20;--ink:#f3f4f6;--mute:#a1a6b0;--line:#2a2e36;--accent:#ff6a42;--accent-ink:#ff9b7d;--ok:#5fd085;--ok-bg:#12281a;--seg:#2a2e36;--focus:#6aa0ff}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:720px;margin:0 auto;padding:56px 24px 40px}
+a{color:var(--accent-ink);text-underline-offset:3px}
+a:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
+.demo{background:var(--bg2);border-radius:12px;padding:10px 14px;font-size:14px;color:var(--mute);margin:0 0 32px}
+h1{font-size:40px;line-height:1.1;letter-spacing:-.02em;margin:0 0 12px;font-weight:700}
+.goal{font-size:20px;color:var(--mute);margin:0 0 6px}
+.goal-meta{font-size:15px;color:var(--mute);margin:0}
+h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:600;margin:48px 0 14px}
+.card{background:var(--bg2);border-radius:18px;padding:22px}
+.level{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.level b{font-size:30px;letter-spacing:-.01em}
+.level span{color:var(--mute)}
+.segs{display:flex;gap:6px;margin:16px 0 10px}
+.segs i{flex:1;height:8px;border-radius:4px;background:var(--seg)}
+.segs i.on{background:var(--accent)}
+.note{font-size:15px;color:var(--mute);margin:0}
+ol.hist{list-style:none;margin:0;padding:0}
+ol.hist li{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-top:1px solid var(--line)}
+ol.hist li:first-child{border-top:0}
+ol.hist .when{color:var(--mute);white-space:nowrap}
+.tag{font-size:13px;color:var(--accent-ink);font-weight:600;margin-left:8px}
+ul.claims{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.claim{background:var(--bg2);border-radius:18px;padding:18px 20px}
+.claim p{margin:0 0 10px}
+.badge{display:table;margin:0 0 8px;font-size:13px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:999px;padding:2px 10px}
+.src{font-size:15px;color:var(--mute);margin:0;overflow-wrap:anywhere}
+.src a{font-weight:500}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:14px;color:var(--mute)}
+footer p{margin:0 0 8px}
+@media (max-width:480px){main{padding:36px 18px 32px}h1{font-size:32px}.goal{font-size:18px}ol.hist li{flex-direction:column;gap:2px}}
+</style>
+</head>
+<body>
+<main>
+<p class="demo">This is a fictional demo profile. Alex Example is not a real person.</p>
+<header>
+<h1>Alex Example</h1>
+<p class="goal">A program, applied AI or policy role at an AI product company</p>
+
+</header>
+<section aria-labelledby="h-level">
+<h2 id="h-level">Where I am now</h2>
+<div class="card">
+<div class="level"><b>Level 3 of 5</b><span>Moderate fit with the roles I am aiming for, measured on 1 Nov 2026</span></div>
+<div class="segs" role="img" aria-label="Level 3 of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+<p class="note">Levels run from 1 (Very low) to 5 (Strong) and come from scored runs on evidence, not from opinion.</p>
+</div>
+</section>
+<section aria-labelledby="h-hist">
+<h2 id="h-hist">Level history</h2>
+<div class="card">
+<ol class="hist">
+<li><span>Level 3, Moderate</span><span class="when">1 Nov 2026</span></li>
+<li><span>Level 3, Moderate<span class="tag">Level up</span></span><span class="when">25 Oct 2026</span></li>
+<li><span>Level 2, Low</span><span class="when">18 Oct 2026</span></li>
+<li><span>Level 2, Low</span><span class="when">11 Oct 2026</span></li>
+<li><span>Level 2, Low</span><span class="when">4 Oct 2026</span></li>
+</ol>
+</div>
+</section>
+<section aria-labelledby="h-claims">
+<h2 id="h-claims">Checked work</h2>
+<ul class="claims">
+<li class="claim" data-claim-level="verified"><p><span class="badge">Verified</span>route-eval: an open-source tool that scores AI answers to logistics questions, 14 releases, 2 outside contributors</p>
+<p class="src">GitHub: <a href="https://example.com/alex/route-eval" rel="noopener">example.com/alex/route-eval</a> <span>(checked 4 Oct 2026)</span></p></li>
+<li class="claim" data-claim-level="verified"><p><span class="badge">Verified</span>Personal site with 6 essays on AI in operations</p>
+<p class="src">Website: <a href="https://example.com/alex" rel="noopener">example.com/alex</a> <span>(checked 4 Oct 2026)</span></p></li>
+<li class="claim" data-claim-level="verified"><p><span class="badge">Verified</span>AI practitioner certificate from Example Academy, 2026</p>
+<p class="src">Certificate: <a href="https://example.com/academy/certificates/alex-example" rel="noopener">example.com/academy/certificates/alex-example</a> <span>(checked 4 Oct 2026)</span></p></li>
+<li class="claim" data-claim-level="verified"><p><span class="badge">Verified</span>Recorded talk at a regional logistics meetup on testing AI answers, 2025</p>
+<p class="src">Talk: <a href="https://example.com/meetups/logistics-ai-2025" rel="noopener">example.com/meetups/logistics-ai-2025</a> <span>(checked 18 Oct 2026)</span></p></li>
+<li class="claim" data-claim-level="corroborated"><p><span class="badge">Corroborated</span>Case study of the scheduling rollout, with the numbers checked by Alex&#x27;s former manager</p>
+<p class="src">Website: <a href="https://example.com/alex/case-study-scheduling" rel="noopener">example.com/alex/case-study-scheduling</a> <span>(checked 25 Oct 2026)</span></p></li>
+</ul>
+</section>
+<footer>
+<p>Only claims checked against a public source are shown. Everything else is left out, including 3 checked claims with no public link.</p>
+<p>Built on 5 Nov 2026 with LVLme. Nothing on this page is self-reported: each claim was checked against the source shown.</p>
+</footer>
+</main>
+</body>
+</html>

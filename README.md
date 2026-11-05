@@ -74,6 +74,8 @@ A dashboard shows the climb:
 organisations.*
 
 New to the dashboard? [Reading your dashboard](docs/for-you/READING-YOUR-DASHBOARD.md)
+
+Want a page you can show people? [Your proof profile](docs/PROOF-PROFILE.md): your level and only the claims you have checked, each with its public link.
 explains each number in plain English, and what to do first.
 
 ## Install

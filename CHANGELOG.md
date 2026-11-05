@@ -8,6 +8,12 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## Unreleased
+
+### Added
+
+- **A proof profile.** `scripts/proof_profile.py` builds `report/profile/index.html`, a clean page of your goal, your level history and only the claims checked at verified or corroborated level, each with its public source link. It refuses to write the page if it would contain an email address, a phone number, a folder path, a private or local link or an unchecked claim. Private by default; see [the proof profile](docs/PROOF-PROFILE.md).
+
 ## 0.6.3 (5 November 2026)
 
 Fixes from four end-to-end tests with real AI agents (a stranger installing
