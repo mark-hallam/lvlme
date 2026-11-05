@@ -32,10 +32,10 @@ or corroborated level, each with its public source. It refuses to write if the
 page would contain an email, a phone number, a folder path, a private link or
 an unchecked claim. Private by default. See docs/PROOF-PROFILE.md.
 
-## Known items for the reviewers
+## Known items
 
-- The accent colour: Today is orange and Mission control is blue. Whether they
-  should share one accent is still open.
+- Today, Mission control and the result page share one orange accent.
+- Tested on macOS with Claude Code and Codex. Windows is not tested yet.
 - Mission control keeps its aviation labels for the chart; Today does not use
   them.
 

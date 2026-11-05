@@ -17,13 +17,14 @@ rhythm, level-up events, outcomes you can choose to share) and a proof
 profile. The scoring rules are now version 1.2. **This release changes how a
 score is worked out**: see Changed.
 
-Tests: 678 pass.
+Tests: 687 pass.
 
-**Known items for the reviewers.** Judging twice did not make scores steadier
-in the three-run test below (26, 24 and 19 on the same CV); nothing in this
-release claims otherwise. The accent colour question is still open: Today is
-orange and Mission control is blue. Mission control keeps its aviation labels
-for the chart; Today, the first thing you see, does not use them.
+**Known items.** Judging twice did not make scores steadier in the three-run
+test below (26, 24 and 19 on the same CV); nothing in this release claims
+otherwise. Today, Mission control and the result page now share one orange
+accent. Mission control keeps its aviation labels for the chart; Today, the
+first thing you see, does not use them. Tested on macOS; Windows is not tested
+yet.
 
 ### Added
 
