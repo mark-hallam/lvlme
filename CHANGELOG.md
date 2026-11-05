@@ -8,14 +8,14 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
-## Unreleased
+## 0.7.2 (6 November 2026)
 
 From a real search for senior project roles: no role reached a fit of 70,
 and the reason was mostly not the jobs. Fit adds three factors about the
 person's campaign (who they know, how findable they are, a tailored CV) that
 are the same for every role at an organisation, and a warm path nobody asked
 about counted the same as knowing nobody. Fit, the bands and the levels are
-unchanged.
+unchanged. The full notes are in [LVLme 0.7.2](docs/RELEASE-0.7.2.md).
 
 ### Added
 
@@ -29,6 +29,8 @@ unchanged.
   instead of reading as nobody, and the questions to unlock list one
   "Do you know anyone at ...?" per organisation. It still counts as 0 until
   you answer: evidence or zero.
+
+Tests: 704 pass.
 
 ## 0.7.1 (5 November 2026)
 

@@ -1,7 +1,7 @@
 {
   "name": "lvlme",
   "displayName": "LVLme",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Honest, evidence-based odds of landing a kind of role at the organisations you choose, and a campaign that raises them. Runs in a private workspace on your own machine and never sends, posts, applies or changes an account on its own.",
   "author": {
     "name": "Mark Hallam",
