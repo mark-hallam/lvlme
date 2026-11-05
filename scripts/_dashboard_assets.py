@@ -1541,14 +1541,14 @@ function doNextRows(list, nl, limit){
 // Mirrors gain_title() in _levels_html.py: the full gain and chance behind the one number, as a tooltip.
 const gainTitle = q => q.a.effects.length && q.works > q.exp + 0.05 ? ` title="${esc(`${fmtP(q.works)} points if it works, about ${Math.round(q.a.p * 100)}% chance: ${fmtP(q.exp)} expected`)}"` : "";
 // After Do next: the career interview, when the campaign has not had one (no outlook yet), so there is one list of next steps.
-const interviewLine = () => D.meta.outlook && D.meta.outlook.band === "Not yet judged" ? '<div class="tiny sub" style="margin-top:8px">After these, when you are ready: say "run the LVLme interview". It adds more roles and the factors a quick result cannot check, and fills in the outlook and the strengths and risks.</div>' : "";
-// One worked example from the first action, so the expected points never look like a different answer from the quick result.
+const interviewLine = () => D.meta.outlook && D.meta.outlook.band === "Not yet judged" ? '<div class="tiny sub" style="margin-top:8px">After these, when you are ready: say "run the LVLme interview". It adds more roles and the factors a first pass cannot check, and fills in the outlook and the strengths and risks.</div>' : "";
+// One worked example from the first action, so the expected points never look like a different answer from the full gain.
 function chanceExample(){
   const q = (lv().up || []).find(x => x.a.effects.length && x.works > x.exp + 0.05 && x.a.p > 0);
   return q ? ` For example, ${fmtP(q.works)} points if "${q.a.title}" works, at about a ${Math.round(q.a.p * 100)}% chance, is ${fmtP(q.exp)} expected.` : "";
 }
-const doNextSub = nl => (nl.top ? "Expected points each action adds to your best fit on its own: its full gain times its chance of working, so smaller than the gain on a LVLme quick result."
-  : `Expected points toward Level ${nl.nextLevel}, each action on its own: its full gain times its chance of working, so smaller than the gain on a LVLme quick result. The path to Level ${nl.nextLevel} comes first.`) + chanceExample();
+const doNextSub = nl => (nl.top ? "Expected points each action adds to your best fit on its own: its full gain times its chance of working, so smaller than its full gain."
+  : `Expected points toward Level ${nl.nextLevel}, each action on its own: its full gain times its chance of working, so smaller than its full gain. The path to Level ${nl.nextLevel} comes first.`) + chanceExample();
 
 // Each scored day's level for the journey the organisation selector follows.
 function levelHist(){

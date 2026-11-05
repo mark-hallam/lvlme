@@ -64,7 +64,7 @@ class RunPlanTests(unittest.TestCase):
         self.assertIn("Full run: judges 12 roles", text)
         self.assertIn("Light run: judges your top 3 by fit", text)
         self.assertNotRegex(text, r"\$|\btokens? (used|cost)|\d+ ?tokens|dollars?")
-        self.assertEqual(R.helpers(17, 3), {"roles": 17, "judges": 3, "reviewers": 2, "scouts": 3, "helpers": 8})
+        self.assertEqual(R.helpers(17, 3), {"roles": 17, "judges": 6, "reviewers": 2, "scouts": 3, "helpers": 11})
 
 
 if __name__ == "__main__":

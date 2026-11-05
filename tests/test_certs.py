@@ -21,8 +21,6 @@ import _common as C
 import claims_audit as CA
 import fetch_doors as FD
 import fetch_roles as FR
-import quick as QK
-import quick_posting as Q
 
 GH = "https://job-boards.greenhouse.io/acmeai/jobs/4200001"
 LINE = ("Your Python can't check website certificates. If you installed Python from python.org, run "
@@ -148,24 +146,6 @@ class ScriptTests(unittest.TestCase):
                       mock.patch("urllib.request.urlopen", Opener(always_fail=True))):
             patch.start()
             self.addCleanup(patch.stop)
-
-    def test_quick_posting_prints_one_plain_line(self):
-        err = io.StringIO()
-        with mock.patch("sys.stderr", err), mock.patch("sys.stdout", io.StringIO()):
-            code = C.run_main(Q.main, [GH], workspace_check=False)
-        self.assertEqual(code, 1)
-        self.assertEqual(err.getvalue(), "lvlme: " + LINE + "\n")
-
-    def test_lvlme_quick_new_prints_one_plain_line_and_writes_nothing(self):
-        parent = tempfile.mkdtemp(prefix="lvlme-quick-")
-        self.addCleanup(__import__("shutil").rmtree, parent, True)
-        err = io.StringIO()
-        with mock.patch("sys.stderr", err), mock.patch("sys.stdout", io.StringIO()):
-            code = C.run_main(QK.main, ["new", "--posting", GH, "--parent", parent, "--date", "2026-11-05"],
-                              workspace_check=False)
-        self.assertEqual(code, 1)
-        self.assertEqual(err.getvalue(), "lvlme: " + LINE + "\n")
-        self.assertEqual(os.listdir(parent), [])
 
     def test_job_boards_stop_with_the_line_instead_of_every_board_failed(self):
         with self.assertRaises(CT.CertificateProblem) as ctx:

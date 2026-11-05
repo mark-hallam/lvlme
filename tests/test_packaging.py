@@ -14,9 +14,11 @@ import unittest
 import helpers as H
 
 ROOT = H.ENGINE
-COMMANDS = {"lvlme", "lvlme-quick", "lvlme-interview", "lvlme-screen", "lvlme-audit", "lvlme-dashboard",
+COMMANDS = {"lvlme", "lvlme-interview", "lvlme-screen", "lvlme-audit", "lvlme-dashboard",
             "lvlme-autopilot", "lvlme-practice", "lvlme-debrief",
             "lvlme-public"}
+REMOVED = {"scripts/quick.py", "scripts/quick_posting.py", "scripts/_quick_html.py", "scripts/_promote.py",
+           "skills/lvlme-quick/SKILL.md", "schemas/quick.schema.json", "examples/build_quick_demo.py"}
 AGENTS = {"evidence-scout", "market-scout", "role-judge", "reviewer", "recruiter-screen"}
 INDEPENDENT = {"reviewer", "recruiter-screen"}
 AFTER_MERGE = {"method/INTERVIEW.md", "method/CONSISTENCY.md", "scripts/consistency_audit.py",
@@ -155,8 +157,6 @@ class ComponentTests(unittest.TestCase):
                 self.assertIs(data.get("disable-model-invocation"), True, rel)
             else:
                 self.assertNotIn("disable-model-invocation", data, rel)
-            if data["name"] == "lvlme-quick":
-                self.assertIn("run LVLme quick", data["description"])
             self.assertIn("${CLAUDE_PLUGIN_ROOT}", body, rel)
             names.add(data["name"])
         self.assertEqual(names, COMMANDS)
@@ -216,8 +216,8 @@ class DocTests(unittest.TestCase):
 
     def test_referenced_paths_exist(self):
         for doc, path in sorted(self.engine_paths()):
-            if path in AFTER_MERGE:
-                continue
+            if path in AFTER_MERGE or (doc == "CHANGELOG.md" and path in REMOVED):
+                continue   # the history may name a file that a later version removed
             with self.subTest(doc=doc, path=path):
                 self.assertTrue(os.path.exists(os.path.join(ROOT, path)), "%s names missing %s" % (doc, path))
 
@@ -317,12 +317,45 @@ class DocTests(unittest.TestCase):
 
 
 class NetworkTests(unittest.TestCase):
-    def test_only_four_scripts_can_reach_the_network(self):
-        """AGENTS.md: network calls only in fetch_roles.py, fetch_doors.py, claims_audit.py and quick_posting.py."""
+    def test_only_three_scripts_can_reach_the_network(self):
+        """AGENTS.md: network calls only in fetch_roles.py, fetch_doors.py and claims_audit.py."""
         net = re.compile(r"\b(urllib\.request|urlopen|http\.client|socket|ftplib|smtplib)\b")
         found = sorted(name for name in os.listdir(os.path.join(ROOT, "scripts"))
                        if name.endswith(".py") and net.search(read(os.path.join("scripts", name))))
-        self.assertEqual(found, ["claims_audit.py", "fetch_doors.py", "fetch_roles.py", "quick_posting.py"])
+        self.assertEqual(found, ["claims_audit.py", "fetch_doors.py", "fetch_roles.py"])
+
+
+class QuickRetiredTests(unittest.TestCase):
+    """LVLme quick was removed in 0.7.0: LVLme works with a goal. Nothing in the product may still offer it."""
+
+    # The only places that may say the words: the history, and the lines that route "run LVLme quick" to a goal.
+    ALLOWED = {"CHANGELOG.md", "SKILL.md", "AGENTS.md", os.path.join(".cursor", "rules", "lvlme-run.mdc")}
+
+    def test_no_quick_skill_command_script_schema_or_demo_is_left(self):
+        for rel in ("skills/lvlme-quick", "scripts/quick.py", "scripts/quick_posting.py", "scripts/_quick_html.py",
+                    "schemas/quick.schema.json", "examples/quick-demo", "examples/build_quick_demo.py",
+                    "docs/demo/quick", "tests/test_quick.py"):
+            self.assertFalse(os.path.exists(os.path.join(ROOT, rel)), rel)
+
+    def test_no_file_points_at_quick(self):
+        word = re.compile(r"quick[-_ ](?:demo|posting|result|mode)|lvlme[- ]quick|/quick/|quick\.py", re.I)
+        for base, dirs, files in os.walk(ROOT):
+            dirs[:] = [d for d in dirs if d not in (".git", "__pycache__")]
+            for name in files:
+                rel = os.path.relpath(os.path.join(base, name), ROOT)
+                if rel in self.ALLOWED or rel.startswith(os.path.join("docs", "RELEASE-")) or name == "test_packaging.py":
+                    continue
+                if not name.endswith((".md", ".py", ".json", ".mdc", ".html", ".txt")):
+                    continue
+                with open(os.path.join(base, name), encoding="utf-8", errors="ignore") as fh:
+                    self.assertIsNone(word.search(fh.read()), rel)
+
+    def test_the_words_run_lvlme_quick_route_to_setting_a_goal(self):
+        for rel in ("SKILL.md", "AGENTS.md"):
+            text = read(rel)
+            self.assertRegex(text, r"(?i)no quick mode", rel)
+            self.assertRegex(text, r"(?i)goal", rel)
+        self.assertFalse(re.search(r"skills/lvlme-quick", read("SKILL.md") + read("AGENTS.md")))
 
 
 if __name__ == "__main__":

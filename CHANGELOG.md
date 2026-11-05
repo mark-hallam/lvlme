@@ -8,6 +8,64 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## 0.7.0 (5 November 2026)
+
+LVLme now works with goals and campaigns only. This is the engine part of
+0.7.0: the scoring is steadier, and LVLme quick is gone. The scoring rules are
+now version 1.2. **This release changes how a score is worked out**: see
+Changed.
+
+Tests: 483 pass.
+
+### Added
+
+- **Every role shows a fit range.** Each role in the run file has `fit_low`
+  and `fit_high` beside `fit`, and so does each organisation's best role. They
+  are the fit with every factor at its lower judging and at its higher one. A
+  factor judged once has a range of one fit, so an older judgement file still
+  works.
+- **`judgings` on each judged factor.** Requirements match, proof of work and
+  organisation edge are judged twice, independently, and both scores are
+  recorded as `judgings: [first, second]` in `eval/judgements.json` and in the
+  run file.
+- **A test that keeps quick gone.** `tests/test_packaging.py` fails if a quick
+  skill, script, schema, demo or link comes back.
+
+### Changed
+
+These are the scoring rules version 1.2.
+
+- **Judge twice and average.** The agent judges D1, D2 and D4 twice, with two
+  helper agents or two passes that cannot see each other. Scoring caps each
+  judging on its own, then averages them to a whole point. A half always
+  rounds down: 3 and 4 give 3. A doubtful half point is not given. The
+  blind review and the rule that keeps a score when only the judging agent
+  changed work as before.
+- **A `score` beside `judgings` is the settled score.** After a blind review
+  settles a factor, the `score` written counts and the judgings only set the
+  range.
+- **Helper counts are doubled for judges.** `run_plan.py` now counts two
+  judges per batch of roles, so a first run of about 300 roles starts about
+  100 helper agents, not about 40.
+- **Plain words in what the person reads first.** The run message uses fit,
+  chance, level and next level, and the score summary names the interview and
+  offer chance and the fit range.
+- **A run says how much it varied.** The score summary prints the fit range
+  for any role judged twice.
+- **The demo is rebuilt** under the new rules, with one role judged twice.
+- **Version 0.7.0.**
+
+### Removed
+
+- **LVLme quick.** The `/lvlme-quick` command and skill, the quick scripts
+  (`quick.py`, `quick_posting.py`, `_promote.py`), its result page and schema,
+  its demo and screenshots, and every page of the docs that described it.
+  Someone who says "run LVLme quick" is told that LVLme now works with a goal
+  and is offered to set one. The scoring functions a campaign uses
+  (`score.py`, the job-board readers and the shared page style) stay; the
+  shared page style moved to `scripts/_page_html.py`. The demo CV moved to
+  `examples/demo-workspace/intake/sources/`.
+
 ## 0.6.3 (5 November 2026)
 
 Fixes from four end-to-end tests with real AI agents (a stranger installing

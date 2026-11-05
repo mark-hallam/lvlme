@@ -150,7 +150,7 @@ more than gaps, so these become top-priority actions.
 (Greenhouse, Ashby, Lever, Workday, SmartRecruiters, Workable, or `manual`;
 Workday names its careers page in `careers_url`). Workday, SmartRecruiters
 and Workable list titles only, so only the postings whose title fits a role
-family are read in full, with the readers quick uses (`scripts/_boards.py`);
+family are read in full, with the readers in `scripts/_boards.py`;
 the rest are listed as excluded. For each
 open role, `fetch_roles.py` extracts: family (keyword taxonomy per goal),
 locations and location class, remote flag and the board's workplace label (remote, hybrid or onsite), years required, degree requirement,

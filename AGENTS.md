@@ -12,10 +12,10 @@ version, and it runs the same procedure. Install notes for every agent:
 Cursor and other agents that run commands are not tested yet.
 
 **First check.** If the engine folder has no `skills/` folder (for example
-`skills/lvlme-quick/SKILL.md` is missing), a skill installer copied only part
+`skills/lvlme-interview/SKILL.md` is missing), a skill installer copied only part
 of it. Run `git -C <engine folder> sparse-checkout disable` to restore the
 rest. If the folder is not a git clone, ask the person, then clone it again
-with `git clone --branch v0.6.3 https://github.com/mark-hallam/lvlme <engine folder>`.
+with `git clone --branch v0.7.0 https://github.com/mark-hallam/lvlme <engine folder>`.
 
 ## Hard rules
 
@@ -127,11 +127,12 @@ cannot, run the same stages one after another; the gates do not change. See
 ## Entry points
 
 If the person asks for one part only, run only that part, with the hard rules:
-`quick` (honest odds for one posting from a link and a CV, in a couple of
-minutes: follow `skills/lvlme-quick/SKILL.md`), `interview` (stage 1), `audit`
+`interview` (stage 1), `audit`
 (the two audits), `screen` (the recruiter screen), `dashboard` (stage 9),
 `status` (stage 10 from the newest files, changing nothing), or `resume` (the
-first stage not yet done today).
+first stage not yet done today). LVLme has no quick mode: if the person asks
+to "run LVLme quick", say LVLme now works with a goal and offer to set one (the
+role, the organisations, where, and by when).
 
 ## Working on the engine itself
 
@@ -139,8 +140,7 @@ first stage not yet done today).
   in `fetch_roles.py` (public job-board APIs, or application programming
   interfaces), `fetch_doors.py` (public Luma calendar feeds the person
   named; never Meetup, Eventbrite or LinkedIn), `claims_audit.py`
-  (addresses the person passes) and `quick_posting.py` (the one posting
-  link the person gives LVLme quick).
+  (addresses the person passes).
 - Every script ends `sys.exit(C.run_main(main))`, so a failure reaches the
   person as one plain `lvlme:` line, never a traceback (a Python error
   listing). Read workspace JSON with `C.load_json`, which names the file, line

@@ -46,7 +46,7 @@ Download (clone) the folder anywhere you like, then add your copy as a
 marketplace and install the plugin from it:
 
 ```bash
-git clone --branch v0.6.3 https://github.com/mark-hallam/lvlme ~/lvlme-engine
+git clone --branch v0.7.0 https://github.com/mark-hallam/lvlme ~/lvlme-engine
 claude plugin marketplace add ~/lvlme-engine
 claude plugin install lvlme@lvlme
 ```
@@ -78,7 +78,6 @@ claude --plugin-dir /path/to/lvlme
 | Command | Does |
 |---|---|
 | `/lvlme` | Run LVLme, or resume today's run. Also `/lvlme status`. |
-| `/lvlme-quick` | LVLme quick: honest odds for one posting, from a link and your CV, in a couple of minutes. |
 | `/lvlme-interview` | The document-led career interview, first time or an update. |
 | `/lvlme-screen` | The independent recruiter screen against real postings. |
 | `/lvlme-audit` | The consistency audit (CV, LinkedIn, website, forms) and the public claims audit. |
@@ -130,25 +129,23 @@ a new test in chat.
 2. Choose **Add**, then **Add marketplace**, then **Add from repository**.
    Type `mark-hallam/lvlme`, choose it, and press **Sync**. Anthropic's
    notice says to add only marketplaces you trust.
-3. LVLme appears in the list. Press **Add**. The plugin holds 10 skills:
-   `/lvlme`, `/lvlme-quick`, `/lvlme-interview`, `/lvlme-screen`,
+3. LVLme appears in the list. Press **Add**. The plugin holds 9 skills:
+   `/lvlme`, `/lvlme-interview`, `/lvlme-screen`,
    `/lvlme-audit`, `/lvlme-dashboard`, `/lvlme-practice`, `/lvlme-debrief`,
    `/lvlme-public` and `/lvlme-autopilot`.
-4. In a new chat, type `/lvlme-quick`, choose it, then paste the posting
-   link and your CV text, and send.
+4. In a new chat, type `/lvlme`, choose it, then tell it your goal (the role
+   you want, at which organisations, where, and by when) and paste your CV
+   text, and send.
 
 Claude asks before each command it runs in its sandbox (choose **Allow
-once**). A run took about three minutes, and the result page opened beside
-the chat.
+once**).
 
 What to expect in chat:
 
-- **LVLme quick works.** It reads the posting, scores it with the same maths
-  and shares the result page.
-- **The blind reviewer**, when a score is above 2, is a helper agent, and
-  chat does not load helper agents. Start it in a new chat, as the quick
-  steps say. Until it has run, those scores count as 2, so a missing review
-  only ever lowers the odds.
+- **The helper agents** (the blind reviewer, and the two independent judges
+  for each role) are helper agents, and chat does not load them. Start the
+  review in a new chat, as the steps say. Until it has run, scores above 2
+  count as 2, so a missing review only ever lowers the odds.
 - **The full campaign belongs in Claude Code.** Chat runs LVLme in Claude's
   sandbox, not on your computer, so there is no private workspace to come
   back to next week.
@@ -165,13 +162,12 @@ folder you work in.
 - **As a skill:** run exactly this command:
 
   ```bash
-  git clone --branch v0.6.3 https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme
+  git clone --branch v0.7.0 https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme
   ```
 
   Do not use a skill installer instead: it copies only part of the folder
-  (it leaves out `skills/`, which LVLme quick needs). Then in Codex type
-  `$lvlme` (or pick it from `/skills`) and say "run LVLme quick" with a job
-  link, or "run LVLme".
+  (it leaves out `skills/`, which LVLme needs). Then in Codex type
+  `$lvlme` (or pick it from `/skills`) and say "run LVLme".
 - **In the engine folder:** open Codex in the cloned folder. It reads
   `AGENTS.md`, which runs the same procedure.
 
@@ -190,13 +186,11 @@ rules in `.cursor/rules/` should load on their own:
 - `lvlme-run.mdc` applies when you ask to run LVLme, or when you mention it
   with `@lvlme-run`.
 
-Cursor also reads `AGENTS.md`. Say "run LVLme quick" with a job link, or
-"run LVLme". If you try it, tell us how it went.
+Cursor also reads `AGENTS.md`. Say "run LVLme". If you try it, tell us how it went.
 
 ## Your first run
 
-Say "run LVLme quick" with a job link for one honest answer, or "run LVLme"
-for the full campaign. The full campaign's first message is short: it asks
+Say "run LVLme" and tell it your goal. The first message is short: it asks
 you to confirm three facts from your CV, which organisations you want, and
 for your LinkedIn data export. Every step of a first run, in order, is in
 ["First run"](../SKILL.md#first-run).
@@ -217,9 +211,9 @@ works:
 
   A new install by the old plugin name finds nothing: use `lvlme`, as in the
   commands at the top of this page.
-- **The commands.** `/climb`, `/climb-quick` and the rest are now `/lvlme`,
-  `/lvlme-quick` and so on, and the helper agents are `lvlme:reviewer` and so
-  on. Saying "run Climb" or "run Climb quick" still starts the same thing.
+- **The commands.** `/climb` and the rest are now `/lvlme`,
+  `/lvlme-interview` and so on, and the helper agents are `lvlme:reviewer` and so
+  on. Saying "run Climb" still starts the same thing.
 - **A cloned folder.** The repository address has not changed, so
   `git -C ~/.claude/skills/climb pull` keeps updating it. The skill inside is
   now called `lvlme`. In Codex, type `$lvlme`.

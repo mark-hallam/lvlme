@@ -110,7 +110,7 @@ class FirstMessageTests(unittest.TestCase):
         self.assertIsNone(re.search("[–—]", message))
         self.assertNotIn(" - ", message)
         self.assertIsNone(re.search(r"(?i)revolutioni[sz]e|transform|game-changer|next-generation|ai-powered", message))
-        cv = read("examples/quick-demo/inputs/cv-alex-example.md")
+        cv = read("examples/demo-workspace/intake/sources/cv-alex-example.md")
         for fact in ("Contoso Freight", "2021", "Bachelor of Business (Logistics)", "2015", "all 6 sites"):
             self.assertIn(fact, cv, "the example's facts come from the fictional demo CV")
             self.assertIn(fact, message)

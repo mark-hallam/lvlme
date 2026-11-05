@@ -1,4 +1,4 @@
-"""One job-board list for everything: a campaign reads Workday, SmartRecruiters and Workable boards as quick does.
+"""Job boards: a campaign reads Workday, SmartRecruiters and Workable boards.
 
 Those boards list titles only, so fetch_roles.py pages through the list,
 reads each posting whose title fits a role family, and lists the rest as
@@ -12,12 +12,11 @@ from unittest import mock
 import helpers as H
 import _boards as B
 import fetch_roles as F
-import quick_posting as QP
 import validate as V
 
 
 def fx(name):
-    return H.load(os.path.join(H.FIXTURES, "quick", name))
+    return H.load(os.path.join(H.FIXTURES, "boards", name))
 
 
 WORKDAY_URL = "https://globex.wd3.myworkdayjobs.com/en-AU/Globex_Careers"
@@ -27,14 +26,13 @@ TARGETS = [
     {"id": "sr", "name": "Initech Robotics", "ats": "smartrecruiters", "slug": "InitechRobotics"},
     {"id": "wk", "name": "Globex Labs", "ats": "workable", "slug": "globexlabs"},
 ]
-# The quick link for the same posting on each board.
-QUICK = {
-    "wd": ("https://globex.wd3.myworkdayjobs.com/en-AU/Globex_Careers" + WORKDAY_PATH, "workday-job.json"),
-    "sr": ("https://jobs.smartrecruiters.com/InitechRobotics/744000000004242-operations-program-lead-robot-fleets",
-           "smartrecruiters-posting.json"),
-    "wk": ("https://apply.workable.com/globexlabs/j/A1B2C3D4E5/", "workable-job.json"),
+# The address each board gives one posting's details at.
+DETAIL_URL = {
+    "wd": "https://globex.wd3.myworkdayjobs.com/wday/cxs/globex/Globex_Careers/job" + "/Australia-NSW-Sydney/Senior-Program-Manager--Fleet-Rollouts_JR0004242",
+    "sr": "https://api.smartrecruiters.com/v1/companies/InitechRobotics/postings/744000000004242",
+    "wk": "https://apply.workable.com/api/v2/accounts/globexlabs/jobs/A1B2C3D4E5",
 }
-LISTS = {  # one page of each board's job list: the posting quick reads, and one title that fits no family
+LISTS = {  # one page of each board's job list: the posting the campaign reads, and one title that fits no family
     "wd": {"total": 2, "jobPostings": [
         {"title": "Senior Program Manager, Fleet Rollouts", "externalPath": WORKDAY_PATH},
         {"title": "Payroll Specialist", "externalPath": "/job/Australia-NSW-Sydney/Payroll-Specialist_JR0009999"}]},
@@ -66,7 +64,7 @@ def answers(target):
     def fetch(where, body=None):
         if where in pages:
             return pages[where]
-        if where == QP.api_url(QP.parse_link(QUICK[tid][0])):
+        if where == DETAIL_URL[tid]:
             return fx(DETAILS[tid])
         raise AssertionError("asked for %s" % where)
     return fetch
@@ -162,16 +160,6 @@ class CampaignTests(unittest.TestCase):
         self.assertEqual(sorted((x["org"], x["title"]) for x in latest["excluded"]),
                          [("sr", "Payroll Specialist"), ("wd", "Payroll Specialist"), ("wk", "Payroll Specialist")])
         self.assertNotIn("endpoint_notes", latest["summary"])
-
-    def test_quick_and_the_campaign_read_a_posting_the_same_way(self):
-        roles = {r["org"]: r for r in self.run_main()["roles"]}
-        for tid, (link, saved) in QUICK.items():
-            quick, _ = QP.fetch(link, saved=os.path.join(H.FIXTURES, "quick", saved))
-            campaign = roles[tid]
-            self.assertEqual(quick["id"].split(":", 1)[1], campaign["id"].split(":", 1)[1], tid)
-            for key in ("title", "locations", "remote", "hard_requirements", "nice_to_haves", "responsibilities",
-                        "years_experience", "eligibility_blockers", "description_text"):
-                self.assertEqual(quick[key], campaign[key], "%s %s" % (tid, key))
 
     def test_a_board_that_fails_is_recorded_and_the_others_carry_on(self):
         os.remove(os.path.join(self.fx, "sr.json"))

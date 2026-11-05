@@ -11,7 +11,7 @@ run.
   facts about real companies.
 - **Standard library only.** Python 3.9 or newer, no third-party packages, no
   telemetry. Network calls belong only in `fetch_roles.py`,
-  `fetch_doors.py`, `claims_audit.py` and `quick_posting.py`. Board
+  `fetch_doors.py` and `claims_audit.py`. Board
   readers shared between them (`_boards.py`) and the calendar reader
   (`_doors.py`) parse answers and never fetch.
 - **Drafts only.** No feature may apply, send, post or change an account.
@@ -36,7 +36,6 @@ run.
 
    ```bash
    python3 examples/build_demo.py
-   python3 examples/build_quick_demo.py
    python3 examples/build_demo_site.py
    ```
 

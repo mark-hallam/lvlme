@@ -11,7 +11,7 @@ public job-board APIs, plus "manual" (roles typed into market/roles/manual.json)
 Greenhouse, Ashby and Lever give every posting in one answer. Workday,
 SmartRecruiters and Workable list titles only, so the list is read page by
 page and only the postings whose title fits a role family are read, with the
-same readers LVLme quick uses (scripts/_boards.py). Standard library only.
+readers in scripts/_boards.py. Standard library only.
 Read only: nothing is applied to or submitted, and no account is used.
 
 Usage

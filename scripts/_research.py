@@ -16,7 +16,7 @@ import html
 import _ai_policies as AIP
 import _common as C
 import _doors as DR
-import _quick_html as QH
+import _page_html as PH
 
 FOLDER = ("report", "research")
 SECTIONS = [("building", "What it is building"), ("news", "Recent news"), ("offices", "Offices"),
@@ -93,17 +93,17 @@ def pack(target, config, orgs_doc, roles_doc, doors_doc, today):
 def render(p, today, fictional=False):
     def src(x):
         s = x["source"] or ""
-        link = ('<a href="%s" target="_blank" rel="noopener noreferrer">source</a>' % QH.esc(s)
-                if s.startswith("https://") else QH.esc(s))
-        return "%s%s" % (link, ", %s %s" % (x["said"], QH.esc(QH.long_date(x["seen_on"]))) if x["seen_on"] else "")
+        link = ('<a href="%s" target="_blank" rel="noopener noreferrer">source</a>' % PH.esc(s)
+                if s.startswith("https://") else PH.esc(s))
+        return "%s%s" % (link, ", %s %s" % (x["said"], PH.esc(PH.long_date(x["seen_on"]))) if x["seen_on"] else "")
     cards = "".join(
-        '<section class="card"><h2>%s</h2><ul class="rows">%s</ul></section>' % (QH.esc(title), "".join(
+        '<section class="card"><h2>%s</h2><ul class="rows">%s</ul></section>' % (PH.esc(title), "".join(
             '<li><div class="row-h"><h3 style="font-weight:500">%s</h3>%s</div><p class="tiny sub">%s</p></li>' % (
-                QH.esc(x["text"]), "" if x["checked"] else QH.chip("Not yet checked", "s"), src(x))
+                PH.esc(x["text"]), "" if x["checked"] else PH.chip("Not yet checked", "s"), src(x))
             for x in lines)) for title, lines in p["sections"])
     demo = '<span class="sep"> · </span><span class="nw">fictional demo</span>' if fictional else ""
     head = ('<section class="card"><div class="eyebrow">Research pack</div><h1>%s</h1><p class="small sub">%s</p>%s</section>'
-            % (QH.esc(p["name"]), QH.esc(NOTE), '<p class="small">%d line%s not yet checked.</p>' % (
+            % (PH.esc(p["name"]), PH.esc(NOTE), '<p class="small">%d line%s not yet checked.</p>' % (
                 p["unchecked"], "" if p["unchecked"] == 1 else "s") if p["unchecked"] else ""))
     return ("<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">"
             "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
@@ -113,7 +113,7 @@ def render(p, today, fictional=False):
             "<span class=\"sub\"><span class=\"nw\">%s</span>%s</span></header><main>%s%s</main>"
             "<footer><a href=\"../index.html\">Back to the dashboard</a>. Public sources only; nothing about named "
             "people.</footer></div></body></html>\n" % (
-                QH.esc(p["name"]), QH.CSS, QH.LOGO, QH.esc(QH.long_date(today)), demo, head, cards))
+                PH.esc(p["name"]), PH.CSS, PH.LOGO, PH.esc(PH.long_date(today)), demo, head, cards))
 
 
 def write_all(ws, config, orgs_doc, roles_doc, doors_doc, today):

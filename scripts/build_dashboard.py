@@ -495,8 +495,8 @@ def build_market(data, roles, groups, group_of, locations, home):
         "new": len(summ.get("new_role_ids") or []), "closed": len(summ.get("closed_role_ids") or []),
         "blocked": sum(1 for x in roles if x["blocked"]),
         "byLocation": {k: sum(1 for x in roles if x["lc"] == k) for k in locations},
-        # from the job-board summary when there is one; else counted from the roles themselves (a campaign made
-        # from a LVLme quick result has roles but no board summary yet)
+        # from the job-board summary when there is one; else counted from the roles themselves (a campaign with
+        # roles added by hand has roles but no board summary yet)
         "byOrgFamily": {o: {f: (matched[o].get(f, 0) if o in matched else
                                 sum(1 for x in roles if x.get("org") == o and x.get("family") == f))
                             for f in data.fam_names} for o in data.targets},

@@ -37,12 +37,10 @@
   A missing hard requirement can move Very low down to Almost none. The five
   fit levels are unchanged. Applications already recorded keep the bands they
   were given on the day.
-- B5: every gap and every quick fix says what kind it is: Show it (the proof
-  is missing, usually days) or Build it (the skill is missing, usually weeks
-  or months). A missing kind counts as Build it, with a warning. In LVLme
-  quick, the shown fixes list Show it first; which fixes are shown, and the
-  points, are worked out as before. The campaign shows the label next to each
-  gap; its plan order is unchanged.
+- B5: every gap says what kind it is: Show it (the proof is missing, usually
+  days) or Build it (the skill is missing, usually weeks or months). A missing
+  kind counts as Build it, with a warning. The campaign shows the label next
+  to each gap; its plan order is unchanged.
 - B6: when a role's requirements match, proof of work or organisation edge is
   judged again by a different AI agent (from `judged_by`) and the evidence it
   cites is unchanged (same ids, levels and claims), the previous score stands,
@@ -175,11 +173,9 @@ person's stated work rights and willingness to move. Use these anchors:
 
 Set one entry per location class in `D6_rules.classes`. `scripts/score.py`
 picks the best class among the role's locations (enforced). A judgement can
-set `location_class` to override the automatic choice. In a full campaign, a
+set `location_class` to override the automatic choice. A
 location class with no rule scores 0, and `scripts/validate.py` warns with the
-class name. LVLme quick has no rules file, so its judge and reviewer score the
-posting's location against what the person said using this table. A quick
-reviewer must not score D6 as 0 only because no rules file exists.
+class name.
 
 ## Links and checkable evidence
 

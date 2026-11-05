@@ -18,7 +18,6 @@ import helpers as H
 import _common as C
 
 SCRIPTS = os.path.join(H.ENGINE, "scripts")
-QUICK_DEMO = glob.glob(os.path.join(H.ENGINE, "examples", "quick-demo", "2026-*"))[0]
 # Scripts that read a workspace, with the extra arguments each one needs to get that far.
 WORKSPACE_SCRIPTS = {
     "validate.py": [],
@@ -144,50 +143,7 @@ class BadJson(Script):
         res = self.run_script("score.py", "--workspace", ws)
         self.assert_one_line(res, r"config\.json: not valid JSON \(it is not UTF-8 text\)")
 
-    def test_a_broken_quick_file_stops_the_build_plainly(self):
-        folder = os.path.join(tmpdir(self), "quick")
-        shutil.copytree(QUICK_DEMO, folder)
-        with open(os.path.join(folder, "eval", "quick.json"), "w", encoding="utf-8") as fh:
-            fh.write('{"factors": ')
-        for cmd in ("build", "review-items"):
-            with self.subTest(cmd=cmd):
-                res = self.run_script("quick.py", cmd, "--folder", folder)
-                self.assert_one_line(res, r"^lvlme: .*eval/quick\.json: not valid JSON \(line 1, column 13")
-        with open(os.path.join(folder, "config.json"), "w", encoding="utf-8") as fh:
-            fh.write("{")
-        res = self.run_script("quick.py", "build", "--folder", folder)
-        self.assert_one_line(res, r"^lvlme: .*config\.json: not valid JSON")
-
-
 class MissingFiles(Script):
-    def test_posting_text_that_is_not_there(self):
-        res = self.run_script("quick_posting.py", "--text", "missing.txt")
-        self.assert_one_line(res, r"^lvlme: missing\.txt: no posting text file at this path\. "
-                                  r"Check the path, then run this again\.$")
-
-    def test_a_saved_response_that_is_not_there(self):
-        res = self.run_script("quick_posting.py", "--saved", "missing.json", "https://boards.greenhouse.io/acme/jobs/1")
-        self.assert_one_line(res, r"^lvlme: No saved response at missing\.json\.")
-
-    def test_quick_checks_every_named_file_before_writing_a_folder(self):
-        posting = os.path.join(self.home, "posting.txt")
-        with open(posting, "w", encoding="utf-8") as fh:
-            fh.write("Program Manager\n\nWe are hiring a program manager to run delivery for our agents team. " * 3)
-        folder = os.path.join(self.home, "quick-folder")
-        cases = [
-            (["--posting-text", "missing.txt"], r"^lvlme: missing\.txt: no posting text file at this path\."),
-            (["--posting-text", posting, "--cv", "missing-cv.pdf"], r"^lvlme: no CV file at missing-cv\.pdf\."),
-            (["--posting-text", posting, "--cv-text", "missing-cv.txt"],
-             r"^lvlme: missing-cv\.txt: no CV text file at this path\."),
-            (["--posting-text", self.home], r"^lvlme: .*: this is a folder, not a posting text file\."),
-        ]
-        for extra, pattern in cases:
-            with self.subTest(args=extra):
-                res = self.run_script("quick.py", "new", "--title", "Program Manager", "--org", "Acme AI",
-                                      "--folder", folder, *extra)
-                self.assert_one_line(res, pattern)
-                self.assertFalse(os.path.exists(folder), "nothing is written when an input is missing")
-
     def test_a_linkedin_export_that_is_not_there(self):
         ws = H.copy_demo(self)
         res = self.run_script("network_map.py", "--workspace", ws, "--csv", "missing.csv")

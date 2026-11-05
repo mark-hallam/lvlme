@@ -20,8 +20,7 @@ from that folder, with `--workspace <workspace>` found as the engine's
 
 ## Turning it on
 
-Needs a workspace with a scored run (a full `/lvlme` run, or LVLme quick
-promoted to a campaign). If there is none, say so and offer to start one.
+Needs a workspace with a scored run (a full `/lvlme` run). If there is none, say so and offer to start one.
 
 1. **Show what will run, in plain words** (one short message):
    - when: weekly on a day and time they choose (default Monday 7am, their

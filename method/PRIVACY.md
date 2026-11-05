@@ -123,12 +123,6 @@ sensitive, the agent does not record it.
 - `fetch_doors.py` reads only the public calendar feeds you list in
   `doors.calendars`, and never a Meetup, Eventbrite or LinkedIn address.
 - `claims_audit.py` fetches only the addresses you pass it.
-- `quick_posting.py` (LVLme quick) fetches only the one posting link you give
-  it: through the public job-board API for Greenhouse, Ashby, Lever, Workday,
-  SmartRecruiters and Workable links, otherwise the page itself, once. For a
-  Workable link it also reads the employer's public account details, for the
-  name the employer uses, and follows a short `apply.workable.com/j/` link
-  once to find the employer. It never opens LinkedIn.
 - No other script uses the network.
 
 ## What the engine never does

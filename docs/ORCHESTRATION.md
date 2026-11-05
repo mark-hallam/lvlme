@@ -242,8 +242,9 @@ person sends or makes themselves.
 
 - **Default:** weekly, at `cadence.run_time` in `candidate.timezone`, plus
   a run whenever something changes (an action done, new evidence, a new
-  export). Scores only move when evidence changes, and a full run can start
-  about 40 helper agents (for around 300 open roles). The person decides the
+  export). Scores only move when evidence changes, and a first full run can
+  start about 100 helper agents (for around 300 open roles: two judges per
+  batch of 8, about one reviewer per two batches, and a scout per organisation). The person decides the
   rhythm; never change the schedule yourself.
 - **One run file per run:** `scripts/score.py` writes
   `eval/runs/<YYYY-MM-DD>.json`. A second run on the same day replaces that

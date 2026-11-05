@@ -11,7 +11,6 @@ import autopilot
 import applications
 import build_dashboard
 import run_plan
-import _quick_html as QH
 
 ROOT = H.ENGINE
 
@@ -38,11 +37,6 @@ class A9Docs(unittest.TestCase):
     def test_install_docs_do_not_claim_plain_plugin_list_shows_path(self):
         for rel in ("README.md", "docs/INSTALL.md", "agents.md"):
             self.assertNotRegex(read(rel), r"claude plugin list.{0,120}Path")
-
-    def test_quick_requirement_note_is_lowercase_and_has_no_period_inside_parentheses(self):
-        text = QH.adjustments({"adjustments": ["Hard requirement lacking"],
-                               "hard_requirement_note": "The posting asks for a quota-carrying sales."})[0]
-        self.assertIn("missing (the posting asks for a quota-carrying sales),", text)
 
 
 class A9Campaign(unittest.TestCase):

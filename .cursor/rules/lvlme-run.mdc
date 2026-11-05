@@ -1,5 +1,5 @@
 ---
-description: How to run, resume or update a LVLme career campaign, or one part of it (LVLme quick for one posting, interview, consistency audit, recruiter screen, dashboard). Use when the person asks to run LVLme (or Climb, its old name), asks how likely they are to get a kind of job, or wants their CV, LinkedIn or website checked.
+description: How to run, resume or update a LVLme career campaign, or one part of it (interview, consistency audit, recruiter screen, dashboard). Use when the person asks to run LVLme (or Climb, its old name), asks how likely they are to get a kind of job, or wants their CV, LinkedIn or website checked.
 alwaysApply: false
 ---
 
@@ -31,8 +31,5 @@ Follow `SKILL.md` in this folder exactly. It is the full procedure, and
    `open <workspace>/report/index.html`. The first time, also point them to
    the plain-English guide, `docs/for-you/READING-YOUR-DASHBOARD.md`.
 
-For one part only, the person may ask for: quick (honest odds for one
-posting from a link and a CV, in a couple of minutes: follow
-`skills/lvlme-quick/SKILL.md`, and run its blind review in a new chat),
-interview, audit, screen, dashboard, status, or resume (see "Entry points" in
-`SKILL.md`).
+For one part only, the person may ask for: interview, audit, screen, dashboard, status, or resume (see "Entry points" in
+`SKILL.md`). LVLme has no quick mode: if the person asks to "run LVLme quick", say LVLme now works with a goal and offer to set one.

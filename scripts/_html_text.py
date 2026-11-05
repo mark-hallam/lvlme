@@ -1,4 +1,4 @@
-"""Posting HTML as plain text blocks, shared by fetch_roles.py, quick_posting.py and _boards.py.
+"""Posting HTML as plain text blocks, shared by fetch_roles.py and _boards.py.
 
 blocks_of turns a posting's HTML into (kind, text, all_bold) blocks, where kind
 is h (a heading), li (a list item) or p; clean folds white space. No network.

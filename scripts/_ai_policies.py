@@ -1,10 +1,9 @@
-"""Employers' own published rules on candidates' use of AI, as LVLme quick shows them.
+"""Employers' own published rules on candidates' use of AI, as the research pages show them.
 
 Each entry was read on the employer's own page, at `source`, on `checked_on`.
 Never add one from anywhere else, and never assume one employer's rules apply
-to another (method/CAMPAIGN.md). LVLme quick puts the entry on its target as
-`ai_policy`, the same field a campaign's config.json uses, so the brief and
-the message say plainly what the employer asks.
+to another (method/CAMPAIGN.md). A target's `ai_policy` in config.json overrides the entry, so the brief and
+the research page say plainly what the employer asks.
 """
 
 KNOWN = {

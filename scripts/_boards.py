@@ -1,10 +1,9 @@
-"""Workday, SmartRecruiters and Workable postings, read the same way by LVLme quick and the full campaign.
+"""Workday, SmartRecruiters and Workable postings, read by the campaign.
 
 Each reader turns one posting from a board's public API answer into the
-posting shape fetch_roles.py builds a role from (`_base`). quick_posting.py
-uses them for the one link the person gives; fetch_roles.py uses them for
-every matching posting on a target's board. No network calls here: the two
-scripts that may reach the network fetch the answers and pass them in.
+posting shape fetch_roles.py builds a role from (`_base`). fetch_roles.py uses
+them for every matching posting on a target's board. No network calls here:
+fetch_roles.py fetches the answers and passes them in.
 """
 import html
 import re
@@ -262,7 +261,7 @@ def list_total(target, data):
 
 
 def detail_url(link):
-    """The public API address of one listed posting (the same one LVLme quick reads for a link)."""
+    """The public API address of one listed posting."""
     board, job = urllib.parse.quote(link["board"], safe=""), urllib.parse.quote(link["job_id"], safe="")
     if link["ats"] == "workday":
         return "https://%s/wday/cxs/%s/%s/job/%s" % (link["host"], board, urllib.parse.quote(link["site"], safe=""),

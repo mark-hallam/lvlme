@@ -17,7 +17,7 @@ below are relative to it. Workspace paths are relative to the person's
 workspace.
 
 **First check.** If the engine folder has no `skills/` folder (for example
-`skills/lvlme-quick/SKILL.md` is missing), a skill installer copied only part
+`skills/lvlme-interview/SKILL.md` is missing), a skill installer copied only part
 of it. Run `git -C <engine folder> sparse-checkout disable` to restore the
 rest. If the folder is not a git clone, ask the person, then clone it again
 with `git clone https://github.com/mark-hallam/lvlme <engine folder>`.
@@ -86,7 +86,7 @@ of the `/lvlme-*` commands), run only that part, with the hard rules.
 | Asked for | Do |
 |---|---|
 | `/lvlme`, `/lvlme run`, "run LVLme" (or the old name, "run Climb") | A full run, stages 1 to 10. If today's run stopped part way, resume it. |
-| `/lvlme quick`, `/lvlme-quick`, "run LVLme quick" (or "run Climb quick"), or one job link with a CV | LVLme quick: honest odds for that one posting in a couple of minutes. Follow `skills/lvlme-quick/SKILL.md`. Its folder, `~/lvlme-workspaces/quick/` (or `~/climb-workspaces/quick/` while only the old folder exists), is not a campaign workspace. |
+| "run LVLme quick", `/lvlme quick`, `/lvlme-quick` (or the old "run Climb quick"), or one job link with a CV | There is no quick mode any more: LVLme works with a goal. Say so in one plain sentence, then offer to set the goal: the role they want, at which organisations, where, and by when, and start the first run below. If they gave a job link, offer to use that role as the first role in the goal. Do not score the one posting on its own. |
 | `/lvlme resume` | Resume today's run at the first stage not yet done (see "Resume" in `docs/ORCHESTRATION.md`). |
 | `/lvlme interview`, `/lvlme-interview` | Stage 1 only. |
 | `/lvlme audit`, `/lvlme-audit` | The claims and consistency audits from stage 4. |
@@ -101,7 +101,7 @@ of the `/lvlme-*` commands), run only that part, with the hard rules.
   setting's name before Climb became LVLme) still counts.
 - Otherwise look in `~/lvlme-workspaces/`, or in `~/climb-workspaces/` if only
   that older folder exists. One campaign folder there (a folder with a
-  `config.json`; the `quick` folder is not one): use it.
+  `config.json`): use it.
   Several: ask which goal.
 - None: this is a first run. Follow "First run" below.
 - Run `python3 scripts/validate.py --workspace <path>` before and after
@@ -126,12 +126,8 @@ other file that describes a first run links here.
 2. **The first message**, about 120 words at most (`method/INTERVIEW.md`,
    "The first message"): confirm three facts from the CV, ask which
    organisations they want, and ask for the LinkedIn data export. No CV yet?
-   Ask for it instead of the three facts. If they ran LVLme quick, start from
-   it instead: `python3 scripts/quick.py promote --folder <quick folder>
-   --goal "<goal>"` carries its evidence, posting, judgements and fixes (as
-   the plan's first actions) into the new workspace, so the first score
-   comes at once; the interview then adds targets in short rounds, and the
-   LinkedIn export can arrive later.
+   Ask for it instead of the three facts. The interview adds targets in
+   short rounds, and the LinkedIn export can arrive later.
    Already use career-ops? Once the targets are in `config.json` (step 3),
    offer `python3 scripts/import_career_ops.py --from <its folder> --dry-run`,
    show the person what it would bring in, and run it without `--dry-run`
@@ -254,7 +250,7 @@ rights question when `fetch_roles.py` first finds an open role that needs it.
 Run `python3 scripts/fetch_roles.py`. Note new and closed roles. Join the
 market scouts' sourced facts (offices in the person's region, growing teams,
 events, partner programmes) into `market/orgs.json`. It reads all six
-boards LVLme quick reads; roles from any other careers site go in
+boards; roles from any other careers site go in
 `market/roles/manual.json`.
 
 Then find doors: run `python3 scripts/fetch_doors.py`, which reads the
@@ -333,7 +329,7 @@ active and park the rest with status `later`; update the north-star metrics. Dra
 
 ### 9. Report
 
-`python3 scripts/build_dashboard.py`. It shows the climb, the current level
+`python3 scripts/build_dashboard.py`. It shows the current level
 and the next-level actions (see `docs/LEVELS.md`). Open `report/index.html`
 only if a browser is available, to check it renders.
 
@@ -341,7 +337,12 @@ only if a browser is available, to check it renders.
 
 Under 150 words, plain English:
 
-- The outlook band and any change since the last run.
+- Where they stand, in these four words and no others for it: their **level**
+  and **fit** on the best role (with the fit range from the two judgings,
+  for example "fit 41, between 38 and 44"), their **chance** of an interview
+  and of an offer, and what it takes to reach the **next level**. Say what
+  changed since the last run. Use no other words for these (no rank or
+  tier names, no flying words).
 - Today's 1 to 3 actions (the top of the plan).
 - Anything that needs their answer or their yes.
 - The dashboard path, as a command they can run:
@@ -363,8 +364,8 @@ On the weekly comparison day, also write `campaign/weekly/<date>.md` (see
 ## Cadence
 
 Weekly, plus a run whenever something changes: an action done, new evidence,
-a new export. Scores only move when evidence changes, and a full run can
-start about 40 helper agents (for around 300 open roles), so a run with
+a new export. Scores only move when evidence changes, and a first full run can
+start about 100 helper agents (for around 300 open roles, two judges per batch), so a run with
 nothing new costs a lot and moves nothing. Each run writes one run file,
 `eval/runs/<date>.json`. The person decides the rhythm (`cadence.mode`);
 never change the schedule yourself. A run with nobody

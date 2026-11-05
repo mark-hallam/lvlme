@@ -543,9 +543,11 @@ def main(argv=None):
     print("Wrote eval/runs/%s.json: %d roles (%d not yet judged, %d awaiting review)"
           % (run_date, n["roles"], n["not_judged"], n["awaiting_review"]))
     names = C.target_names(config)
+    print("  Fit (range)      Interview chance / offer chance")
     for r in run["roles"][:10]:
-        print("  %5.1f  %-9s %-9s %-14s %s" % (r["fit"], r["interview_band"], r["offer_band"],
-                                              names.get(r["org"], r["org"])[:14], r["title"]))
+        spread = "" if r["fit_low"] == r["fit_high"] == r["fit"] else " (%g to %g)" % (r["fit_low"], r["fit_high"])
+        print("  %5.1f%-14s %-11s %-11s %-14s %s" % (r["fit"], spread, r["interview_band"], r["offer_band"],
+                                                 names.get(r["org"], r["org"])[:14], r["title"]))
     for w in run["warnings"]:
         print("WARNING: " + w, file=sys.stderr)
     return 0

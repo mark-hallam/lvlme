@@ -100,7 +100,7 @@ class CursorUntested(unittest.TestCase):
         """Every current doc: Markdown, Cursor rules and the demo page builder (history and the built demo excluded)."""
         out = []
         for base, dirs, files in os.walk(ROOT):
-            dirs[:] = [d for d in dirs if d not in (".git", "demo", "demo-workspace", "quick-demo", "tests")]
+            dirs[:] = [d for d in dirs if d not in (".git", "demo", "demo-workspace", "tests")]
             for name in files:
                 rel = os.path.relpath(os.path.join(base, name), ROOT)
                 if rel in ("CHANGELOG.md", os.path.join("docs", "RELEASE-0.3.0.md")):

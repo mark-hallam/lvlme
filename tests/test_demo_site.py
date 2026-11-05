@@ -1,6 +1,6 @@
 """The static demo folder (docs/demo/): fictional only, self-contained, true to the demos and kept up to date.
 
-examples/build_demo_site.py copies the two fictional demo pages and writes an
+examples/build_demo_site.py copies the fictional demo page and writes an
 index page. These tests build it into a temporary folder, offline, and check
 that the copies are exact, every link on the index works, nothing is loaded
 from anywhere, a workspace not marked fictional is refused, the index's numbers
@@ -17,14 +17,14 @@ from html.parser import HTMLParser
 from unittest import mock
 
 import helpers as H
-import _quick_html as QH
-import test_quick_page_a11y as A11Y
+import _page_html as PH
+import test_page_a11y as A11Y
 
 sys.path.insert(0, os.path.join(H.ENGINE, "examples"))
 import build_demo_site as S  # noqa: E402
 
 COMMITTED = os.path.join(H.ENGINE, "docs", "demo")
-FILES = ["index.html", os.path.join("quick", "index.html"), os.path.join("dashboard", "index.html")]
+FILES = ["index.html", os.path.join("dashboard", "index.html")]
 FILES += [os.path.join("dashboard", "research", "%s.html" % o) for o in ("acme", "globex", "initech")]
 
 
@@ -123,17 +123,12 @@ class FictionalOnlyTests(unittest.TestCase):
 
 class IndexPageTests(Base):
     def test_numbers_match_the_demos(self):
-        result = H.load(os.path.join(S.QD.folder_for(), "result.json"))
         dash = H.load(os.path.join(H.DEMO, "report", "for-agents", "dashboard.json"))
         best = dash["levels"]["best_role"]
         text = " ".join(parse(self.index).text)
-        self.assertIn("fit %d of 100 now, up to %d" % (result["fit"], result["if_unchecked_strong"]["fit"]), text)
-        self.assertIn("Interview chance %s, offer chance %s" % (
-            result["interview_band"].lower(), result["offer_band"].lower()), text)
-        self.assertIn("%s at %s" % (result["role"]["title"], result["role"]["org_name"]), text)
         self.assertIn("best match %s" % best["title"], text)
         self.assertIn("Level %d, %s" % (best["level"], best["band"]), text)
-        self.assertIn(QH.long_date(dash["run_date"]), text)
+        self.assertIn(PH.long_date(dash["run_date"]), text)
 
     def test_says_it_is_fictional_and_names_every_made_up_name(self):
         text = " ".join(parse(self.index).text)
@@ -155,10 +150,10 @@ class IndexPageTests(Base):
         for word in ("revolutioni", "game-changer", "next-generation", "AI-powered", "Climb"):
             self.assertNotIn(word.lower(), text.lower())
 
-    def test_colours_are_the_quick_pages_tested_tokens(self):
-        """The index adds layout only, so the quick page's contrast checks cover it in every theme."""
-        extra = S.CSS[len(QH.CSS):]
-        self.assertTrue(S.CSS.startswith(QH.CSS))
+    def test_colours_are_the_shared_pages_tested_tokens(self):
+        """The index adds layout only, so the shared page's contrast checks cover it in every theme."""
+        extra = S.CSS[len(PH.CSS):]
+        self.assertTrue(S.CSS.startswith(PH.CSS))
         self.assertNotRegex(extra, r"#[0-9a-fA-F]{3,6}\b|rgba?\(")
         for theme, t in A11Y.themes().items():
             for fg, bg in (("ink", "card"), ("sub", "card"), ("sub", "bg"), ("accent", "card"), ("ink", "bg")):

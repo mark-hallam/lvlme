@@ -1,93 +1,12 @@
 # How LVLme works
 
-The README is the front door. This page holds the detail: LVLme quick step by
-step, the full campaign, the honesty rules, privacy, the dashboard, the demo,
+The README is the front door. This page holds the detail: the campaign, the honesty rules, privacy, the dashboard, the demo,
 running the scripts by hand, and where everything lives.
 
 LVLme runs on your own computer, through an artificial intelligence (AI) agent
 such as Claude Code or Codex (Cursor and other agents that run commands should
 work but are not tested yet). The agent does the judging; the Python
 scripts only do the arithmetic, so without an agent every role scores zero.
-
-## LVLme quick: one job, a couple of minutes
-
-Say "run LVLme quick" (or `/lvlme-quick`) and give two things: one job posting
-link, or the posting text, and your CV (short for curriculum vitae: a file, or
-pasted text). The steps are in
-[`skills/lvlme-quick/SKILL.md`](../skills/lvlme-quick/SKILL.md):
-
-1. **The posting.** `scripts/quick_posting.py` reads Greenhouse, Ashby,
-   Lever, Workday, SmartRecruiters and Workable links through their public job-board
-   APIs (application programming interfaces, the feeds job boards publish). A
-   Workday careers page holds only a flat summary, so the feed gives the full
-   posting with its headings, which is how its requirements are found, and
-   the employer's everyday name rather than the legal entity Workday lists. A
-   SmartRecruiters page (used by Canva, ServiceNow and Bosch, among others)
-   opens with the employer's welcome, so the posting API is read instead: the
-   job description and qualifications come first and the welcome last, where
-   it is never mistaken for a requirement, with the city, whether the role is
-   hybrid or remote, and the date it was posted. A Workable page (used by
-   Hugging Face, among others) is drawn in the browser and holds no posting
-   text at all, so its job feed is read: the description, the requirements
-   under their own heading, and the benefits last, never as requirements,
-   with the employer's name as the employer writes it. Any other link
-   is fetched once as a public page, using the job details many careers sites
-   build into the page when they are there. If the page gives too little text
-   (many sites draw the page in the browser), you paste the text instead. LinkedIn links are
-   refused: LVLme never opens LinkedIn.
-2. **Your evidence.** The agent turns your CV into a few evidence items, each
-   marked on the verification ladder (below). A line on a CV alone is
-   self-reported. If your CV links to public work, such as a repository, the
-   agent may open up to three such links, read only, to check them.
-3. **One or two questions.** Always: do you know someone there who has seen
-   your work and would vouch for you? (yes or no). Work rights only if your CV
-   and the posting do not settle them.
-4. **The judging.** Five of the seven factors: requirements match, proof of
-   work, warm path, organisation-specific edge, and eligibility and logistics.
-   Public signal and application readiness need more than one posting and a
-   CV, so the answer shows them as not checked and gives the fit as a range:
-   today's fit, which counts them 0 as anything without evidence does, up to
-   the fit if both turned out strong (in the demo, 41 today, up to 56). The
-   odds are always today's.
-5. **The blind second opinion.** For every score above 2, one fresh reviewer,
-   given only the rubric, your evidence and the posting, scores it for itself.
-   If the two agree, the score stands. If they disagree, the disagreement is
-   logged and the score counts as 2, the rule for a dispute still waiting for
-   its tie-break. The full campaign runs that tie-break.
-6. **The maths.** `scripts/quick.py build` scores with the campaign's own code
-   (`scripts/score.py`): the evidence caps, the review cap, the hard
-   requirement and eligibility rules, the fit and the bands.
-7. **The fixes.** The agent proposes fixes; the script measures each with the
-   same maths, caps it at what can realistically change in a few months (the
-   dashboard's projection caps), and keeps the three that add the most fit
-   points. Each comes with one concrete next step.
-
-The result is a one-page `index.html` and a short message:
-
-![LVLme quick's result page for the fictional demo, light theme](images/quick-result-desktop.png)
-
-<img src="images/quick-result-phone.png" alt="The same page on a phone" width="320">
-
-The page is light by default, with a dark mode that follows your device.
-Every piece of text passes WCAG AA contrast (the usual web accessibility
-standard) in both. If your device's "increase contrast" setting is on, the
-grey text takes the main text colour and the dividers get darker. In a Windows
-contrast theme the meters, score dots and fit bar keep their shape. Headings
-come in order and each card is named by its heading, so a screen reader can
-jump between them. `tests/test_quick_page_a11y.py` checks all of this.
-
-LVLme quick gives fixes and a brief, never application answers. Some
-employers publish guidance on how candidates may use AI when applying; check
-theirs, and write your answers in your own words.
-
-Its files live in `~/lvlme-workspaces/quick/<date>-<organisation>-<title>/`
-(or, when `LVLME_HOME` is set, in a `quick/` folder next to the workspace it
-names), never in this repository. To go deeper, say "run LVLme": the full campaign
-below.
-
-The demo is in `examples/quick-demo/`: the fictional Alex Example asks about a
-made-up Globex Labs posting. Rebuild it offline with
-`python3 examples/build_quick_demo.py`.
 
 ## The full campaign
 
@@ -154,9 +73,8 @@ saves one dated run file, so your progress is a record, not a claim. Details:
 
 ### What a run uses
 
-LVLme quick starts one helper agent, the blind reviewer, and only when a
-score is above 2. A full run starts many helper agents: about 40 for a goal
-with around 300 open roles (one role judge per batch, plus scouts and
+A full run starts many helper agents: about 100 on a first run for a goal
+with around 300 open roles (two independent role judges per batch, plus scouts and
 reviewers). That is a noticeable share of an AI plan's usage, so check your
 plan's limits before you schedule runs.
 
@@ -213,7 +131,7 @@ Most career advice flatters. LVLme is built to do the opposite.
 
 - **Your data never lives in this repository.** The first run creates a
   private workspace folder on your own machine, by default
-  `~/lvlme-workspaces/<goal>` (LVLme quick uses `~/lvlme-workspaces/quick/`).
+  `~/lvlme-workspaces/<goal>`.
   Only you can open it.
 - The scripts refuse to work on a workspace inside this repository, or inside
   any git repository (a version-controlled folder) that has a remote, meaning
@@ -236,8 +154,7 @@ Most career advice flatters. LVLme is built to do the opposite.
   names and salary figures out of the briefing files written for other agents.
 - No telemetry. The only network calls are to public job-board APIs in
   `fetch_roles.py`, the public event calendars you name in `fetch_doors.py`
-  (never Meetup, Eventbrite or LinkedIn), the one posting link you give
-  `quick_posting.py`, the web pages you name in `claims_audit.py`, and the
+  (never Meetup, Eventbrite or LinkedIn), the web pages you name in `claims_audit.py`, and the
   sources you approve for your agent to read.
 
 Full details: [`method/PRIVACY.md`](../method/PRIVACY.md).
@@ -313,8 +230,7 @@ JavaScript Object Notation, a plain-text data format).
 `examples/demo-workspace/` is a complete, built example for a **fictional**
 person, Alex Example, who targets three made-up organisations (Acme AI, Globex
 Labs and Initech Robotics). Nothing in it describes a real person or a real
-company's hiring. `examples/quick-demo/` is the same person's LVLme quick
-answer for one made-up posting.
+company's hiring.
 
 Open `examples/demo-workspace/report/index.html` in your browser, or rebuild
 it:
@@ -327,25 +243,15 @@ Rebuild the whole demo from its inputs (offline):
 
 ```bash
 python3 examples/build_demo.py
-python3 examples/build_quick_demo.py
 python3 examples/build_demo_site.py
 ```
 
-The last one copies both demo pages into `docs/demo/`, with an index page
-that introduces them: a static folder that works opened from disk or served
+The last one copies the demo dashboard into `docs/demo/`, with an index page
+that introduces it: a static folder that works opened from disk or served
 as a website. It copies a page only from a workspace whose `config.json` says
 `"fictional": true`, so a real dashboard can never end up there.
 
 ## By hand, in a terminal
-
-LVLme quick:
-
-```bash
-python3 scripts/quick.py new --posting "https://jobs.lever.co/example/0000" --cv ~/Documents/cv.pdf
-# the agent's part: profile/evidence.json and eval/quick.json in the folder it prints
-python3 scripts/quick.py review-items --folder <folder>   # what the blind reviewer scores
-python3 scripts/quick.py build --folder <folder>          # index.html, result.json, message.md
-```
 
 The full campaign:
 
@@ -382,8 +288,7 @@ lvlme: cv.txt: no CV text file at this path. Check the path, then run this again
 No target organisations yet. Say to your agent: run the LVLme interview.
 ```
 
-LVLme quick checks every file you name before it makes a folder, so a wrong
-path leaves nothing half made. If the line says "unexpected error", run
+If the line says "unexpected error", run
 `python3 scripts/validate.py` first: it lists every file that breaks the rules.
 If that says Valid, it is a bug in LVLme. Put `LVLME_DEBUG=1` in front of the
 command to see the full details, and include them when you report it.
@@ -392,7 +297,6 @@ command to see the full details, and include them when you report it.
 
 | Command | Does |
 |---|---|
-| `/lvlme-quick` | LVLme quick: honest odds for one posting, from a link and your CV. |
 | `/lvlme` | Run LVLme, or resume today's run. `/lvlme status` changes nothing and reports. |
 | `/lvlme-interview` | The career interview, first time or an update. |
 | `/lvlme-screen` | The independent recruiter screen. |
@@ -410,18 +314,17 @@ on Linux, and Windows is untested.
 ```
 SKILL.md  AGENTS.md  README.md  LICENSE  CONTRIBUTING.md
 .claude-plugin/  plugin.json and marketplace.json (Claude Code)
-skills/     the /lvlme-quick, /lvlme-interview, /lvlme-screen, /lvlme-audit, /lvlme-dashboard commands
+skills/     the /lvlme-interview, /lvlme-screen, /lvlme-audit, /lvlme-dashboard commands
 agents/     subagent briefs: evidence-scout, market-scout, role-judge, reviewer, recruiter-screen
 .cursor/rules/  Cursor rules (not tested yet)
 method/     the rules for each stage (rubric, interview, intake, audits, review, campaign, privacy, runbook)
 schemas/    JSON Schema files (rules for every workspace file)
 scripts/    init, fetch_roles, fetch_doors, doors, applications, stories, practice, public, offer, import_career_ops, network_map,
-            claims_audit, consistency_audit, score, build_dashboard, validate, quick, quick_posting
+            claims_audit, consistency_audit, score, build_dashboard, validate
 templates/  the workspace skeleton that init.py copies, and agent prompts
 docs/       INSTALL.md, HOW-IT-WORKS.md, ORCHESTRATION.md, LEVELS.md, DESIGN.md,
             for-you/ (guides for people who are not technical), demo/ (the static demo folder)
-examples/   demo-workspace/ and quick-demo/ (fictional), build_demo.py, build_quick_demo.py,
-            build_demo_site.py
+examples/   demo-workspace/ (fictional), build_demo.py, build_demo_site.py
 tests/      offline tests: python3 -m unittest discover -s tests
 ```
 
@@ -444,5 +347,4 @@ Automatic LinkedIn scraping (it breaks LinkedIn's terms, so use the official
 data export instead), automatic applying, salary negotiation, and goals other
 than jobs. The full campaign reads Greenhouse, Ashby, Lever, Workday,
 SmartRecruiters and Workable boards; roles from any other careers site go in
-by hand in `market/roles/manual.json`. LVLme quick takes a posting from any
-site, as a link when the page holds the text, or pasted.
+by hand in `market/roles/manual.json`.

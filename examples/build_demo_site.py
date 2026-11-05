@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """Build docs/demo/: the fictional demos as one static folder, ready for a website.
 
-Copies the two pages LVLme builds for the fictional Alex Example, unchanged,
-and writes an index page that introduces them:
+Copies the page LVLme builds for the fictional Alex Example, unchanged,
+and writes an index page that introduces it:
 
   docs/demo/index.html            the index page
-  docs/demo/quick/index.html      LVLme quick's answer for one made-up posting
   docs/demo/dashboard/index.html  the full campaign's dashboard (five weekly runs)
   docs/demo/dashboard/research/   its research pack for each fictional organisation
 
@@ -19,7 +18,6 @@ real person's dashboard can never end up in the folder. It copies the
 committed demo pages; rebuild those first if you changed the engine:
 
   python3 examples/build_demo.py
-  python3 examples/build_quick_demo.py
   python3 examples/build_demo_site.py
 
 Usage: python3 examples/build_demo_site.py [--out FOLDER]
@@ -34,16 +32,15 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ENGINE = os.path.dirname(HERE)
 sys.path.insert(0, os.path.join(ENGINE, "scripts"))
-import _quick_html as QH  # noqa: E402
-import build_quick_demo as QD  # noqa: E402
+import _page_html as PH  # noqa: E402
 
 OUT = os.path.join(ENGINE, "docs", "demo")
 DEMO = os.path.join(HERE, "demo-workspace")
 REPO = "https://github.com/mark-hallam/lvlme"
 # (folder the page is copied to, workspace it comes from, the page inside that workspace)
-PAGES = [("quick", None, "index.html"), ("dashboard", DEMO, os.path.join("report", "index.html"))]
+PAGES = [("dashboard", DEMO, os.path.join("report", "index.html"))]
 
-CSS = QH.CSS + """
+CSS = PH.CSS + """
 .lead{margin:0 0 4px}
 ul.rows{list-style:none;margin:0;padding:0}
 ul.rows li+li{border-top:1px solid var(--rule)}
@@ -76,7 +73,7 @@ def whole(v):
 
 def sources():
     """The workspace folder and page path for each demo page."""
-    return [(name, ws or QD.folder_for(), page) for name, ws, page in PAGES]
+    return [(name, ws, page) for name, ws, page in PAGES]
 
 
 def check_fictional(workspace):
@@ -87,21 +84,11 @@ def check_fictional(workspace):
                          % os.path.relpath(workspace, ENGINE))
 
 
-def quick_line(result):
-    r, up = result["role"], result.get("if_unchecked_strong") or {}
-    fit = "fit %s of 100" % whole(result["fit"])
-    if up:
-        fit += " now, up to %s if the two things it cannot check turn out strong" % whole(up["fit"])
-    return ("%s at %s: %s. Interview chance %s, offer chance %s." % (
-        esc(r["title"]), esc(r["org_name"]), fit, esc(result["interview_band"].lower()),
-        esc(result["offer_band"].lower())))
-
-
 def dashboard_line(dash):
     best = dash["levels"]["best_role"]
     org = (dash["per_org"].get(best["org"]) or {}).get("org_name", best["org"])
     return ("Latest run %s: best match %s at %s, fit %s of 100, Level %d, %s." % (
-        esc(QH.long_date(dash["run_date"])), esc(best["title"]), esc(org), whole(best["fit"]),
+        esc(PH.long_date(dash["run_date"])), esc(best["title"]), esc(org), whole(best["fit"]),
         best["level"], esc(best["band"])))
 
 
@@ -110,20 +97,17 @@ def row(href, title, text):
             % (href, title, text, CHEVRON))
 
 
-def render(result, dash):
+def render(dash):
     rows = "".join([
-        row("quick/index.html", "LVLme quick: one job, honest odds",
-            "One job link and a CV give honest odds and the top 3 fixes, in a couple of minutes. "
-            "Alex Example asks about " + quick_line(result)),
         row("dashboard/index.html", "The full campaign dashboard",
-            "Five weekly runs at three organisations: Altitude, Flight level, Quests, Badges and what to do "
+            "Five weekly runs at three organisations: your level, the fit range for each role and what to do "
             "next. " + dashboard_line(dash)),
     ])
     body = (
         '<section class="card" aria-labelledby="introH"><p class="eyebrow">Demo</p>'
         '<h1 id="introH">See LVLme with made-up data</h1>'
         '<p class="lead">For the job you can\'t get yet. LVLme works out honestly how far you are from a job, '
-        'turns the gap into real actions, and measures again as you go. These are the pages it builds, '
+        'turns the gap into real actions, and measures again as you go. This is the page it builds, '
         'for a fictional person.</p></section>'
         '<section class="card" aria-labelledby="pagesH"><h2 id="pagesH">Open a demo</h2>'
         '<ul class="rows">%s</ul></section>'
@@ -141,16 +125,16 @@ def render(result, dash):
     return ("<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">"
             "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
             "<meta name=\"color-scheme\" content=\"light dark\">"
-            "<meta name=\"description\" content=\"LVLme's two demo pages, for a fictional person.\">"
+            "<meta name=\"description\" content=\"LVLme's demo page, for a fictional person.\">"
             "<title>LVLme demo</title><style>%s</style></head><body><div class=\"wrap\">"
             "<header class=\"top\"><span class=\"mark\">%s</span><b>LVLme</b>"
             "<span class=\"sub\"><span class=\"nw\">fictional demo</span></span></header><main>%s</main>"
             "<footer>Copies of the pages LVLme builds on your own computer. Rebuild this folder with "
-            "python3 examples/build_demo_site.py.</footer></div></body></html>\n") % (CSS, QH.LOGO, body)
+            "python3 examples/build_demo_site.py.</footer></div></body></html>\n") % (CSS, PH.LOGO, body)
 
 
 def build(out=OUT):
-    """Write the demo folder at out (its three pages; nothing else is touched). Returns the paths written."""
+    """Write the demo folder at out (its pages; nothing else is touched). Returns the paths written."""
     for _name, workspace, _page in sources():
         check_fictional(workspace)
     written = []
@@ -165,11 +149,10 @@ def build(out=OUT):
         os.makedirs(os.path.dirname(dest), exist_ok=True)
         shutil.copyfile(os.path.join(research, name), dest)
         written.append(dest)
-    result = load(os.path.join(QD.folder_for(), "result.json"))
     dash = load(os.path.join(DEMO, "report", "for-agents", "dashboard.json"))
     index = os.path.join(out, "index.html")
     with open(index, "w", encoding="utf-8") as fh:
-        fh.write(render(result, dash))
+        fh.write(render(dash))
     return [index] + written
 
 

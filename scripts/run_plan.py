@@ -18,8 +18,8 @@ Every other role keeps its last judgement, and the score says when it was judged
 Full run: every role that needs judging. Light run: of those, the top N by
 fit in the newest run (default 30), plus every role never judged.
 
-Helpers, as docs/ORCHESTRATION.md sizes them: one role judge per batch of
-about 8 roles, about one blind reviewer per two judge batches (the reviewer
+Helpers, as docs/ORCHESTRATION.md sizes them: two independent role judges per
+batch of about 8 roles (rubric 1.2 judges D1, D2 and D4 twice), about one blind reviewer per two judge batches (the reviewer
 only sees scores above 2 and a few others), and, on a full run only, one
 market scout per target organisation.
 
@@ -37,6 +37,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _common as C  # noqa: E402
 
 BATCH = 8
+JUDGES_PER_BATCH = 2   # judge twice: two independent judges on every batch
 JUDGED = {"D1", "D2", "D4"}
 
 
@@ -70,8 +71,9 @@ def last_fits(ws):
 
 
 def helpers(n_roles, targets):
-    judges = math.ceil(n_roles / BATCH)
-    reviewers = math.ceil(judges / 2)
+    batches = math.ceil(n_roles / BATCH)
+    judges = batches * JUDGES_PER_BATCH
+    reviewers = math.ceil(batches / 2)
     return {"roles": n_roles, "judges": judges, "reviewers": reviewers, "scouts": targets,
             "helpers": judges + reviewers + targets}
 

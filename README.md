@@ -2,7 +2,7 @@
 
 **For the job you can't get yet.** LVLme works out honestly how far you are from it, gives you the steps to climb there, and re-measures as you go.
 
-![LVLme quick's answer for one job: a low chance of an interview and a very low chance of an offer, in plain words, and a fit of 41 today, up to 56 if the two factors it cannot check turn out strong (fictional demo)](docs/images/quick-result-hero.png)
+![The full campaign's dashboard, light theme (fictional demo)](docs/images/dashboard-desktop.png)
 
 Install in Claude Code:
 
@@ -10,12 +10,13 @@ Install in Claude Code:
 /plugin install lvlme --marketplace mark-hallam/lvlme
 ```
 
-Then say: **run LVLme quick**, paste a job link and say where your CV is (for
-example `~/Documents/cv.pdf`). If the command is not found, start a new
+Then say: **run LVLme** and tell it your goal: the role you want, at which
+organisations, where, and by when. If the command is not found, start a new
 Claude Code session.
 
-In a couple of minutes you get honest odds for that one job. Codex works too
-(see [Install](#install)).
+LVLme measures honestly how far you are from that goal, then runs a campaign
+with your own AI agent that levels you up, move by move, on evidence. Codex
+works too (see [Install](#install)).
 
 ## Why LVLme is different
 
@@ -29,30 +30,7 @@ a very low score.
 
 ## What you get
 
-**First, the quick answer.** Give LVLme one job posting (a link from
-Greenhouse, Ashby, Lever, Workday, SmartRecruiters, Workable or most careers pages, or
-the posting text) and your CV. It:
-
-- reads the posting, and turns your CV into a few facts, each marked with how
-  far it can be trusted (a CV line alone is "self-reported");
-- asks at most two short questions: do you know someone there who has seen
-  your work, and, if the posting and your CV do not settle it, can you work
-  where the job is?
-- scores five factors with the same rules and maths as the full campaign,
-  and shows the two it cannot check from one posting and a CV (public signal
-  and application readiness) as not checked, so your fit is a range: for
-  example 41 today, up to 56 if those two turn out strong;
-- has a second agent score every point above 2 blind, without seeing the
-  first scores, and shows you where the two disagree;
-- gives you one page: your chance of an interview and of an offer in plain
-  words, one line per factor with the evidence behind it, and up to three fixes
-  that would raise your odds most, each with a next step (with a reason for any
-  fix it leaves out).
-
-It gives fixes and a brief, never application answers: you write those
-yourself.
-
-**Then, if you want it, the full campaign.** Say **run LVLme**. It checks
+**Say run LVLme.** It checks
 every open role at the organisations you choose, gathers evidence from the
 sources you approve, runs a career interview, a recruiter screen and a
 consistency audit of your CV, LinkedIn and website, and turns the gaps into a
@@ -66,11 +44,9 @@ reads its applications, contacts and stories, read only, so you can keep
 both. It starts with one short message:
 three facts from your CV to confirm, which organisations you want, and a
 request for your LinkedIn data export ([the first run, in order](SKILL.md#first-run)).
-A dashboard shows the climb:
+A dashboard shows your level and what to do next.
 
-![The full campaign's dashboard, light theme (fictional demo)](docs/images/dashboard-desktop.png)
-
-*Both screenshots are the fictional demo: Alex Example and made-up
+*The screenshot is the fictional demo: Alex Example and made-up
 organisations.*
 
 New to the dashboard? [Reading your dashboard](docs/for-you/READING-YOUR-DASHBOARD.md)
@@ -90,8 +66,8 @@ Linux and Windows are not tested yet.
 - **Claude Code** (version 2.1.275 or later): the one line above. Or download
   the folder and install from your copy (option B in the install guide).
 - **Codex:** run exactly
-  `git clone --branch v0.6.3 https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme`
-  and say "run LVLme quick", or open Codex in the folder (it follows `AGENTS.md`). Do
+  `git clone --branch v0.7.0 https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme`
+  and say "run LVLme", or open Codex in the folder (it follows `AGENTS.md`). Do
   not use a skill installer: it copies only part of the folder.
 - **Cursor** (not tested yet): open the folder. The rules in `.cursor/rules/`
   and `AGENTS.md` should load on their own. Cursor and other agents that run
@@ -101,7 +77,6 @@ Every agent, step by step: [`docs/INSTALL.md`](docs/INSTALL.md).
 
 | Command | Does |
 |---|---|
-| `/lvlme-quick` | Honest odds for one job, from a link and your CV, in a couple of minutes. |
 | `/lvlme` | The full campaign, or resume today's run. `/lvlme status` reports and changes nothing. |
 | `/lvlme-interview` | The career interview, first time or an update. |
 | `/lvlme-screen` | The independent recruiter screen. |
@@ -113,12 +88,11 @@ Every agent, step by step: [`docs/INSTALL.md`](docs/INSTALL.md).
 | `/lvlme-autopilot` | Turn Autopilot on or off: the campaign runs itself on your schedule and leaves a "This week" note. It asks for every permission first. |
 
 Every command also has a full name with the plugin prefix
-(`/lvlme:lvlme-quick`), for when another command already uses the short
-name. In Codex and other agents, say the words: "run LVLme quick".
+(`/lvlme:lvlme-interview`), for when another command already uses the short
+name. In Codex and other agents, say the words: "run LVLme".
 
-**What a run uses.** LVLme quick starts at most one helper agent, the blind
-reviewer. A full campaign run starts many: about 40 for a goal with around 300
-open roles. That is a noticeable share of an AI plan's usage, so check your
+**What a run uses.** A campaign run starts many helper agents: about 100 on a first run for a goal with
+around 300 open roles (two independent judges for each batch of roles). That is a noticeable share of an AI plan's usage, so check your
 plan's limits before you schedule runs. By default the full campaign runs
 weekly, plus whenever something changes.
 
@@ -130,8 +104,9 @@ weekly, plus whenever something changes.
   every point above 2. The maths is a script, so the
   same judgements always give the same score. Different AI agents (for
   example Claude and Codex) can judge the same evidence differently, and so
-  can two runs of the same agent, often by a few fit points, so the result
-  page and the dashboard name which agent and model judged. The
+  can two runs of the same agent, so LVLme judges the main factors twice,
+  independently, averages them and shows the fit as a range, and the dashboard
+  names which agent and model judged. The
   default answer is "unlikely".
 - **Private.** Your data lives in a folder on your own computer
   (`~/lvlme-workspaces/`), never in this repository, and the scripts refuse to
@@ -155,18 +130,16 @@ weekly, plus whenever something changes.
 
 ## How it works
 
-The detail is in [`docs/HOW-IT-WORKS.md`](docs/HOW-IT-WORKS.md): LVLme quick
-step by step, the full campaign, scoring, the honesty rules in full, privacy,
+The detail is in [`docs/HOW-IT-WORKS.md`](docs/HOW-IT-WORKS.md): the campaign, scoring, the honesty rules in full, privacy,
 the dashboard, running the scripts by hand, and the project layout. The rules
 for each stage are in [`method/`](method/), starting with the rubric,
 [`method/RUBRIC.md`](method/RUBRIC.md). What changed in each version is in
 [`CHANGELOG.md`](CHANGELOG.md).
 
-Try it with no data of your own: both demos are for the fictional Alex
-Example. Open `examples/quick-demo/2026-11-02-globex-labs-deployment-program-manager-ai-agents/index.html`
-(LVLme quick) or `examples/demo-workspace/report/index.html` (the full
-campaign's dashboard) in your browser. `docs/demo/index.html` puts both
-behind one page, as a static folder ready to serve as a website.
+Try it with no data of your own: the demo is for the fictional Alex
+Example. Open `examples/demo-workspace/report/index.html` (the dashboard) in
+your browser. `docs/demo/index.html` puts it behind one page, as a static
+folder ready to serve as a website.
 
 Author: Mark Hallam. Licence: MIT (see `LICENSE`). Contributing: see
 [`CONTRIBUTING.md`](CONTRIBUTING.md).

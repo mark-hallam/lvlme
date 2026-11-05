@@ -1,7 +1,7 @@
 """LVLme was called Climb until 3 November 2026: the old names keep working.
 
 Pins each fallback: $CLIMB_HOME when $LVLME_HOME is not set, ~/climb-workspaces
-when ~/lvlme-workspaces does not exist (said once), the quick folder's parent,
+when ~/lvlme-workspaces does not exist (said once),
 the dashboard's saved browser settings, and workspaces written under the old
 name. Every test uses temporary folders, never the real home folder.
 """
@@ -19,12 +19,9 @@ import _common as C
 import _dashboard_assets as A
 import build_dashboard as B
 import init as I
-import quick as Q
 import validate as V
 
 NODE = shutil.which("node")
-BOARD = os.path.join(H.FIXTURES, "quick", "ashby-board.json")
-LINK = "https://jobs.ashbyhq.com/globex/0b6f3c2e-1a2b-4c3d-8e9f-000000000001"
 NO_ENV = {"LVLME_HOME": "", "CLIMB_HOME": ""}
 
 
@@ -135,41 +132,6 @@ class FolderTests(Homes):
             self.assertEqual(I.main(["--goal", "AI labs"]), 0)
         self.assertTrue(os.path.isfile(os.path.join(target, "config.json")))
         self.assertEqual(out.getvalue().splitlines()[-1], I.NEXT_STEP)
-
-
-class QuickFolderTests(Homes):
-    def new_quick(self):
-        code, err = self.call(Q.main, ["new", "--posting", LINK, "--saved-response", BOARD, "--org", "Globex Labs",
-                                       "--date", "2026-11-02"])
-        self.assertEqual(code, 0, err)
-        return err
-
-    def test_quick_goes_to_the_new_folder_by_default(self):
-        self.assertEqual(Q.default_parent(), os.path.join(self.new, "quick"))
-        self.new_quick()
-        self.assertEqual(len(os.listdir(os.path.join(self.new, "quick"))), 1)
-
-    def test_quick_falls_back_to_the_old_folder(self):
-        os.makedirs(self.old)
-        err = self.new_quick()
-        self.assertEqual(len(os.listdir(os.path.join(self.old, "quick"))), 1)
-        self.assertFalse(os.path.exists(self.new))
-        self.assertIn(C.LEGACY_NOTE, err)
-
-    def test_quick_follows_lvlme_home(self):
-        """LVLME_HOME names a workspace: quick writes to quick/ next to it, never to the default folders."""
-        ws = os.path.join(self.home, "sandbox", "my-goal")
-        with mock.patch.dict(os.environ, {"LVLME_HOME": ws}):
-            self.assertEqual(Q.default_parent(), os.path.join(self.home, "sandbox", "quick"))
-            self.new_quick()
-        self.assertEqual(len(os.listdir(os.path.join(self.home, "sandbox", "quick"))), 1)
-        self.assertFalse(os.path.exists(self.new))
-        self.assertFalse(os.path.exists(self.old))
-
-    def test_quick_follows_climb_home_too(self):
-        ws = os.path.join(self.home, "elsewhere", "labs")
-        with mock.patch.dict(os.environ, {"CLIMB_HOME": ws}):
-            self.assertEqual(Q.default_parent(), os.path.join(self.home, "elsewhere", "quick"))
 
 
 class OldWorkspaceTests(unittest.TestCase):
