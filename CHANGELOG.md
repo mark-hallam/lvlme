@@ -10,15 +10,44 @@ before. Nothing here changes how a score is worked out unless it says so.
 
 ## 0.7.0 (5 November 2026)
 
-LVLme now works with goals and campaigns only. This is the engine part of
-0.7.0: the scoring is steadier, and LVLme quick is gone. The scoring rules are
-now version 1.2. **This release changes how a score is worked out**: see
-Changed.
+LVLme now works with goals and campaigns only. 0.7.0 has three parts: the
+engine (every factor judged twice, a fit range, LVLme quick retired as a
+product), the journey (set a goal, a starting line, a Today screen, a weekly
+rhythm, level-up events, outcomes you can choose to share) and a proof
+profile. The scoring rules are now version 1.2. **This release changes how a
+score is worked out**: see Changed.
 
-Tests: 591 pass.
+Tests: TESTCOUNT pass.
 
 ### Added
 
+- **Set a goal.** `scripts/goal.py` and setup ask for the role, the
+  organisations, where and by when. LVLme tests the goal against the starting
+  line and, when no plan reaches it in time, proposes a stepping stone with the
+  reason. You choose.
+- **The starting line.** The first result gives your level, the fit range and
+  the date the plan is expected to reach the next level, or says plainly that
+  no plan gets there yet and what is missing. A first run judges only the best
+  few roles so it comes in about 15 minutes; the rest are judged on the next
+  runs and Today says what is still being checked.
+- **Today first.** The dashboard opens on Today in plain words: your level, one
+  sentence on where you stand (with "fit about X to Y" when a role was judged
+  twice), the one move for today and the next level date. The full dashboard
+  (Mission control) is one tap away.
+- **A weekly rhythm.** A Monday plan note and a Friday review under
+  `campaign/weekly/`, and a count of weeks in a row with real evidence.
+- **Level-up and goal-reached events** in `eval/levels.json`, marked on Today,
+  with a share card that shows level and dates and no names.
+- **Outcomes you can share, if you choose.** `scripts/outcomes.py` writes a
+  numbers-only export (scores, bands, rubric version, role family, outcome; no
+  CV, no names) after a plain consent screen. LVLme sends nothing anywhere.
+- **A proof profile.** `scripts/proof_profile.py` builds
+  `report/profile/index.html`, a clean page of your goal, your level history
+  and only the claims checked at verified or corroborated level, each with its
+  public source link. It refuses to write the page if it would contain an
+  email address, a phone number, a folder path, a private or local link or an
+  unchecked claim. Private by default; see
+  [the proof profile](docs/PROOF-PROFILE.md).
 - **Every role shows a fit range.** Each role in the run file has `fit_low`
   and `fit_high` beside `fit`, and so does each organisation's best role. They
   are the fit with every factor at its lower judging and at its higher one. A
@@ -73,6 +102,16 @@ These are the scoring rules version 1.2.
   that described it. Someone who says "run LVLme quick" is told that LVLme now
   works with a goal and is offered to set one. Nothing the person reads
   offers it any more.
+
+### Known items for the reviewers
+
+- **The accent colour.** Today is orange and Mission control is blue. Whether
+  the two should share one accent is still open.
+- **Judging twice did not make scores steadier** in the three-run test above.
+  Nothing in this release claims otherwise.
+- Mission control keeps its aviation labels for the chart; Today, the first
+  thing you see, does not use them.
+
 
 ## 0.6.3 (5 November 2026)
 

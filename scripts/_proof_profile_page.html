@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>$title</title>
+<meta name="description" content="$description">
+<style>
+:root{--bg:#fff;--bg2:#f5f5f7;--ink:#0c0e12;--mute:#5b6068;--line:#e4e5e8;--accent:#ff4a1c;--accent-ink:#b8300a;--ok:#1a7f3c;--ok-bg:#e8f5ec;--seg:#e4e5e8;--focus:#0a66ff}
+@media (prefers-color-scheme:dark){:root{--bg:#0c0e12;--bg2:#171a20;--ink:#f3f4f6;--mute:#a1a6b0;--line:#2a2e36;--accent:#ff6a42;--accent-ink:#ff9b7d;--ok:#5fd085;--ok-bg:#12281a;--seg:#2a2e36;--focus:#6aa0ff}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:720px;margin:0 auto;padding:56px 24px 40px}
+a{color:var(--accent-ink);text-underline-offset:3px}
+a:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
+.demo{background:var(--bg2);border-radius:12px;padding:10px 14px;font-size:14px;color:var(--mute);margin:0 0 32px}
+h1{font-size:40px;line-height:1.1;letter-spacing:-.02em;margin:0 0 12px;font-weight:700}
+.goal{font-size:20px;color:var(--mute);margin:0 0 6px}
+.goal-meta{font-size:15px;color:var(--mute);margin:0}
+h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:600;margin:48px 0 14px}
+.card{background:var(--bg2);border-radius:18px;padding:22px}
+.level{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.level b{font-size:30px;letter-spacing:-.01em}
+.level span{color:var(--mute)}
+.segs{display:flex;gap:6px;margin:16px 0 10px}
+.segs i{flex:1;height:8px;border-radius:4px;background:var(--seg)}
+.segs i.on{background:var(--accent)}
+.note{font-size:15px;color:var(--mute);margin:0}
+ol.hist{list-style:none;margin:0;padding:0}
+ol.hist li{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-top:1px solid var(--line)}
+ol.hist li:first-child{border-top:0}
+ol.hist .when{color:var(--mute);white-space:nowrap}
+.tag{font-size:13px;color:var(--accent-ink);font-weight:600;margin-left:8px}
+ul.claims{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.claim{background:var(--bg2);border-radius:18px;padding:18px 20px}
+.claim p{margin:0 0 10px}
+.badge{display:table;margin:0 0 8px;font-size:13px;font-weight:600;color:var(--ok);background:var(--ok-bg);border-radius:999px;padding:2px 10px}
+.src{font-size:15px;color:var(--mute);margin:0;overflow-wrap:anywhere}
+.src a{font-weight:500}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:14px;color:var(--mute)}
+footer p{margin:0 0 8px}
+@media (max-width:480px){main{padding:36px 18px 32px}h1{font-size:32px}.goal{font-size:18px}ol.hist li{flex-direction:column;gap:2px}}
+</style>
+</head>
+<body>
+<main>
+$banner
+<header>
+<h1>$name</h1>
+<p class="goal">$goal</p>
+$goal_meta
+</header>
+<section aria-labelledby="h-level">
+<h2 id="h-level">Where I am now</h2>
+<div class="card">
+<div class="level"><b>Level $level of 5</b><span>$band fit with the roles I am aiming for, measured on $level_date</span></div>
+<div class="segs" role="img" aria-label="Level $level of 5">$segs</div>
+<p class="note">$level_note</p>
+</div>
+</section>
+<section aria-labelledby="h-hist">
+<h2 id="h-hist">Level history</h2>
+<div class="card">
+$history
+</div>
+</section>
+<section aria-labelledby="h-claims">
+<h2 id="h-claims">Checked work</h2>
+$claims
+</section>
+<footer>
+<p>$footer</p>
+<p>Built on $built with LVLme. Nothing on this page is self-reported: each claim was checked against the source shown.</p>
+</footer>
+</main>
+</body>
+</html>

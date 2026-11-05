@@ -1,0 +1,112 @@
+{
+  "name": "Alex Example",
+  "goal": {
+    "title": "A program, applied AI or policy role at an AI product company"
+  },
+  "built_on": "2026-11-05",
+  "levels": [
+    {
+      "date": "2026-10-04",
+      "level": 2,
+      "band": "Low",
+      "change": null,
+      "rules_changed": false,
+      "event": null
+    },
+    {
+      "date": "2026-10-11",
+      "level": 2,
+      "band": "Low",
+      "change": null,
+      "rules_changed": false,
+      "event": null
+    },
+    {
+      "date": "2026-10-18",
+      "level": 2,
+      "band": "Low",
+      "change": null,
+      "rules_changed": false,
+      "event": null
+    },
+    {
+      "date": "2026-10-25",
+      "level": 3,
+      "band": "Moderate",
+      "change": "up",
+      "rules_changed": false,
+      "event": null
+    },
+    {
+      "date": "2026-11-01",
+      "level": 3,
+      "band": "Moderate",
+      "change": null,
+      "rules_changed": false,
+      "event": null
+    }
+  ],
+  "claims": [
+    {
+      "id": "E04",
+      "claim": "route-eval: an open-source tool that scores AI answers to logistics questions, 14 releases, 2 outside contributors",
+      "level": "verified",
+      "sources": [
+        {
+          "url": "https://example.com/alex/route-eval",
+          "type": "github",
+          "checked_on": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "E07",
+      "claim": "Personal site with 6 essays on AI in operations",
+      "level": "verified",
+      "sources": [
+        {
+          "url": "https://example.com/alex",
+          "type": "website",
+          "checked_on": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "E08",
+      "claim": "AI practitioner certificate from Example Academy, 2026",
+      "level": "verified",
+      "sources": [
+        {
+          "url": "https://example.com/academy/certificates/alex-example",
+          "type": "certification",
+          "checked_on": "2026-10-04"
+        }
+      ]
+    },
+    {
+      "id": "E14",
+      "claim": "Recorded talk at a regional logistics meetup on testing AI answers, 2025",
+      "level": "verified",
+      "sources": [
+        {
+          "url": "https://example.com/meetups/logistics-ai-2025",
+          "type": "talk",
+          "checked_on": "2026-10-18"
+        }
+      ]
+    },
+    {
+      "id": "E15",
+      "claim": "Case study of the scheduling rollout, with the numbers checked by Alex's former manager",
+      "level": "corroborated",
+      "sources": [
+        {
+          "url": "https://example.com/alex/case-study-scheduling",
+          "type": "website",
+          "checked_on": "2026-10-25"
+        }
+      ]
+    }
+  ],
+  "checked_claims_without_public_link": 3
+}

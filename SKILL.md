@@ -310,6 +310,7 @@ they give. Never register, RSVP, apply or pay (`method/CAMPAIGN.md`).
 - **Claims audit.** `python3 scripts/claims_audit.py <their site> <other pages>`.
   Judge each `pending` claim as `supported`, `overstated`, `unsupported` or
   `contradicted`, with evidence ids and suggested honest wording.
+- **Proof profile.** `scripts/proof_profile.py`, as `docs/PROOF-PROFILE.md` says: builds `report/profile/index.html` from verified or corroborated evidence with a public source, private by default, and refuses to write it if the leak check finds anything private. Hosting it is the person's own step.
 - **Consistency audit.** `scripts/consistency_audit.py`, as
   `method/CONSISTENCY.md` describes: what the CV, LinkedIn, website and any
   official form say about the same facts.
