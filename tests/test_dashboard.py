@@ -333,7 +333,10 @@ class ParkedAndStaticTests(unittest.TestCase):
         self.assertLess(body.index('id="nextIn"'), body.index('id="chartWrap"'))
         self.assertIn(".btn,.seg button,select{min-height:44px}", page)
         # One h1; tabs with aria-selected and aria-controls; every view keeps its tab, in a row that scrolls with a hint.
-        self.assertEqual(len(re.findall(r"<h1[\s>]", page)), 1)
+        # The page is two screens, Today and Mission control, and only one shows at a time: one h1 on each.
+        today_part, mission_part = page.split('<header class="top">', 1)
+        self.assertEqual(len(re.findall(r"<h1[\s>]", today_part.split('id="today"', 1)[1])), 1)
+        self.assertEqual(len(re.findall(r"<h1[\s>]", mission_part)), 1)
         self.assertIn('role="tab" id="tab-${v[0]}" aria-selected="${on}" aria-controls="v-${v[0]}"', script)
         self.assertNotIn('role="tab" aria-pressed', script)
         self.assertIn('<div class="hscroll"><div class="seg" id="viewSeg" role="tablist"', body)
