@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "kind": "review",
+  "date": "2026-10-30",
+  "week_of": "2026-10-26",
+  "done": [],
+  "evidence": [],
+  "moved": {
+    "changed": false,
+    "text": "Best fit unchanged, from 55 to 55.",
+    "from": 55.0,
+    "to": 55.0,
+    "level_from": 3,
+    "level_to": 3
+  },
+  "next_move": {
+    "id": "A06",
+    "title": "Apply to the Initech Robotics fleet deployments role once “Fix the LinkedIn headline” is done",
+    "why": "Application submitted (confirmation email)"
+  },
+  "weeks_in_a_row": 4,
+  "streak_text": "4 weeks in a row with real evidence."
+}

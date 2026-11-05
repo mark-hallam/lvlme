@@ -3,6 +3,7 @@
 The fictional demo, no network, no scheduler touched: the tests read what the
 script records and prints.
 """
+import glob
 import io
 import json
 import os
@@ -19,6 +20,8 @@ import validate as V
 class AutopilotTests(unittest.TestCase):
     def setUp(self):
         self.ws = H.copy_demo(self)
+        for name in glob.glob(os.path.join(self.ws, "campaign", "weekly", "*")):     # these tests start with no notes written
+            os.remove(name)
 
     def run_cli(self, *args):
         out = io.StringIO()

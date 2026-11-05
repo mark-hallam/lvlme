@@ -1,18 +1,18 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="description" content="LVLme's demo page, for a fictional person."><title>LVLme demo</title><style>
 :root{color-scheme:light;--bg:#f2f2f5;--card:#fff;--card2:#f6f6f8;--ink:#1d1d1f;--sub:#56565b;--rule:#e2e2e7;
---accent:#084c9e;--on-accent:#fff;--accent-soft:#e7f0fb;--warn:#843800;--warn-bg:#fff4d6;
+--accent:#FF4A1C;--accent-ink:#B8300A;--on-accent:#0C0E12;--accent-soft:#FFE9E2;--warn:#843800;--warn-bg:#fff4d6;
 --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);--pip:#d9d9de;
 --v-bg:#dff3e4;--v-t:#14501f;--c-bg:#fde3e1;--c-t:#7a1810;--p-bg:#fcefd6;--p-t:#6b3f00;--s-bg:#ececf0;--s-t:#3a3a3c}
 @media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#111113;--card:#1c1c1e;--card2:#26262a;--ink:#f5f5f7;
---sub:#b8b8be;--rule:#38383c;--accent:#64b0ff;--on-accent:#0b1a2b;--accent-soft:#172c45;--warn:#ffb340;--warn-bg:#3a2e0b;
+--sub:#b8b8be;--rule:#38383c;--accent:#FF6A42;--accent-ink:#FF9B7D;--on-accent:#0C0E12;--accent-soft:#3A1A12;--warn:#ffb340;--warn-bg:#3a2e0b;
 --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.4);--pip:#48484c;
 --v-bg:#1e3a24;--v-t:#a6efb0;--c-bg:#3d1714;--c-t:#ffc2ba;--p-bg:#3a2a10;--p-t:#ffd99a;--s-bg:#2c2c30;--s-t:#d8d8dc}}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
 body{font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
 -webkit-font-smoothing:antialiased;overflow-wrap:break-word}
-a{color:var(--accent)}
+a{color:var(--accent-ink)}
 a.posting,a.guide{padding:10px 4px;margin:0 -4px}
 .wrap{max-width:780px;margin:0 auto;padding:20px 16px 48px}
 .top{display:flex;align-items:center;gap:10px;margin:4px 2px 16px}
@@ -67,8 +67,8 @@ ol.fixes{list-style:none;margin:10px 0 0;padding:0;counter-reset:f}
 ol.fixes li{counter-increment:f;display:grid;grid-template-columns:34px 1fr;gap:4px 12px;border-top:1px solid var(--rule);padding:14px 0}
 ol.fixes li:first-child{border-top:none;padding-top:6px}
 ol.fixes li::before{content:counter(f);grid-row:span 3;width:30px;height:30px;border-radius:50%;background:var(--accent-soft);
-color:var(--accent);font-weight:700;display:grid;place-items:center}
-.gain{font-weight:700;color:var(--accent)}
+color:var(--accent-ink);font-weight:700;display:grid;place-items:center}
+.gain{font-weight:700;color:var(--accent-ink)}
 .step{font-size:15px}
 .step b{font-weight:650}
 .all{background:var(--accent-soft);border-radius:14px;padding:12px 16px;margin-top:6px;font-size:15px}

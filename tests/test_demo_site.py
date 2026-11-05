@@ -156,7 +156,7 @@ class IndexPageTests(Base):
         self.assertTrue(S.CSS.startswith(PH.CSS))
         self.assertNotRegex(extra, r"#[0-9a-fA-F]{3,6}\b|rgba?\(")
         for theme, t in A11Y.themes().items():
-            for fg, bg in (("ink", "card"), ("sub", "card"), ("sub", "bg"), ("accent", "card"), ("ink", "bg")):
+            for fg, bg in (("ink", "card"), ("sub", "card"), ("sub", "bg"), ("accent-ink", "card"), ("ink", "bg")):
                 self.assertGreaterEqual(A11Y.contrast(t[fg], t[bg]), 4.5, "%s on %s, %s" % (fg, bg, theme))
 
     def test_rows_are_big_enough_to_tap(self):

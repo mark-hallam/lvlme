@@ -31,6 +31,8 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEMO = os.path.join(HERE, "demo-workspace")
 sys.path.insert(0, os.path.join(os.path.dirname(HERE), "scripts"))
+import _autopilot as autopilot_notes  # noqa: E402
+import _weekly as weekly  # noqa: E402
 import applications  # noqa: E402
 import build_dashboard  # noqa: E402
 import doors  # noqa: E402
@@ -245,7 +247,12 @@ def main():
             run(fetch_roles.main, ["--workspace", work, "--fixtures", fx, "--date", week])
             run(score.main, ["--workspace", work, "--date", week])
             run(build_dashboard.main, ["--workspace", work])
+            if week == "2026-10-25":     # the Monday plan note for the next day, written from the data of this run
+                autopilot_notes.write_note(work, json.load(open(os.path.join(work, "config.json"), encoding="utf-8")),
+                                           "2026-10-26", "2026-10-26")
         clean_outputs(DEMO)
+        for name in glob.glob(os.path.join(work, "campaign", "weekly", "2026-10-26.*")):
+            shutil.copy2(name, os.path.join(DEMO, "campaign", "weekly", os.path.basename(name)))
         for rel in ("eval/runs", "market/roles"):
             shutil.copytree(os.path.join(work, rel), os.path.join(DEMO, rel))
         shutil.copy2(os.path.join(work, "campaign", "metrics-history.json"),
@@ -267,6 +274,10 @@ def main():
         for date, *rest in PUBLIC:
             run(public.main, ["--workspace", DEMO] + rest + ["--date", date])
         run(score.main, ["--workspace", DEMO, "--date", today])
+        run(build_dashboard.main, ["--workspace", DEMO, "--today", today])
+        cfg = json.load(open(os.path.join(DEMO, "config.json"), encoding="utf-8"))
+        dash = json.load(open(os.path.join(DEMO, "report", "for-agents", "dashboard.json"), encoding="utf-8"))
+        weekly.write_review(DEMO, cfg, "2026-10-30", "2026-10-30", dash)         # Friday review of the week of 26 Oct
         run(build_dashboard.main, ["--workspace", DEMO, "--today", today])
         run(proof_profile.main, ["--workspace", DEMO, "--date", "2026-11-05"])
     finally:

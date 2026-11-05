@@ -187,6 +187,43 @@ class CheckingAndStoneTests(unittest.TestCase):
         self.assertIn("Your first result is on its way", T.render(t))
 
 
+class WeekCardTests(unittest.TestCase):
+    """The weekly rhythm is visible on Today: Monday's plan, Friday's review, and what counts as a week."""
+
+    def write_notes(self, ws):
+        import _autopilot as A
+        import _weekly as WK
+        cfg = H.load(os.path.join(ws, "config.json"))
+        dash = H.load(os.path.join(ws, "report", "for-agents", "dashboard.json"))
+        A.write_note(ws, cfg, "2026-11-02", "2026-11-02")
+        WK.write_review(ws, cfg, "2026-10-30", "2026-11-05", dash)
+
+    def test_this_week_card_shows_the_monday_plan_and_the_friday_review(self):
+        ws, page = build(self, self.write_notes)
+        import html
+        words = html.unescape(text_of(today_part(page)))
+        self.assertIn("This week", words)
+        self.assertIn("Monday plan, 2 Nov", words)
+        self.assertIn("Friday review, week of 26 Oct", words)
+        self.assertIn("Done with evidence", words)
+        self.assertIn("Next week's one move", words)
+        dash = H.load(os.path.join(ws, "report", "for-agents", "dashboard.json"))
+        self.assertEqual(dash["today"]["week"]["plan"]["date"], "2026-11-02")      # the newer note than the demo's own
+        self.assertEqual(dash["today"]["week"]["review"]["week_of"], "2026-10-26")
+
+    def test_with_no_notes_yet_it_says_what_will_appear_and_how_to_get_it(self):
+        import glob
+        ws, page = build(self, lambda ws: [os.remove(f) for f in glob.glob(os.path.join(ws, "campaign", "weekly", "*.json"))])
+        words = text_of(today_part(page))
+        self.assertIn("This week", words)
+        self.assertIn("Your Monday plan and Friday review appear here", words)
+        self.assertIn("Ask your agent", words)
+
+    def test_the_streak_says_what_counts_as_a_week(self):
+        ws, page = build(self, lambda ws: None)
+        self.assertIn("A week counts when a move is finished or evidence is checked", text_of(today_part(page)))
+
+
 class DarkThemeAndPrivacyTests(unittest.TestCase):
     def test_today_data_reaches_the_agents_file(self):
         ws, _ = build(self, lambda ws: None)

@@ -54,6 +54,24 @@ def weeks_in_a_row(progress_days, today):
     return n
 
 
+def latest(ws, today):
+    """The newest Monday plan note and the newest Friday review on or before today, as data: {"plan", "review"}.
+    Either is None when the agent has not written one yet."""
+    plan = review = None
+    for f in sorted(glob.glob(C.wpath(ws, *WEEKLY, "*.json"))):
+        name = os.path.basename(f)
+        if name[:10] > today:
+            continue
+        doc = C.load_json(f, None)
+        if not isinstance(doc, dict):
+            continue
+        if name.endswith("-review.json"):
+            review = doc
+        else:
+            plan = doc
+    return {"plan": plan, "review": review}
+
+
 def plural(n, one, many=None):
     return "%d %s" % (n, one if n == 1 else (many or one + "s"))
 

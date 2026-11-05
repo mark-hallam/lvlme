@@ -124,7 +124,7 @@ def _load(ws, *parts):
 
 def previous_note(ws, today):
     notes = sorted(f for f in glob.glob(os.path.join(C.wpath(ws, *WEEKLY_DIR), "*.json"))
-                   if os.path.basename(f)[:10] < today)
+                   if os.path.basename(f)[:10] < today and not f.endswith("-review.json"))
     return C.load_json(notes[-1], {}) if notes else None
 
 
@@ -141,7 +141,7 @@ def previous_run(ws, today):
 
 
 def newest_note(ws):
-    notes = sorted(glob.glob(os.path.join(C.wpath(ws, *WEEKLY_DIR), "*.json")))
+    notes = sorted(f for f in glob.glob(os.path.join(C.wpath(ws, *WEEKLY_DIR), "*.json")) if not f.endswith("-review.json"))
     return C.load_json(notes[-1], None) if notes else None
 
 

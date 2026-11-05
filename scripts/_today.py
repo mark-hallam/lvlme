@@ -70,6 +70,7 @@ def build(page, data, events):
     out["checking"] = checking(page, data)
     out["level_up"] = share_of(EV.recent(events, today, "level_up"), page)
     out["goal_reached"] = share_of(EV.recent(events, today, "goal_reached", 60), page)
+    out["week"] = WK.latest(data.ws, today)
     out["show_start_line"] = len(page["runs"]) <= 2 or (dt.date.fromisoformat(today) - dt.date.fromisoformat(page["meta"]["baseline"])).days <= STARTING_LINE_DAYS
     out["stone_to_choose"] = stone_to_choose(data, out["goal_check"])
     return out
@@ -124,7 +125,7 @@ def render(t, has_numbers_page=False):
         body = ('<h1 id="tdH" class="td-h">Your first result is on its way</h1><p class="td-stand">%s</p>' % esc(t["stand"]))
         return head + goal + body + _footer(t, has_numbers_page) + "</div></main>"
     parts = [head, goal, _moment(t), _hero(t), '<p class="td-stand">%s</p>' % esc(t["stand"]), _move(t), _next(t),
-             _streak(t), _checking(t), _stone(t), _start(t), _reached(t), _footer(t, has_numbers_page), "</div></main>"]
+             _week(t), _streak(t), _checking(t), _stone(t), _start(t), _reached(t), _footer(t, has_numbers_page), "</div></main>"]
     return "".join(parts)
 
 
@@ -186,8 +187,45 @@ def _chance_line(sl):
 
 def _streak(t):
     n = t["weeks_in_a_row"]
+    dots = "".join('<i class="on"></i>' for _ in range(min(n, 12)))
     return ('<section class="td-card td-row"><div class="td-num">%d</div><div><div class="td-eyebrow">Weeks in a row</div>'
-            '<p class="td-sub" style="margin:0">%s</p></div></section>' % (n, esc(t["streak_text"])))
+            '<p class="td-sub" style="margin:0">%s</p>%s'
+            '<p class="td-tiny" style="margin:6px 0 0">A week counts when a move is finished or evidence is checked.</p></div></section>'
+            % (n, esc(t["streak_text"]), '<div class="td-dots" role="img" aria-label="%d weeks">%s</div>' % (n, dots) if n else ""))
+
+
+def _short(iso):
+    d = dt.date.fromisoformat(iso)
+    return "%d %s" % (d.day, d.strftime("%b"))
+
+
+def _week(t):
+    """This week: Monday's plan and the last Friday review, or what will appear and how to ask for it."""
+    w = t.get("week") or {}
+    plan, rev = w.get("plan"), w.get("review")
+    if not plan and not rev:
+        return ('<section class="td-card"><div class="td-eyebrow">This week</div>'
+                '<p class="td-big">Your Monday plan and Friday review appear here.</p>'
+                '<p class="td-sub">Ask your agent: "Write this week\'s plan." It writes a short note and nothing is sent.</p></section>')
+    out = ['<section class="td-card td-week"><div class="td-eyebrow">This week</div>']
+    if plan:
+        act = plan.get("action") or {}
+        out.append('<h2 class="td-big">Monday plan, %s</h2><p class="td-sub">%s</p>' % (
+            esc(_short(plan["date"])), esc("The one move this week: %s." % act["title"].rstrip(".") if act.get("title")
+                                           else "Nothing new: keep going with the plan.")))
+        if plan.get("next_level_line"):
+            out.append('<p class="td-sub">%s</p>' % esc(plan["next_level_line"]))
+    if rev:
+        done = rev.get("done") or []
+        out.append('<h2 class="td-big td-gap">Friday review, week of %s</h2>' % esc(_short(rev["week_of"])))
+        out.append('<p class="td-sub">%s</p>' % esc("Done with evidence: %s." % "; ".join(d["title"].rstrip(".") for d in done)
+                                                    if done else "No move was finished with evidence that week."))
+        out.append('<p class="td-sub">What moved: %s</p>' % esc((rev.get("moved") or {}).get("text", "")))
+        nm = rev.get("next_move")
+        out.append('<p class="td-sub">%s</p>' % esc("Next week's one move: %s." % nm["title"].rstrip(".") if nm
+                                                    else "Next week's one move: ask your agent to add one."))
+    out.append("</section>")
+    return "".join(out)
 
 
 def _checking(t):
@@ -252,6 +290,8 @@ CSS = r"""
 .td-wrap{max-width:600px;margin:0 auto;padding:24px 20px 56px}
 .td-top{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--sub)}
 .td-brand{font-weight:700;letter-spacing:-.01em;color:var(--ink);font-size:17px}
+.td-dots{display:flex;gap:5px;margin-top:8px}.td-dots i{width:9px;height:9px;border-radius:50%;background:var(--lv)}
+.td-gap{margin-top:18px}
 .td-goal{margin:18px 0 0;font-size:14px;color:var(--sub)}
 .td-goal+.td-goal{margin-top:2px}
 .td-hero{display:flex;gap:18px;align-items:center;margin:22px 0 6px}
