@@ -36,6 +36,10 @@ before. Nothing here changes how a score is worked out unless it says so.
   non-software engineer still counts when the posting itself describes coding
   work.
 
+- **Docs:** the runbook, agent skill, and orchestration notes now point at
+  `scripts/add_job.py` as the official way to add a job from a link or pasted
+  text. Do not hand-edit `market/roles/manual.json`.
+
 ### Fixed
 
 - **Role fetch:** a clearance line at the start of a posting kept its first

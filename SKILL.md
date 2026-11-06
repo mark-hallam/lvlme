@@ -272,11 +272,11 @@ rights question when `fetch_roles.py` first finds an open role that needs it.
 Run `python3 scripts/fetch_roles.py`. Note new and closed roles. Join the
 market scouts' sourced facts (offices in the person's region, growing teams,
 events, partner programmes) into `market/orgs.json`. It reads all six
-boards; roles from any other careers site go in
-`market/roles/manual.json`. To add one job from a link or pasted text (SEEK,
-Indeed, a hospital board, and so on), run `python3 scripts/add_job.py
---workspace PATH --url URL` or `--text-file FILE` with a manual target (`--org`
-when the employer name is not in config).
+boards. To add a role from any other careers site (SEEK, Indeed, a hospital
+board, and so on), run `python3 scripts/add_job.py --workspace PATH --url URL`
+or `--text-file FILE` with a manual target (`--org` when the employer name is
+not in config). That is the official way to add a job; it writes to
+`market/roles/manual.json`. Do not hand-edit the jobs list.
 
 Then find doors: run `python3 scripts/fetch_doors.py`, which reads the
 public Luma calendars in `config.json` (`doors.calendars`) and the

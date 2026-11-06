@@ -346,8 +346,10 @@ report/                    index.html, for-agents/
 Automatic LinkedIn scraping (it breaks LinkedIn's terms, so use the official
 data export instead), automatic applying, salary negotiation, and goals other
 than jobs. The full campaign reads Greenhouse, Ashby, Lever, Workday,
-SmartRecruiters and Workable boards; roles from any other careers site go in
-by hand in `market/roles/manual.json`. Use `scripts/add_job.py --workspace
-PATH --url URL` or `--text-file FILE` to read one posting and append it there
-(same checks as the role fetch: families, heavy coding, eligibility blockers).
-Run `fetch_roles.py` afterward so it appears in `market/roles/latest.json`.
+SmartRecruiters and Workable boards. To add a role from any other careers
+site, run `scripts/add_job.py --workspace PATH --url URL` or `--text-file FILE`
+(with `--org` when the employer name is not in config). That is the official
+way to add a job; it writes to `market/roles/manual.json`. Do not hand-edit
+the jobs list. It applies the same checks as the role fetch: families, heavy
+coding, eligibility blockers. Run `fetch_roles.py` afterward so the job appears
+in `market/roles/latest.json`.

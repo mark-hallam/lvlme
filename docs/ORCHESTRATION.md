@@ -124,8 +124,12 @@ Never scrape LinkedIn; use the official export.
   0) and becomes a "verify to unlock" question.
 - Duplicates merge into the existing evidence id. Contradictions mark the old
   item `contradicted`; nothing is deleted.
-- Then the lead writes `profile/evidence.json`, `market/orgs.json` and
-  `market/roles/manual.json`, and processes the inbox.
+- Then the lead writes `profile/evidence.json` and `market/orgs.json`, and
+  processes the inbox. To add a role from a careers site that is not one of
+  the six boards, run `python3 scripts/add_job.py --workspace PATH --url URL`
+  or `--text-file FILE` (with `--org` when the employer name is not in config).
+  That is the official way to add a job; it writes to `market/roles/manual.json`.
+  Do not hand-edit the jobs list.
 
 ### Fan-out 2: assess (stage 4)
 
