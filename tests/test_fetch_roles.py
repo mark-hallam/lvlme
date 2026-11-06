@@ -8,7 +8,7 @@ from unittest import mock
 import helpers as H
 import fetch_roles as F
 import validate as V
-from _common import matches_any
+from _common import BLOCKER_TYPES, matches_any
 
 CFG = H.example_config()
 GH = H.load(os.path.join(H.FIXTURES, "ats", "greenhouse.json"))
@@ -93,6 +93,119 @@ class EngineeringTitles(unittest.TestCase):
         self.assertTrue(F.engineering_title("Software Engineer II"))
         self.assertFalse(F.engineering_title("Engineer Relations Lead"))
         self.assertFalse(F.engineering_title("Technical Program Manager, Engineering"))
+
+    def test_non_software_engineer_and_developer_titles_are_not_coding_jobs(self):
+        for title in ("Civil Engineer", "Civil Infrastructure Engineer", "Infrastructure Engineer",
+                      "Site Engineer", "Maintenance Engineer", "Biomedical Engineer", "Property Developer",
+                      "Engineering Manager, Facilities", "Senior Engineering Manager, Civil Works",
+                      "Project Engineer", "Chemical Engineer"):
+            with self.subTest(title=title):
+                self.assertFalse(F.engineering_title(title))
+        for title in ("Software Engineer", "Backend Developer", "Site Reliability Engineer",
+                      "Software Quality Engineer"):
+            with self.subTest(title=title):
+                self.assertTrue(F.engineering_title(title))
+
+    def test_posting_blurb_does_not_make_field_engineer_a_coding_title(self):
+        blurb = (
+            "plant performance targets, deployment of the programme, and batches of 50 ml samples."
+        )
+        for title in ("Project Engineer", "Chemical Engineer"):
+            with self.subTest(title=title):
+                self.assertFalse(F.engineering_title(title, blurb))
+
+    def test_non_software_engineer_roles_are_not_heavy_coding_from_title(self):
+        body = "<h3>Requirements</h3><ul><li>5+ years of field experience.</li></ul>"
+        cfg = H.deep(CFG)
+        cfg["families"].append({
+            "id": "field_engineering",
+            "name": "Field engineering",
+            "title_keywords": [],
+            "department_keywords": ["Operations"],
+            "drop_if_heavy_coding": False,
+        })
+        for title in ("Civil Engineer", "Site Engineer", "Maintenance Engineer",
+                      "Biomedical Engineer", "Property Developer"):
+            with self.subTest(title=title):
+                base = next(F.greenhouse_postings({"jobs": [gh_job(99, title, "Operations", body)]}))
+                role, _ = F.build_role(TARGET, base, cfg)
+                self.assertIsNotNone(role, title)
+                self.assertFalse(role["requires_heavy_coding"], title)
+                self.assertFalse(F.engineering_title(title, base["raw_html"]))
+
+
+class EligibilityBlockerTests(unittest.TestCase):
+    """Unit tests for eligibility_blockers() on posting text."""
+
+    def test_australian_blockers(self):
+        cases = (
+            ("Must be a registered nurse with AHPRA registration.", "health_practitioner_registration"),
+            ("Current registration with the Australian Health Practitioner Regulation Agency is required.",
+             "health_practitioner_registration"),
+            ("You must hold current teacher registration with VIT.", "teacher_registration"),
+            ("Registered with NESA before you start.", "teacher_registration"),
+            ("A valid Working With Children Check is required.", "working_with_children_check"),
+            ("WWCC must be current.", "working_with_children_check"),
+            ("Must hold a current national police check.", "police_check"),
+            ("Must hold NV1 clearance before starting.", "australian_security_clearance"),
+            ("Ability to obtain a Baseline security clearance.", "australian_security_clearance"),
+            ("Negative Vetting Level 2 clearance required.", "australian_security_clearance"),
+            ("Negative Vetting Level 1 clearance required.", "australian_security_clearance"),
+            ("Ability to obtain NV1 before starting.", "australian_security_clearance"),
+            ("Baseline level security clearance required.", "australian_security_clearance"),
+            ("Teacher registration is required.", "teacher_registration"),
+            ("Registration with QCT is essential.", "teacher_registration"),
+            ("You must hold a current White Card.", "white_card"),
+        )
+        for text, kind in cases:
+            with self.subTest(text=text):
+                types = [b["type"] for b in F.eligibility_blockers(text)]
+                self.assertIn(kind, types)
+
+    def test_us_clearance_stays_security_clearance_not_australian(self):
+        text = "Must maintain an active TS/SCI clearance."
+        types = [b["type"] for b in F.eligibility_blockers(text)]
+        self.assertIn("security_clearance", types)
+        self.assertNotIn("australian_security_clearance", types)
+
+    def test_mixed_us_and_australian_clearance_sentences(self):
+        text = ("Must maintain an active TS/SCI clearance. "
+                "Australian citizens must hold a Baseline clearance.")
+        types = [b["type"] for b in F.eligibility_blockers(text)]
+        self.assertIn("security_clearance", types)
+        self.assertIn("australian_security_clearance", types)
+
+    def test_agsva_does_not_drop_us_clearance_in_another_sentence(self):
+        text = "Active Top Secret clearance. AGSVA sponsorship is available."
+        types = [b["type"] for b in F.eligibility_blockers(text)]
+        self.assertIn("security_clearance", types)
+        self.assertIn("australian_security_clearance", types)
+
+    def test_construction_induction_provided_is_not_white_card(self):
+        text = "Construction induction training will be provided."
+        types = [b["type"] for b in F.eligibility_blockers(text)]
+        self.assertNotIn("white_card", types)
+
+    def test_bare_vit_without_teacher_context_is_not_teacher_registration(self):
+        text = "Take Vit D daily."
+        types = [b["type"] for b in F.eligibility_blockers(text)]
+        self.assertNotIn("teacher_registration", types)
+
+    def test_default_hard_types_exclude_clearable_blockers(self):
+        from build_dashboard import DEFAULT_HARD_TYPES
+        for kind in ("police_check", "working_with_children_check", "white_card", "licence"):
+            self.assertNotIn(kind, DEFAULT_HARD_TYPES)
+
+    def test_nv1_is_australian_not_generic_clearance(self):
+        text = "Must hold NV1 clearance."
+        types = [b["type"] for b in F.eligibility_blockers(text)]
+        self.assertEqual(types, ["australian_security_clearance"])
+
+    def test_baseline_level_clearance_keeps_its_first_letter_and_is_not_generic(self):
+        text = "Baseline level security clearance required."
+        blockers = F.eligibility_blockers(text)
+        self.assertEqual([b["type"] for b in blockers], ["australian_security_clearance"])
+        self.assertTrue(blockers[0]["text"].startswith("Baseline"))
 
 
 class AdapterTests(unittest.TestCase):
@@ -248,7 +361,7 @@ class MainTests(unittest.TestCase):
             self.assertEqual(F.main(["--workspace", self.ws, "--fixtures", self.fx, "--date", "2026-11-01"]), 0)
         latest = H.load(os.path.join(self.ws, "market", "roles", "latest.json"))
         counts = latest["summary"]["blocker_counts"]
-        self.assertEqual(list(counts), ["us_person_export_control", "security_clearance", "citizenship", "licence"])
+        self.assertEqual(list(counts), BLOCKER_TYPES)
         for kind, n in counts.items():
             with self.subTest(kind=kind):
                 self.assertEqual(n, sum(1 for r in latest["roles"]
@@ -263,8 +376,7 @@ class MainTests(unittest.TestCase):
         roles = [{"eligibility_blockers": [{"type": "security_clearance", "text": "a"},
                                            {"type": "security_clearance", "text": "b"}]},
                  {"eligibility_blockers": []}, {}]
-        self.assertEqual(F.blocker_counts(roles), {"us_person_export_control": 0, "security_clearance": 1,
-                                                   "citizenship": 0, "licence": 0})
+        self.assertEqual(F.blocker_counts(roles), {t: (1 if t == "security_clearance" else 0) for t in BLOCKER_TYPES})
 
     def test_no_targets_stops_with_one_line(self):
         cfg = H.load(os.path.join(self.ws, "config.json"))

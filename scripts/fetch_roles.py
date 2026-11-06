@@ -26,16 +26,22 @@ Field notes
   location_classes  from the config keywords. "remote" counts as its own class
                 only when the same location line names no region.
   eligibility_blockers  postings that say US person / ITAR / export control,
-                security clearance, a named citizenship, or a licence.
+                security clearance, a named citizenship, a licence, AHPRA or
+                other professional registration, a Working With Children Check,
+                a police check, an Australian clearance level, or a White Card.
   blocker_counts  (in the summary, and printed) how many matched open roles
                 state each blocker type. The interview asks the export
                 control and clearance questions only when their count is
-                above 0 (method/INTERVIEW.md, "Work rights").
+                above 0 (`method/INTERVIEW.md`, "Work rights"). Counts for
+                `security_clearance` and `australian_security_clearance` both
+                gate the clearance question.
   requires_heavy_coding  heuristic; coding_signals lists the phrases found.
-                When candidate.writes_production_code is false, an engineering
-                title (ending in Engineer or Developer, or starting with
-                Engineering Manager) counts too, unless the posting says the
-                role needs no production code.
+                When candidate.writes_production_code is false, a software or
+                coding title (software, coding or programming in the title or
+                posting, or a known software role such as backend engineer)
+                counts too, unless the posting says the role needs no production
+                code. Civil, site, maintenance, biomedical and property roles
+                are not treated as coding jobs from the title alone.
 """
 import argparse
 import datetime as dt
@@ -235,16 +241,50 @@ CODE_STRONG = CODE_CORE + [
     r"strong\s+engineering\s+depth",
 ]
 NEGATION = re.compile(r"(?:n't|\bnot|\bnever|\bwithout|\bno need to|\bno)\s+(?:\w+\s+){0,3}$", re.I)
-ENGINEER_TITLE = re.compile(r"\b(engineer|developer)\b", re.I)
-# An engineering job by its title: the main part (before a comma, a dash or a bracket) ends in Engineer or
-# Developer ("Android Engineer, Plugin Platform"), or the title starts with Engineering Manager.
+# Main title ends in Engineer or Developer, or starts with Engineering Manager.
 ENGINEERING_JOB = re.compile(r"(?:\b(?:engineer|developer)(?:\s+(?:i{1,3}|iv|v|\d))?\s*$|^\s*(?:senior\s+|sr\.?\s+)?engineering\s+manager\b)", re.I)
+NON_SOFTWARE_ENGINEER = re.compile(
+    r"\bcivil\s+(?:\w+\s+)*engineer\b|"
+    r"\binfrastructure\s+engineer\b|"
+    r"\b(?:site|maintenance|biomedical|structural|mechanical|electrical|environmental|"
+    r"property|construction|manufacturing|process|packaging|chemical|project)\s+"
+    r"(?:engineer|developer)\b|"
+    r"\b(?<!software\s)quality\s+(?:engineer|developer)\b|"
+    r"\b(?<!site\s)reliability\s+(?:engineer|developer)\b|"
+    r"\bproperty\s+developer\b",
+    re.I,
+)
+# Ambiguous words (deployment, platform, performance, ml) apply to the title only, not the company blurb.
+TITLE_SOFTWARE_CODING_WORD = re.compile(
+    r"\b(?:software|coding|programming|programmer|devops|sre\b|"
+    r"backend|back[- ]end|frontend|front[- ]end|full[- ]stack|fullstack|"
+    r"machine\s+learning|\bml\b|android|ios|"
+    r"deployment|forward[- ]deployed|platform|performance|"
+    r"site\s+reliability|software\s+quality|"
+    r"plugin|monetization|chatgpt|data\s+engineer|analytics\s+engineer)\b",
+    re.I,
+)
+POSTING_SOFTWARE_CODING_WORD = re.compile(
+    r"\b(?:software|coding|programming|programmer|devops|sre\b|"
+    r"backend|back[- ]end|frontend|front[- ]end|full[- ]stack|fullstack|"
+    r"machine\s+learning|android|ios|"
+    r"plugin|chatgpt|data\s+engineer|analytics\s+engineer)\b",
+    re.I,
+)
 
 
-def engineering_title(title):
-    """True when the title alone names an engineering job (see ENGINEERING_JOB)."""
+def engineering_title(title, posting_text=None):
+    """True when the title names a software or coding job (see ENGINEERING_JOB)."""
     main = re.split(r"\s*(?:,|\(|\||\s[-\u2013\u2014]\s)", title or "", maxsplit=1)[0]
-    return bool(ENGINEERING_JOB.search(main))
+    if NON_SOFTWARE_ENGINEER.search(main):
+        return False
+    if not ENGINEERING_JOB.search(main):
+        return False
+    if TITLE_SOFTWARE_CODING_WORD.search(main):
+        return True
+    if posting_text and POSTING_SOFTWARE_CODING_WORD.search(posting_text):
+        return True
+    return False
 
 
 def coding_check(title, text):
@@ -259,7 +299,7 @@ def coding_check(title, text):
             hits.append(m.group(0)[:80])
             core = core or rx in CODE_CORE
             break
-    heavy = bool(core or (ENGINEER_TITLE.search(title) and hits) or len(hits) >= 2)
+    heavy = bool(core or (engineering_title(title, text) and hits) or len(hits) >= 2)
     return heavy, hits + list(dict.fromkeys(negated))
 
 
@@ -358,13 +398,57 @@ CITIZEN_RX = re.compile(r"(?:must|required to|need to|have to)\s+(?:be|hold)\s+(
 LICENCE_RX = re.compile(r"(?:must|required to|need to)\s+(?:hold|have|possess)\s+(?:an?\s+)?"
                         r"(?:valid\s+|current\s+|active\s+)?(?:[\w']+\s+){0,3}licen[cs]e\b|"
                         r"valid\s+(?:[\w']+\s+){0,3}licen[cs]e\s+(?:is\s+)?required", re.I)
+HEALTH_REG_RX = re.compile(
+    r"\bAHPRA\b|Australian\s+Health\s+Practitioner\s+Regulation\s+Agency|"
+    r"(?:current\s+)?registration\s+with\s+(?:the\s+)?Australian\s+Health\s+Practitioner\s+Regulation\s+Agency|"
+    r"registered\s+(?:[\w-]+\s+){0,4}(?:nurse|midwife|physiotherapist|psychologist|doctor|dentist)\s+with\s+AHPRA",
+    re.I)
+TEACHER_REG_RX = re.compile(
+    r"teacher\s+registration\s+(?:is\s+)?required|"
+    r"(?:must\s+hold|current|valid)\s+(?:[\w-]+\s+){0,3}teacher\s+registration|"
+    r"teacher\s+registration\s+with\s+(?:the\s+)?(?:VIT|NESA)\b|"
+    r"registration\s+with\s+(?:the\s+)?(?:QCT|Queensland\s+College\s+of\s+Teachers)\b|"
+    r"(?:registration\s+with\s+(?:the\s+)?(?:VIT|Victorian\s+Institute\s+of\s+Teaching|NESA)|"
+    r"Victorian\s+Institute\s+of\s+Teaching|NSW\s+Education\s+Standards\s+Authority|"
+    r"registered\s+with\s+(?:the\s+)?(?:VIT|Victorian\s+Institute\s+of\s+Teaching|NESA))\b",
+    re.I)
+WWCC_RX = re.compile(
+    r"working\s+with\s+children\s+check|\bWWCC\b|"
+    r"(?:valid|current)\s+WWC\s+check",
+    re.I)
+POLICE_RX = re.compile(
+    r"national\s+police\s+check|"
+    r"AFP\s+(?:national\s+)?(?:police\s+)?check|"
+    r"(?:must\s+hold|current|valid)\s+(?:a\s+)?national\s+police\s+check|"
+    r"(?:must\s+hold|current|valid)\s+(?:a\s+)?police\s+check",
+    re.I)
+_AU_LEVEL = r"(?:baseline|nv1|nv2|negative\s+vetting(?:\s+level\s*[12])?)"
+AU_CLEARANCE_RX = re.compile(
+    r"\b" + _AU_LEVEL + r"\b(?:\s+level)?(?:\s+security)?\s+clearance|"
+    r"Australian\s+Government\s+Security\s+Vetting|\bAGSVA\b|"
+    r"(?:ability\s+to\s+obtain|must\s+hold|hold\s+or\s+obtain|current)\s+"
+    r"(?:an?\s+)?" + _AU_LEVEL + r"(?:\s+(?:security\s+)?clearance)?",
+    re.I)
+WHITE_CARD_RX = re.compile(
+    r"\bwhite\s+card\b|"
+    r"(?:must\s+hold|required\s+to\s+hold|hold\s+(?:a\s+)?valid)\s+"
+    r"(?:a\s+)?construction\s+induction(?:\s+card)?|"
+    r"construction\s+induction(?:\s+card)?\s+(?:is\s+)?required|"
+    r"\bCPCCWHS1001\b",
+    re.I)
 US_WORDS = re.compile(r"\bU\.?S\.?\b|united states|american", re.I)
 
 
 def sentence_with(text, match):
-    start = max(text.rfind(". ", 0, match.start()) + 2, 0)
+    dot = text.rfind(". ", 0, match.start())
+    start = dot + 2 if dot >= 0 else 0
     end = text.find(". ", match.end())
     return shorten(text[start: end + 1 if end >= 0 else len(text)])
+
+
+def _append_blocker(out, kind, text):
+    if not any(b["type"] == kind and b["text"] == text for b in out):
+        out.append({"type": kind, "text": text})
 
 
 def eligibility_blockers(full_text):
@@ -372,9 +456,12 @@ def eligibility_blockers(full_text):
     m = US_PERSON_RX.search(full_text)
     if m:
         out.append({"type": "us_person_export_control", "text": sentence_with(full_text, m)})
-    m = CLEARANCE_RX.search(full_text)
-    if m:
-        out.append({"type": "security_clearance", "text": sentence_with(full_text, m)})
+    for m in AU_CLEARANCE_RX.finditer(full_text):
+        _append_blocker(out, "australian_security_clearance", sentence_with(full_text, m))
+    for m in CLEARANCE_RX.finditer(full_text):
+        sent = sentence_with(full_text, m)
+        if not AU_CLEARANCE_RX.search(sent):
+            _append_blocker(out, "security_clearance", sent)
     for m in CITIZEN_RX.finditer(full_text):
         if not US_WORDS.search(m.group(0)):
             out.append({"type": "citizenship", "text": sentence_with(full_text, m)})
@@ -382,6 +469,16 @@ def eligibility_blockers(full_text):
     m = LICENCE_RX.search(full_text)
     if m:
         out.append({"type": "licence", "text": sentence_with(full_text, m)})
+    for rx, kind in (
+        (HEALTH_REG_RX, "health_practitioner_registration"),
+        (TEACHER_REG_RX, "teacher_registration"),
+        (WWCC_RX, "working_with_children_check"),
+        (POLICE_RX, "police_check"),
+        (WHITE_CARD_RX, "white_card"),
+    ):
+        m = rx.search(full_text)
+        if m:
+            out.append({"type": kind, "text": sentence_with(full_text, m)})
     return out
 
 
@@ -546,11 +643,19 @@ def manual_postings(data, org):
         desc = job.get("description") or ""
         raw = desc if "<" in desc else "".join("<p>%s</p>" % html.escape(p) for p in desc.split("\n") if p.strip())
         dept = job.get("department")
+        wt = job.get("workplace_type")
+        is_remote = job.get("remote")
+        if wt:
+            workplace_type = wt
+        elif is_remote is True:
+            workplace_type = "Remote"
+        else:
+            workplace_type = None
         yield {
             "source_id": str(job.get("id")), "title": clean(job.get("title") or ""),
             "depts": [dept] if dept else [], "team_or_department": dept,
             "locations": list(job.get("locations") or []), "extra_location_text": [],
-            "workplace_type": "Remote" if job.get("remote") is True else None, "is_remote": job.get("remote"),
+            "workplace_type": workplace_type, "is_remote": is_remote,
             "url": job.get("url"), "updated_at": job.get("updated_at"), "published_at": job.get("published_at"),
             "raw_html": raw, "compensation": job.get("compensation"),
         }
@@ -578,10 +683,11 @@ def build_role(target, base, config):
     if not (config.get("heavy_coding") or {}).get("detect", True):
         heavy, signals = False, []
     elif (not heavy and "candidate" in config and not (config["candidate"] or {}).get("writes_production_code", False)
-          and engineering_title(base["title"]) and not any(s.startswith("NOT required") for s in signals)):
-        # Someone who doesn't write production code: an engineering title counts as heavy coding
+          and engineering_title(base["title"], parsed.get("full_text") or "")
+          and not any(s.startswith("NOT required") for s in signals)):
+        # Someone who doesn't write production code: a software or coding title counts as heavy coding
         # unless the posting itself says the role doesn't need it.
-        heavy, signals = True, signals + ["title names an engineering job: " + base["title"][:70]]
+        heavy, signals = True, signals + ["title names a software or coding job: " + base["title"][:70]]
     fam_cfg = next(f for f in config["families"] if f["id"] == fam)
     if heavy and fam_cfg.get("drop_if_heavy_coding"):
         return None, "the %s family drops postings that expect production coding" % fam

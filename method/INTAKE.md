@@ -178,7 +178,7 @@ that is a fact as an evidence item with a source of type `interview` and a
    country and level? [D6]
    Why we ask: clearance roles are closed without one.
    Ask only when an open role needs it: `summary.blocker_counts.security_clearance`
-   is above 0.
+   or `summary.blocker_counts.australian_security_clearance` is above 0.
 6. Do you hold any professional licence a target role might require (for
    example a driving licence, an engineering registration, a financial
    services licence)? [D6, D1]

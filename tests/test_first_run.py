@@ -124,14 +124,16 @@ class WorkRightsTests(unittest.TestCase):
         q5 = " ".join(re.search(r"^5\. (.*?)(?=^6\. )", bank, re.M | re.S).group(1).split())
         self.assertIn("export-control", q4)
         self.assertIn("clearance", q5)
-        for q, kind in ((q4, "us_person_export_control"), (q5, "security_clearance")):
-            with self.subTest(kind=kind):
+        for q, kinds in ((q4, ("us_person_export_control",)), (q5, ("security_clearance", "australian_security_clearance"))):
+            with self.subTest(q=q[:40]):
                 self.assertIn("Ask only when an open role needs it", q)
-                self.assertIn(kind, q)
+                for kind in kinds:
+                    self.assertIn(kind, q)
         interview = " ".join(section(read("method/INTERVIEW.md"), "The rounds").split())
         self.assertIn("summary.blocker_counts", interview)
-        for kind in ("us_person_export_control", "security_clearance"):
-            self.assertIn("`%s` is above 0" % kind, interview)
+        for kind in ("us_person_export_control", "security_clearance", "australian_security_clearance"):
+            self.assertIn("`%s`" % kind, interview)
+        self.assertIn("above 0", interview)
         self.assertIn("honest default", interview)
 
     def test_the_counts_named_exist(self):

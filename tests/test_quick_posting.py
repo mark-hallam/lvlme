@@ -163,6 +163,15 @@ class FetchTests(unittest.TestCase):
         with self.assertRaises(Q.PostingError):
             Q.from_text("Short posting\nOne line.")
 
+    def test_pasted_text_reads_employer_and_location_headers(self):
+        posting = ("Data Analyst\nEmployer: Example Co\nLocation: Perth, Australia\n\nRequirements\n"
+                   "- 3+ years of analysis\n\n" + "More detail about the team and tools. " * 35)
+        base = Q.base_from_text(posting)
+        self.assertEqual(base["org_name"], "Example Co")
+        self.assertEqual(base["locations"], ["Perth, Australia"])
+        role, _ = Q.from_text(posting)
+        self.assertIn("3+ years", role["hard_requirements"][0])
+
     def test_cli_exit_codes(self):
         with mock.patch("sys.stderr", new_callable=io.StringIO) as err:
             self.assertEqual(Q.main(["https://www.linkedin.com/jobs/view/1"]), 3)

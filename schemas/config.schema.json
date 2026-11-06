@@ -193,7 +193,11 @@
     },
     "extension": {"description": "Extension field: any key starting x_ holds data the engine never reads (for example a field from an older system). Kept as is."},
     "date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
-    "blocker_type": {"enum": ["us_person_export_control", "security_clearance", "citizenship", "licence"]},
+    "blocker_type": {"enum": [
+      "us_person_export_control", "security_clearance", "citizenship", "licence",
+      "health_practitioner_registration", "teacher_registration",
+      "working_with_children_check", "police_check", "australian_security_clearance", "white_card"
+    ]},
     "target": {
       "type": "object",
       "required": ["id", "name", "ats"],

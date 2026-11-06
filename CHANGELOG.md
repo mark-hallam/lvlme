@@ -8,6 +8,34 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## Unreleased
+
+### Added
+
+- **Checklist score:** `scripts/_checklist.py` scores a job as the list of things that job asks for. It keeps a requirement only when two reads of the ad agree, fails a licence or an eligibility rule only on a majority of votes, treats a check or vaccination as a to-do, counts a soft skill at half weight, and lets an unknown widen the range. When `eval/checklists.json` has a saved list, the scored run and the role screen show that verdict beside today's fit. Today's fit is unchanged, and no chance percentage is shown.
+- **Manual job:** `scripts/add_job.py` reads one posting from a link or a text
+  file (same reader as `scripts/quick_posting.py`), classifies it with the
+  workspace config, and saves it to `market/roles/manual.json` for a manual
+  target. Run `fetch_roles.py` afterward to score it with the rest.
+- **Role fetch:** eligibility blocker detection for Australian health
+  practitioner registration (AHPRA), teacher registration (VIT, NESA), a Working
+  With Children Check, a national police check, Australian security clearance
+  levels (Baseline, NV1, NV2, Negative Vetting), and a construction White Card.
+  Police check, WWCC and White Card blockers can be cleared in the plan like a
+  licence; registration and clearance types stay hard by default.
+
+### Fixed
+
+- **Role fetch:** a clearance line at the start of a posting kept its first
+  letter. "Baseline level security clearance" is only an Australian clearance,
+  not also a generic security clearance.
+- **Role fetch:** only software or coding job titles (not civil, site,
+  maintenance, biomedical or property developer roles) are treated as heavy
+  coding when the person does not write production code. Title matching no
+  longer treats every engineering manager or ambiguous posting words (for
+  example platform in a company blurb) as a coding job; site reliability and
+  software quality engineer titles still count.
+
 ## 0.7.2 (6 November 2026)
 
 From a real search for senior project roles: no role reached a fit of 70,

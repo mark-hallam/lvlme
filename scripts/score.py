@@ -53,6 +53,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _checklist as CL  # noqa: E402
 import _common as C  # noqa: E402
 import _judge_change as JC  # noqa: E402
 import _match as M  # noqa: E402
@@ -460,6 +461,13 @@ def build_run(ws, config, run_date):
                 ctx.warn("profile %s has an entry for %s, which is not a target in config.json" % (section, key))
 
     scored = sorted((score_role(ctx, r, judgements.get(r["id"])) for r in roles), key=sort_key)
+    checklists = C.load_json(C.wpath(ws, "eval", "checklists.json"), None)
+    if checklists:
+        saved = checklists.get("roles") or {}
+        for scored_role in scored:
+            entry = saved.get(scored_role["role_id"])
+            if entry:
+                CL.attach(scored_role, entry)
     per_org = {}
     for tid in C.target_ids(config):
         best = next((r for r in scored if r["org"] == tid and r["judged"]), None)
@@ -484,7 +492,8 @@ def build_run(ws, config, run_date):
         # posting_check holds a posting's age, which moves every day: it is a label, never an input to a score
         "inputs_digest": digest(RUBRIC_VERSION, config,
                                 [{k: v for k, v in r.items() if k != "posting_check"} for r in roles],
-                                judgements_doc, profile, templates, outlook, evidence),
+                                judgements_doc, profile, templates, outlook, evidence,
+                                *( [checklists] if checklists else [] )),
         "counts": {
             "roles": len(scored),
             "judged": sum(1 for r in scored if r["judged"]),

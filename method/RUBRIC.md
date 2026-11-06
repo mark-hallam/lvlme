@@ -276,15 +276,21 @@ Unknown evidence ids are reported as warnings and ignored.
 
 ## Eligibility beats everything (enforced)
 
-`scripts/fetch_roles.py` looks for four kinds of eligibility blocker in each
+`scripts/fetch_roles.py` looks for these kinds of eligibility blocker in each
 posting:
 
 | Blocker type | What it catches |
 |---|---|
 | `us_person_export_control` | ITAR (the United States International Traffic in Arms Regulations), "US person", export control, US citizenship or permanent residency (green card). |
-| `security_clearance` | An active or obtainable government security clearance. |
+| `security_clearance` | An active or obtainable government security clearance (not the Australian levels below). |
+| `australian_security_clearance` | An Australian Government clearance (Baseline, NV1, NV2, Negative Vetting), AGSVA, or wording such as "ability to obtain" one of those levels. |
 | `citizenship` | "Must be a citizen of" a named country. |
 | `licence` | "Must hold" a named licence. |
+| `health_practitioner_registration` | AHPRA registration, or registration with the Australian Health Practitioner Regulation Agency. |
+| `teacher_registration` | Teacher registration with VIT, NESA, or the named state bodies. |
+| `working_with_children_check` | A Working With Children Check or WWCC. |
+| `police_check` | A national or AFP police check. |
+| `white_card` | A construction induction White Card. |
 
 A role is **blocked** if it has a blocker whose type is not listed in
 `config.json` under `candidate.eligibility_cleared`. The judgement field
@@ -294,13 +300,16 @@ when the detector misread the posting.
 A blocked role scores D6 = 0 and counts as a lacking hard requirement, so D1
 is capped at 1 and both bands move down one step.
 
-Some blockers no plan can clear in time, such as a citizenship rule. Set
-`hard_eligibility_block: true` in the role's judgement to say so (it also
-marks the role blocked). The dashboard's projection then keeps D6 at 0 for
-that role, whatever the plan does. Blocked roles whose blocker type is listed
-in `campaign/plan.json` under `eligibility_blockers.hard_types` (by default
-`us_person_export_control`, `citizenship` and `security_clearance`) are
-treated the same way; a `licence` blocker can be cleared by a plan action.
+Some blockers no plan can clear in time, such as a citizenship rule or
+professional registration you do not hold. Set `hard_eligibility_block: true`
+in the role's judgement to say so (it also marks the role blocked). The
+dashboard's projection then keeps D6 at 0 for that role, whatever the plan
+does. Blocked roles whose blocker type is listed in `campaign/plan.json` under
+`eligibility_blockers.hard_types` (by default export control, citizenship,
+security clearance, health practitioner registration, teacher registration and
+Australian security clearance) are treated the same way. A `licence`, Working
+With Children Check, police check or White Card blocker can be cleared by a
+plan action once the person holds it.
 
 ## Review cap (enforced)
 

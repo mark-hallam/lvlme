@@ -29,8 +29,13 @@
       "description": "Which eligibility blockers the plan can never clear. A blocked role with one of these types, or whose judgement sets hard_eligibility_block, keeps eligibility (D6) at 0 in the projection.",
       "additionalProperties": false,
       "properties": {
-        "hard_types": {"type": "array", "description": "Default: us_person_export_control, citizenship, security_clearance.",
-                       "items": {"enum": ["us_person_export_control", "security_clearance", "citizenship", "licence"]}}
+        "hard_types": {"type": "array",
+                       "description": "Default: us_person_export_control, citizenship, security_clearance, health_practitioner_registration, teacher_registration, australian_security_clearance.",
+                       "items": {"enum": [
+                         "us_person_export_control", "security_clearance", "citizenship", "licence",
+                         "health_practitioner_registration", "teacher_registration",
+                         "working_with_children_check", "police_check", "australian_security_clearance", "white_card"
+                       ]}}
       }
     },
     "north_star": {"type": "array", "items": {"$ref": "#/definitions/metric"}},

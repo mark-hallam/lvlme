@@ -144,8 +144,8 @@ open role needs them, which `fetch_roles.py` counts in
 
 - the US export control question (`INTAKE.md` 1.4), only when
   `us_person_export_control` is above 0;
-- the security clearance question (1.5), only when `security_clearance` is
-  above 0.
+- the security clearance question (1.5), only when `security_clearance` or
+  `australian_security_clearance` is above 0.
 
 Until the person says they meet a requirement, the roles that state it
 count as blocked (D6 = 0), which is the honest default. If a later run's
