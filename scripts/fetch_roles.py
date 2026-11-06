@@ -32,7 +32,9 @@ Field notes
   blocker_counts  (in the summary, and printed) how many matched open roles
                 state each blocker type. The interview asks the export
                 control and clearance questions only when their count is
-                above 0 (method/INTERVIEW.md, "Work rights").
+                above 0 (`method/INTERVIEW.md`, "Work rights"). Counts for
+                `security_clearance` and `australian_security_clearance` both
+                gate the clearance question.
   requires_heavy_coding  heuristic; coding_signals lists the phrases found.
                 When candidate.writes_production_code is false, a software or
                 coding title (software, coding or programming in the title or
@@ -402,10 +404,13 @@ HEALTH_REG_RX = re.compile(
     r"registered\s+(?:[\w-]+\s+){0,4}(?:nurse|midwife|physiotherapist|psychologist|doctor|dentist)\s+with\s+AHPRA",
     re.I)
 TEACHER_REG_RX = re.compile(
-    r"\b(?:VIT|NESA)\b(?:\s+registration)?|Victorian\s+Institute\s+of\s+Teaching|"
-    r"NSW\s+Education\s+Standards\s+Authority|"
+    r"teacher\s+registration\s+(?:is\s+)?required|"
     r"(?:must\s+hold|current|valid)\s+(?:[\w-]+\s+){0,3}teacher\s+registration|"
-    r"registered\s+with\s+(?:the\s+)?(?:VIT|Victorian\s+Institute\s+of\s+Teaching|NESA)\b",
+    r"teacher\s+registration\s+with\s+(?:the\s+)?(?:VIT|NESA)\b|"
+    r"registration\s+with\s+(?:the\s+)?(?:QCT|Queensland\s+College\s+of\s+Teachers)\b|"
+    r"(?:registration\s+with\s+(?:the\s+)?(?:VIT|Victorian\s+Institute\s+of\s+Teaching|NESA)|"
+    r"Victorian\s+Institute\s+of\s+Teaching|NSW\s+Education\s+Standards\s+Authority|"
+    r"registered\s+with\s+(?:the\s+)?(?:VIT|Victorian\s+Institute\s+of\s+Teaching|NESA))\b",
     re.I)
 WWCC_RX = re.compile(
     r"working\s+with\s+children\s+check|\bWWCC\b|"
@@ -417,15 +422,19 @@ POLICE_RX = re.compile(
     r"(?:must\s+hold|current|valid)\s+(?:a\s+)?national\s+police\s+check|"
     r"(?:must\s+hold|current|valid)\s+(?:a\s+)?police\s+check",
     re.I)
+_AU_LEVEL = r"(?:baseline|nv1|nv2|negative\s+vetting(?:\s+level\s*[12])?)"
 AU_CLEARANCE_RX = re.compile(
-    r"\b(?:baseline|nv1|nv2|negative\s+vetting(?:\s+level\s*2)?)\b(?:\s+security)?\s+clearance|"
+    r"\b" + _AU_LEVEL + r"\b(?:\s+level)?(?:\s+security)?\s+clearance|"
     r"Australian\s+Government\s+Security\s+Vetting|\bAGSVA\b|"
     r"(?:ability\s+to\s+obtain|must\s+hold|hold\s+or\s+obtain|current)\s+"
-    r"(?:an?\s+)?(?:baseline|nv1|nv2|negative\s+vetting(?:\s+level\s*2)?)\s+"
-    r"(?:security\s+)?clearance",
+    r"(?:an?\s+)?" + _AU_LEVEL + r"(?:\s+(?:security\s+)?clearance)?",
     re.I)
 WHITE_CARD_RX = re.compile(
-    r"\bwhite\s+card\b|construction\s+induction(?:\s+card)?|\bCPCCWHS1001\b",
+    r"\bwhite\s+card\b|"
+    r"(?:must\s+hold|required\s+to\s+hold|hold\s+(?:a\s+)?valid)\s+"
+    r"(?:a\s+)?construction\s+induction(?:\s+card)?|"
+    r"construction\s+induction(?:\s+card)?\s+(?:is\s+)?required|"
+    r"\bCPCCWHS1001\b",
     re.I)
 US_WORDS = re.compile(r"\bU\.?S\.?\b|united states|american", re.I)
 
@@ -436,19 +445,22 @@ def sentence_with(text, match):
     return shorten(text[start: end + 1 if end >= 0 else len(text)])
 
 
+def _append_blocker(out, kind, text):
+    if not any(b["type"] == kind and b["text"] == text for b in out):
+        out.append({"type": kind, "text": text})
+
+
 def eligibility_blockers(full_text):
     out = []
     m = US_PERSON_RX.search(full_text)
     if m:
         out.append({"type": "us_person_export_control", "text": sentence_with(full_text, m)})
-    m = AU_CLEARANCE_RX.search(full_text)
-    if m:
-        out.append({"type": "australian_security_clearance", "text": sentence_with(full_text, m)})
-    m = CLEARANCE_RX.search(full_text)
-    if m and not any(b["type"] == "australian_security_clearance" for b in out):
+    for m in AU_CLEARANCE_RX.finditer(full_text):
+        _append_blocker(out, "australian_security_clearance", sentence_with(full_text, m))
+    for m in CLEARANCE_RX.finditer(full_text):
         sent = sentence_with(full_text, m)
         if not AU_CLEARANCE_RX.search(sent):
-            out.append({"type": "security_clearance", "text": sent})
+            _append_blocker(out, "security_clearance", sent)
     for m in CITIZEN_RX.finditer(full_text):
         if not US_WORDS.search(m.group(0)):
             out.append({"type": "citizenship", "text": sentence_with(full_text, m)})

@@ -150,6 +150,11 @@ class EligibilityBlockerTests(unittest.TestCase):
             ("Must hold NV1 clearance before starting.", "australian_security_clearance"),
             ("Ability to obtain a Baseline security clearance.", "australian_security_clearance"),
             ("Negative Vetting Level 2 clearance required.", "australian_security_clearance"),
+            ("Negative Vetting Level 1 clearance required.", "australian_security_clearance"),
+            ("Ability to obtain NV1 before starting.", "australian_security_clearance"),
+            ("Baseline level security clearance required.", "australian_security_clearance"),
+            ("Teacher registration is required.", "teacher_registration"),
+            ("Registration with QCT is essential.", "teacher_registration"),
             ("You must hold a current White Card.", "white_card"),
         )
         for text, kind in cases:
@@ -162,6 +167,34 @@ class EligibilityBlockerTests(unittest.TestCase):
         types = [b["type"] for b in F.eligibility_blockers(text)]
         self.assertIn("security_clearance", types)
         self.assertNotIn("australian_security_clearance", types)
+
+    def test_mixed_us_and_australian_clearance_sentences(self):
+        text = ("Must maintain an active TS/SCI clearance. "
+                "Australian citizens must hold a Baseline clearance.")
+        types = [b["type"] for b in F.eligibility_blockers(text)]
+        self.assertIn("security_clearance", types)
+        self.assertIn("australian_security_clearance", types)
+
+    def test_agsva_does_not_drop_us_clearance_in_another_sentence(self):
+        text = "Active Top Secret clearance. AGSVA sponsorship is available."
+        types = [b["type"] for b in F.eligibility_blockers(text)]
+        self.assertIn("security_clearance", types)
+        self.assertIn("australian_security_clearance", types)
+
+    def test_construction_induction_provided_is_not_white_card(self):
+        text = "Construction induction training will be provided."
+        types = [b["type"] for b in F.eligibility_blockers(text)]
+        self.assertNotIn("white_card", types)
+
+    def test_bare_vit_without_teacher_context_is_not_teacher_registration(self):
+        text = "Take Vit D daily."
+        types = [b["type"] for b in F.eligibility_blockers(text)]
+        self.assertNotIn("teacher_registration", types)
+
+    def test_default_hard_types_exclude_clearable_blockers(self):
+        from build_dashboard import DEFAULT_HARD_TYPES
+        for kind in ("police_check", "working_with_children_check", "white_card", "licence"):
+            self.assertNotIn(kind, DEFAULT_HARD_TYPES)
 
     def test_nv1_is_australian_not_generic_clearance(self):
         text = "Must hold NV1 clearance."

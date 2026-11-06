@@ -17,8 +17,11 @@
   "eligibility_blockers": {
     "hard_types": [
       "us_person_export_control",
+      "citizenship",
       "security_clearance",
-      "citizenship"
+      "health_practitioner_registration",
+      "teacher_registration",
+      "australian_security_clearance"
     ]
   },
   "north_star": [

@@ -121,8 +121,9 @@ best case and do nothing. They come from each open action's `effects`:
   months, so D1 stays put by default.
 - **Blockers you can't clear stay blocked.** A role whose judgement sets
   `hard_eligibility_block: true`, or that is blocked by a type listed in
-  `eligibility_blockers.hard_types` (default: export control, citizenship and
-  security clearance), keeps D6 at 0 in every path.
+  `eligibility_blockers.hard_types` (default: export control, citizenship,
+  security clearance, health practitioner registration, teacher registration and
+  Australian security clearance), keeps D6 at 0 in every path.
 - `baseline_date` (Day 1, default the first run) and `end_date` (default 90
   days after the latest run, later if an action's target date needs it) frame
   the chart.
