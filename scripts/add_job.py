@@ -12,7 +12,7 @@ department, remote). Nothing is applied or submitted.
 
 Usage
   python3 scripts/add_job.py --workspace PATH --url URL [--org TARGET_ID] [--saved FILE]
-  python3 scripts/add_job.py --workspace PATH --text-file FILE [--org TARGET_ID] [--title TITLE] [--url URL]
+  python3 scripts/add_job.py --workspace PATH --text-file FILE [--org TARGET_ID] [--title TITLE] [--link URL]
 Every command takes --workspace PATH. --org must be a target whose ats is manual
 (when omitted, the employer name must match a manual target's name or alias).
 """
@@ -47,7 +47,7 @@ def resolve_target(config, org_id, employer_name):
                              "and run fetch_roles.py instead." % (org_id, target.get("ats")))
         return target
     name = (employer_name or "").strip().lower()
-    if not name:
+    if not name or name == "the employer":
         raise SystemExit("lvlme: could not tell which organisation this posting belongs to. "
                          "Give --org with a manual target id from config.json.")
     matches = []
@@ -68,43 +68,54 @@ def resolve_target(config, org_id, employer_name):
                      % (employer_name, ", ".join(t["id"] for t in manual)))
 
 
-def build_role(config, target, base):
-    role, reason = FR.build_role(target, base, config)
-    if role is None:
-        raise SystemExit("lvlme: this posting is not kept for scoring (%s). "
-                         "Check config.json role families, or paste a different posting." % (reason or "unknown"))
-    return Q.check_text(role)
-
-
-def posting_entry(role):
-    """One manual.json posting from a classified role (no invented fields)."""
+def posting_entry(target, base, role=None):
+    """One manual.json posting from the read base (description is the same HTML fetch_roles will parse)."""
+    org = (role or {}).get("org") or target["id"]
+    rid = (role or {}).get("id") or "%s:%s" % (org, base["source_id"])
     entry = {
-        "org": role["org"],
-        "id": role["id"].split(":", 1)[1],
-        "title": role["title"],
-        "locations": list(role.get("locations") or []),
-        "description": role.get("description_text") or "",
+        "org": org,
+        "id": rid.split(":", 1)[1],
+        "title": (role or {}).get("title") or base["title"],
+        "locations": list((role or {}).get("locations") or base.get("locations") or []),
+        "description": base.get("raw_html") or "",
     }
-    if role.get("url"):
-        entry["url"] = role["url"]
-    if role.get("compensation"):
-        entry["compensation"] = role["compensation"]
-    if role.get("team_or_department"):
-        entry["department"] = role["team_or_department"]
-    if role.get("remote") is True:
+    link = base.get("url")
+    if link:
+        entry["url"] = link
+    comp = (role or {}).get("compensation") or base.get("compensation")
+    if comp:
+        entry["compensation"] = comp
+    dept = (role or {}).get("team_or_department") or base.get("team_or_department")
+    if dept:
+        entry["department"] = dept
+    if base.get("workplace_type"):
+        entry["workplace_type"] = base["workplace_type"]
+    remote = (role or {}).get("remote") if role else base.get("is_remote")
+    if remote is True:
         entry["remote"] = True
     for key in ("published_at", "updated_at"):
-        if role.get(key):
-            entry[key] = role[key]
+        val = (role or {}).get(key) or base.get(key)
+        if val:
+            entry[key] = val
     return entry
 
 
 def merge_posting(doc, entry):
-    postings = list((doc or {}).get("postings") or [])
+    out = dict(doc or {})
+    postings = list(out.get("postings") or [])
     key = (entry["org"], entry["id"])
     postings = [p for p in postings if (p.get("org"), p.get("id")) != key]
     postings.append(entry)
-    return {"postings": postings}
+    out["postings"] = postings
+    return out
+
+
+def classify(config, target, base):
+    """Return (role, exclusion_reason). Raises PostingError when the text is too short to judge."""
+    role, reason = FR.build_role(target, base, config)
+    if role is None:
+        return None, reason
+    return Q.check_text(role), None
 
 
 def main(argv=None):
@@ -115,6 +126,7 @@ def main(argv=None):
     src.add_argument("--text-file", help="a file with the posting text ('-' reads standard input)")
     ap.add_argument("--org", help="manual target id from config.json")
     ap.add_argument("--title", help="role title when using --text-file (default: first line of the file)")
+    ap.add_argument("--link", help="posting link to record when using --text-file")
     ap.add_argument("--saved", help="offline: read this saved page or API response instead of the network")
     args = ap.parse_args(argv)
     ws, config = C.open_workspace(args.workspace)
@@ -124,34 +136,43 @@ def main(argv=None):
     try:
         if args.text_file:
             text = C.read_input(args.text_file, "posting text file")
+            paste_url = args.link
             if args.org:
                 target = resolve_target(config, args.org, None)
             else:
-                preview = Q.base_from_text(text, args.title, None, args.url)
+                preview = Q.base_from_text(text, args.title, None, paste_url)
                 target = resolve_target(config, None, preview.get("org_name"))
-            base = Q.base_from_text(text, args.title, target.get("name"), args.url)
+            base = Q.base_from_text(text, args.title, target.get("name"), paste_url)
             source = {"kind": "text", "org_name": base.get("org_name")}
         else:
             base, source, _link = Q.fetch_base(args.url, args.saved)
             target = resolve_target(config, args.org, base.get("org_name") or source.get("org_name"))
+        Q.check_base(base)
+        role, excluded = classify(config, target, base)
     except Q.PostingError as exc:
         print("lvlme: %s" % exc, file=sys.stderr)
         return 3
-    role = build_role(config, target, base)
+    entry = posting_entry(target, base, role)
     path = C.wpath(ws, *MANUAL)
     doc = C.load_json(path, {"postings": []})
-    entry = posting_entry(role)
     C.write_json(path, merge_posting(doc, entry))
     out = {
-        "role_id": role["id"],
-        "title": role["title"],
-        "org": role["org"],
-        "requires_heavy_coding": role["requires_heavy_coding"],
-        "coding_signals": role.get("coding_signals") or [],
-        "eligibility_blockers": role.get("eligibility_blockers") or [],
+        "role_id": role["id"] if role else "%s:%s" % (target["id"], base["source_id"]),
+        "title": entry["title"],
+        "org": target["id"],
         "manual_posting": entry,
         "source": source,
     }
+    if role:
+        out.update(requires_heavy_coding=role["requires_heavy_coding"],
+                   coding_signals=role.get("coding_signals") or [],
+                   eligibility_blockers=role.get("eligibility_blockers") or [])
+    else:
+        out["kept_for_scoring"] = False
+        out["exclusion_reason"] = excluded or "unknown"
+        print("lvlme: saved to market/roles/manual.json but not kept for scoring (%s). "
+              "Check config.json role families, or paste a different posting." % out["exclusion_reason"],
+              file=sys.stderr)
     print(json.dumps(out, indent=2, ensure_ascii=False))
     return 0
 

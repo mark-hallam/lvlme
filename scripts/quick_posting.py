@@ -296,6 +296,59 @@ def _ld_locations(job):
     return [x for x in dict.fromkeys(out) if x]
 
 
+def _ld_compensation(job):
+    bs = job.get("baseSalary")
+    if not isinstance(bs, dict):
+        return None
+    cur = (bs.get("currency") or "").strip()
+    unit = (bs.get("unitText") or bs.get("unitCode") or "").strip()
+    lo, hi = bs.get("minValue"), bs.get("maxValue")
+    if lo is not None and hi is not None:
+        text = "%s%s to %s" % (cur + " " if cur else "", lo, hi)
+    else:
+        val = bs.get("value")
+        if isinstance(val, dict):
+            lo, hi = val.get("minValue"), val.get("maxValue")
+            if lo is not None and hi is not None:
+                text = "%s%s to %s" % (cur + " " if cur else "", lo, hi)
+            else:
+                text = str(val.get("value") or val.get("minValue") or "")
+        else:
+            text = str(val or lo or "")
+    text = FR.clean(text)
+    if unit and unit.lower() not in text.lower():
+        text = (text + " " + unit).strip()
+    return text or None
+
+
+def _paste_meta_line(line):
+    """Return (field, value) for Employer:, Location:, and similar paste headers, or None."""
+    for rx, field in (
+        (re.compile(r"^employer\s*:\s*(.+)", re.I), "employer"),
+        (re.compile(r"^location\s*:\s*(.+)", re.I), "location"),
+        (re.compile(r"^(?:salary|pay|compensation)\s*:\s*(.+)", re.I), "pay"),
+        (re.compile(r"^(?:closing|apply by|applications close)\s*:\s*(.+)", re.I), "closing"),
+    ):
+        m = rx.match(line.strip())
+        if m:
+            return field, m.group(1).strip()
+    return None
+
+
+def _paste_line_html(line):
+    if line[:1] in "-*•":
+        return "<li>%s</li>" % html.escape(line[1:].strip())
+    if _paste_meta_line(line):
+        return ""
+    plain = line.rstrip(":").strip()
+    cat = FR.heading_category(plain)
+    if cat in ("req", "nice", "resp", "about", "stop") and len(plain) <= 100:
+        return "<h3>%s</h3>" % html.escape(line.rstrip(":").strip())
+    if len(line) <= 80 and (line.endswith(":") or (line.isupper() and len(line) <= 60)):
+        return "<h3>%s</h3>" % html.escape(line.rstrip(":").strip())
+    return "<p>%s</p>" % html.escape(line)
+
+
 def base_from_page(raw_html, url):
     """One posting from a public web page: its JobPosting block if it has one, else its text."""
     page = _Page()
@@ -314,21 +367,50 @@ def base_from_page(raw_html, url):
             org_name = org.get("name") if isinstance(org, dict) else org if isinstance(org, str) else None
             desc = str(job["description"])
             raw = desc if "<" in desc else "".join("<p>%s</p>" % html.escape(p) for p in desc.split("\n") if p.strip())
-            return _base(source_id, FR.clean(str(job.get("title") or page.h1 or page.title or "")),
-                         _ld_locations(job), url, raw, org_name or page.site or host,
-                         published=job.get("datePosted"))
+            base = _base(source_id, FR.clean(str(job.get("title") or page.h1 or page.title or "")),
+                          _ld_locations(job), url, raw, org_name or page.site or host,
+                          published=job.get("datePosted"))
+            base["compensation"] = _ld_compensation(job) or base.get("compensation")
+            wt = str(job.get("jobLocationType") or "")
+            if wt.upper() == "TELECOMMUTE":
+                base["workplace_type"] = "Remote"
+            elif wt:
+                base["workplace_type"] = wt
+            closing = job.get("validThrough")
+            if closing and not base.get("updated_at"):
+                base["updated_at"] = str(closing)
+            return base
     return _base(source_id, page.h1 or page.title or "", [], url, raw_html, page.site or host)
 
 
 def base_from_text(text, title=None, org_name=None, url=None):
     """One posting from text the person pasted. The first line is the title unless one is given."""
-    lines = [l.strip() for l in (text or "").splitlines()]
+    lines = [l.strip() for l in (text or "").splitlines() if l.strip()]
+    parsed_org, parsed_locs, compensation, closing = None, [], None, None
+    body = []
+    for line in lines:
+        meta = _paste_meta_line(line)
+        if meta:
+            field, value = meta
+            if field == "employer":
+                parsed_org = value
+            elif field == "location":
+                parsed_locs.append(value)
+            elif field == "pay":
+                compensation = value
+            elif field == "closing":
+                closing = value
+            continue
+        body.append(line)
     if not title:
-        title = next((l.lstrip("# ").strip() for l in lines if l), "")
-    paras = "".join("<li>%s</li>" % html.escape(l[1:].strip()) if l[:1] in "-*•" else
-                    "<p>%s</p>" % html.escape(l) for l in lines if l)
+        title = next((l.lstrip("# ").strip() for l in body if l), "")
+    paras = "".join(_paste_line_html(l) for l in body if l)
     source_id = "text_" + hashlib.sha256((text or "").encode("utf-8")).hexdigest()[:10]
-    return _base(source_id, title, [], url, paras, org_name or "The employer")
+    base = _base(source_id, title, parsed_locs, url, paras, org_name or parsed_org or "The employer")
+    base["compensation"] = compensation
+    if closing:
+        base["updated_at"] = closing
+    return base
 
 
 # ------------------------------------------------------------ the role
@@ -356,6 +438,15 @@ def check_text(role):
         raise PostingError("The page gave too little text to judge (many careers sites build the page in "
                            "the browser). Paste the posting text instead.")
     return role
+
+
+def check_base(base):
+    """Enough posting text to judge, before family classification."""
+    parsed = FR.parse_posting(base.get("raw_html") or "", base.get("title") or "")
+    if len(parsed.get("text") or "") < MIN_TEXT:
+        raise PostingError("The page gave too little text to judge (many careers sites build the page in "
+                           "the browser). Paste the posting text instead.")
+    return base
 
 
 # ------------------------------------------------------------- fetch

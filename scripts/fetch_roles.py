@@ -642,11 +642,19 @@ def manual_postings(data, org):
         desc = job.get("description") or ""
         raw = desc if "<" in desc else "".join("<p>%s</p>" % html.escape(p) for p in desc.split("\n") if p.strip())
         dept = job.get("department")
+        wt = job.get("workplace_type")
+        is_remote = job.get("remote")
+        if wt:
+            workplace_type = wt
+        elif is_remote is True:
+            workplace_type = "Remote"
+        else:
+            workplace_type = None
         yield {
             "source_id": str(job.get("id")), "title": clean(job.get("title") or ""),
             "depts": [dept] if dept else [], "team_or_department": dept,
             "locations": list(job.get("locations") or []), "extra_location_text": [],
-            "workplace_type": "Remote" if job.get("remote") is True else None, "is_remote": job.get("remote"),
+            "workplace_type": workplace_type, "is_remote": is_remote,
             "url": job.get("url"), "updated_at": job.get("updated_at"), "published_at": job.get("published_at"),
             "raw_html": raw, "compensation": job.get("compensation"),
         }
