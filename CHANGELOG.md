@@ -28,6 +28,14 @@ before. Nothing here changes how a score is worked out unless it says so.
   security clearance questions already work. Australian security clearance is
   no longer folded into the generic security clearance question.
 
+### Changed
+
+- **Role fetch:** whether a role needs heavy coding is judged from the posting
+  (duties, requirements, responsibilities and description), not from fuzzy
+  title words such as platform or deployment. A title that looks like a
+  non-software engineer still counts when the posting itself describes coding
+  work.
+
 ### Fixed
 
 - **Role fetch:** a clearance line at the start of a posting kept its first
