@@ -12,6 +12,10 @@ before. Nothing here changes how a score is worked out unless it says so.
 
 ### Added
 
+- **Manual job:** `scripts/add_job.py` reads one posting from a link or a text
+  file (same reader as `scripts/quick_posting.py`), classifies it with the
+  workspace config, and saves it to `market/roles/manual.json` for a manual
+  target. Run `fetch_roles.py` afterward to score it with the rest.
 - **Role fetch:** eligibility blocker detection for Australian health
   practitioner registration (AHPRA), teacher registration (VIT, NESA), a Working
   With Children Check, a national police check, Australian security clearance

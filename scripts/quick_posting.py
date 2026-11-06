@@ -387,8 +387,11 @@ def api_problem(exc):
     return str(getattr(exc, "detail", None) or exc) or exc.__class__.__name__
 
 
-def fetch(url, saved=None):
-    """Return (role, source) for a posting link. saved: a saved API response or page, read instead of the network."""
+def fetch_base(url, saved=None):
+    """Return (base, source, link) for a posting link, before classifying it against a campaign config.
+
+    saved: a saved API response or page, read instead of the network.
+    """
     link = parse_link(url)
     if saved and not os.path.isfile(saved):
         raise PostingError("No saved response at %s. Check the path, then run this again." % C.show_path(saved))
@@ -411,9 +414,9 @@ def fetch(url, saved=None):
             if link["ats"] == "workable" and not saved:
                 base["org_name"] = workable_account_name(link["board"]) or base["org_name"]
             guessed = base.pop("org_name_guessed", False)
-            return check_text(role_from_base(base, slug(link["board"]))), {
+            return base, {
                 "kind": link["ats"], "link": url, "endpoint": where, "org_name": base["org_name"],
-                **({"org_name_guessed": True} if guessed else {})}
+                **({"org_name_guessed": True} if guessed else {})}, link
         except urllib.error.HTTPError as exc:
             if exc.code in (404, 410):
                 raise PostingError("This posting is no longer open on the %s board %r. "
@@ -441,7 +444,14 @@ def fetch(url, saved=None):
         source["fallback"] = ("The %s job board API could not be read (%s), so this was read from the "
                               "public web page instead, which may hold less of the posting."
                               % (BOARD_NAMES[link["ats"]], fallback))
-    return check_text(role_from_base(base)), source
+    return base, source, link
+
+
+def fetch(url, saved=None):
+    """Return (role, source) for a posting link. saved: a saved API response or page, read instead of the network."""
+    base, source, link = fetch_base(url, saved)
+    org_id = slug(link["board"]) if link.get("board") else None
+    return check_text(role_from_base(base, org_id)), source
 
 
 def from_text(text, title=None, org_name=None, url=None):
