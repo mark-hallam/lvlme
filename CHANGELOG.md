@@ -12,6 +12,7 @@ before. Nothing here changes how a score is worked out unless it says so.
 
 ### Added
 
+- **Checklist score:** `scripts/_checklist.py` scores a job as the list of things that job asks for. It keeps a requirement only when two reads of the ad agree, fails a licence or an eligibility rule only on a majority of votes, treats a check or vaccination as a to-do, counts a soft skill at half weight, and lets an unknown widen the range. When `eval/checklists.json` has a saved list, the scored run and the role screen show that verdict beside today's fit. Today's fit is unchanged, and no chance percentage is shown.
 - **Manual job:** `scripts/add_job.py` reads one posting from a link or a text
   file (same reader as `scripts/quick_posting.py`), classifies it with the
   workspace config, and saves it to `market/roles/manual.json` for a manual
@@ -25,6 +26,9 @@ before. Nothing here changes how a score is worked out unless it says so.
 
 ### Fixed
 
+- **Role fetch:** a clearance line at the start of a posting kept its first
+  letter. "Baseline level security clearance" is only an Australian clearance,
+  not also a generic security clearance.
 - **Role fetch:** only software or coding job titles (not civil, site,
   maintenance, biomedical or property developer roles) are treated as heavy
   coding when the person does not write production code. Title matching no

@@ -201,6 +201,12 @@ class EligibilityBlockerTests(unittest.TestCase):
         types = [b["type"] for b in F.eligibility_blockers(text)]
         self.assertEqual(types, ["australian_security_clearance"])
 
+    def test_baseline_level_clearance_keeps_its_first_letter_and_is_not_generic(self):
+        text = "Baseline level security clearance required."
+        blockers = F.eligibility_blockers(text)
+        self.assertEqual([b["type"] for b in blockers], ["australian_security_clearance"])
+        self.assertTrue(blockers[0]["text"].startswith("Baseline"))
+
 
 class AdapterTests(unittest.TestCase):
     def test_greenhouse(self):

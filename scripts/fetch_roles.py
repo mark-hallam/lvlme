@@ -440,7 +440,8 @@ US_WORDS = re.compile(r"\bU\.?S\.?\b|united states|american", re.I)
 
 
 def sentence_with(text, match):
-    start = max(text.rfind(". ", 0, match.start()) + 2, 0)
+    dot = text.rfind(". ", 0, match.start())
+    start = dot + 2 if dot >= 0 else 0
     end = text.find(". ", match.end())
     return shorten(text[start: end + 1 if end >= 0 else len(text)])
 

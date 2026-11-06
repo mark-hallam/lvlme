@@ -377,6 +377,21 @@ in_scope, r1, fit_of, project = L.in_scope, L.r1, L.fit_of, L.project
 # ------------------------------------------------------------ page data
 
 
+def _checklist_view(checklist):
+    """The checklist block for one role, or nothing when this role has no saved list."""
+    if not checklist:
+        return {}
+    return {"ck": {
+        "verdict": clean(checklist.get("verdict")),
+        "must": clean(checklist.get("must_line")),
+        "notice": clean(checklist.get("notice")),
+        "questions": [clean(x) for x in checklist.get("questions") or []],
+        "moves": [clean(x) for x in checklist.get("moves") or []],
+        "todos": [clean(x) for x in checklist.get("todos") or []],
+        "rows": [clean(x.get("text")) for x in checklist.get("rows") or []],
+    }}
+
+
 def posting_label(p):
     """The role's posting check for the page: nothing for a likely real opening, a quiet note otherwise."""
     pc = p.get("posting_check") or {}
@@ -406,6 +421,7 @@ def build_roles(data, group_of, hard_types):
             "lo": r.get("fit_low"), "hi": r.get("fit_high"),   # the range across two judgings, once the engine writes it
             "m": r.get("match"),   # job match: the job-side factors only (D1, D2, D4, D6), once the engine writes it
             "adj": [clean(x) for x in r.get("adjustments") or []], "rn": clean(r.get("reviewer_note")),
+            **_checklist_view(r.get("checklist")),
             "hardReq": [clean(h) for h in (p.get("hard_requirements") or [])[:5]],
             **posting_label(p),
         })

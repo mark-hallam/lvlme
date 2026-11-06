@@ -165,7 +165,25 @@
         "eligibility_blocked": {"type": "boolean"},
         "hard_requirement_lacking": {"type": "boolean"},
         "requires_heavy_coding": {"type": "boolean"},
-        "reviewer_note": {"type": "string"}
+        "reviewer_note": {"type": "string"},
+        "checklist": {
+          "type": "object",
+          "description": "The checklist verdict for this job, beside today's fit. It does not change fit or the chance bands.",
+          "additionalProperties": false,
+          "required": ["verdict", "must_line", "moves", "questions", "todos", "thin_posting", "rows", "corrected", "today_fit"],
+          "properties": {
+            "verdict": {"enum": ["strong match", "worth applying", "stretch", "not yet"]},
+            "must_line": {"type": "string"},
+            "moves": {"type": "array", "items": {"type": "string"}},
+            "questions": {"type": "array", "items": {"type": "string"}},
+            "todos": {"type": "array", "items": {"type": "string"}},
+            "thin_posting": {"type": "boolean"},
+            "notice": {"type": ["string", "null"]},
+            "rows": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "text", "strength", "type", "inferred"], "properties": {"id": {"type": "string"}, "text": {"type": "string"}, "strength": {"type": "string"}, "type": {"type": "string"}, "inferred": {"type": "boolean"}}}},
+            "corrected": {"type": "boolean"},
+            "today_fit": {"type": "number"}
+          }
+        }
       }
     }
   }
