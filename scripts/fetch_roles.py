@@ -26,7 +26,9 @@ Field notes
   location_classes  from the config keywords. "remote" counts as its own class
                 only when the same location line names no region.
   eligibility_blockers  postings that say US person / ITAR / export control,
-                security clearance, a named citizenship, or a licence.
+                security clearance, a named citizenship, a licence, AHPRA or
+                other professional registration, a Working With Children Check,
+                a police check, an Australian clearance level, or a White Card.
   blocker_counts  (in the summary, and printed) how many matched open roles
                 state each blocker type. The interview asks the export
                 control and clearance questions only when their count is
@@ -394,6 +396,37 @@ CITIZEN_RX = re.compile(r"(?:must|required to|need to|have to)\s+(?:be|hold)\s+(
 LICENCE_RX = re.compile(r"(?:must|required to|need to)\s+(?:hold|have|possess)\s+(?:an?\s+)?"
                         r"(?:valid\s+|current\s+|active\s+)?(?:[\w']+\s+){0,3}licen[cs]e\b|"
                         r"valid\s+(?:[\w']+\s+){0,3}licen[cs]e\s+(?:is\s+)?required", re.I)
+HEALTH_REG_RX = re.compile(
+    r"\bAHPRA\b|Australian\s+Health\s+Practitioner\s+Regulation\s+Agency|"
+    r"(?:current\s+)?registration\s+with\s+(?:the\s+)?Australian\s+Health\s+Practitioner\s+Regulation\s+Agency|"
+    r"registered\s+(?:[\w-]+\s+){0,4}(?:nurse|midwife|physiotherapist|psychologist|doctor|dentist)\s+with\s+AHPRA",
+    re.I)
+TEACHER_REG_RX = re.compile(
+    r"\b(?:VIT|NESA)\b(?:\s+registration)?|Victorian\s+Institute\s+of\s+Teaching|"
+    r"NSW\s+Education\s+Standards\s+Authority|"
+    r"(?:must\s+hold|current|valid)\s+(?:[\w-]+\s+){0,3}teacher\s+registration|"
+    r"registered\s+with\s+(?:the\s+)?(?:VIT|Victorian\s+Institute\s+of\s+Teaching|NESA)\b",
+    re.I)
+WWCC_RX = re.compile(
+    r"working\s+with\s+children\s+check|\bWWCC\b|"
+    r"(?:valid|current)\s+WWC\s+check",
+    re.I)
+POLICE_RX = re.compile(
+    r"national\s+police\s+check|"
+    r"AFP\s+(?:national\s+)?(?:police\s+)?check|"
+    r"(?:must\s+hold|current|valid)\s+(?:a\s+)?national\s+police\s+check|"
+    r"(?:must\s+hold|current|valid)\s+(?:a\s+)?police\s+check",
+    re.I)
+AU_CLEARANCE_RX = re.compile(
+    r"\b(?:baseline|nv1|nv2|negative\s+vetting(?:\s+level\s*2)?)\b(?:\s+security)?\s+clearance|"
+    r"Australian\s+Government\s+Security\s+Vetting|\bAGSVA\b|"
+    r"(?:ability\s+to\s+obtain|must\s+hold|hold\s+or\s+obtain|current)\s+"
+    r"(?:an?\s+)?(?:baseline|nv1|nv2|negative\s+vetting(?:\s+level\s*2)?)\s+"
+    r"(?:security\s+)?clearance",
+    re.I)
+WHITE_CARD_RX = re.compile(
+    r"\bwhite\s+card\b|construction\s+induction(?:\s+card)?|\bCPCCWHS1001\b",
+    re.I)
 US_WORDS = re.compile(r"\bU\.?S\.?\b|united states|american", re.I)
 
 
@@ -408,9 +441,14 @@ def eligibility_blockers(full_text):
     m = US_PERSON_RX.search(full_text)
     if m:
         out.append({"type": "us_person_export_control", "text": sentence_with(full_text, m)})
-    m = CLEARANCE_RX.search(full_text)
+    m = AU_CLEARANCE_RX.search(full_text)
     if m:
-        out.append({"type": "security_clearance", "text": sentence_with(full_text, m)})
+        out.append({"type": "australian_security_clearance", "text": sentence_with(full_text, m)})
+    m = CLEARANCE_RX.search(full_text)
+    if m and not any(b["type"] == "australian_security_clearance" for b in out):
+        sent = sentence_with(full_text, m)
+        if not AU_CLEARANCE_RX.search(sent):
+            out.append({"type": "security_clearance", "text": sent})
     for m in CITIZEN_RX.finditer(full_text):
         if not US_WORDS.search(m.group(0)):
             out.append({"type": "citizenship", "text": sentence_with(full_text, m)})
@@ -418,6 +456,16 @@ def eligibility_blockers(full_text):
     m = LICENCE_RX.search(full_text)
     if m:
         out.append({"type": "licence", "text": sentence_with(full_text, m)})
+    for rx, kind in (
+        (HEALTH_REG_RX, "health_practitioner_registration"),
+        (TEACHER_REG_RX, "teacher_registration"),
+        (WWCC_RX, "working_with_children_check"),
+        (POLICE_RX, "police_check"),
+        (WHITE_CARD_RX, "white_card"),
+    ):
+        m = rx.search(full_text)
+        if m:
+            out.append({"type": kind, "text": sentence_with(full_text, m)})
     return out
 
 

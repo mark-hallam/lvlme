@@ -43,7 +43,13 @@
       "us_person_export_control": 1,
       "security_clearance": 1,
       "citizenship": 0,
-      "licence": 1
+      "licence": 1,
+      "health_practitioner_registration": 0,
+      "teacher_registration": 0,
+      "working_with_children_check": 0,
+      "police_check": 0,
+      "australian_security_clearance": 0,
+      "white_card": 0
     },
     "excluded_count": 1,
     "posting_checks": {

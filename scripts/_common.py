@@ -41,7 +41,18 @@ DIMENSION_NAMES = {
 DEFAULT_WEIGHTS = {"D1": 25, "D2": 20, "D3": 20, "D4": 10, "D5": 10, "D6": 10, "D7": 5}
 BANDS = ["Very low", "Low", "Moderate", "Good", "Strong"]   # the five fit levels
 CHANCE_BANDS = ["Almost none"] + BANDS                       # chance of an interview or an offer (rubric 1.1)
-BLOCKER_TYPES = ["us_person_export_control", "security_clearance", "citizenship", "licence"]
+BLOCKER_TYPES = [
+    "us_person_export_control",
+    "security_clearance",
+    "citizenship",
+    "licence",
+    "health_practitioner_registration",
+    "teacher_registration",
+    "working_with_children_check",
+    "police_check",
+    "australian_security_clearance",
+    "white_card",
+]
 # Evidence ids: 1 to 3 capital letters, then digits. E is the default for new items (E01, E02, ...);
 # other prefixes keep a source's own numbering (for example G01 for email findings).
 EVIDENCE_ID = r"^[A-Z]{1,3}[0-9]+$"
@@ -55,6 +66,12 @@ BLOCKER_NAMES = {
     "security_clearance": "Security clearance",
     "citizenship": "Citizenship",
     "licence": "Licence",
+    "health_practitioner_registration": "Health practitioner registration (AHPRA)",
+    "teacher_registration": "Teacher registration",
+    "working_with_children_check": "Working With Children Check",
+    "police_check": "National police check",
+    "australian_security_clearance": "Australian security clearance",
+    "white_card": "Construction White Card",
 }
 # The one line a new workspace gets until the interview has set it up.
 NO_TARGETS = "No target organisations yet. Say to your agent: run the LVLme interview."

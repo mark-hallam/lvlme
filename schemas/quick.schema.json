@@ -17,7 +17,11 @@
                     "description": "Which separate agent did the blind review, for example {\"agent\": \"Claude Code helper agent (lvlme:reviewer)\", \"model\": \"claude-opus-5-5\"}. Only the agent that started the reviewer fills it in, and only when a separate reviewer really ran.",
                     "properties": {"agent": {"type": "string", "minLength": 1}, "model": {"type": "string"}}},
     "warm_path": {"type": ["boolean", "null"], "description": "The person's yes (true) or no (false) to the one warm path question; null until asked."},
-    "eligibility_cleared": {"type": "array", "items": {"enum": ["us_person_export_control", "security_clearance", "citizenship", "licence"]},
+    "eligibility_cleared": {"type": "array", "items": {"enum": [
+      "us_person_export_control", "security_clearance", "citizenship", "licence",
+      "health_practitioner_registration", "teacher_registration",
+      "working_with_children_check", "police_check", "australian_security_clearance", "white_card"
+    ]},
                             "description": "Blocker types in the posting the person says they meet, as they state it."},
     "factors": {
       "type": "object",

@@ -8,7 +8,7 @@ from unittest import mock
 import helpers as H
 import fetch_roles as F
 import validate as V
-from _common import matches_any
+from _common import BLOCKER_TYPES, matches_any
 
 CFG = H.example_config()
 GH = H.load(os.path.join(H.FIXTURES, "ats", "greenhouse.json"))
@@ -132,6 +132,41 @@ class EngineeringTitles(unittest.TestCase):
                 self.assertIsNotNone(role, title)
                 self.assertFalse(role["requires_heavy_coding"], title)
                 self.assertFalse(F.engineering_title(title, base["raw_html"]))
+
+
+class EligibilityBlockerTests(unittest.TestCase):
+    """Unit tests for eligibility_blockers() on posting text."""
+
+    def test_australian_blockers(self):
+        cases = (
+            ("Must be a registered nurse with AHPRA registration.", "health_practitioner_registration"),
+            ("Current registration with the Australian Health Practitioner Regulation Agency is required.",
+             "health_practitioner_registration"),
+            ("You must hold current teacher registration with VIT.", "teacher_registration"),
+            ("Registered with NESA before you start.", "teacher_registration"),
+            ("A valid Working With Children Check is required.", "working_with_children_check"),
+            ("WWCC must be current.", "working_with_children_check"),
+            ("Must hold a current national police check.", "police_check"),
+            ("Must hold NV1 clearance before starting.", "australian_security_clearance"),
+            ("Ability to obtain a Baseline security clearance.", "australian_security_clearance"),
+            ("Negative Vetting Level 2 clearance required.", "australian_security_clearance"),
+            ("You must hold a current White Card.", "white_card"),
+        )
+        for text, kind in cases:
+            with self.subTest(text=text):
+                types = [b["type"] for b in F.eligibility_blockers(text)]
+                self.assertIn(kind, types)
+
+    def test_us_clearance_stays_security_clearance_not_australian(self):
+        text = "Must maintain an active TS/SCI clearance."
+        types = [b["type"] for b in F.eligibility_blockers(text)]
+        self.assertIn("security_clearance", types)
+        self.assertNotIn("australian_security_clearance", types)
+
+    def test_nv1_is_australian_not_generic_clearance(self):
+        text = "Must hold NV1 clearance."
+        types = [b["type"] for b in F.eligibility_blockers(text)]
+        self.assertEqual(types, ["australian_security_clearance"])
 
 
 class AdapterTests(unittest.TestCase):
@@ -287,7 +322,7 @@ class MainTests(unittest.TestCase):
             self.assertEqual(F.main(["--workspace", self.ws, "--fixtures", self.fx, "--date", "2026-11-01"]), 0)
         latest = H.load(os.path.join(self.ws, "market", "roles", "latest.json"))
         counts = latest["summary"]["blocker_counts"]
-        self.assertEqual(list(counts), ["us_person_export_control", "security_clearance", "citizenship", "licence"])
+        self.assertEqual(list(counts), BLOCKER_TYPES)
         for kind, n in counts.items():
             with self.subTest(kind=kind):
                 self.assertEqual(n, sum(1 for r in latest["roles"]
@@ -302,8 +337,7 @@ class MainTests(unittest.TestCase):
         roles = [{"eligibility_blockers": [{"type": "security_clearance", "text": "a"},
                                            {"type": "security_clearance", "text": "b"}]},
                  {"eligibility_blockers": []}, {}]
-        self.assertEqual(F.blocker_counts(roles), {"us_person_export_control": 0, "security_clearance": 1,
-                                                   "citizenship": 0, "licence": 0})
+        self.assertEqual(F.blocker_counts(roles), {t: (1 if t == "security_clearance" else 0) for t in BLOCKER_TYPES})
 
     def test_no_targets_stops_with_one_line(self):
         cfg = H.load(os.path.join(self.ws, "config.json"))

@@ -106,7 +106,14 @@ STATUS_ORDER = {"doing": 0, "todo": 1, "later": 2, "done": 3, "dropped": 4}
 STATUS_NAMES = {"doing": "in progress", "todo": "to do", "later": "parked for later", "done": "done", "dropped": "dropped"}
 OWNERS = {"you": "You", "agent": "Your agent", "both": "You and your agent"}
 DEFAULT_CAPS = {"D1": 0, "D2": 1, "D3": 2, "D4": 1, "D5": 1, "D6": 1, "D7": 3}
-DEFAULT_HARD_TYPES = ["us_person_export_control", "citizenship", "security_clearance"]
+DEFAULT_HARD_TYPES = [
+    "us_person_export_control",
+    "citizenship",
+    "security_clearance",
+    "health_practitioner_registration",
+    "teacher_registration",
+    "australian_security_clearance",
+]
 CLAIM_STATUSES = [("supported", "Supported"), ("overstated", "Overstated"), ("unsupported", "Unsupported"),
                   ("contradicted", "Contradicted"), ("pending", "Waiting to be checked")]
 TOWS = {"SO": "Use a strength to seize an opportunity", "ST": "Use a strength to blunt a threat",

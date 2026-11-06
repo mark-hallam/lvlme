@@ -10,6 +10,15 @@ before. Nothing here changes how a score is worked out unless it says so.
 
 ## Unreleased
 
+### Added
+
+- **Role fetch:** eligibility blocker detection for Australian health
+  practitioner registration (AHPRA), teacher registration (VIT, NESA), a Working
+  With Children Check, a national police check, Australian security clearance
+  levels (Baseline, NV1, NV2, Negative Vetting), and a construction White Card.
+  Police check, WWCC and White Card blockers can be cleared in the plan like a
+  licence; registration and clearance types stay hard by default.
+
 ### Fixed
 
 - **Role fetch:** only software or coding job titles (not civil, site,

@@ -22,10 +22,17 @@
         "blocked_by_eligibility": {"type": "integer", "minimum": 0},
         "blocker_counts": {"type": "object", "additionalProperties": false,
                            "description": "How many matched open roles state each eligibility blocker type. The interview asks the export control and clearance questions only when their count is above 0.",
-                           "properties": {"us_person_export_control": {"type": "integer", "minimum": 0},
-                                          "security_clearance": {"type": "integer", "minimum": 0},
-                                          "citizenship": {"type": "integer", "minimum": 0},
-                                          "licence": {"type": "integer", "minimum": 0}}},
+                           "properties": {
+                             "us_person_export_control": {"type": "integer", "minimum": 0},
+                             "security_clearance": {"type": "integer", "minimum": 0},
+                             "citizenship": {"type": "integer", "minimum": 0},
+                             "licence": {"type": "integer", "minimum": 0},
+                             "health_practitioner_registration": {"type": "integer", "minimum": 0},
+                             "teacher_registration": {"type": "integer", "minimum": 0},
+                             "working_with_children_check": {"type": "integer", "minimum": 0},
+                             "police_check": {"type": "integer", "minimum": 0},
+                             "australian_security_clearance": {"type": "integer", "minimum": 0},
+                             "white_card": {"type": "integer", "minimum": 0}}},
         "excluded_count": {"type": "integer", "minimum": 0},
         "endpoint_errors": {"type": "object", "additionalProperties": {"type": "string"}},
         "posting_checks": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0},
@@ -96,7 +103,11 @@
             "required": ["type", "text"],
             "additionalProperties": false,
             "properties": {
-              "type": {"enum": ["us_person_export_control", "security_clearance", "citizenship", "licence"]},
+              "type": {"enum": [
+                "us_person_export_control", "security_clearance", "citizenship", "licence",
+                "health_practitioner_registration", "teacher_registration",
+                "working_with_children_check", "police_check", "australian_security_clearance", "white_card"
+              ]},
               "text": {"type": "string"}
             }
           }
