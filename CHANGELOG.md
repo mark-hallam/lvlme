@@ -23,6 +23,10 @@ before. Nothing here changes how a score is worked out unless it says so.
   levels (Baseline, NV1, NV2, Negative Vetting), and a construction White Card.
   Police check, WWCC and White Card blockers can be cleared in the plan like a
   licence; registration and clearance types stay hard by default.
+- **Intake:** each of those blocker types has its own question, asked only when
+  an open role needs that type, the same way the US export control and
+  security clearance questions already work. Australian security clearance is
+  no longer folded into the generic security clearance question.
 
 ### Fixed
 

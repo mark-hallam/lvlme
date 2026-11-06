@@ -149,9 +149,11 @@ other file that describes a first run links here.
    when the export arrives.
 5. **The rounds.** The rest of the interview in short rounds
    (`method/INTERVIEW.md`), skipping what the CV and the export already
-   answer. Ask about US export control and security clearance only when
-   `blocker_counts` in `market/roles/latest.json` shows an open role that
-   needs it (`method/INTERVIEW.md`, "Work rights"). Add each requirement the
+   answer. Ask about US export control, security clearance, Australian
+   security clearance, health practitioner registration, teacher
+   registration, a Working With Children Check, a police check, and a White
+   Card only when `blocker_counts` in `market/roles/latest.json` shows an
+   open role that needs that type (`method/INTERVIEW.md`, "Work rights"). Add each requirement the
    person says they meet to `candidate.eligibility_cleared`.
 6. **Work rights rules.** Fill the D6 rules in
    `eval/profile-dimensions.json` for every location class, from the work

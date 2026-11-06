@@ -68,8 +68,10 @@ rounds while roles and evidence are gathered.
 
    Note new and closed roles (printed, and in the summary of
    `market/roles/latest.json`). If `blocker_counts` there is above 0 for US
-   export control or for `security_clearance` or `australian_security_clearance`
-   and that question has not been asked yet, ask it (`INTERVIEW.md`, "Work rights"). Add roles from boards
+   export control, `security_clearance`, `australian_security_clearance`,
+   `health_practitioner_registration`, `teacher_registration`,
+   `working_with_children_check`, `police_check` or `white_card`
+   and that type's question has not been asked yet, ask it (`INTERVIEW.md`, "Work rights"). Add roles from boards
    from any other careers site to `market/roles/manual.json`. If the
    summary has `endpoint_notes` (a board too big to list in full), say so.
    Each role carries a `posting_check` label (likely real, check first,
