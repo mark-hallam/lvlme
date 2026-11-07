@@ -8,7 +8,13 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
-## Unreleased
+## 0.7.4 (7 November 2026)
+
+A requirement checklist for each job, filled from the posting and marked
+against the evidence, beside today's fit. Job match leads until the
+who-you-know question is answered. The full notes are in
+[LVLme 0.7.4](docs/RELEASE-0.7.4.md).
+Tests: 756 pass.
 
 ### Changed
 

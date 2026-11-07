@@ -46,7 +46,7 @@ Download (clone) the folder anywhere you like, then add your copy as a
 marketplace and install the plugin from it:
 
 ```bash
-git clone --branch v0.7.3 https://github.com/mark-hallam/lvlme ~/lvlme-engine
+git clone --branch v0.7.4 https://github.com/mark-hallam/lvlme ~/lvlme-engine
 claude plugin marketplace add ~/lvlme-engine
 claude plugin install lvlme@lvlme
 ```
@@ -162,7 +162,7 @@ folder you work in.
 - **As a skill:** run exactly this command:
 
   ```bash
-  git clone --branch v0.7.3 https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme
+  git clone --branch v0.7.4 https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme
   ```
 
   Do not use a skill installer instead: it copies only part of the folder

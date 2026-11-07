@@ -15,7 +15,7 @@ Cursor and other agents that run commands are not tested yet.
 `skills/lvlme-interview/SKILL.md` is missing), a skill installer copied only part
 of it. Run `git -C <engine folder> sparse-checkout disable` to restore the
 rest. If the folder is not a git clone, ask the person, then clone it again
-with `git clone --branch v0.7.3 https://github.com/mark-hallam/lvlme <engine folder>`.
+with `git clone --branch v0.7.4 https://github.com/mark-hallam/lvlme <engine folder>`.
 
 ## Hard rules
 
