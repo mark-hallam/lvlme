@@ -36,8 +36,6 @@ WORKSPACE_SCRIPTS = {
     "network_map.py": ["--csv", os.path.join(H.FIXTURES, "Connections.csv")],
     "claims_audit.py": ["notes.md"],
     "consistency_audit.py": [],
-    "checklist.py": ["status"],
-    "add_job.py": ["--url", "https://boards.greenhouse.io/x/jobs/1"],
 }
 
 
