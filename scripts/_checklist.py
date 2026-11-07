@@ -6,7 +6,8 @@ eligibility rule fails the job only when most votes say it is not shown. Somethi
 anyone can get before starting (a check, a vaccination) is a to-do, not a fail.
 A soft skill counts at half weight. An unknown widens the range. It is never stored
 as zero and it is never shown as a chance of getting the job. A strong match needs
-most must-have rows fully met: half-met rows earn points but not that verdict.
+most must-have rows fully met, and worth applying needs at least one: half-met
+rows earn points but not those verdicts.
 
   merge_extracts(extracts)     keep a requirement that appears in at least two reads
   score_checklist(rows, votes) the verdict, the must-have line, and the comparison points
@@ -141,6 +142,7 @@ def _majority(votes):
 
 
 STRONG_NEEDS_MET = 0.6   # strong match: at least this share of the must-have rows fully met, not half met
+WORTH_NEEDS_MET = 1      # worth applying: at least this many must-have rows fully met, not all half met
 
 
 def _verdict(points, gate_fail, must_met=None, must_total=None):
@@ -148,10 +150,10 @@ def _verdict(points, gate_fail, must_met=None, must_total=None):
         return "not yet"
     if points >= 75 and (not must_total or must_met / must_total >= STRONG_NEEDS_MET):
         return "strong match"
-    if points >= 75:
-        return "worth applying"   # the points are there, but too many must-haves are only half met
-    if points >= 50:
+    if points >= 50 and (not must_total or must_met >= WORTH_NEEDS_MET):
         return "worth applying"
+    if points >= 50:
+        return "stretch"   # the points come from half-met rows only; no must-have is fully shown
     if points >= 25:
         return "stretch"
     return "not yet"

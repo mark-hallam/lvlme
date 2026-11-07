@@ -119,6 +119,14 @@ class ScoreTests(unittest.TestCase):
                                       {"R1": ["met"], "R2": ["met"], "R3": ["partly"]})
         self.assertEqual(soft_only["shown"]["verdict"], "strong match")   # 2 of 3 musts met
 
+    def test_worth_applying_needs_one_must_have_fully_met(self):
+        rows = [row("R%d" % i, "Requirement %d" % i, "must") for i in range(1, 7)]
+        all_partly = C.score_checklist(rows, {r["id"]: ["partly"] for r in rows})
+        self.assertEqual(all_partly["compare"]["points"], 50.0)
+        self.assertEqual(all_partly["shown"]["verdict"], "stretch")
+        one_met = C.score_checklist(rows, {"R1": ["met"], **{r["id"]: ["partly"] for r in rows[1:]}})
+        self.assertEqual(one_met["shown"]["verdict"], "worth applying")
+
     def test_a_thin_posting_is_named(self):
         rows = [row("R1", "Work rights", "must", "eligibility"), row("R2", "A related degree", "should", "credential")]
         got = C.score_checklist(rows, {"R1": ["met"], "R2": ["met"]})
