@@ -5,7 +5,8 @@ or not applicable. Plain code turns those marks into a verdict. A licence or an
 eligibility rule fails the job only when most votes say it is not shown. Something
 anyone can get before starting (a check, a vaccination) is a to-do, not a fail.
 A soft skill counts at half weight. An unknown widens the range. It is never stored
-as zero and it is never shown as a chance of getting the job.
+as zero and it is never shown as a chance of getting the job. A strong match needs
+most must-have rows fully met: half-met rows earn points but not that verdict.
 
   merge_extracts(extracts)     keep a requirement that appears in at least two reads
   score_checklist(rows, votes) the verdict, the must-have line, and the comparison points
@@ -139,11 +140,16 @@ def _majority(votes):
     return ranked[0][0], False
 
 
-def _verdict(points, gate_fail):
+STRONG_NEEDS_MET = 0.6   # strong match: at least this share of the must-have rows fully met, not half met
+
+
+def _verdict(points, gate_fail, must_met=None, must_total=None):
     if gate_fail:
         return "not yet"
-    if points >= 75:
+    if points >= 75 and (not must_total or must_met / must_total >= STRONG_NEEDS_MET):
         return "strong match"
+    if points >= 75:
+        return "worth applying"   # the points are there, but too many must-haves are only half met
     if points >= 50:
         return "worth applying"
     if points >= 25:
@@ -181,6 +187,7 @@ def score_checklist(rows, votes):
     high = {"must": [0.0, 0.0], "should": [0.0, 0.0]}
     gate_fail = False
     unknown_count = 0
+    must_unknown = 0   # must rows nobody could judge: met in the best case, not in the worst
     todos, questions, moves = [], [], []
 
     for row in rows:
@@ -205,6 +212,8 @@ def score_checklist(rows, votes):
             gate_fail = True
         if verdict == "unknown":
             unknown_count += 1
+            if strength == "must":
+                must_unknown += 1
             low[strength][1] += weight
             high[strength][0] += weight
             high[strength][1] += weight
@@ -221,10 +230,11 @@ def score_checklist(rows, votes):
     points = 0.0 if gate_fail else _points(known["must"], known["should"])
     points_low = 0.0 if gate_fail else _points(low["must"], low["should"])
     points_high = 0.0 if gate_fail else _points(high["must"], high["should"])
-    verdict = _verdict(points, gate_fail)
-    if not gate_fail and _verdict(points_low, False) != _verdict(points_high, False):
-        questions.append("The unknowns could move this between %s and %s." % (
-            _verdict(points_low, False), _verdict(points_high, False)))
+    verdict = _verdict(points, gate_fail, must_met, must_total)
+    low_v = _verdict(points_low, False, must_met, must_total)
+    high_v = _verdict(points_high, False, must_met + must_unknown, must_total)
+    if not gate_fail and low_v != high_v:
+        questions.append("The unknowns could move this between %s and %s." % (low_v, high_v))
     moves = ["Add evidence for: %s" % text for _, _, text in sorted(moves)[:3]]
     thin = thin_posting(rows)
     must_line = ("%d of %d must-haves met" % (must_met, must_total) if must_total

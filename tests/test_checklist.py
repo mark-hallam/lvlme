@@ -103,6 +103,22 @@ class ScoreTests(unittest.TestCase):
         self.assertEqual(got["shown"]["must_line"], "1 of 3 must-haves met")
         self.assertEqual(got["shown"]["moves"], ["Add evidence for: Three", "Add evidence for: Two", "Add evidence for: Four"])
 
+    def test_strong_match_needs_most_must_haves_fully_met(self):
+        rows = [row("R%d" % i, "Requirement %d" % i, "must") for i in range(1, 6)]
+        mostly_partly = C.score_checklist(rows, {"R1": ["met"], "R2": ["partly"], "R3": ["partly"], "R4": ["partly"], "R5": ["partly"]})
+        self.assertEqual(mostly_partly["compare"]["points"], 60.0)
+        self.assertEqual(mostly_partly["shown"]["verdict"], "worth applying")
+        high_points = C.score_checklist(rows, {"R1": ["met"], "R2": ["met"], "R3": ["partly"], "R4": ["partly"], "R5": ["partly"]})
+        self.assertEqual(high_points["compare"]["points"], 70.0)
+        self.assertEqual(high_points["shown"]["verdict"], "worth applying")
+        mostly_met = C.score_checklist(rows, {"R1": ["met"], "R2": ["met"], "R3": ["met"], "R4": ["partly"], "R5": ["partly"]})
+        self.assertEqual(mostly_met["compare"]["points"], 80.0)
+        self.assertEqual(mostly_met["shown"]["verdict"], "strong match")
+        soft_only = C.score_checklist([row("R1", "Communication", "must", "soft_skill"), row("R2", "Teamwork", "must", "soft_skill"),
+                                       row("R3", "Cannulation", "must", "skill")],
+                                      {"R1": ["met"], "R2": ["met"], "R3": ["partly"]})
+        self.assertEqual(soft_only["shown"]["verdict"], "strong match")   # 2 of 3 musts met
+
     def test_a_thin_posting_is_named(self):
         rows = [row("R1", "Work rights", "must", "eligibility"), row("R2", "A related degree", "should", "credential")]
         got = C.score_checklist(rows, {"R1": ["met"], "R2": ["met"]})
