@@ -8,15 +8,22 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
-## Unreleased
+## 0.7.5 (7 November 2026)
+
+Relocation is part of the profile: where, from when and on what terms you
+would move, recorded once and shown beside the pay of every role outside your
+home area. The checklist's "worth applying" needs a must-have met. The full
+notes are in [LVLme 0.7.5](docs/RELEASE-0.7.5.md).
+Tests: 781 pass.
 
 ### Added
 
-- Relocation is part of the profile: `candidate.relocation` in the config records where, from when and on what terms the person would move, and every role outside their home area shows the posting's pay and whether they said they would move for it.
+- **Relocation in the profile:** `candidate.relocation` in the config records whether you would move (anywhere, some places, no, unsure), from when, the lowest yearly pay you would move for, whether the employer must pay the visa, and any organisation worth the move at any pay. Every role outside your home area shows the posting's pay and one line saying whether you said you would move for it, with the posting's pay compared to your floor when both are clear. The Today screen, the roles list and the briefing for agents carry the same. `scripts/validate.py` checks the field and warns when the judged location rules contradict a "no" or the question was never asked. Scores do not change.
+- The intake asks where, by when and on what terms you would move (`method/INTAKE.md`), and the checklist marks a "based in" or "relocate to" row from that answer (`method/CHECKLIST.md`).
 
 ### Changed
 
-- Nothing in the maths.
+- **Checklist verdict:** "worth applying" needs at least one must-have row fully met; otherwise the verdict is "stretch".
 
 ## 0.7.4 (7 November 2026)
 

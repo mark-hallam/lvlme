@@ -68,7 +68,7 @@ Linux and Windows are not tested yet.
 - **Claude Code** (version 2.1.275 or later): the one line above. Or download
   the folder and install from your copy (option B in the install guide).
 - **Codex:** run exactly
-  `git clone --branch v0.7.4 https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme`
+  `git clone --branch v0.7.5 https://github.com/mark-hallam/lvlme ~/.agents/skills/lvlme`
   and say "run LVLme", or open Codex in the folder (it follows `AGENTS.md`). Do
   not use a skill installer: it copies only part of the folder.
 - **Cursor** (not tested yet): open the folder. The rules in `.cursor/rules/`
