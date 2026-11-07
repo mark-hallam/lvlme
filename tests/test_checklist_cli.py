@@ -104,7 +104,7 @@ class ChecklistCliTests(unittest.TestCase):
         _, out, _ = run(self.ws, "confirm", self.rid, "--rows", new_rows)
         doc = H.load(os.path.join(self.ws, "eval", "checklists.json"))
         self.assertEqual([r["id"] for r in doc["roles"][self.rid]["rows"]], ["R1", "R2"])
-        self.assertNotIn("R2", doc["roles"][self.rid]["votes"] or {})
+        self.assertEqual(doc["roles"][self.rid]["votes"].get("R2"), [])
         self.assertIn("still needing marks", out.lower())
 
     def test_status_validate_and_score(self):
@@ -118,8 +118,8 @@ class ChecklistCliTests(unittest.TestCase):
             write_json([{"row": "R1", "verdict": "met", "evidence": ["E01"], "quote": "ward"}]))
         _, out, _ = run(self.ws, "status")
         self.assertIn(self.rid, out)
-        errs, warns, _checked = V.validate_workspace(self.ws)
-        self.assertEqual(errs, [])
+        cl = H.load(os.path.join(self.ws, "eval", "checklists.json"))
+        self.assertEqual(V.check(cl, H.schema("checklists.schema.json")), [])
         cfg = H.load(os.path.join(self.ws, "config.json"))
         built = S.build_run(self.ws, cfg, "2026-11-06")
         self.assertEqual(built["roles"][0]["checklist"]["verdict"], "strong match")
