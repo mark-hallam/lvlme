@@ -60,6 +60,7 @@ FILES = [
     ("campaign/plan.json", "plan.schema.json", True),
     ("campaign/warm-paths.json", "warm-paths.schema.json", False),
     ("campaign/applications.json", "applications.schema.json", False),
+    ("eval/checklists.json", "checklists.schema.json", False),
 ]
 
 # ------------------------------------------------------------ the validator
@@ -224,6 +225,23 @@ def cross_checks(ws, docs, errors, warnings):
             cite("eval/judgements.json %s %s" % (rid, d), (j.get(d) or {}).get("evidence"))
         if roles_doc is not None and rid not in role_ids:
             warnings.append("eval/judgements.json: %s is no longer an open role (kept for history)" % rid)
+
+    checklists = docs.get("eval/checklists.json") or {}
+    for rid, entry in (checklists.get("roles") or {}).items():
+        if roles_doc is not None and rid not in role_ids:
+            warnings.append("eval/checklists.json: %s is not an open role" % rid)
+        row_ids = {r.get("id") for r in (entry.get("rows") or [])}
+        for vid in (entry.get("votes") or {}):
+            if vid not in row_ids:
+                errors.append("eval/checklists.json: %s votes row %s, which is not in rows" % (rid, vid))
+        for mark_pass in entry.get("marks") or []:
+            for mid, detail in mark_pass.items():
+                if mid.startswith(C.EXTENSION_PREFIX):
+                    continue
+                for eid in detail.get("evidence") or []:
+                    if eid not in ev_ids:
+                        warnings.append("eval/checklists.json: %s mark on %s cites evidence %s, "
+                                        "which is not in profile/evidence.json" % (rid, mid, eid))
 
     prof = docs.get("eval/profile-dimensions.json") or {}
     for section in ("D3", "D5", "D7"):

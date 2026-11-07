@@ -8,6 +8,14 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## Unreleased
+
+### Added
+
+- **Checklist commands:** `python3 scripts/checklist.py` stores extraction
+  reads and evidence marks in `eval/checklists.json`, merges requirements, and
+  reports the checklist verdict beside today's fit. Method: `method/CHECKLIST.md`.
+
 ## 0.7.3 (7 November 2026)
 
 Fairer job checks for Australian roles, and a job you can add by link or
