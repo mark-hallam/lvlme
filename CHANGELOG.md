@@ -13,6 +13,7 @@ before. Nothing here changes how a score is worked out unless it says so.
 ### Changed
 
 - Job match leads until the who-you-know question is answered for an organisation; then fit leads. Nothing in the maths changes.
+- **Checklist verdict:** a strong match needs at least 60 percent of the must-have rows fully met; half-met rows earn points but not that verdict. An unmarked list says "not marked yet" instead of a verdict. Reads of a posting are merged by the words they share, not exact text, and `checklist.py merge` rebuilds the rows from saved reads.
 
 ### Added
 
