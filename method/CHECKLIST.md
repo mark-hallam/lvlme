@@ -21,8 +21,11 @@ see the others. Use the extraction prompt below. Save each returned JSON with:
 python3 scripts/checklist.py extract ROLE_ID --workspace PATH --read FILE
 ```
 
-The merger keeps a row only when at least two reads share the same wording.
-With one read, the list is provisional until a second read agrees.
+The merger keeps a row only when at least two reads name the same requirement.
+Reads rarely use the same words, so rows are matched by the content words they
+share, and the first read's wording is kept. With one read, the list is
+provisional until a second read agrees. `python3 scripts/checklist.py merge
+ROLE_ID` rebuilds the rows from the saved reads.
 
 ## The person confirms
 

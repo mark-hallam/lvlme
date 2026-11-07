@@ -24,6 +24,39 @@ def _norm(text):
     return re.sub(r"[^a-z0-9]+", " ", (text or "").lower()).strip()
 
 
+# Words that say nothing about which requirement a row is, so they do not count as shared.
+_STOP = set("a an the and or of to in on for with by as at from into through including include that this these "
+            "those is are be been its it their your you we our will can ability skill skills experience "
+            "experienced".split())
+SAME_ROW_SHARED = 0.5       # share at least half of all content words (Jaccard), or
+SAME_ROW_CONTAINED = 0.7    # the shorter row's words are mostly inside the longer row's
+
+
+def _words(text):
+    """The content words of a row, crudely stemmed, so two wordings of one requirement look alike."""
+    out = set()
+    for w in re.findall(r"[a-z0-9]+", (text or "").lower()):
+        if w in _STOP or len(w) < 3:
+            continue
+        for suffix in ("ing", "ed", "es", "s"):
+            if w.endswith(suffix) and len(w) - len(suffix) >= 4:
+                w = w[:-len(suffix)]
+                break
+        out.add(w)
+    return out
+
+
+def same_requirement(a, b):
+    """True when two rows read as the same requirement: identical text, or most content words shared."""
+    if _norm(a) == _norm(b):
+        return True
+    wa, wb = _words(a), _words(b)
+    if not wa or not wb:
+        return False
+    both = len(wa & wb)
+    return both / len(wa | wb) >= SAME_ROW_SHARED or both / min(len(wa), len(wb)) >= SAME_ROW_CONTAINED
+
+
 def _common(values, default):
     vals = [v for v in values if v not in (None, "")]
     if not vals:
@@ -34,8 +67,11 @@ def _common(values, default):
 def merge_extracts(extracts):
     """Keep a requirement that shows up in at least two reads of the posting.
 
-    One read is kept as given: that is a checklist the person has already corrected.
-    Rows come back numbered R1, R2, ... in the order they were first seen.
+    Two reads rarely use the same words for one requirement, so rows are matched
+    by the content words they share (same_requirement), not by exact text. The
+    first read's wording is kept. One read is kept as given: that is a checklist
+    the person has already corrected. Rows come back numbered R1, R2, ... in
+    the order they were first seen.
     """
     extracts = [list(e or []) for e in extracts]
     if len(extracts) <= 1:
@@ -43,19 +79,20 @@ def merge_extracts(extracts):
     else:
         groups = []
         for src in extracts:
-            seen = set()
+            used = set()   # one row of this read per group, so a read cannot vote twice for one requirement
             for row in src:
-                key = _norm(row.get("text"))
-                if not key or key in seen:
+                text = row.get("text") or ""
+                if not _norm(text):
                     continue
-                seen.add(key)
-                for group in groups:
-                    if group["key"] == key:
-                        group["hits"] += 1
-                        group["copies"].append(row)
-                        break
+                match = next((i for i, g in enumerate(groups)
+                              if i not in used and same_requirement(text, g["text"])), None)
+                if match is None:
+                    groups.append({"text": text, "hits": 1, "copies": [row]})
+                    used.add(len(groups) - 1)
                 else:
-                    groups.append({"key": key, "hits": 1, "copies": [row]})
+                    groups[match]["hits"] += 1
+                    groups[match]["copies"].append(row)
+                    used.add(match)
         rows = []
         for group in groups:
             if group["hits"] < 2:

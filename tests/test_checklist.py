@@ -27,6 +27,33 @@ class MergeTests(unittest.TestCase):
         self.assertEqual(texts, ["AHPRA registration", "Flu vaccination"])
         self.assertEqual([r["id"] for r in kept], ["R1", "R2"])
 
+    def test_two_wordings_of_one_requirement_merge(self):
+        kept = C.merge_extracts([
+            [{"text": "National police check before employment", "strength": "must", "type": "condition"},
+             {"text": "Skill in identifying benefits, setting KPIs and reporting on outcomes", "strength": "should", "type": "skill"},
+             {"text": "A degree in nursing", "strength": "must", "type": "credential"}],
+            [{"text": "National police check as part of pre-employment checks", "strength": "must", "type": "condition"},
+             {"text": "Ability to identify expected benefits, set performance measures and KPIs, and report on outcomes",
+              "strength": "should", "type": "skill"},
+             {"text": "Forklift licence", "strength": "must", "type": "licence"}],
+        ])
+        self.assertEqual([r["text"] for r in kept],
+                         ["National police check before employment",
+                          "Skill in identifying benefits, setting KPIs and reporting on outcomes"])
+        self.assertTrue(C.same_requirement("Misconduct screening before employment",
+                                           "Misconduct screening as part of pre-employment checks"))
+        self.assertFalse(C.same_requirement("A degree in nursing", "Forklift licence"))
+        self.assertFalse(C.same_requirement("Experience leading planning and delivery of technology initiatives",
+                                            "Experience in business engagement and requirements management"))
+
+    def test_one_read_cannot_vote_twice_for_one_requirement(self):
+        kept = C.merge_extracts([
+            [{"text": "Police check", "strength": "must", "type": "condition"},
+             {"text": "Police check required", "strength": "must", "type": "condition"}],
+            [{"text": "Triage", "strength": "must", "type": "skill"}],
+        ])
+        self.assertEqual(kept, [])
+
     def test_one_corrected_read_is_kept_whole(self):
         kept = C.merge_extracts([[{"text": "A degree in nursing", "strength": "must", "type": "credential"}]])
         self.assertEqual(kept[0]["text"], "A degree in nursing")

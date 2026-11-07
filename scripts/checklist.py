@@ -9,6 +9,7 @@ Usage
   python3 scripts/checklist.py status [--json]
   python3 scripts/checklist.py posting ROLE_ID
   python3 scripts/checklist.py extract ROLE_ID --read FILE
+  python3 scripts/checklist.py merge ROLE_ID
   python3 scripts/checklist.py mark ROLE_ID --read FILE
   python3 scripts/checklist.py confirm ROLE_ID [--rows FILE]
   python3 scripts/checklist.py show ROLE_ID [--json]
@@ -216,6 +217,23 @@ def cmd_extract(ws, config, rid, read_path, today):
         print("Provisional list: add a second independent read before you treat this as the job list.")
 
 
+def cmd_merge(ws, config, rid):
+    """Rebuild rows from the saved reads (after an engine change, or to check the merge)."""
+    path, doc = _load(ws)
+    entry = _entry(doc, rid)
+    if entry.get("corrected"):
+        print("%s is confirmed by the person, so its rows stay as they are." % rid)
+        return
+    if not entry.get("reads"):
+        _refuse("%s has no saved reads. Run extract first." % rid)
+    merged = K.merge_extracts(entry["reads"])
+    entry["rows"] = merged
+    entry["votes"] = rebuild_votes(merged, entry.get("marks"))
+    _save(path, doc)
+    print(json.dumps(merged, indent=2, ensure_ascii=False))
+    print("%d row(s) from %d read(s)." % (len(merged), len(entry["reads"])))
+
+
 def cmd_mark(ws, config, rid, read_path):
     path, doc = _load(ws)
     entry = _entry(doc, rid)
@@ -346,10 +364,11 @@ def main(argv=None):
     ap.add_argument("--json", action="store_true", help="machine-readable JSON on supported commands")
     sub = ap.add_subparsers(dest="command", required=True)
 
-    sub.add_parser("status")
-    for name in ("posting", "show", "drop"):
+    sub.add_parser("status").add_argument("--json", dest="json_after", action="store_true", help=argparse.SUPPRESS)
+    for name in ("posting", "show", "drop", "merge"):
         p = sub.add_parser(name)
         p.add_argument("role_id")
+        p.add_argument("--json", dest="json_after", action="store_true", help=argparse.SUPPRESS)
     p = sub.add_parser("extract")
     p.add_argument("role_id")
     p.add_argument("--read", required=True, help="JSON with rows, or '-' for standard input")
@@ -360,6 +379,7 @@ def main(argv=None):
     p.add_argument("role_id")
     p.add_argument("--rows", help="replace rows after the person's edits (renumbered)")
     args = ap.parse_args(argv)
+    args.json = args.json or getattr(args, "json_after", False)   # --json works before or after the command
     ws, config = C.open_workspace(args.workspace)
     today = C.today_in(config)
     if args.command == "status":
@@ -368,6 +388,8 @@ def main(argv=None):
         print(posting_text(_role(ws, args.role_id)))
     elif args.command == "extract":
         cmd_extract(ws, config, args.role_id, args.read, today)
+    elif args.command == "merge":
+        cmd_merge(ws, config, args.role_id)
     elif args.command == "mark":
         cmd_mark(ws, config, args.role_id, args.read)
     elif args.command == "confirm":
