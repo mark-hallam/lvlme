@@ -238,8 +238,13 @@ that is a fact as an evidence item with a source of type `interview` and a
 3. Do you have a non-compete or non-solicitation clause? What does it cover,
    and until when? [D6]
    Why we ask: it may rule out some organisations or roles for a time.
-4. Would you relocate? To where, and on what timeline? [D6]
-   Why we ask: this sets the D6 score for each location class.
+4. Would you relocate? To where, by when, and on what terms: a lowest pay
+   you would move for, visa sponsorship paid, or a particular organisation
+   worth the move regardless? [D6]
+   Why we ask: this sets the D6 score for each location class, and the
+   terms decide which roles count as a move you would make. Record the
+   answer as a `preference` evidence item: your own word supports D6 in
+   full, and visas are judged separately.
 5. How many days a week could you work on site, and how much travel could
    you do? [D6]
    Why we ask: many roles are on site or hybrid.
