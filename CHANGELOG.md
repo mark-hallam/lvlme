@@ -8,7 +8,11 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
-## Unreleased
+## 0.7.3 (7 November 2026)
+
+Fairer job checks for Australian roles, and a job you can add by link or
+pasted text. The full notes are in [LVLme 0.7.3](docs/RELEASE-0.7.3.md).
+Tests: 742 pass.
 
 ### Added
 
