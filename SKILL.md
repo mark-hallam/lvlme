@@ -149,9 +149,11 @@ other file that describes a first run links here.
    when the export arrives.
 5. **The rounds.** The rest of the interview in short rounds
    (`method/INTERVIEW.md`), skipping what the CV and the export already
-   answer. Ask about US export control and security clearance only when
-   `blocker_counts` in `market/roles/latest.json` shows an open role that
-   needs it (`method/INTERVIEW.md`, "Work rights"). Add each requirement the
+   answer. Ask about US export control, security clearance, Australian
+   security clearance, health practitioner registration, teacher
+   registration, a Working With Children Check, a police check, and a White
+   Card only when `blocker_counts` in `market/roles/latest.json` shows an
+   open role that needs that type (`method/INTERVIEW.md`, "Work rights"). Add each requirement the
    person says they meet to `candidate.eligibility_cleared`.
 6. **Work rights rules.** Fill the D6 rules in
    `eval/profile-dimensions.json` for every location class, from the work
@@ -270,11 +272,11 @@ rights question when `fetch_roles.py` first finds an open role that needs it.
 Run `python3 scripts/fetch_roles.py`. Note new and closed roles. Join the
 market scouts' sourced facts (offices in the person's region, growing teams,
 events, partner programmes) into `market/orgs.json`. It reads all six
-boards; roles from any other careers site go in
-`market/roles/manual.json`. To add one job from a link or pasted text (SEEK,
-Indeed, a hospital board, and so on), run `python3 scripts/add_job.py
---workspace PATH --url URL` or `--text-file FILE` with a manual target (`--org`
-when the employer name is not in config).
+boards. To add a role from any other careers site (SEEK, Indeed, a hospital
+board, and so on), run `python3 scripts/add_job.py --workspace PATH --url URL`
+or `--text-file FILE` with a manual target (`--org` when the employer name is
+not in config). That is the official way to add a job; it writes to
+`market/roles/manual.json`. Do not hand-edit the jobs list.
 
 Then find doors: run `python3 scripts/fetch_doors.py`, which reads the
 public Luma calendars in `config.json` (`doors.calendars`) and the

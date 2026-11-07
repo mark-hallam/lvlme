@@ -26,9 +26,11 @@ filled in, it is the folder two levels above this file).
    only. Save supplied files in `intake/sources/`.
 4. Follow `method/INTERVIEW.md`: read the documents first, then ask only the
    gaps, a few questions at a time. Use the question bank in
-   `method/INTAKE.md` as the checklist. Ask about US export control and
-   security clearance only when an open role needs them ("Work rights" in
-   `method/INTERVIEW.md`).
+   `method/INTAKE.md` as the checklist. Ask about US export control,
+   security clearance, Australian security clearance, health practitioner
+   registration, teacher registration, a Working With Children Check, a
+   police check, and a White Card only when an open role needs that type
+   ("Work rights" in `method/INTERVIEW.md`).
 5. With the argument `update` (or when `intake/answers.md` already has
    answers), ask only about what changed since the last run and the open
    questions in `profile/evidence.json`.

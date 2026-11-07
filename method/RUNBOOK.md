@@ -68,9 +68,14 @@ rounds while roles and evidence are gathered.
 
    Note new and closed roles (printed, and in the summary of
    `market/roles/latest.json`). If `blocker_counts` there is above 0 for US
-   export control or for `security_clearance` or `australian_security_clearance`
-   and that question has not been asked yet, ask it (`INTERVIEW.md`, "Work rights"). Add roles from boards
-   from any other careers site to `market/roles/manual.json`. If the
+   export control, `security_clearance`, `australian_security_clearance`,
+   `health_practitioner_registration`, `teacher_registration`,
+   `working_with_children_check`, `police_check` or `white_card`
+   and that type's question has not been asked yet, ask it (`INTERVIEW.md`, "Work rights"). To add a role from any other careers site (SEEK, Indeed, a hospital board, and so on),
+   run `python3 scripts/add_job.py --workspace PATH --url URL` or `--text-file FILE`
+   (with `--org` when the employer name is not in config). That is the official way
+   to add a job; it writes to `market/roles/manual.json`. Do not hand-edit the jobs
+   list. If the
    summary has `endpoint_notes` (a board too big to list in full), say so.
    Each role carries a `posting_check` label (likely real, check first,
    suspicious) from its age and reposts; mention any suspicious role the

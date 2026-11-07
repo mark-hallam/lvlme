@@ -178,16 +178,52 @@ that is a fact as an evidence item with a source of type `interview` and a
    country and level? [D6]
    Why we ask: clearance roles are closed without one.
    Ask only when an open role needs it: `summary.blocker_counts.security_clearance`
-   or `summary.blocker_counts.australian_security_clearance` is above 0.
-6. Do you hold any professional licence a target role might require (for
+   is above 0.
+6. Do you hold, or could you obtain, an Australian Government security
+   clearance (Baseline, NV1, NV2, Negative Vetting, or another named
+   Australian level)? [D6]
+   Why we ask: Australian clearance roles are closed without the named level,
+   or without being able to obtain it when the posting says that is enough.
+   Ask only when an open role needs it:
+   `summary.blocker_counts.australian_security_clearance` is above 0.
+7. Do you hold current registration with the Australian Health Practitioner
+   Regulation Agency (AHPRA), or another health practitioner registration a
+   target role might require? [D6]
+   Why we ask: health roles that require registration are closed without it.
+   Ask only when an open role needs it:
+   `summary.blocker_counts.health_practitioner_registration` is above 0.
+8. Do you hold teacher registration (for example with VIT, NESA or QCT)
+   that a target role might require? [D6]
+   Why we ask: teaching roles that require registration are closed without it.
+   Ask only when an open role needs it:
+   `summary.blocker_counts.teacher_registration` is above 0.
+9. Do you hold a Working With Children Check, or could you obtain one
+   before starting? [D6]
+   Why we ask: some roles require it, and a person can often get one before
+   they start.
+   Ask only when an open role needs it:
+   `summary.blocker_counts.working_with_children_check` is above 0.
+10. Do you hold a national police check, or could you obtain one before
+   starting? [D6]
+   Why we ask: some roles require it, and a person can often get one before
+   they start.
+   Ask only when an open role needs it: `summary.blocker_counts.police_check`
+   is above 0.
+11. Do you hold a construction White Card, or could you obtain one before
+   starting? [D6]
+   Why we ask: some construction roles require it, and a person can often get
+   one before they start.
+   Ask only when an open role needs it: `summary.blocker_counts.white_card`
+   is above 0.
+12. Do you hold any professional licence a target role might require (for
    example a driving licence, an engineering registration, a financial
    services licence)? [D6, D1]
    Why we ask: licence requirements are hard blockers.
-7. Is there anything that would stop you passing a standard background or
+13. Is there anything that would stop you passing a standard background or
    reference check for this kind of role? You do not need to say what it is.
    [D6]
    Why we ask: better to plan for it than to be surprised late.
-8. Are any of your past employers or clients likely to be seen as a conflict
+14. Are any of your past employers or clients likely to be seen as a conflict
    of interest by a target organisation? [D6, D4]
    Why we ask: some organisations screen out applicants from competitors or
    regulators.

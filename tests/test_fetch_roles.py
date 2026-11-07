@@ -78,10 +78,14 @@ class EngineeringTitles(unittest.TestCase):
                 gh_job(11, "Technical Success Engineer", "Technical Success",
                        "<h3>Responsibilities</h3><ul><li>You will not write production code; you guide customers through launches.</li></ul>")]
         roles = built(F.greenhouse_postings({"jobs": jobs}))
-        for title in [j["title"] for j in jobs[:8]]:
+        for title in [j["title"] for j in jobs[:7]]:
             role, why = roles[title]
             self.assertIsNone(role, title)
-        self.assertIn("production coding", roles["Deployment Engineer, Public Sector"][1])  # dropped by its title
+        # "Deployment" in the title is not enough; this posting does not describe coding work.
+        dep, why = roles["Deployment Engineer, Public Sector"]
+        self.assertIsNotNone(dep)
+        self.assertFalse(dep["requires_heavy_coding"])
+        self.assertIsNone(why)
         for title in ("Deployment Lead, Applied AI", "Technical Program Manager, Model Launches"):
             self.assertFalse(roles[title][0]["requires_heavy_coding"], title)
         kept = roles["Technical Success Engineer"][0]                 # the posting says no production code
@@ -113,6 +117,61 @@ class EngineeringTitles(unittest.TestCase):
         for title in ("Project Engineer", "Chemical Engineer"):
             with self.subTest(title=title):
                 self.assertFalse(F.engineering_title(title, blurb))
+
+    def test_fuzzy_title_follows_the_posting_not_platform_or_deployment(self):
+        plant = (
+            "<p>You will own plant performance targets, deployment of the programme, "
+            "and batches of 50 ml samples.</p>"
+            "<h3>Responsibilities</h3><ul><li>Coordinate field crews and suppliers.</li></ul>"
+        )
+        coding = (
+            "<p>You will own the internal developer platform.</p>"
+            "<h3>Responsibilities</h3><ul><li>You will write production code and review it.</li></ul>"
+            "<h3>Requirements</h3><ul><li>Hands-on coding and software engineering experience.</li></ul>"
+        )
+        cfg = H.deep(CFG)
+        cfg["families"].append({
+            "id": "field_engineering",
+            "name": "Field engineering",
+            "title_keywords": [],
+            "department_keywords": ["Operations", "Applied AI"],
+            "drop_if_heavy_coding": False,
+        })
+        for title in ("Platform Engineer", "Deployment Engineer", "Performance Engineer"):
+            with self.subTest(title=title, body="plant"):
+                base = next(F.greenhouse_postings({"jobs": [gh_job(21, title, "Operations", plant)]}))
+                role, _ = F.build_role(TARGET, base, cfg)
+                self.assertIsNotNone(role, title)
+                self.assertFalse(role["requires_heavy_coding"], title)
+                self.assertFalse(F.engineering_title(title, "plant performance targets, deployment of the programme"))
+            with self.subTest(title=title, body="coding"):
+                base = next(F.greenhouse_postings({"jobs": [gh_job(22, title, "Operations", coding)]}))
+                role, _ = F.build_role(TARGET, base, cfg)
+                self.assertIsNotNone(role, title)
+                self.assertTrue(role["requires_heavy_coding"], title)
+                self.assertTrue(F.engineering_title(title, role["description_text"]))
+
+    def test_non_software_title_is_heavy_coding_when_the_body_shows_coding_work(self):
+        coding = (
+            "<h3>About the role</h3><p>This posting describes the day to day work.</p>"
+            "<h3>Responsibilities</h3><ul><li>You will write production code used by the site team.</li></ul>"
+            "<h3>Requirements</h3><ul><li>Professional experience with programming in Python.</li></ul>"
+        )
+        cfg = H.deep(CFG)
+        cfg["families"].append({
+            "id": "field_engineering",
+            "name": "Field engineering",
+            "title_keywords": [],
+            "department_keywords": ["Operations"],
+            "drop_if_heavy_coding": False,
+        })
+        for title in ("Civil Engineer", "Site Engineer", "Project Engineer"):
+            with self.subTest(title=title):
+                base = next(F.greenhouse_postings({"jobs": [gh_job(23, title, "Operations", coding)]}))
+                role, _ = F.build_role(TARGET, base, cfg)
+                self.assertIsNotNone(role, title)
+                self.assertTrue(role["requires_heavy_coding"], title)
+                self.assertTrue(F.engineering_title(title, role["description_text"]))
 
     def test_non_software_engineer_roles_are_not_heavy_coding_from_title(self):
         body = "<h3>Requirements</h3><ul><li>5+ years of field experience.</li></ul>"

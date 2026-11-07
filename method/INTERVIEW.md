@@ -138,19 +138,29 @@ person never did, comes to light.
 
 Ask the "Eligibility and work rights" questions in `INTAKE.md`: where the
 person can work without sponsorship, visa routes, the degree, licences, the
-background check and conflicts of interest. Ask two of them only when an
-open role needs them, which `fetch_roles.py` counts in
+background check and conflicts of interest. Ask each of these only when an
+open role needs it, which `fetch_roles.py` counts in
 `market/roles/latest.json` under `summary.blocker_counts`:
 
 - the US export control question (`INTAKE.md` 1.4), only when
   `us_person_export_control` is above 0;
-- the security clearance question (1.5), only when `security_clearance` or
-  `australian_security_clearance` is above 0.
+- the security clearance question (1.5), only when `security_clearance` is
+  above 0;
+- the Australian security clearance question (1.6), only when
+  `australian_security_clearance` is above 0;
+- the health practitioner registration question (1.7), only when
+  `health_practitioner_registration` is above 0;
+- the teacher registration question (1.8), only when `teacher_registration`
+  is above 0;
+- the Working With Children Check question (1.9), only when
+  `working_with_children_check` is above 0;
+- the police check question (1.10), only when `police_check` is above 0;
+- the White Card question (1.11), only when `white_card` is above 0.
 
 Until the person says they meet a requirement, the roles that state it
 count as blocked (D6 = 0), which is the honest default. If a later run's
 count goes above 0 for a question not yet asked, ask it then. If the person
-raises either one themselves, record what they say.
+raises any of them themselves, record what they say.
 
 ### Gaps
 

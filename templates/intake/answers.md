@@ -18,6 +18,12 @@ Last updated:
 - Degree (level and field), or what I hold instead:
 - US person for export-control purposes (yes or no; asked only if an open role needs it):
 - Security clearance (country and level, or none; asked only if an open role needs it):
+- Australian security clearance (level, or none; asked only if an open role needs it):
+- Health practitioner registration such as AHPRA (asked only if an open role needs it):
+- Teacher registration (asked only if an open role needs it):
+- Working With Children Check (asked only if an open role needs it):
+- National police check (asked only if an open role needs it):
+- Construction White Card (asked only if an open role needs it):
 - Licences a role might require:
 - Anything that could affect a background or reference check (no detail needed):
 - Possible conflicts of interest with past employers or clients:

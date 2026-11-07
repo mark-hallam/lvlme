@@ -6,8 +6,9 @@ Offline and standard library only. Pins three things:
 - the interview's first message is about 120 words at most and asks only
   three things (three CV facts to confirm, which organisations, the LinkedIn
   data export);
-- the US export control and security clearance questions are asked only when
-  fetch_roles.py counts an open role that needs them (summary.blocker_counts).
+- the US export control, security clearance, and each new blocker-type
+  question are asked only when fetch_roles.py counts an open role that
+  needs that type (summary.blocker_counts).
 """
 import os
 import re
@@ -120,18 +121,31 @@ class WorkRightsTests(unittest.TestCase):
     def test_only_when_an_open_role_needs_them(self):
         intake = section(read("method/INTAKE.md"), "The question bank")
         bank = intake.split("### 2. Constraints")[0]
-        q4 = " ".join(re.search(r"^4\. (.*?)(?=^5\. )", bank, re.M | re.S).group(1).split())
-        q5 = " ".join(re.search(r"^5\. (.*?)(?=^6\. )", bank, re.M | re.S).group(1).split())
-        self.assertIn("export-control", q4)
-        self.assertIn("clearance", q5)
-        for q, kinds in ((q4, ("us_person_export_control",)), (q5, ("security_clearance", "australian_security_clearance"))):
-            with self.subTest(q=q[:40]):
+        gated = (
+            (4, 5, "export-control", ("us_person_export_control",)),
+            (5, 6, "clearance", ("security_clearance",)),
+            (6, 7, "Australian", ("australian_security_clearance",)),
+            (7, 8, "AHPRA", ("health_practitioner_registration",)),
+            (8, 9, "teacher registration", ("teacher_registration",)),
+            (9, 10, "Working With Children", ("working_with_children_check",)),
+            (10, 11, "police check", ("police_check",)),
+            (11, 12, "White Card", ("white_card",)),
+        )
+        for n, nxt, phrase, kinds in gated:
+            q = " ".join(re.search(r"^%d\. (.*?)(?=^%d\. )" % (n, nxt), bank, re.M | re.S).group(1).split())
+            with self.subTest(question=n):
+                self.assertIn(phrase, q)
                 self.assertIn("Ask only when an open role needs it", q)
                 for kind in kinds:
                     self.assertIn(kind, q)
+                if n == 5:
+                    self.assertNotIn("australian_security_clearance", q)
         interview = " ".join(section(read("method/INTERVIEW.md"), "The rounds").split())
         self.assertIn("summary.blocker_counts", interview)
-        for kind in ("us_person_export_control", "security_clearance", "australian_security_clearance"):
+        for kind in ("us_person_export_control", "security_clearance",
+                     "australian_security_clearance", "health_practitioner_registration",
+                     "teacher_registration", "working_with_children_check",
+                     "police_check", "white_card"):
             self.assertIn("`%s`" % kind, interview)
         self.assertIn("above 0", interview)
         self.assertIn("honest default", interview)

@@ -254,12 +254,13 @@ NON_SOFTWARE_ENGINEER = re.compile(
     r"\bproperty\s+developer\b",
     re.I,
 )
-# Ambiguous words (deployment, platform, performance, ml) apply to the title only, not the company blurb.
+# Clear software or coding words in a title. Fuzzy words (platform, deployment,
+# performance, bare ml) are not enough on their own; the posting decides those.
 TITLE_SOFTWARE_CODING_WORD = re.compile(
     r"\b(?:software|coding|programming|programmer|devops|sre\b|"
     r"backend|back[- ]end|frontend|front[- ]end|full[- ]stack|fullstack|"
-    r"machine\s+learning|\bml\b|android|ios|"
-    r"deployment|forward[- ]deployed|platform|performance|"
+    r"machine\s+learning|android|ios|"
+    r"forward[- ]deployed|"
     r"site\s+reliability|software\s+quality|"
     r"plugin|monetization|chatgpt|data\s+engineer|analytics\s+engineer)\b",
     re.I,
@@ -273,18 +274,36 @@ POSTING_SOFTWARE_CODING_WORD = re.compile(
 )
 
 
-def engineering_title(title, posting_text=None):
-    """True when the title names a software or coding job (see ENGINEERING_JOB)."""
-    main = re.split(r"\s*(?:,|\(|\||\s[-\u2013\u2014]\s)", title or "", maxsplit=1)[0]
-    if NON_SOFTWARE_ENGINEER.search(main):
+def posting_shows_coding(posting_text):
+    """True when duties, requirements or description show software or coding work."""
+    if not posting_text:
         return False
+    if POSTING_SOFTWARE_CODING_WORD.search(posting_text):
+        return True
+    for rx in CODE_STRONG:
+        for m in re.finditer(rx, posting_text, re.I):
+            if not NEGATION.search(posting_text[max(0, m.start() - 40):m.start()]):
+                return True
+    return False
+
+
+def engineering_title(title, posting_text=None):
+    """True when the role is a software or coding job.
+
+    Clear title words (software, backend, programming) still count. Fuzzy
+    title words (platform, deployment, performance) do not, on their own.
+    A non-software-looking title can still count when the posting shows
+    coding work.
+    """
+    main = re.split(r"\s*(?:,|\(|\||\s[-\u2013\u2014]\s)", title or "", maxsplit=1)[0]
+    body_coding = posting_shows_coding(posting_text)
+    if NON_SOFTWARE_ENGINEER.search(main):
+        return body_coding
     if not ENGINEERING_JOB.search(main):
         return False
     if TITLE_SOFTWARE_CODING_WORD.search(main):
         return True
-    if posting_text and POSTING_SOFTWARE_CODING_WORD.search(posting_text):
-        return True
-    return False
+    return body_coding
 
 
 def coding_check(title, text):
@@ -331,13 +350,17 @@ def parse_posting(raw_html, title, org_stop=None):
         degree = shorten("Preferred: " + pref) if pref else None
     lines = [("- " if kind == "li" else "") + text for kind, text, _ in blocks]
     full_text = clean(" ".join(t for _, t, _ in blocks_of(raw_html, skip_boilerplate=False)))
-    heavy, hits = coding_check(title, " ".join(req + resp + nice))
+    intro = [i for c, _, items in secs if c == "intro" for i in items]
+    extra = [i for c, _, items in secs if c == "other" for i in items]
+    role_text = " ".join(req + resp + nice + intro + extra)
+    heavy, hits = coding_check(title, role_text)
     return {
         "hard": [shorten(i) for i in req if len(i) > 3][:6],
         "nice": [shorten(i) for i in nice if len(i) > 3][:4],
         "resp": [shorten(i) for i in resp if len(i) > 3][:6],
         "years": years, "years_basis": basis, "degree": degree,
         "text": "\n".join(lines), "full_text": full_text,
+        "role_text": role_text,
         "coding": (heavy, hits), "parse_note": note,
     }
 
@@ -683,7 +706,7 @@ def build_role(target, base, config):
     if not (config.get("heavy_coding") or {}).get("detect", True):
         heavy, signals = False, []
     elif (not heavy and "candidate" in config and not (config["candidate"] or {}).get("writes_production_code", False)
-          and engineering_title(base["title"], parsed.get("full_text") or "")
+          and engineering_title(base["title"], parsed.get("role_text") or parsed.get("full_text") or "")
           and not any(s.startswith("NOT required") for s in signals)):
         # Someone who doesn't write production code: a software or coding title counts as heavy coding
         # unless the posting itself says the role doesn't need it.
