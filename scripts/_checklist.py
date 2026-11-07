@@ -208,6 +208,28 @@ def score_checklist(rows, votes):
     }
 
 
+NOT_MARKED = "not marked yet"
+
+
+def unmarked(rows):
+    """The result for a list nobody has marked against the evidence yet: no verdict, no points."""
+    rows = list(rows or [])
+    musts = sum(1 for r in rows if r.get("strength") == "must" and r.get("type") != "condition")
+    return {
+        "shown": {
+            "verdict": NOT_MARKED,
+            "must_line": ("%d must-have%s to check against your evidence" % (musts, "" if musts == 1 else "s")
+                          if musts else "This posting states no must-haves."),
+            "moves": [],
+            "questions": [],
+            "todos": [],
+            "thin_posting": thin_posting(rows),
+            "notice": THIN_NOTICE if thin_posting(rows) else None,
+        },
+        "compare": {"points": None, "points_low": None, "points_high": None, "unknown_count": len(rows)},
+    }
+
+
 def beside(today_fit, result):
     """Today's fit, unchanged, next to the checklist. Fit is not rewritten."""
     out = {"today_fit": today_fit, "shown": result["shown"], "compare": dict(result["compare"])}
@@ -223,7 +245,11 @@ def attach(role, entry):
     """
     fit = role["fit"]
     rows = list(entry.get("rows") or [])
-    result = score_checklist(rows, entry.get("votes") or {})
+    votes = entry.get("votes") or {}
+    if not any(votes.get(r.get("id")) for r in rows):
+        result = unmarked(rows)
+    else:
+        result = score_checklist(rows, votes)
     if entry.get("corrected") is False:
         result["shown"]["questions"] = ["Is this what the job asks for?"] + result["shown"]["questions"]
     both = beside(fit, result)

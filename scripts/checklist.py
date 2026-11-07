@@ -145,7 +145,12 @@ def _evidence_ids(ws):
 
 
 def _verdict_line(entry):
-    result = K.score_checklist(entry.get("rows") or [], entry.get("votes") or {})
+    rows = entry.get("rows") or []
+    votes = entry.get("votes") or {}
+    if not any(votes.get(r.get("id")) for r in rows):
+        result = K.unmarked(rows)
+    else:
+        result = K.score_checklist(rows, votes)
     shown = result["shown"]
     return shown["verdict"], shown
 
