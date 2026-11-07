@@ -530,8 +530,9 @@ __TODAYHEAD____TODAY__
    <div class="strip" id="strip"></div>
    <div class="hero-row">
     <div>
-     <div class="best-l" id="bestLabel">Best match today</div>
+     <div class="best-l" id="bestLabel">__BESTLABEL__</div>
      <div class="best-v num"><span id="bestNum">__BESTFIT__</span> <small>of 100</small></div>
+     <div class="tiny sub" id="bestWhy">__BESTWHY__</div>
      <div class="best-pills" id="bestPills"></div>
      <div class="small sub" id="bestRole" style="margin-top:6px">__BESTROLE__</div>
     </div>
@@ -684,6 +685,9 @@ let LV = null;                                             // the journey's next
 let JPC = {};                                              // journey -> its projection (see jp())
 function recompute(){ P = {}; LV = null; JPC = {}; D.roles.forEach(r => P[r.id] = {exp: project(r, "exp"), best: project(r, "best")}); }
 function fitM(r, mode){ mode = mode || state.mode; return mode === "today" ? r.fit : P[r.id][mode].end; }
+function matchLeads(r){ return r.judged && r.h && r.h.kind === "match"; }
+function headlineValue(r){ return matchLeads(r) ? r.h.value : fitM(r); }
+function allMatch(rs){ const judged = rs.filter(r => r.judged); return judged.length > 0 && judged.every(matchLeads); }
 function scoresM(r, mode){ mode = mode || state.mode; return mode === "today" ? r.s : P[r.id][mode].scores; }
 function ibM(r, mode){ mode = mode || state.mode; return mode === "today" ? r.ib : interviewBand(fitM(r, mode), scoresM(r, mode), r.hrl); }
 function obM(r, mode){ mode = mode || state.mode; return mode === "today" ? r.ob : offerBand(fitM(r, mode), scoresM(r, mode), r.hrl); }
@@ -754,9 +758,11 @@ function renderTopline(){
     <span title="Your best fit, out of 100">Altitude (fit)<b class="num">${Math.round(last.v)}</b></span><span title="The chance band your fit is in">Flight level (chance)<b>${esc(BANDS[bi])}</b></span>
     <span>Next level (${esc(nextT != null ? BANDS[bi + 1] : "top")})<b>${nextDate ? esc(fmtDate(nextDate)) : "not on the current plan"}</b></span>`;
   // best chance (mode aware)
-  const focus = journeyRoles().reduce((a, b) => fitM(b) > fitM(a) ? b : a);   // the role the journey's projection follows
-  $("#bestLabel").textContent = (state.org === "best" ? "Best match " : D.orgs[focus.g].name + ", best match ") + modeName();
-  countTo($("#bestNum"), fitM(focus));
+  const rs = journeyRoles(), jobMatch = allMatch(rs);
+  const focus = (jobMatch ? rs.filter(r => r.judged) : rs).reduce((a, b) => (jobMatch ? b.h.value > a.h.value : fitM(b) > fitM(a)) ? b : a);   // job match is today's result; fit follows the selected projection
+  $("#bestLabel").textContent = jobMatch ? "Best job match today" : (state.org === "best" ? "Best match " : D.orgs[focus.g].name + ", best match ") + modeName();
+  countTo($("#bestNum"), jobMatch ? focus.h.value : fitM(focus));
+  $("#bestWhy").textContent = jobMatch ? "Fit waits for your answers about who you know." : "";
   $("#bestPills").innerHTML = `Interview ${pill(ibM(focus))} Offer ${pill(obM(focus))}`;
   $("#bestRole").textContent = `${focus.on}: ${focus.title}`;
   // level (today, actual): the next level and what gets you there
@@ -1337,15 +1343,15 @@ const JUDGED_DIMS = ["D1", "D2", "D4"];   // judged per role; until then they ar
 function cellStyle(v){ const k = Math.max(0, Math.min(5, Math.round(v))); return `background:var(--h${k});color:${k >= 3 ? "var(--hdt)" : "var(--hlt)"}`; }
 function fillHeat(){
   const list = D.roles.filter(r => (!roleFilter.org || r.org === roleFilter.org) && (!roleFilter.fam || r.family === roleFilter.fam) && (!roleFilter.loc || r.lc === roleFilter.loc) && (!roleFilter.elig || (roleFilter.elig === "blocked") === r.blocked))
-    .sort((a, b) => (b.judged - a.judged) || (fitM(b) - fitM(a)));   // judged first: an unjudged role has no real fit
+    .sort((a, b) => (b.judged - a.judged) || (headlineValue(b) - headlineValue(a)));   // judged first: an unjudged role has no real fit
   const nj = list.filter(r => !r.judged).length;
   $("#fCount").textContent = plural(list.length, "role") + (nj ? `, ${nj} not judged yet` : "");
   const shown = list.slice(0, 80);
   const short = ["Match","Proof","Warm path","Edge","Signal","Eligible","Ready"];
-  $("#heatWrap").innerHTML = list.length ? `<table class="heat"><thead><tr><th>Role</th>${DIMS.map((d, k) => `<th title="${esc(D.dimNames[d])}">${short[k]}<div class="tiny sub">${W[k]}</div></th>`).join("")}<th>Fit</th></tr></thead><tbody>${shown.map(r => { const s = scoresM(r);
+  $("#heatWrap").innerHTML = list.length ? `<table class="heat"><thead><tr><th>Role</th>${DIMS.map((d, k) => `<th title="${esc(D.dimNames[d])}">${short[k]}<div class="tiny sub">${W[k]}</div></th>`).join("")}<th>${allMatch(list) ? "Job match" : list.some(matchLeads) ? "Fit or job match" : "Fit"}</th></tr></thead><tbody>${shown.map(r => { const s = scoresM(r);
     return `<tr${r.judged ? "" : ' class="nj"'}><td class="name" data-role-open="${esc(r.id)}"><div class="row-title small"><i class="org-key" style="background:${orgColour(r.g)};margin-right:6px"></i>${esc(r.title)}</div><div class="tiny sub">${esc(r.on)} · ${esc(r.loc.slice(0, 1).join(""))}${r.blocked ? " · eligibility blocker" : ""}${r.pc ? " · " + esc(r.pc) : ""}${r.judged ? "" : " · not judged yet"}</div></td>
     ${s.map((v, k) => !r.judged && JUDGED_DIMS.includes(DIMS[k]) ? `<td><div class="cell nj" data-tip="${esc(D.dimNames[DIMS[k]])}: not judged yet.">?</div></td>` : `<td><div class="cell" style="${cellStyle(v)}" data-tip="${esc(D.dimNames[DIMS[k]])}: ${r1(v)} of 5. ${esc(r.n[k])}">${Number.isInteger(v) ? v : v.toFixed(1)}</div></td>`).join("")}
-    <td>${r.judged ? `<div class="cell" style="background:var(--card2);color:var(--ink)">${Math.round(fitM(r))}</div>` : '<div class="cell nj tiny" data-tip="Not judged yet, so no fit score.">Not judged</div>'}</td></tr>`; }).join("")}</tbody></table>
+    <td>${r.judged ? `<div class="cell" style="background:var(--card2);color:var(--ink)">${Math.round(headlineValue(r))}</div>${matchLeads(r) ? '<div class="tiny sub">Job match</div>' : '<div class="tiny sub">Fit</div>'}` : '<div class="cell nj tiny" data-tip="Not judged yet, so no fit score.">Not judged</div>'}</td></tr>`; }).join("")}</tbody></table>
     ${list.length > shown.length ? `<div class="small sub" style="margin-top:8px">Showing the top ${shown.length} of ${list.length}. Narrow the filters to see more.</div>` : ""}` : '<div class="small sub">No roles match these filters.</div>';
   bindTips($("#heatWrap"));
   $("#heatWrap").querySelectorAll("[data-role-open]").forEach(n => n.addEventListener("click", () => openDetail({type: "role", id: n.dataset.roleOpen}, true)));
@@ -1771,9 +1777,9 @@ function detailRole(id){
   const block = r.hard ? `This role has an eligibility blocker you can't clear${r.bt ? " (" + r.bt + ")" : ""}, so eligibility stays at zero.`
     : r.blocked ? `This role has an eligibility blocker${r.bt ? " (" + r.bt + ")" : ""}. Eligibility rises only if a plan action clears it.` : "";
   return `<h2>${esc(r.title)}</h2><div class="small sub">${esc(r.on)} · ${esc(D.families[r.family] || "")} · ${esc(r.loc.join(", "))}</div>
-    <div class="journey-mini"><b>${Math.round(r.fit)}</b><span class="arrow">→</span><b>${Math.round(exp.end)}</b><span class="arrow">→</span><b>${Math.round(best.end)}</b></div><div class="tiny sub">today, expected, best case</div>
+    ${matchLeads(r) ? `<div class="eyebrow" style="margin-top:16px">Job match</div><div class="journey-mini"><b>${Math.round(r.h.value)}</b><span class="small sub">of 100</span></div><div class="small sub">${esc(r.h.why)}</div><div class="kv"><span>Fit</span><b class="num">${Math.round(r.fit)}</b></div>` : `<div class="journey-mini"><b>${Math.round(r.fit)}</b><span class="arrow">→</span><b>${Math.round(exp.end)}</b><span class="arrow">→</span><b>${Math.round(best.end)}</b></div><div class="tiny sub">today, expected, best case</div>`}
     <div class="kv" style="margin-top:8px"><span>Interview chance now</span>${pill(r.ib)}</div><div class="kv"><span>Offer chance now</span>${pill(r.ob)}</div>
-    ${r.m != null ? `<div class="kv"><span>Job match</span><b class="num">${Math.round(r.m)}</b></div><div class="tiny sub">How well you match the job itself: requirements, proof of work, what this organisation values and location. Fit also counts who knows you here, how findable you are and a tailored CV.</div>` : ""}
+    ${!matchLeads(r) && r.m != null ? `<div class="kv"><span>Job match</span><b class="num">${Math.round(r.m)}</b></div><div class="tiny sub">How well you match the job itself: requirements, proof of work, what this organisation values and location. Fit also counts who knows you here, how findable you are and a tailored CV.</div>` : ""}
     ${r.ck ? `<div class="eyebrow" style="margin-top:16px">Checklist</div><div class="small">${esc(r.ck.verdict)}. ${esc(r.ck.must)}</div>${r.ck.notice ? `<div class="small sub">${esc(r.ck.notice)}</div>` : ""}${r.ck.questions.length ? `<ul class="small">${r.ck.questions.map(q => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}${r.ck.moves.length ? `<ul class="small">${r.ck.moves.map(q => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}${r.ck.todos.length ? `<div class="tiny sub">Before you start: ${esc(r.ck.todos.join("; "))}</div>` : ""}${r.ck.rows.length ? `<ul class="small">${r.ck.rows.map(q => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}<div class="tiny sub">This sits beside today's fit. Today's fit is unchanged.</div>` : ""}
     <div class="kv"><span>If the plan works</span>${pill(interviewBand(exp.end, exp.scores, r.hrl))}</div>
     ${block ? `<div class="small warnline">${esc(block)}</div>` : ""}

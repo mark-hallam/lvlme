@@ -337,11 +337,17 @@ def score_role(ctx, role, judgement):
     if scores["D3"]["score"] <= 1 and CHANCE_BANDS.index(offer) > CHANCE_BANDS.index("Low"):
         offer = "Low"
         adjustments.append("Cold application only (D3 at most 1): offer band capped at Low")
+    headline = {"kind": "fit", "value": fit, "low": fit_low, "high": fit_high, "why": ""}
+    if not asked and match is not None:
+        name = C.target_names(ctx.config).get(org, org)
+        headline = {"kind": "match", "value": match, "low": match_low, "high": match_high,
+                    "why": "Job match: the job itself. Fit waits for your answer about who you know at %s." % name}
     return {
         "role_id": rid, "org": org, "title": role["title"], "family": role["family"],
         "locations": list(role.get("locations") or []), "location_class": loc_class, "url": role.get("url"),
         "scores": scores, "fit": fit, "fit_low": fit_low, "fit_high": fit_high,
         "match": match, "match_low": match_low, "match_high": match_high, "warm_path_asked": asked,
+        "headline": headline,
         "interview_band": interview, "offer_band": offer,
         "adjustments": adjustments, "judged": judgement is not None,
         "awaiting_review": sorted(set(awaiting)), "eligibility_blocked": blocked,

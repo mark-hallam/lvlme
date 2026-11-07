@@ -13,7 +13,7 @@ import unittest
 import helpers as H
 import score as S
 import validate as V
-from test_score import Base, e
+from test_score import Base, e, role
 
 
 def match_of(w, pts):
@@ -140,3 +140,30 @@ class DemoTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HeadlineTests(Base):
+    def test_headline_changes_after_the_answer_without_changing_the_maths(self):
+        self.judge("acme:1", e(2, ["E01"]), e(2, ["E01"]), e(2, ["E01"]))
+        runs = []
+        for asked in (False, True):
+            self.profile["D3"] = {"acme": e(0, [], asked=asked)}
+            run = self.run_score()
+            r = run["roles"][0]
+            kind = "fit" if asked else "match"
+            why = "" if asked else "Job match: the job itself. Fit waits for your answer about who you know at Acme."
+            self.assertEqual(r["headline"], {"kind": kind, "value": r[kind],
+                                           "low": r[kind + "_low"], "high": r[kind + "_high"], "why": why})
+            self.assertEqual(V.check(run, H.schema("run.schema.json")), [])
+            runs.append(r)
+        for key in ("fit", "fit_low", "fit_high", "match", "match_low", "match_high", "interview_band", "offer_band"):
+            self.assertEqual(runs[0][key], runs[1][key], key)
+
+    def test_headline_does_not_change_run_sorting(self):
+        self.roles = [role("acme:1"), role("globex:1", org="globex")]
+        self.judge("acme:1", e(2, ["E01"]), e(2, ["E01"]), e(2, ["E01"]))
+        self.judge("globex:1", e(1, ["E01"]), e(1, ["E01"]), e(1, ["E01"]))
+        self.profile["D3"] = {"acme": e(0, [], asked=False), "globex": e(5, ["E01"], asked=True)}
+        run = self.run_score()
+        self.assertEqual([r["role_id"] for r in run["roles"]], ["globex:1", "acme:1"])
+        self.assertGreater(run["roles"][1]["match"], run["roles"][0]["match"])

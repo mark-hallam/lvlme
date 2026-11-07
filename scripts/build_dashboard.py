@@ -419,6 +419,7 @@ def build_roles(data, group_of, hard_types):
             "e": [r["scores"][d].get("evidence") or [] for d in DIMS],
             "fit": r["fit"], "ib": r["interview_band"], "ob": r["offer_band"],
             "lo": r.get("fit_low"), "hi": r.get("fit_high"),   # the range across two judgings, once the engine writes it
+            "h": r.get("headline"),
             "m": r.get("match"),   # job match: the job-side factors only (D1, D2, D4, D6), once the engine writes it
             "adj": [clean(x) for x in r.get("adjustments") or []], "rn": clean(r.get("reviewer_note")),
             **_checklist_view(r.get("checklist")),
@@ -699,9 +700,16 @@ def render_page(data):
     card, view = LH.render(page)          # first render, readable without JavaScript; the page script redraws it
     static = ST.render(page, data.cur.get("per_org") or {})
     top = page["roles"][0] if page["roles"] else None
+    judged = [r for r in page["roles"] if r["judged"]]
+    match_leads = bool(judged) and all((r.get("h") or {}).get("kind") == "match" for r in judged)
+    if match_leads:
+        top = max(judged, key=lambda r: r["h"]["value"])
     out = A.TEMPLATE.replace("__TITLE__", html.escape(page["meta"]["title"])).replace(
         '<span id="builtAt"></span>', '<span id="builtAt">%s</span>' % html.escape(page["meta"]["built"]))
-    out = out.replace("__BESTFIT__", str(int(top["fit"] + 0.5)) if top else "0")
+    out = out.replace("__BESTLABEL__", "Best job match today" if match_leads else "Best match today")
+    out = out.replace("__BESTWHY__", "Fit waits for your answers about who you know." if match_leads else "")
+    best_value = top["h"]["value"] if match_leads else top["fit"] if top else 0
+    out = out.replace("__BESTFIT__", str(int(best_value + 0.5)))
     out = out.replace("__BESTROLE__", html.escape("%s: %s" % (top["on"], top["title"])) if top else "")
     events, _ = EV.merged(EV.load(data.ws), data.runs, page["progress"], data.config.get("goal") or {})
     today = TD.build(page, data, events)
@@ -926,6 +934,7 @@ def agent_payload(data, page):
         "roles": [{"role_id": r["role_id"], "org": r["org"], "title": r["title"], "family": r["family"],
                    "judged": r.get("judged", True),
                    **({"fit_low": r["fit_low"], "fit_high": r["fit_high"]} if r.get("fit_low") is not None and r.get("fit_high") is not None else {}),
+                   **({"headline": r["headline"]} if r.get("headline") else {}),
                    **({"match": r["match"]} if r.get("match") is not None else {}),
                    "locations": r.get("locations", []), "url": r.get("url"), "fit": r["fit"],
                    "interview_band": r["interview_band"], "offer_band": r["offer_band"],
@@ -1061,6 +1070,10 @@ def goal_line(goal):
 
 
 def summary_md(data, p):
+    best = max((r for r in p["roles"] if r["judged"]), key=lambda r: r["fit"], default=None)
+    headline = (best or {}).get("headline") or {}
+    match_line = (["- Best job match (job-side factors only; fit waits for the who-you-know answer at %s): %s of 100" % (
+        data.org(best["org"]), int(headline["value"] + 0.5))] if headline.get("kind") == "match" else [])
     lines = [
         "# Career campaign: briefing for AI agents",
         "",
@@ -1084,6 +1097,7 @@ def summary_md(data, p):
         "- %s" % p["outlook"]["text"],
         "- Best match (the best fit across your open roles, a fit score, not a probability): %s of 100" % _g(
             max([r["fit"] for r in p["roles"] if r["judged"]] or [0])),
+        *match_line,
         "- Roles judged: %d of %d open. A role not judged yet has no real fit score and is left out of the best roles below." % (
             p["role_counts"]["judged"], p["role_counts"]["open"]),
         "- Average fit of the 5 best open roles: %s / 100%s" % (

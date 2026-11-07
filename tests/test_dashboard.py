@@ -438,3 +438,39 @@ class InterviewLineTests(unittest.TestCase):
         line = next(x for x in js.splitlines() if x.startswith("const interviewLine"))
         self.assertIn('D.meta.outlook.band === "Not yet judged"', line)
         self.assertIn("${interviewLine()}", js)
+
+
+class HeadlinePayloadTests(unittest.TestCase):
+    def test_headline_reaches_page_and_agents_and_summary_only_adds_match_when_needed(self):
+        for kind in ("match", "fit", None):
+            with self.subTest(kind=kind):
+                ws = H.copy_demo(self)
+                path = os.path.join(ws, "eval", "runs", "2026-11-01.json")
+                run = H.load(path)
+                for r in run["roles"]:
+                    if kind:
+                        value = 82 if kind == "match" else r["fit"]
+                        r["headline"] = {"kind": kind, "value": value, "low": value - 2, "high": value + 2,
+                                         "why": "Job match: the job itself." if kind == "match" else ""}
+                    else:
+                        r.pop("headline", None)
+                H.save(path, run)
+                B.main(["--workspace", ws])
+                html_page, page = page_data(ws)
+                dash = H.load(os.path.join(ws, "report", "for-agents", "dashboard.json"))
+                expected = {r["role_id"]: r.get("headline") for r in run["roles"]}
+                for r in page["roles"]:
+                    self.assertEqual(r["h"], expected[r["id"]])
+                for r in dash["roles"]:
+                    self.assertEqual(r.get("headline"), expected[r["role_id"]])
+                summary = open(os.path.join(ws, "report", "for-agents", "SUMMARY.md"), encoding="utf-8").read()
+                self.assertIn("Best match (the best fit across your open roles, a fit score, not a probability): 57 of 100", summary)
+                if kind == "match":
+                    self.assertIn('id="bestLabel">Best job match today</div>', html_page)
+                    self.assertIn('id="bestNum">82</span>', html_page)
+                    self.assertIn('id="bestWhy">Fit waits for your answers about who you know.</div>', html_page)
+                    best = max((r for r in run["roles"] if r.get("judged", True)), key=lambda r: r["fit"])
+                    self.assertIn("Best job match (job-side factors only; fit waits for the who-you-know answer at %s): 82 of 100" %
+                                  page["orgNames"][best["org"]], summary)
+                else:
+                    self.assertNotIn("Best job match (", summary)

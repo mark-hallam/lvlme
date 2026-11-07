@@ -52,6 +52,14 @@ def build(page, data, events):
     out["stand"] = "You are at Level %d, %s. Your best match is %s at %s: %s out of 100%s." % (
         line["level"], line["band"], line["role"], line["org"], line["fit_text"],
         ", with a %s chance of an interview" % chance if chance else "")
+    best = next(r for r in page["roles"] if r["id"] == line["role_id"])
+    headline = best.get("h") or {}
+    if headline.get("kind") == "match":
+        out["stand"] = ("You are at Level %d, %s. Your best job match is %s at %s: %s out of 100. "
+                        "Fit, which adds who you know, how findable you are and a tailored CV, "
+                        "waits for your answer about who you know at %s.") % (
+                            line["level"], line["band"], line["role"], line["org"],
+                            int(headline["value"] + 0.5), line["org"])
     rs, acts = L.journey_roles([r for r in page["roles"] if r.get("judged", True)]), page["actions"]
     lead, nl, qs, up = LH.compute(dict(page, roles=rs))
     first = next((q for q in up if not q["a"].get("susp")), up[0] if up else None)   # never lead with a stale posting

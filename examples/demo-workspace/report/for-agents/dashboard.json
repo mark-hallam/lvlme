@@ -1513,6 +1513,13 @@
       "judged": true,
       "fit_low": 57.0,
       "fit_high": 61.0,
+      "headline": {
+        "kind": "fit",
+        "value": 57.0,
+        "low": 57.0,
+        "high": 61.0,
+        "why": ""
+      },
       "match": 76.9,
       "locations": [
         "Melbourne, Australia"
@@ -1541,6 +1548,13 @@
       "judged": true,
       "fit_low": 46.0,
       "fit_high": 50.0,
+      "headline": {
+        "kind": "fit",
+        "value": 46.0,
+        "low": 46.0,
+        "high": 50.0,
+        "why": ""
+      },
       "match": 56.9,
       "locations": [
         "San Francisco, CA",
@@ -1570,6 +1584,13 @@
       "judged": true,
       "fit_low": 45.0,
       "fit_high": 45.0,
+      "headline": {
+        "kind": "fit",
+        "value": 45.0,
+        "low": 45.0,
+        "high": 45.0,
+        "why": ""
+      },
       "match": 55.4,
       "locations": [
         "Sydney, Australia"
@@ -1598,6 +1619,13 @@
       "judged": true,
       "fit_low": 45.0,
       "fit_high": 45.0,
+      "headline": {
+        "kind": "fit",
+        "value": 45.0,
+        "low": 45.0,
+        "high": 45.0,
+        "why": ""
+      },
       "match": 58.5,
       "locations": [
         "Brisbane, Australia"
@@ -1626,6 +1654,13 @@
       "judged": true,
       "fit_low": 39.0,
       "fit_high": 39.0,
+      "headline": {
+        "kind": "fit",
+        "value": 39.0,
+        "low": 39.0,
+        "high": 39.0,
+        "why": ""
+      },
       "match": 40.0,
       "locations": [
         "Singapore"
@@ -1657,6 +1692,13 @@
       "judged": true,
       "fit_low": 37.0,
       "fit_high": 37.0,
+      "headline": {
+        "kind": "fit",
+        "value": 37.0,
+        "low": 37.0,
+        "high": 37.0,
+        "why": ""
+      },
       "match": 36.9,
       "locations": [
         "Seattle, WA",
@@ -1686,6 +1728,13 @@
       "judged": true,
       "fit_low": 34.0,
       "fit_high": 34.0,
+      "headline": {
+        "kind": "fit",
+        "value": 34.0,
+        "low": 34.0,
+        "high": 34.0,
+        "why": ""
+      },
       "match": 32.3,
       "locations": [
         "Remote"
@@ -1716,6 +1765,13 @@
       "judged": true,
       "fit_low": 28.0,
       "fit_high": 28.0,
+      "headline": {
+        "kind": "fit",
+        "value": 28.0,
+        "low": 28.0,
+        "high": 28.0,
+        "why": ""
+      },
       "match": 23.1,
       "locations": [
         "Dublin, Ireland"
@@ -1746,6 +1802,13 @@
       "judged": true,
       "fit_low": 24.0,
       "fit_high": 24.0,
+      "headline": {
+        "kind": "fit",
+        "value": 24.0,
+        "low": 24.0,
+        "high": 24.0,
+        "why": ""
+      },
       "match": 23.1,
       "locations": [
         "London, United Kingdom"
@@ -1776,6 +1839,13 @@
       "judged": true,
       "fit_low": 24.0,
       "fit_high": 24.0,
+      "headline": {
+        "kind": "fit",
+        "value": 24.0,
+        "low": 24.0,
+        "high": 24.0,
+        "why": ""
+      },
       "match": 26.2,
       "locations": [
         "Austin, TX"
@@ -1806,6 +1876,13 @@
       "judged": true,
       "fit_low": 18.0,
       "fit_high": 18.0,
+      "headline": {
+        "kind": "fit",
+        "value": 18.0,
+        "low": 18.0,
+        "high": 18.0,
+        "why": ""
+      },
       "match": 13.8,
       "locations": [
         "Washington, DC"
@@ -1837,6 +1914,13 @@
       "judged": false,
       "fit_low": 17.0,
       "fit_high": 17.0,
+      "headline": {
+        "kind": "fit",
+        "value": 17.0,
+        "low": 17.0,
+        "high": 17.0,
+        "why": ""
+      },
       "match": 15.4,
       "locations": [
         "Auckland, New Zealand"
