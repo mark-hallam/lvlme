@@ -21,6 +21,8 @@ SCRIPTS = os.path.join(H.ENGINE, "scripts")
 # Scripts that read a workspace, with the extra arguments each one needs to get that far.
 WORKSPACE_SCRIPTS = {
     "validate.py": [],
+    "checklist.py": ["status"],
+    "add_job.py": ["--url", "https://boards.greenhouse.io/x/jobs/1"],
     "fetch_roles.py": [],
     "fetch_doors.py": [],
     "doors.py": ["list"],

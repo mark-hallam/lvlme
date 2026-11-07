@@ -321,6 +321,8 @@ they give. Never register, RSVP, apply or pay (`method/CAMPAIGN.md`).
   official form say about the same facts.
 - **Recruiter screen.** `method/RECRUITER_SCREEN.md`, with the prompt in
   `templates/prompts/recruiter-screen.md`, in fresh context (G2).
+- **Checklist (optional).** For the best roles, build the requirement checklist
+  beside fit: `method/CHECKLIST.md`, `python3 scripts/checklist.py`.
 - Overclaims and mismatches become top-priority actions and drafted fixes.
 
 ### 5. Review

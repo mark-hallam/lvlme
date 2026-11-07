@@ -87,7 +87,10 @@ Weighted together they give a fit score out of 100, which maps to a chance
 band for an interview and for an offer (Almost none, Very low, Low, Moderate, Good, Strong).
 A referral moves the interview band up; a missing hard requirement moves both
 down; a cold application caps the offer band at Low. The full rules are in
-[`method/RUBRIC.md`](../method/RUBRIC.md).
+[`method/RUBRIC.md`](../method/RUBRIC.md). Optionally, for a judged role you
+can fill a requirement checklist from the posting (three merged reads, then
+three evidence marks in `eval/checklists.json`); the dashboard shows that
+verdict beside today's fit without changing the fit score.
 
 ## The honesty rules
 

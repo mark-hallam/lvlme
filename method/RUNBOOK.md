@@ -150,6 +150,8 @@ rounds while roles and evidence are gathered.
      other organisations (for example contacts at a different goal's targets).
    - `eval/gap-templates.json` and `eval/outlook.json`: revise when the
      picture changes. Give every gap a `kind`: `show_it` when the proof is missing but the person can probably already do it (a project example, a public link, a reference, a write-up; usually days), or `build_it` when they have to learn or do the thing first (usually weeks or months). If unsure, write `build_it`: never guess `show_it`.
+   - **Checklist (optional).** For the best roles, build the requirement checklist
+     beside fit: `method/CHECKLIST.md`, `python3 scripts/checklist.py`.
 
 7. **Review.** Start a separate, fresh, sceptical reviewer agent with the
    prompt in `REVIEW.md`. Give it the rubric, the evidence, the postings and

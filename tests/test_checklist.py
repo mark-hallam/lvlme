@@ -96,6 +96,19 @@ class ScoreTests(unittest.TestCase):
         self.assertNotIn("chance", text)
         self.assertNotIn("%", text)
 
+    def test_an_unmarked_list_has_no_verdict_yet(self):
+        rows = [row("R1", "Cannulation"), row("R2", "Flu vaccination", "must", "condition")]
+        got = C.unmarked(rows)
+        self.assertEqual(got["shown"]["verdict"], C.NOT_MARKED)
+        self.assertEqual(got["shown"]["must_line"], "1 must-have to check against your evidence")
+        self.assertEqual(got["shown"]["questions"], [])
+        self.assertIsNone(got["compare"]["points"])
+        role = {"fit": 41.0}
+        C.attach(role, {"corrected": False, "rows": rows, "votes": {"R1": [], "R2": []}})
+        self.assertEqual(role["checklist"]["verdict"], C.NOT_MARKED)
+        self.assertEqual(role["checklist"]["questions"], ["Is this what the job asks for?"])
+        self.assertEqual(role["fit"], 41.0)
+
     def test_beside_keeps_todays_fit(self):
         result = C.score_checklist([row("R1", "Cannulation")], {"R1": ["met"]})
         both = C.beside(41.0, result)
