@@ -216,6 +216,11 @@ class EligibilityBlockerTests(unittest.TestCase):
             ("Teacher registration is required.", "teacher_registration"),
             ("Registration with QCT is essential.", "teacher_registration"),
             ("You must hold a current White Card.", "white_card"),
+            ("A National Police Certificate is required.", "police_check"),
+            ("A police check is required before you start.", "police_check"),
+            ("You must hold a Queensland Blue Card.", "working_with_children_check"),
+            ("Positive Vetting clearance is essential.", "australian_security_clearance"),
+            ("Must hold or be able to obtain a PV clearance.", "australian_security_clearance"),
         )
         for text, kind in cases:
             with self.subTest(text=text):

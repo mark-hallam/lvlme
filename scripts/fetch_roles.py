@@ -437,16 +437,18 @@ TEACHER_REG_RX = re.compile(
     re.I)
 WWCC_RX = re.compile(
     r"working\s+with\s+children\s+check|\bWWCC\b|"
-    r"(?:valid|current)\s+WWC\s+check",
+    r"(?:valid|current)\s+WWC\s+check|"
+    r"\bblue\s+card\b",   # Queensland's working with children check
     re.I)
 POLICE_RX = re.compile(
-    r"national\s+police\s+check|"
+    r"national\s+police\s+(?:check|certificate|clearance)|"
+    r"police\s+(?:check|certificate)\s+(?:is\s+)?(?:required|essential|mandatory)|"
     r"AFP\s+(?:national\s+)?(?:police\s+)?check|"
     r"(?:must\s+hold|current|valid)\s+(?:a\s+)?national\s+police\s+check|"
     r"(?:must\s+hold|current|valid)\s+(?:a\s+)?police\s+check",
     re.I)
 # The Australian levels: Baseline and Negative Vetting, written in full or as the short two letter code with its number.
-_AU_LEVEL = r"(?:baseline|nv\s?[12]|negative\s+vetting(?:\s+level\s*[12])?)"
+_AU_LEVEL = r"(?:baseline|nv\s?[12]|negative\s+vetting(?:\s+level\s*[12])?|positive\s+vetting|\bpv\b)"
 AU_CLEARANCE_RX = re.compile(
     r"\b" + _AU_LEVEL + r"\b(?:\s+level)?(?:\s+security)?\s+clearance|"
     r"Australian\s+Government\s+Security\s+Vetting|\bAGSVA\b|"
