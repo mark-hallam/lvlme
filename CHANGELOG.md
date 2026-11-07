@@ -8,6 +8,16 @@ so the versions before 0.3.0 carry that name.
 **Added** is new, **Changed** works differently and **Fixed** was wrong
 before. Nothing here changes how a score is worked out unless it says so.
 
+## Unreleased
+
+### Added
+
+- Relocation is part of the profile: `candidate.relocation` in the config records where, from when and on what terms the person would move, and every role outside their home area shows the posting's pay and whether they said they would move for it.
+
+### Changed
+
+- Nothing in the maths.
+
 ## 0.7.4 (7 November 2026)
 
 A requirement checklist for each job, filled from the posting and marked

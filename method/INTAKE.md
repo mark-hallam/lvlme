@@ -245,6 +245,9 @@ that is a fact as an evidence item with a source of type `interview` and a
    terms decide which roles count as a move you would make. Record the
    answer as a `preference` evidence item: your own word supports D6 in
    full, and visas are judged separately.
+   Also record the answer in `config.json` as `candidate.relocation`: `willing`,
+   `classes` for some places only, `from`, `minimum_pay` with amount and currency,
+   `needs_sponsorship_paid`, `organisations_regardless`, `evidence` and `answered_on`.
 5. How many days a week could you work on site, and how much travel could
    you do? [D6]
    Why we ask: many roles are on site or hybrid.

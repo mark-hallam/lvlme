@@ -398,6 +398,96 @@ def posting_label(p):
     return {"pc": clean(pc.get("note")), "pcl": pc.get("label")} if pc.get("label") in ("check_first", "suspicious") else {}
 
 
+def parse_pay(text):
+    """Read a clear yearly figure or range, without guessing a dollar currency."""
+    if not text or re.search(r"\b(?:hours?|hrs?|hourly|days?|daily|months?|monthly)\b|/\s*[hdm]\b", text, re.I):
+        return None
+    currency = r"(?:[A-Z]{3}|US\$|A\$|AU\$|\$|£|€)"
+    number = r"(?:\d{1,3}(?:[,.]\d{3})+|\d+(?:\.\d+)?)(?:\s*[kKmM])?"
+    pattern = r"(?<![\w.,])(?P<currency>" + currency + r")\s*(?P<low>" + number + r")(?:\s*(?:to|[-–—])\s*(?P<other>" + currency + r")?\s*(?P<high>" + number + r"))?(?![\w.,])"
+    matches = list(re.finditer(pattern, text))
+    if len(matches) != 1:
+        return None
+    m = matches[0]
+    codes = {"US$": "USD", "A$": "AUD", "AU$": "AUD", "$": None, "£": "GBP", "€": "EUR"}
+    code = codes.get(m['currency'], m['currency'])
+    suffix = re.match(r"\s*([A-Z]{3})\b", text[m.end():])
+    if suffix:
+        if code is not None and code != suffix[1]:
+            return None
+        code = suffix[1]
+    other = m['other']
+    if other and other != '$' and codes.get(other, other) != code:
+        return None
+
+    def amount(value):
+        suffix = value[-1].lower()
+        value = value.rstrip('kKmM').strip()
+        value = re.sub(r"[,.](?=\d{3}(?:[,.]|$))", "", value)
+        return float(value) * (1000 if suffix == 'k' else 1000000 if suffix == 'm' else 1)
+
+    low, high = amount(m['low']), amount(m['high'] or m['low'])
+    return (code, low, high) if low <= high else None
+
+
+def relocation_terms(config, classes=None):
+    """One sentence with the person's moving terms, shared by roles and agents."""
+    relocation = (config.get("candidate") or {}).get("relocation") or {}
+    if relocation.get("willing") in (None, "unsure"):
+        return "not asked yet"
+    if relocation["willing"] == "no":
+        return "would not move"
+    names = {c["id"]: c["name"] for c in config["locations"]["classes"]}
+    place = "anywhere" if relocation["willing"] == "anywhere" else "to " + ", ".join(
+        names.get(c, c) for c in (classes if classes is not None else relocation.get("classes", [])))
+    parts = [place]
+    when = relocation.get("from")
+    if when:
+        parts.append("from " + ("now" if when == "now" else dt.datetime.strptime(when, "%Y-%m").strftime("%B %Y")))
+    floor = relocation.get("minimum_pay")
+    if floor:
+        amount = format(floor["amount"], ",").removesuffix(".0")
+        parts.append("for %s %s a year or more" % (floor["currency"], amount))
+    if relocation.get("needs_sponsorship_paid"):
+        parts.append("with the visa paid by the employer")
+    return "would move %s." % ", ".join(parts)
+
+
+def move_line(config, role_dict, posting, home):
+    """Show the person's answer beside a role, never as a scoring rule."""
+    if role_dict.get("lc") == home:
+        return None
+    relocation = (config.get("candidate") or {}).get("relocation") or {}
+    org = role_dict.get("org")
+    if org in relocation.get("organisations_regardless", []):
+        name = next((t["name"] for t in config.get("targets", []) if t["id"] == org), org)
+        return {"text": "A move. You said %s is worth the move at any pay." % clean(name), "verdict": "willing"}
+    willing = relocation.get("willing")
+    if willing in (None, "unsure"):
+        return {"text": "You have not said whether you would move for a role here. Ask your agent to record it.", "verdict": "unknown"}
+    if willing == "no" or (willing == "some_places" and role_dict.get("lc") not in relocation.get("classes", [])):
+        return {"text": "You said you would not move for a role here.", "verdict": "not_willing"}
+    text = "A move. You said you would move for this: %s" % relocation_terms(config, [role_dict.get("lc")])[len("would move "):]
+    verdict = "willing"
+    floor, pay = relocation.get("minimum_pay"), posting.get("compensation")
+    if not pay or not pay.strip():
+        text += " The posting does not state pay, so ask early."
+    elif floor:
+        parsed = parse_pay(pay)
+        if parsed is None:
+            text += " The posting's yearly pay is unclear, so compare it yourself."
+        elif parsed[0] is None:
+            text += " The posting's pay does not name its currency, so compare it yourself."
+        elif parsed[0] != floor["currency"]:
+            text += " The posting states pay in another currency, so compare it yourself."
+        elif parsed[2] < floor["amount"]:
+            text += " The posting's pay is below the pay you said you would move for."
+            verdict = "below_floor"
+        else:
+            text += " The posting's pay meets your floor."
+    return {"text": text, "verdict": verdict}
+
+
 def build_roles(data, group_of, hard_types):
     cleared = set((data.config.get("candidate") or {}).get("eligibility_cleared") or [])
     roles = []
@@ -424,8 +514,12 @@ def build_roles(data, group_of, hard_types):
             "adj": [clean(x) for x in r.get("adjustments") or []], "rn": clean(r.get("reviewer_note")),
             **_checklist_view(r.get("checklist")),
             "hardReq": [clean(h) for h in (p.get("hard_requirements") or [])[:5]],
+            "pay": clean(p.get("compensation")) or None,
             **posting_label(p),
         })
+        move = move_line(data.config, roles[-1], p, home_class(data.config))
+        if move:
+            roles[-1]["mv"] = move
     roles.sort(key=lambda x: (not x["judged"], -x["fit"], x["id"]))   # an unjudged role is never the best role
     return roles
 
@@ -721,8 +815,9 @@ def render_page(data):
 # ------------------------------------------------------------ agent files
 
 
-MONEY_RX = re.compile(r"(?:[$£€]\s?|\b(?:USD|AUD|EUR|GBP|CAD|NZD|SGD)\s?)\d[\d,.]*\s?[kKmM]?\b"
-                      r"(?:\s*(?:to|-|–|—)\s*(?:[$£€]\s?)?\d[\d,.]*\s?[kKmM]?\b)?")
+CURRENCY_CODES = "USD|AUD|EUR|GBP|CAD|NZD|SGD|CHF|JPY|INR|HKD"
+MONEY_RX = re.compile(r"(?:(?:US|AU?)?[$£€]\s?|\b(?:%s)\s?)\d[\d,.]*(?:\s?[kKmM])?\b"
+                      r"(?:\s*(?:to|-|–|—)\s*(?:(?:US|AU?)?[$£€]\s?)?\d[\d,.]*(?:\s?[kKmM])?\b)?" % CURRENCY_CODES)
 
 
 def make_redactor(data, sensitive, hide_names, placeholder="[contact]"):
@@ -774,7 +869,7 @@ def scrub(value, clean_text):
     if isinstance(value, list):
         return [scrub(v, clean_text) for v in value]
     if isinstance(value, dict):
-        return {k: scrub(v, clean_text) for k, v in value.items() if k != "compensation"}
+        return {k: v if k == "pay" else scrub(v, clean_text) for k, v in value.items() if k != "compensation"}
     return value
 
 
@@ -902,6 +997,7 @@ def agent_payload(data, page):
         "about": "Private career campaign data. Read only. See SUMMARY.md in this folder for the rules.",
         "generated_by": "lvlme scripts/build_dashboard.py",
         "sensitive_mode": sensitive,
+        "relocation": relocation_terms(data.config),
         "run_date": cur["run_date"], "rubric_version": cur["rubric_version"],
         "goal": dict({"title": goal.get("title", ""), "description": goal.get("description", ""),
                       "horizon_months": goal.get("horizon_months", 12)},
@@ -941,6 +1037,12 @@ def agent_payload(data, page):
                    "scores": {d: r["scores"][d]["score"] for d in DIMS},
                    "adjustments": r["adjustments"], "reviewer_note": r.get("reviewer_note", "")} for r in cur["roles"]],
     }
+    page_roles = {r["id"]: r for r in page["roles"]}
+    for role in payload["roles"]:
+        shown = page_roles[role["role_id"]]
+        role["pay"] = shown["pay"]
+        if shown.get("mv"):
+            role["mv"] = shown["mv"]
     if data.swot:
         payload["swot"] = data.swot
     if not sensitive:
@@ -1089,6 +1191,9 @@ def summary_md(data, p):
         "",
         "## Goal",
         goal_line(p["goal"]),
+        "",
+        "## Person",
+        "Relocation: %s" % p["relocation"],
         "",
         "## Outlook",
         "- %s" % p["judged_by_note"],

@@ -193,6 +193,9 @@ person's stated work rights and willingness to move. Use these anchors:
 | 1 | They need a visa or work right they lack and the posting says nothing about sponsorship, or they are unsure about moving. |
 | 0 | They cannot lawfully work there because of an uncleared eligibility blocker, the posting says it does not sponsor and they have no route, or they will not move for an on-site role. |
 
+`candidate.relocation` is the person's own word and supplies the move line on
+the role screen, while the D6 class rule stays the judged score.
+
 Set one entry per location class in `D6_rules.classes`. `scripts/score.py`
 picks the best class among the role's locations (enforced). A judgement can
 set `location_class` to override the automatic choice. A

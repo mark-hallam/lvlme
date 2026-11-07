@@ -1,5 +1,6 @@
 """End to end on a copy of the demo workspace: fetch (offline), network map, score, dashboard, validate."""
 import os
+import json
 import re
 import subprocess
 import sys
@@ -63,7 +64,13 @@ class EndToEndTests(unittest.TestCase):
         self.build()
         summary = self.read("report", "for-agents", "SUMMARY.md")
         data = self.read("report", "for-agents", "dashboard.json")
-        for text in (summary, data):
+        private_data = json.loads(data)
+        postings = H.load(os.path.join(self.ws, "market", "roles", "latest.json"))
+        posted_pay = {r["id"]: B.clean(r.get("compensation")) or None for r in postings["roles"]}
+        for role in private_data["roles"]:
+            # Public posting pay is the sole salary exception; every private field stays masked.
+            self.assertEqual(role.pop("pay"), posted_pay[role["role_id"]])
+        for text in (summary, json.dumps(private_data)):
             self.assertNotIn("Contoso", text)          # employer name from redact_terms
             self.assertNotIn("Jordan Sample", text)    # contact name from network.json
             self.assertNotRegex(text, r"\$\s?\d")      # no salary figures

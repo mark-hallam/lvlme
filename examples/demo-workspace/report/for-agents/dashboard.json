@@ -2,6 +2,7 @@
   "about": "Private career campaign data. Read only. See SUMMARY.md in this folder for the rules.",
   "generated_by": "lvlme scripts/build_dashboard.py",
   "sensitive_mode": true,
+  "relocation": "would move to United States, from now, for [salary] a year or more.",
   "run_date": "2026-11-01",
   "rubric_version": "1.2",
   "goal": {
@@ -1538,7 +1539,8 @@
         "D7": 3
       },
       "adjustments": [],
-      "reviewer_note": "Agreed D1 4 and D4 4: same domain and scale; D2 held at 3, one case study is not a track record."
+      "reviewer_note": "Agreed D1 4 and D4 4: same domain and scale; D2 held at 3, one case study is not a track record.",
+      "pay": "AUD 150,000 to 180,000 per year salary"
     },
     {
       "role_id": "acme:4100001",
@@ -1574,7 +1576,8 @@
         "D7": 1
       },
       "adjustments": [],
-      "reviewer_note": "Agreed D1 3: program years meet the ask, the domain gap keeps it at 3."
+      "reviewer_note": "Agreed D1 3: program years meet the ask, the domain gap keeps it at 3.",
+      "pay": "$190,000 to $240,000 USD"
     },
     {
       "role_id": "acme:4100002",
@@ -1609,7 +1612,8 @@
         "D7": 1
       },
       "adjustments": [],
-      "reviewer_note": "Agreed D2 3 on the verified repository; D1 stays 2."
+      "reviewer_note": "Agreed D2 3 on the verified repository; D1 stays 2.",
+      "pay": null
     },
     {
       "role_id": "initech:i-0002",
@@ -1644,7 +1648,8 @@
         "D7": 3
       },
       "adjustments": [],
-      "reviewer_note": "Agreed: the licence blocker is cleared (E13)."
+      "reviewer_note": "Agreed: the licence blocker is cleared (E13).",
+      "pay": null
     },
     {
       "role_id": "globex:g-0003",
@@ -1682,7 +1687,12 @@
         "D1 3 counted as 2 until the blind review settles it",
         "D2 3 counted as 2 until the blind review settles it"
       ],
-      "reviewer_note": ""
+      "reviewer_note": "",
+      "pay": null,
+      "mv": {
+        "text": "You said you would not move for a role here.",
+        "verdict": "not_willing"
+      }
     },
     {
       "role_id": "globex:g-0002",
@@ -1718,7 +1728,12 @@
         "D7": 1
       },
       "adjustments": [],
-      "reviewer_note": ""
+      "reviewer_note": "",
+      "pay": "$180K to $230K",
+      "mv": {
+        "text": "A move. You said you would move for this: to United States, from now, for [salary] a year or more. The posting's pay does not name its currency, so compare it yourself.",
+        "verdict": "willing"
+      }
     },
     {
       "role_id": "globex:g-0001",
@@ -1755,7 +1770,12 @@
       "adjustments": [
         "Hard requirement lacking (5+ years of product management): D1 capped at 1 and both bands down one step"
       ],
-      "reviewer_note": ""
+      "reviewer_note": "",
+      "pay": "$170K to $210K",
+      "mv": {
+        "text": "You said you would not move for a role here.",
+        "verdict": "not_willing"
+      }
     },
     {
       "role_id": "globex:g-0004",
@@ -1792,7 +1812,12 @@
       "adjustments": [
         "Hard requirement lacking (3+ years leading trust and safety operations): D1 capped at 1 and both bands down one step"
       ],
-      "reviewer_note": ""
+      "reviewer_note": "",
+      "pay": null,
+      "mv": {
+        "text": "You said you would not move for a role here.",
+        "verdict": "not_willing"
+      }
     },
     {
       "role_id": "acme:4100004",
@@ -1829,7 +1854,12 @@
       "adjustments": [
         "Hard requirement lacking (3+ years in trust and safety or policy operations): D1 capped at 1 and both bands down one step"
       ],
-      "reviewer_note": ""
+      "reviewer_note": "",
+      "pay": null,
+      "mv": {
+        "text": "You said you would not move for a role here.",
+        "verdict": "not_willing"
+      }
     },
     {
       "role_id": "initech:i-0003",
@@ -1866,7 +1896,12 @@
       "adjustments": [
         "Hard requirement lacking (5+ years in safety policy or standards): D1 capped at 1 and both bands down one step"
       ],
-      "reviewer_note": ""
+      "reviewer_note": "",
+      "pay": null,
+      "mv": {
+        "text": "A move. You said you would move for this: to United States, from now, for [salary] a year or more. The posting does not state pay, so ask early.",
+        "verdict": "willing"
+      }
     },
     {
       "role_id": "acme:4100006",
@@ -1904,7 +1939,12 @@
         "Eligibility blocker (Security clearance, US person or export control (ITAR)): D6 = 0",
         "Hard requirement lacking (US citizenship and a security clearance): D1 capped at 1 and both bands down one step"
       ],
-      "reviewer_note": ""
+      "reviewer_note": "",
+      "pay": null,
+      "mv": {
+        "text": "A move. You said you would move for this: to United States, from now, for [salary] a year or more. The posting does not state pay, so ask early.",
+        "verdict": "willing"
+      }
     },
     {
       "role_id": "initech:i-0004",
@@ -1941,7 +1981,8 @@
       "adjustments": [
         "Not yet judged: D1, D2 and D4 count as 0 until the scorer judges this role"
       ],
-      "reviewer_note": ""
+      "reviewer_note": "",
+      "pay": null
     }
   ],
   "swot": {

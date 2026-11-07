@@ -12,6 +12,9 @@ Privacy: sensitive mode is ON. Employer names, third-party names and salary are 
 ## Goal
 A program, applied AI or policy role at an AI product company. Fictional demo goal for Alex Example: one of three made-up AI companies, ideally in Australia.
 
+## Person
+Relocation: would move to United States, from now, for [salary] a year or more.
+
 ## Outlook
 - Which AI agent judged was not recorded. Another AI agent, or another run, can judge the same evidence differently, often by a few fit points; the maths after the judging is the same.
 - Chance of reaching the goal within 12 months if the campaign is followed: Low

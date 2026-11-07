@@ -90,3 +90,42 @@ console.log(JSON.stringify([match, matchList, detailRole("a"), $("#heatWrap").in
         self.assertNotIn("Fit waits", fit)
         self.assertIn('<th>Fit</th>', fit_list)
         self.assertIn('>40</div>', fit_list)
+
+    def test_posted_pay_and_moving_terms_render_in_detail_and_roles_list(self):
+        body = r'''
+const r = {id: "a", org: "a", g: "a", on: "Acme", title: "Role", family: "tpm", loc: ["US"],
+    judged: true, fit: 40, s: [], n: [], awaiting: [], adj: [], hardReq: [], pay: "USD 300,000",
+    mv: {text: "A move. Your terms.", verdict: "willing"}};
+const roleById = {a: r}, P = {a: {exp: {end: 55}, best: {end: 70}}};
+const D = {roles: [r], families: {}, dims: []}, DIMS = [], W = [];
+const esc = x => String(x).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const pill = x => x, interviewBand = () => "Low", fitM = r => r.fit;
+const roleFilter = {}, nodes = {}, $ = id => nodes[id] || (nodes[id] = {querySelectorAll: () => []});
+const scoresM = r => r.s, plural = n => n + " roles", orgColour = () => "blue", bindTips = () => {};
+'''
+        body += function(A.JS_DETAIL, "detailRole") + "\n" + function(A.JS_VIEWS, "fillHeat") + r'''
+const capture = () => {fillHeat(); return [detailRole("a"), $("#heatWrap").innerHTML];};
+const results = [capture()];
+r.mv.verdict = "not_willing"; results.push(capture());
+r.mv.verdict = "below_floor"; results.push(capture());
+r.mv.verdict = "unknown"; results.push(capture());
+r.pay = null; delete r.mv; results.push(capture());
+r.pay = "<img src=x onerror=bad()>"; r.mv = {text: "<script>bad()</script>", verdict: "unknown"};
+results.push(capture());
+console.log(JSON.stringify(results));
+'''
+        willing, no, below, unknown, home, escaped = self.run_js(body)
+        self.assertIn('<span>Pay</span><span>USD 300,000</span>', willing[0])
+        self.assertIn('<div class="small sub">A move. Your terms.</div>', willing[0])
+        self.assertLess(willing[0].index('<span>Pay</span>'), willing[0].index('A move. Your terms.'))
+        self.assertIn(' · a move', willing[1])
+        self.assertIn(' · you would not move', no[1])
+        for detail, _ in (no, below):
+            self.assertIn('<div class="small warnline">A move. Your terms.</div>', detail)
+        self.assertIn('<div class="small sub">', unknown[0])
+        self.assertIn('not stated in the posting', home[0])
+        self.assertNotIn('A move.', home[0])
+        self.assertNotIn(' · a move', home[1])
+        self.assertIn('&lt;img', escaped[0])
+        self.assertIn('&lt;script&gt;', escaped[0])
+        self.assertNotIn('<script>', escaped[0])

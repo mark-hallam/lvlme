@@ -60,6 +60,13 @@ def build(page, data, events):
                         "waits for your answer about who you know at %s.") % (
                             line["level"], line["band"], line["role"], line["org"],
                             int(headline["value"] + 0.5), line["org"])
+    if best.get("mv"):
+        out["stand"] += {
+            "willing": " You said you would move for this.",
+            "below_floor": " It is a move, and the posting's pay is below your floor.",
+            "not_willing": " It is a move you said you would not make.",
+            "unknown": " It is outside your home area; you have not said whether you would move.",
+        }[best["mv"]["verdict"]]
     rs, acts = L.journey_roles([r for r in page["roles"] if r.get("judged", True)]), page["actions"]
     lead, nl, qs, up = LH.compute(dict(page, roles=rs))
     first = next((q for q in up if not q["a"].get("susp")), up[0] if up else None)   # never lead with a stale posting

@@ -37,6 +37,108 @@
       "additionalProperties": false,
       "patternProperties": {"^x_": {"$ref": "#/definitions/extension"}},
       "properties": {
+        "relocation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "willing"
+          ],
+          "description": "The person’s own answer about moving for a role, shown without changing scores.",
+          "properties": {
+            "willing": {
+              "enum": [
+                "anywhere",
+                "some_places",
+                "no",
+                "unsure"
+              ],
+              "description": "Whether and where the person said they would move."
+            },
+            "classes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The location class ids the person would move to when they chose some places."
+            },
+            "from": {
+              "type": "string",
+              "pattern": "^(now|[0-9]{4}-(0[1-9]|1[0-2]))$",
+              "description": "When the person could move, as now or a year and month."
+            },
+            "minimum_pay": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "amount",
+                "currency"
+              ],
+              "description": "The lowest yearly pay the person would move for.",
+              "properties": {
+                "amount": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "The lowest yearly amount the person would accept for a move."
+                },
+                "currency": {
+                  "type": "string",
+                  "pattern": "^[A-Z]{3}$",
+                  "description": "The three letter currency code for that yearly amount."
+                }
+              }
+            },
+            "needs_sponsorship_paid": {
+              "type": "boolean",
+              "description": "True means the employer must pay for the visa."
+            },
+            "organisations_regardless": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The target organisation ids the person considers worth a move at any pay."
+            },
+            "evidence": {
+              "type": "string",
+              "description": "The preference evidence id that records the person’s answer."
+            },
+            "answered_on": {
+              "type": "string",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+              "description": "The date the person gave this answer."
+            }
+          },
+          "anyOf": [
+            {
+              "properties": {
+                "willing": {
+                  "const": "some_places"
+                }
+              },
+              "required": [
+                "classes"
+              ]
+            },
+            {
+              "properties": {
+                "willing": {
+                  "enum": [
+                    "anywhere",
+                    "no",
+                    "unsure"
+                  ]
+                },
+                "from": {},
+                "minimum_pay": {},
+                "needs_sponsorship_paid": {},
+                "organisations_regardless": {},
+                "evidence": {},
+                "answered_on": {}
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
         "display_name": {"type": "string"},
         "home_region": {"type": "string"},
         "timezone": {"type": "string", "description": "IANA time zone name, for example Australia/Sydney. Sets what 'today' means."},

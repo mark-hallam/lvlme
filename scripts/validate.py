@@ -38,6 +38,7 @@ import _doors as DR  # noqa: E402
 import _stories as STY  # noqa: E402
 import _practice as PR  # noqa: E402
 import _public as PB  # noqa: E402
+from build_dashboard import home_class  # noqa: E402
 
 FILES = [
     ("config.json", "config.schema.json", True),
@@ -188,6 +189,24 @@ def cross_checks(ws, docs, errors, warnings):
     targets = C.target_ids(cfg)
     fams = [f.get("id") for f in cfg.get("families", [])]
     classes = [c.get("id") for c in (cfg.get("locations") or {}).get("classes", [])]
+    names = {c["id"]: c["name"] for c in (cfg.get("locations") or {}).get("classes", [])}
+    home = home_class(cfg)
+    relocation = (cfg.get("candidate") or {}).get("relocation")
+    if isinstance(relocation, dict):
+        for key in relocation.get("classes") or []:
+            if key not in classes:
+                errors.append("config.json: relocation class '%s' is not a location class id" % key)
+        for key in relocation.get("organisations_regardless") or []:
+            if key not in targets:
+                errors.append("config.json: relocation organisation '%s' is not a target id" % key)
+        if relocation.get("evidence") and relocation["evidence"] not in ev_ids:
+            warnings.append("config.json: relocation evidence '%s' is not in profile/evidence.json" % relocation["evidence"])
+    elif relocation is None:
+        runs = [docs[k] for k in sorted(docs) if re.fullmatch(r"eval/runs/\d{4}-\d{2}-\d{2}\.json", k)]
+        count = sum(1 for r in (runs[-1].get("roles") or []) if (r.get("location_class") or "other") != home) if runs else 0
+        if count:
+            warnings.append("%d open roles are outside %s and the person has not been asked whether they would move: "
+                            "method/INTAKE.md section 2, question 4" % (count, names.get(home, home)))
 
     for label, ids in (("target", targets), ("family", fams), ("location class", classes),
                        ("evidence", [e.get("id") for e in ev.get("items", [])]),
@@ -252,6 +271,9 @@ def cross_checks(ws, docs, errors, warnings):
     rules = prof.get("D6_rules") or {}
     default_class = (cfg.get("locations") or {}).get("default_class") or "other"
     for key, entry in (rules.get("classes") or {}).items():
+        if isinstance(relocation, dict) and relocation.get("willing") == "no" and key != home and entry.get("score", 0) > 0:
+            warnings.append("the person said they would not move, but the D6 rule for %s scores %s" %
+                            (names.get(key, key), entry["score"]))
         if key not in classes and key != default_class:
             warnings.append("eval/profile-dimensions.json: D6 rule for '%s', not a location class in config.json" % key)
         cite("eval/profile-dimensions.json D6 rule %s" % key, entry.get("evidence"))

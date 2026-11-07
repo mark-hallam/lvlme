@@ -94,6 +94,9 @@ down; a cold application caps the offer band at Low. The full rules are in
 can fill a requirement checklist from the posting (three merged reads, then
 three evidence marks in `eval/checklists.json`); the dashboard shows that
 verdict beside today's fit without changing the fit score.
+The role screen shows the posting's pay and, outside your home area, whether
+you said you would move and on what terms, recorded once in `candidate.relocation`.
+This shows your own answer without changing the judged eligibility and location score.
 
 ## The honesty rules
 

@@ -12,6 +12,12 @@
   "by": "2027-03-31"
   },
   "candidate": {
+    "relocation": {
+      "willing": "some_places",
+      "classes": ["us"],
+      "from": "now",
+      "minimum_pay": {"amount": 180000, "currency": "USD"}
+    },
     "display_name": "Alex Example",
     "home_region": "Brisbane, Australia",
     "timezone": "Australia/Brisbane",
