@@ -445,7 +445,8 @@ POLICE_RX = re.compile(
     r"(?:must\s+hold|current|valid)\s+(?:a\s+)?national\s+police\s+check|"
     r"(?:must\s+hold|current|valid)\s+(?:a\s+)?police\s+check",
     re.I)
-_AU_LEVEL = r"(?:baseline|nv1|nv2|negative\s+vetting(?:\s+level\s*[12])?)"
+# The Australian levels: Baseline and Negative Vetting, written in full or as the short two letter code with its number.
+_AU_LEVEL = r"(?:baseline|nv\s?[12]|negative\s+vetting(?:\s+level\s*[12])?)"
 AU_CLEARANCE_RX = re.compile(
     r"\b" + _AU_LEVEL + r"\b(?:\s+level)?(?:\s+security)?\s+clearance|"
     r"Australian\s+Government\s+Security\s+Vetting|\bAGSVA\b|"

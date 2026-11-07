@@ -206,11 +206,12 @@ class EligibilityBlockerTests(unittest.TestCase):
             ("A valid Working With Children Check is required.", "working_with_children_check"),
             ("WWCC must be current.", "working_with_children_check"),
             ("Must hold a current national police check.", "police_check"),
-            ("Must hold NV1 clearance before starting.", "australian_security_clearance"),
+            ("Must hold NV2 clearance before starting.", "australian_security_clearance"),
             ("Ability to obtain a Baseline security clearance.", "australian_security_clearance"),
             ("Negative Vetting Level 2 clearance required.", "australian_security_clearance"),
             ("Negative Vetting Level 1 clearance required.", "australian_security_clearance"),
-            ("Ability to obtain NV1 before starting.", "australian_security_clearance"),
+            ("Ability to obtain NV2 before starting.", "australian_security_clearance"),
+            ("Must hold an NV 2 clearance.", "australian_security_clearance"),
             ("Baseline level security clearance required.", "australian_security_clearance"),
             ("Teacher registration is required.", "teacher_registration"),
             ("Registration with QCT is essential.", "teacher_registration"),
@@ -255,8 +256,8 @@ class EligibilityBlockerTests(unittest.TestCase):
         for kind in ("police_check", "working_with_children_check", "white_card", "licence"):
             self.assertNotIn(kind, DEFAULT_HARD_TYPES)
 
-    def test_nv1_is_australian_not_generic_clearance(self):
-        text = "Must hold NV1 clearance."
+    def test_short_level_code_is_australian_not_generic_clearance(self):
+        text = "Must hold NV2 clearance."
         types = [b["type"] for b in F.eligibility_blockers(text)]
         self.assertEqual(types, ["australian_security_clearance"])
 

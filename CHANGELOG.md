@@ -24,7 +24,7 @@ Tests: 742 pass.
 - **Role fetch:** eligibility blocker detection for Australian health
   practitioner registration (AHPRA), teacher registration (VIT, NESA), a Working
   With Children Check, a national police check, Australian security clearance
-  levels (Baseline, NV1, NV2, Negative Vetting), and a construction White Card.
+  levels (Baseline, Negative Vetting), and a construction White Card.
   Police check, WWCC and White Card blockers can be cleared in the plan like a
   licence; registration and clearance types stay hard by default.
 - **Intake:** each of those blocker types has its own question, asked only when

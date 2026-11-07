@@ -180,7 +180,7 @@ that is a fact as an evidence item with a source of type `interview` and a
    Ask only when an open role needs it: `summary.blocker_counts.security_clearance`
    is above 0.
 6. Do you hold, or could you obtain, an Australian Government security
-   clearance (Baseline, NV1, NV2, Negative Vetting, or another named
+   clearance (Baseline, Negative Vetting, or another named
    Australian level)? [D6]
    Why we ask: Australian clearance roles are closed without the named level,
    or without being able to obtain it when the posting says that is enough.

@@ -283,7 +283,7 @@ posting:
 |---|---|
 | `us_person_export_control` | ITAR (the United States International Traffic in Arms Regulations), "US person", export control, US citizenship or permanent residency (green card). |
 | `security_clearance` | An active or obtainable government security clearance (not the Australian levels below). |
-| `australian_security_clearance` | An Australian Government clearance (Baseline, NV1, NV2, Negative Vetting), AGSVA, or wording such as "ability to obtain" one of those levels. |
+| `australian_security_clearance` | An Australian Government clearance (Baseline or Negative Vetting, written in full or as its short code), AGSVA, or wording such as "ability to obtain" one of those levels. |
 | `citizenship` | "Must be a citizen of" a named country. |
 | `licence` | "Must hold" a named licence. |
 | `health_practitioner_registration` | AHPRA registration, or registration with the Australian Health Practitioner Regulation Agency. |
