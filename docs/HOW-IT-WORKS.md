@@ -8,6 +8,9 @@ such as Claude Code or Codex (Cursor and other agents that run commands should
 work but are not tested yet). The agent does the judging; the Python
 scripts only do the arithmetic, so without an agent every role scores zero.
 
+Job match leads until the person answers who they know at that organisation;
+then fit leads. Fit, bands, levels and the maths stay the same.
+
 ## The full campaign
 
 It answers one question honestly: how likely am I to land this kind of role at

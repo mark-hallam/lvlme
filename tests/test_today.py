@@ -258,3 +258,28 @@ class DarkThemeAndPrivacyTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HeadlineStandTests(unittest.TestCase):
+    def test_match_leads_before_the_answer_and_fit_leads_after(self):
+        for kind in ("match", "fit"):
+            with self.subTest(kind=kind):
+                def tweak(ws):
+                    path = os.path.join(ws, "eval", "runs", "2026-11-01.json")
+                    run = H.load(path)
+                    for r in run["roles"]:
+                        value = 82 if kind == "match" else r["fit"]
+                        r["headline"] = {"kind": kind, "value": value, "low": value, "high": value, "why": ""}
+                    H.save(path, run)
+                ws, page = build(self, tweak)
+                dash = H.load(os.path.join(ws, "report", "for-agents", "dashboard.json"))
+                stand = dash["today"]["stand"]
+                self.assertTrue(stand.startswith("You are at Level 3, Moderate."))
+                if kind == "match":
+                    self.assertIn("Your best job match is", stand)
+                    self.assertIn(": 82 out of 100. Fit, which adds who you know, how findable you are and a tailored CV, "
+                                  "waits for your answer about who you know at ", stand)
+                else:
+                    self.assertIn("Your best match is", stand)
+                    self.assertNotIn("waits for your answer", stand)
+                self.assertIn(stand, text_of(today_part(page)))

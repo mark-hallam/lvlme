@@ -10,6 +10,10 @@ before. Nothing here changes how a score is worked out unless it says so.
 
 ## Unreleased
 
+### Changed
+
+- Job match leads until the who-you-know question is answered for an organisation; then fit leads. Nothing in the maths changes.
+
 ### Added
 
 - **Checklist commands:** `python3 scripts/checklist.py` stores extraction

@@ -11,7 +11,8 @@
   today. A job match of 60 with the default weights is about what a typical
   shortlisted applicant shows (3 out of 5 on requirements and proof of work,
   1 on the organisation edge, full marks on location). Fit, bands, levels and
-  gaps are unchanged.
+  gaps are unchanged. Job match leads until the person answers who they know
+  at that organisation; then fit leads. Nothing in the maths changes.
 - **A warm path not asked is not a warm path of 0 known people.** A D3 entry
   for an organisation counts as asked unless it says `asked: false`. The
   `default` entry counts as asked only with `asked: true` (the person

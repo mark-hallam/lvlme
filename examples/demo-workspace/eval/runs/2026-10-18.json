@@ -114,6 +114,13 @@
       "match_low": 56.9,
       "match_high": 63.1,
       "warm_path_asked": true,
+      "headline": {
+        "kind": "fit",
+        "value": 46.0,
+        "low": 46.0,
+        "high": 50.0,
+        "why": ""
+      },
       "interview_band": "Low",
       "offer_band": "Very low",
       "adjustments": [],
@@ -204,6 +211,13 @@
       "match_low": 55.4,
       "match_high": 55.4,
       "warm_path_asked": true,
+      "headline": {
+        "kind": "fit",
+        "value": 45.0,
+        "low": 45.0,
+        "high": 45.0,
+        "why": ""
+      },
       "interview_band": "Low",
       "offer_band": "Very low",
       "adjustments": [],
@@ -294,6 +308,13 @@
       "match_low": 53.8,
       "match_high": 53.8,
       "warm_path_asked": true,
+      "headline": {
+        "kind": "fit",
+        "value": 44.0,
+        "low": 44.0,
+        "high": 44.0,
+        "why": ""
+      },
       "interview_band": "Low",
       "offer_band": "Very low",
       "adjustments": [],
@@ -384,6 +405,13 @@
       "match_low": 52.3,
       "match_high": 52.3,
       "warm_path_asked": true,
+      "headline": {
+        "kind": "fit",
+        "value": 39.0,
+        "low": 39.0,
+        "high": 39.0,
+        "why": ""
+      },
       "interview_band": "Very low",
       "offer_band": "Very low",
       "adjustments": [],
@@ -473,6 +501,13 @@
       "match_low": 38.5,
       "match_high": 38.5,
       "warm_path_asked": true,
+      "headline": {
+        "kind": "fit",
+        "value": 34.0,
+        "low": 34.0,
+        "high": 34.0,
+        "why": ""
+      },
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -564,6 +599,13 @@
       "match_low": 32.3,
       "match_high": 32.3,
       "warm_path_asked": true,
+      "headline": {
+        "kind": "fit",
+        "value": 30.0,
+        "low": 30.0,
+        "high": 30.0,
+        "why": ""
+      },
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -658,6 +700,13 @@
       "match_low": 30.8,
       "match_high": 30.8,
       "warm_path_asked": true,
+      "headline": {
+        "kind": "fit",
+        "value": 29.0,
+        "low": 29.0,
+        "high": 29.0,
+        "why": ""
+      },
       "interview_band": "Very low",
       "offer_band": "Very low",
       "adjustments": [
@@ -749,6 +798,13 @@
       "match_low": 23.1,
       "match_high": 23.1,
       "warm_path_asked": true,
+      "headline": {
+        "kind": "fit",
+        "value": 24.0,
+        "low": 24.0,
+        "high": 24.0,
+        "why": ""
+      },
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -840,6 +896,13 @@
       "match_low": 26.2,
       "match_high": 26.2,
       "warm_path_asked": true,
+      "headline": {
+        "kind": "fit",
+        "value": 22.0,
+        "low": 22.0,
+        "high": 22.0,
+        "why": ""
+      },
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -931,6 +994,13 @@
       "match_low": 13.8,
       "match_high": 13.8,
       "warm_path_asked": true,
+      "headline": {
+        "kind": "fit",
+        "value": 18.0,
+        "low": 18.0,
+        "high": 18.0,
+        "why": ""
+      },
       "interview_band": "Almost none",
       "offer_band": "Almost none",
       "adjustments": [
@@ -1014,6 +1084,13 @@
       "match_low": 15.4,
       "match_high": 15.4,
       "warm_path_asked": true,
+      "headline": {
+        "kind": "fit",
+        "value": 15.0,
+        "low": 15.0,
+        "high": 15.0,
+        "why": ""
+      },
       "interview_band": "Very low",
       "offer_band": "Almost none",
       "adjustments": [

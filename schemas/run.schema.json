@@ -156,6 +156,18 @@
         "match": {"type": "number", "minimum": 0, "maximum": 100, "description": "Job match: how well the person matches the job itself, from D1, D2, D4 and D6 only, with their weights, rescaled to 0 to 100. Fit adds the campaign factors (D3, D5, D7)."},
         "match_low": {"type": "number", "minimum": 0, "maximum": 100, "description": "Job match with every judged factor at its lower judging."},
         "match_high": {"type": "number", "minimum": 0, "maximum": 100, "description": "Job match with every judged factor at its higher judging."},
+        "headline": {
+          "type": "object",
+          "required": ["kind", "value", "low", "high", "why"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {"enum": ["match", "fit"]},
+            "value": {"type": "number", "minimum": 0, "maximum": 100},
+            "low": {"type": "number", "minimum": 0, "maximum": 100},
+            "high": {"type": "number", "minimum": 0, "maximum": 100},
+            "why": {"type": "string"}
+          }
+        },
         "warm_path_asked": {"type": "boolean", "description": "False when the person was never asked whether they know anyone at this organisation: D3 then counts 0 as unknown, not as nobody."},
         "interview_band": {"$ref": "#/definitions/band"},
         "offer_band": {"$ref": "#/definitions/band"},
