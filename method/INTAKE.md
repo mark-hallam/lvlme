@@ -109,7 +109,10 @@ evidence and set:
 - `unsupported`: no evidence either way.
 - `contradicted`: evidence says otherwise.
 
-Add the evidence ids and a `suggested_wording` that is true. Overclaims hurt
+Add the evidence ids and a `suggested_wording` that is true. The honest
+wording says less; it never adds a negative status line ("no users yet",
+"not completed", "retired"): leave the fact unsaid and never claim the
+opposite (`PROFILE_FIXES.md`, rule 8). Overclaims hurt
 credibility more than gaps, so every `overstated` or `contradicted` claim
 becomes a top-priority plan action.
 
