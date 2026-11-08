@@ -13,7 +13,8 @@ vitae) lines and website copy, each one tied to evidence.
 2. **Every line is tied to evidence.** Each draft names the evidence ids
    (`profile/evidence.json`) and the finding it fixes. No evidence, no line.
 3. **Never invent.** No new number, title, date, client or story. Fixing an
-   overclaim means saying less, not saying something else.
+   overclaim means saying less, not saying something else, and never a
+   confession (rule 8).
 4. **The modest truth wins.** Use the suggested single source of truth from
    the consistency audit. Where a title is in doubt, use the more modest one
    until a document shows otherwise.
@@ -27,6 +28,14 @@ vitae) lines and website copy, each one tied to evidence.
    answers for an organisation whose `ai_policy.first_draft_by_person` is
    true in `config.json` (for example Anthropic): give the person a brief and
    review their own draft instead, as `CAMPAIGN.md` describes.
+8. **No negative status lines.** A draft for a public place (CV, LinkedIn,
+   website, a post) never carries a line like "no users yet", "no paying
+   customers", "did not finish", "not completed", "retired" or "I never
+   switched it on". Readers and screening tools mark those down. Leave the
+   fact unsaid; never claim the opposite. A hedge on the person's own count
+   ("by my count") stays where a number appears. An interview answer or a
+   case study the person writes in their own words is theirs to decide.
+
 
 ## The draft file
 

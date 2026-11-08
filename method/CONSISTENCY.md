@@ -151,7 +151,8 @@ if possible, before anything is changed.
 
 - Fixes to the CV, LinkedIn and website are **drafts**. Turn them into
   ready-to-paste text with `PROFILE_FIXES.md`. The engine never edits an
-  account.
+  account. A fix removes an overclaim by saying less; it never adds a
+  negative status line ("not completed", "did not finish").
 - A signed form cannot be changed. Its "fixes" say what the person should
   be ready to explain, and every editable source should match the truth.
 - Fixes under `confirmed` are questions to ask the person.
